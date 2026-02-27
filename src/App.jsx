@@ -420,7 +420,28 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
 function ExamsGlobalView({ exams, setExams, setView }) {
   const [selectedExam, setSelectedExam] = useState(null);
   if (selectedExam) {
-    return <InPanelExam exam={selectedExam} onBack={() => setSelectedExam(null)} />;
+    return (
+      <div className="flex-1 flex flex-col bg-[#09090b]">
+        {/* Header with Back button */}
+        <div className="h-16 flex items-center justify-between px-6 bg-[#121214] border-b border-zinc-800 shrink-0">
+          <button 
+            onClick={() => setSelectedExam(null)}
+            className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-bold uppercase tracking-widest"
+          >
+            <ChevronLeft size={18} /> Back to List
+          </button>
+          <span className="text-sm text-zinc-400">
+            {selectedExam.title} • {selectedExam.questions.length} Questions
+          </span>
+        </div>
+
+        {/* Render the actual exam */}
+        <InPanelExam 
+          exam={selectedExam} 
+          onBack={() => setSelectedExam(null)} 
+        />
+      </div>
+    );
   }
   if (exams.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
@@ -445,7 +466,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <button onClick={() => setSelectedExam(e)} className="p-3 bg-emerald-600 text-white rounded-xl transition-all flex items-center gap-2"><Play size={18}/> Take</button>
+                <button onClick={() => setSelectedExam(e)} className="p-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-all flex items-center gap-2 shadow-md"><Play size={18} /> Take Exam</button>
                 <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-3 bg-zinc-950 text-zinc-600 hover:text-red-400 rounded-xl transition-all"><Trash2 size={18}/></button>
               </div>
             </div>
