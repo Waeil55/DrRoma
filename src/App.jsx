@@ -7,7 +7,7 @@ import {
   Send, ShieldAlert, LayoutDashboard,
   GraduationCap, Save, X, BookA, Crosshair,
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
-  FileUp, Target, Info, Trash
+  FileUp, Target, Info, Trash, Sparkles
 } from 'lucide-react';
 
 const DB_NAME = 'MariamProDB';
@@ -115,25 +115,33 @@ export default function App() {
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
   useEffect(() => {
-    const savedDocs = localStorage.getItem('drMariam_docs');
-    const savedCards = localStorage.getItem('drMariam_flashcards');
-    const savedExams = localStorage.getItem('drMariam_exams');
-    const savedNotes = localStorage.getItem('drMariam_notes');
-    const savedSettings = localStorage.getItem('drMariam_settings');
-    
-    if (savedDocs) setDocuments(JSON.parse(savedDocs));
-    if (savedCards) setFlashcards(JSON.parse(savedCards));
-    if (savedExams) setExams(JSON.parse(savedExams));
-    if (savedNotes) setNotes(JSON.parse(savedNotes));
-    if (savedSettings) setUserSettings(JSON.parse(savedSettings));
+    try {
+      const savedDocs = localStorage.getItem('drMariam_docs');
+      const savedCards = localStorage.getItem('drMariam_flashcards');
+      const savedExams = localStorage.getItem('drMariam_exams');
+      const savedNotes = localStorage.getItem('drMariam_notes');
+      const savedSettings = localStorage.getItem('drMariam_settings');
+      
+      if (savedDocs) setDocuments(JSON.parse(savedDocs) || []);
+      if (savedCards) setFlashcards(JSON.parse(savedCards) || []);
+      if (savedExams) setExams(JSON.parse(savedExams) || []);
+      if (savedNotes) setNotes(JSON.parse(savedNotes) || []);
+      if (savedSettings) setUserSettings(JSON.parse(savedSettings) || { apiKey: '', strictMode: true });
+    } catch (e) {
+      console.warn("Storage read error", e);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('drMariam_docs', JSON.stringify(documents));
-    localStorage.setItem('drMariam_flashcards', JSON.stringify(flashcards));
-    localStorage.setItem('drMariam_exams', JSON.stringify(exams));
-    localStorage.setItem('drMariam_notes', JSON.stringify(notes));
-    localStorage.setItem('drMariam_settings', JSON.stringify(userSettings));
+    try {
+      localStorage.setItem('drMariam_docs', JSON.stringify(documents));
+      localStorage.setItem('drMariam_flashcards', JSON.stringify(flashcards));
+      localStorage.setItem('drMariam_exams', JSON.stringify(exams));
+      localStorage.setItem('drMariam_notes', JSON.stringify(notes));
+      localStorage.setItem('drMariam_settings', JSON.stringify(userSettings));
+    } catch (e) {
+      console.warn("Storage write error - quota exceeded?", e);
+    }
   }, [documents, flashcards, exams, notes, userSettings]);
 
   const handleFileUpload = async (event) => {
@@ -209,16 +217,16 @@ export default function App() {
         </div>
         
         <div className="flex-1 flex flex-col gap-4 w-full px-2">
-          <SidebarBtn icon={Library} label="Library" active={!activeDocId} onClick={() => setActiveDocId(null)} />
-          {activeDocId && (
+          <SidebarBtn icon={Library} label="Library" active={!activeDoc} onClick={() => setActiveDocId(null)} />
+          {activeDoc && (
             <>
               <div className="w-8 h-px bg-zinc-800 mx-auto my-2" />
-              <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => {}} highlight />
+              <SidebarBtn icon={BookOpen} label="Reader" active={activeDoc !== undefined} onClick={() => {}} highlight />
             </>
           )}
         </div>
 
-        <SidebarBtn icon={Settings} label="Global Settings" active={rightPanelTab === 'settings' && !activeDocId} onClick={() => { setActiveDocId(null); setRightPanelTab('settings'); }} />
+        <SidebarBtn icon={Settings} label="Global Settings" active={rightPanelTab === 'settings' && !activeDoc} onClick={() => { setActiveDocId(null); setRightPanelTab('settings'); }} />
       </nav>
 
       <main className="flex-1 flex flex-col relative bg-zinc-900 min-w-0">
@@ -228,7 +236,7 @@ export default function App() {
           </div>
         )}
 
-        {!activeDocId ? (
+        {!activeDoc ? (
           <LibraryView 
             documents={documents} 
             onUpload={handleFileUpload} 
@@ -247,8 +255,14 @@ export default function App() {
         )}
       </main>
 
-      {rightPanelOpen && activeDocId && (
+      {rightPanelOpen && activeDoc && (
         <aside className="w-[400px] bg-zinc-950 border-l border-zinc-800 flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
+          
+          <div className="bg-indigo-600 px-4 py-2 flex items-center gap-2 shrink-0 border-b border-indigo-700">
+             <Target size={16} className="text-white"/>
+             <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {activeDoc.progress}</span>
+          </div>
+
           <div className="h-12 flex p-1 bg-zinc-900/50 border-b border-zinc-800 shrink-0">
             <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="Generate" icon={Crosshair} />
             <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Chat" icon={MessageSquare} />
@@ -270,13 +284,13 @@ export default function App() {
             ) : rightPanelTab === 'chat' ? (
               <PanelChat activeDoc={activeDoc} settings={userSettings} />
             ) : rightPanelTab === 'review' ? (
-              <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
+              <PanelReview activeDocId={activeDoc.id} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
             ) : null}
           </div>
         </aside>
       )}
 
-      {!activeDocId && rightPanelTab === 'settings' && (
+      {!activeDoc && rightPanelTab === 'settings' && (
          <aside className="w-[400px] bg-zinc-950 border-l border-zinc-800 flex flex-col shrink-0 z-20">
            <div className="h-12 flex items-center px-4 border-b border-zinc-800">
              <h2 className="text-sm font-bold text-white">System Settings</h2>
@@ -499,7 +513,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes 
     setGenerated(null);
     try {
       let text = "";
-      for (let i = startPage; i <= endPage; i++) if (activeDoc.pagesText[i]) text += activeDoc.pagesText[i] + "\n";
+      for (let i = Number(startPage); i <= Number(endPage); i++) if (activeDoc.pagesText[i]) text += activeDoc.pagesText[i] + "\n";
       if (!text.trim()) throw new Error("No readable text found on these pages.");
 
       setStatus({ loading: true, msg: 'AI generating via OpenAI...', err: false });
@@ -552,11 +566,11 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes 
         <div className="flex items-center justify-between mb-6">
           <div className="w-full mr-4">
             <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 block">Start Pg</label>
-            <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(parseInt(e.target.value)||1)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
+            <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
           </div>
           <div className="w-full">
             <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 block">End Pg</label>
-            <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(parseInt(e.target.value)||1)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
+            <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
           </div>
         </div>
         
