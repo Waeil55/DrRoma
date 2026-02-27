@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BookOpen, Layers, CheckSquare, Settings,
@@ -385,6 +384,10 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
   );
 }
 function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
+  const [studying, setStudying] = useState(false);
+  if (studying) {
+    return <InPanelFlashcards cards={flashcards} onBack={() => setStudying(false)} setFlashcards={setFlashcards} />;
+  }
   if (flashcards.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
       <Layers size={64} className="text-zinc-800 mb-6" />
@@ -396,7 +399,10 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><Layers className="text-indigo-500"/> Global Flashcard Database</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-4"><Layers className="text-indigo-500"/> Global Flashcard Database</h1>
+          <button onClick={() => setStudying(true)} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold flex items-center gap-2">Study All <Play size={18} /></button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {flashcards.map(c => (
             <div key={c.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl relative group shadow-sm hover:border-indigo-500/50 transition-all">
@@ -412,6 +418,10 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
   );
 }
 function ExamsGlobalView({ exams, setExams, setView }) {
+  const [selectedExam, setSelectedExam] = useState(null);
+  if (selectedExam) {
+    return <InPanelExam exam={selectedExam} onBack={() => setSelectedExam(null)} />;
+  }
   if (exams.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
       <GraduationCap size={64} className="text-zinc-800 mb-6" />
@@ -435,6 +445,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
                 </div>
               </div>
               <div className="flex items-center gap-4">
+                <button onClick={() => setSelectedExam(e)} className="p-3 bg-emerald-600 text-white rounded-xl transition-all flex items-center gap-2"><Play size={18}/> Take</button>
                 <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-3 bg-zinc-950 text-zinc-600 hover:text-red-400 rounded-xl transition-all"><Trash2 size={18}/></button>
               </div>
             </div>
@@ -476,6 +487,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -501,7 +513,12 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     const renderPage = async () => {
       try {
         const page = await pdf.getPage(currentPage);
-        const scale = 1.5;
+        const container = containerRef.current;
+        if (!container) return;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const tempViewport = page.getViewport({ scale: 1 });
+        let scale = Math.min((containerWidth / tempViewport.width) * 0.95, (containerHeight / tempViewport.height) * 0.95);
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         if (canvas) {
@@ -519,6 +536,18 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     };
     renderPage();
   }, [currentPage, pdf]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentPage(p => Math.max(1, p - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1));
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activeDoc.totalPages]);
 
   useEffect(() => {
     setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
@@ -549,14 +578,14 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </div>
       </div>
      
-      <div className="flex-1 overflow-auto bg-[#121214] flex justify-center items-start relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+      <div ref={containerRef} className="flex-1 overflow-hidden bg-[#121214] flex justify-center items-center relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
         {isLoading ? (
           <div className="flex flex-col items-center gap-6 text-zinc-500 m-auto">
             <Loader2 className="animate-spin text-indigo-500" size={40}/>
             <span className="text-xs font-black tracking-widest uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdf ? (
-          <canvas ref={canvasRef} className="shadow-[0_0_50px_rgba(0,0,0,1)] my-10" />
+          <canvas ref={canvasRef} className="shadow-[0_0_50px_rgba(0,0,0,1)]" />
         ) : (
           <div className="m-auto text-red-400 text-sm flex items-center gap-2 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
             <AlertCircle size={16}/> Failed to load PDF visual layer. AI text context is still intact.
