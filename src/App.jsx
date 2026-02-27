@@ -7,9 +7,11 @@ import {
   Send, ShieldAlert, LayoutDashboard,
   GraduationCap, Save, X, BookA, Crosshair,
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
-  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play
+  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play,
+  Database, Search, FileText, BarChart2, Globe, Bot, Code
 } from 'lucide-react';
-const DB_NAME = 'MariamProDB_v2';
+
+const DB_NAME = 'MariamProDB_v3'; // Updated version for new features
 const STORE_NAME = 'pdfs';
 const openDB = () => new Promise((resolve, reject) => {
   const request = indexedDB.open(DB_NAME, 1);
@@ -61,56 +63,93 @@ const loadPdfJs = async () => {
 };
 const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 1000) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
- 
+
   const sysPrompt = strictMode
     ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. Do not use outside knowledge. If the answer is not in the text, say 'Information not found in the selected pages.'"
     : "You are an elite medical AI tutor and diagnostic assistant.";
-  const res = await fetch(`https://api.openai.com/v1/chat/completions`, {
+
+  const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey.trim()}`
+      'Authorization': `Bearer ${apiKey.trim()}`,
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',  // Switched to faster model
+      model: 'gpt-3.5-turbo',  // Faster model
       messages: [
         { role: "system", content: sysPrompt + (expectJson ? " Respond in strictly valid JSON format." : "") },
         { role: "user", content: prompt }
       ],
       response_format: expectJson ? { type: "json_object" } : { type: "text" },
-      max_tokens: maxTokens,  // Limit tokens for speed
-      stream: true  // Enable streaming for perceived speed
-    })
+      max_tokens: maxTokens,
+      stream: true,
+    }),
   });
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(`${errData.error?.message || res.statusText || 'API Error'}`);
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(`${errData.error?.message || response.statusText || 'API Error'}`);
   }
-  // Handle streaming response for faster feel
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
   let fullContent = '';
-  const reader = res.body.getReader();
+  let buffer = '';
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    fullContent += new TextDecoder().decode(value);
+
+    buffer += decoder.decode(value, { stream: true });
+
+    const lines = buffer.split('\n');
+    buffer = lines.pop(); // Keep incomplete line for next chunk
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed === 'data: [DONE]') continue;
+
+      if (trimmed.startsWith('data: ')) {
+        const jsonStr = trimmed.slice(6); // Remove "data: "
+        try {
+          const chunk = JSON.parse(jsonStr);
+          const delta = chunk.choices?.[0]?.delta?.content;
+          if (delta) {
+            fullContent += delta;
+          }
+        } catch (e) {
+          console.warn('Failed to parse chunk:', trimmed, e);
+        }
+      }
+    }
   }
-  // Parse the streamed content (simplified; in real app, show partials)
-  return fullContent;  // Adjust for JSON if expectJson
+
+  // Final buffer check
+  if (buffer.trim().startsWith('data: ')) {
+    const jsonStr = buffer.trim().slice(6);
+    try {
+      const chunk = JSON.parse(jsonStr);
+      const delta = chunk.choices?.[0]?.delta?.content;
+      if (delta) fullContent += delta;
+    } catch {}
+  }
+
+  return fullContent.trim();
 };
+
 export default function App() {
   const [documents, setDocuments] = useState([]);
   const [activeDocId, setActiveDocId] = useState(null);
- 
   const [flashcards, setFlashcards] = useState([]);
   const [exams, setExams] = useState([]);
   const [notes, setNotes] = useState([]);
- 
   const [userSettings, setUserSettings] = useState({ apiKey: '', strictMode: true });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentView, setCurrentView] = useState('library');
   const [rightPanelTab, setRightPanelTab] = useState('generate');
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
+
   useEffect(() => {
     try {
       const savedDocs = localStorage.getItem('drMariam_docs');
@@ -118,7 +157,7 @@ export default function App() {
       const savedExams = localStorage.getItem('drMariam_exams');
       const savedNotes = localStorage.getItem('drMariam_notes');
       const savedSettings = localStorage.getItem('drMariam_settings');
-     
+
       if (savedDocs) setDocuments(JSON.parse(savedDocs) || []);
       if (savedCards) setFlashcards(JSON.parse(savedCards) || []);
       if (savedExams) setExams(JSON.parse(savedExams) || []);
@@ -128,6 +167,7 @@ export default function App() {
       console.warn("Storage read error", e);
     }
   }, []);
+
   useEffect(() => {
     try {
       localStorage.setItem('drMariam_docs', JSON.stringify(documents));
@@ -139,6 +179,7 @@ export default function App() {
       console.warn("Storage write error", e);
     }
   }, [documents, flashcards, exams, notes, userSettings]);
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file || file.type !== 'application/pdf') return;
@@ -172,7 +213,7 @@ export default function App() {
         addedAt: new Date().toISOString()
       };
       await savePdfData(id, arrayBuffer);
-     
+
       setDocuments(prev => [...prev, newDoc]);
       setActiveDocId(id);
       setCurrentView('reader');
@@ -186,6 +227,7 @@ export default function App() {
       event.target.value = '';
     }
   };
+
   const deleteDocument = async (id, e) => {
     e.stopPropagation();
     await deletePdfData(id);
@@ -197,13 +239,11 @@ export default function App() {
   };
   const activeDoc = documents.find(d => d.id === activeDocId);
   return (
-    <div className="flex h-screen bg-[#09090b] text-zinc-300 font-sans overflow-hidden">
-     
-      <nav className="w-20 bg-[#09090b] border-r border-zinc-800/50 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50 mb-10 cursor-pointer" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
-          <BrainCircuit className="text-white w-7 h-7" />
+    <div className="flex h-screen bg-gradient-to-br from-[#0a0a0c] to-[#1a1a20] text-zinc-200 font-sans overflow-hidden">
+      <nav className="w-20 bg-[#0a0a0c] border-r border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl shadow-black/50">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-xl shadow-indigo-900/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
+          <BrainCircuit className="text-white w-6 h-6" />
         </div>
-       
         <div className="flex-1 flex flex-col gap-6 w-full px-2">
           <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
           <SidebarBtn icon={Layers} label="Flashcards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
@@ -216,9 +256,9 @@ export default function App() {
             </>
           )}
         </div>
-        <SidebarBtn icon={Settings} label="API Key" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
+        <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
       </nav>
-      <main className="flex-1 flex flex-col relative bg-[#09090b] min-w-0">
+      <main className="flex-1 flex flex-col relative bg-[#0a0a0c] min-w-0">
         {isUploading && (
           <div className="absolute top-0 left-0 w-full h-1.5 bg-zinc-800 z-50">
             <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,1)]" style={{ width: `${uploadProgress}%` }}></div>
@@ -246,18 +286,17 @@ export default function App() {
         )}
       </main>
       {rightPanelOpen && activeDocId && (
-        <aside className="w-[550px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
-          <div className="bg-indigo-600 px-4 py-2 flex items-center gap-2 shrink-0 border-b border-indigo-700">
-             <Target size={16} className="text-white"/>
-             <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {activeDoc.progress}</span>
+        <aside className="w-[550px] bg-[#0a0a0c] border-l border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 flex items-center gap-2 shrink-0 border-b border-indigo-700/50 shadow-md">
+            <Target size={16} className="text-white"/>
+            <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {activeDoc.progress}</span>
           </div>
-          <div className="h-16 flex p-2 bg-[#09090b] border-b border-zinc-800/80 shrink-0 gap-1 items-center">
+          <div className="h-16 flex p-2 bg-[#0a0a0c] border-b border-zinc-800/30 shrink-0 gap-1 items-center">
             <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Tools" icon={Sparkles} />
             <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Chat" icon={MessageSquare} />
             <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
             <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
           </div>
-         
           <div className="flex-1 overflow-hidden relative">
             {rightPanelTab === 'settings' ? (
               <PanelSettings settings={userSettings} setSettings={setUserSettings} />
@@ -316,7 +355,7 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
 // --- GLOBAL VIEWS ---
 function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes, setView }) {
   return (
-    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#0a0a0c]">
       <div className="max-w-7xl mx-auto w-full">
        
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
@@ -399,7 +438,7 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
     return <InPanelFlashcards cards={flashcards} onBack={() => setStudying(false)} setFlashcards={setFlashcards} />;
   }
   if (flashcards.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#0a0a0c] text-center">
       <Layers size={64} className="text-zinc-800 mb-6" />
       <h2 className="text-2xl font-bold text-white mb-2">No Flashcards</h2>
       <p className="text-zinc-500 max-w-md">Open a document and use the AI Generator to extract targeted flashcards.</p>
@@ -407,7 +446,7 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
     </div>
   );
   return (
-    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#0a0a0c]">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-4"><Layers className="text-indigo-500"/> Global Flashcard Database</h1>
@@ -431,8 +470,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
   const [selectedExam, setSelectedExam] = useState(null);
   if (selectedExam) {
     return (
-      <div className="flex-1 flex flex-col bg-[#09090b]">
-        {/* Header with Back button */}
+      <div className="flex-1 flex flex-col bg-[#0a0a0c]">
         <div className="h-16 flex items-center justify-between px-6 bg-[#121214] border-b border-zinc-800 shrink-0">
           <button 
             onClick={() => setSelectedExam(null)}
@@ -444,8 +482,6 @@ function ExamsGlobalView({ exams, setExams, setView }) {
             {selectedExam.title} • {selectedExam.questions.length} Questions
           </span>
         </div>
-
-        {/* Render the actual exam */}
         <InPanelExam 
           exam={selectedExam} 
           onBack={() => setSelectedExam(null)} 
@@ -454,7 +490,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
     );
   }
   if (exams.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#0a0a0c] text-center">
       <GraduationCap size={64} className="text-zinc-800 mb-6" />
       <h2 className="text-2xl font-bold text-white mb-2">No Exams Generated</h2>
       <p className="text-zinc-500 max-w-md">Open a document and use the AI to generate a strict test on specific pages.</p>
@@ -462,7 +498,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
     </div>
   );
   return (
-    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#0a0a0c]">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><GraduationCap className="text-emerald-500"/> Global Exam Database</h1>
         <div className="space-y-6">
@@ -488,7 +524,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
 }
 function NotesGlobalView({ notes, setNotes, setView }) {
   if (notes.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#0a0a0c] text-center">
       <BookA size={64} className="text-zinc-800 mb-6" />
       <h2 className="text-2xl font-bold text-white mb-2">No Notes Found</h2>
       <p className="text-zinc-500 max-w-md">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
@@ -496,7 +532,7 @@ function NotesGlobalView({ notes, setNotes, setView }) {
     </div>
   );
   return (
-    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#0a0a0c]">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><BookA className="text-blue-500"/> Global Notes Database</h1>
         <div className="space-y-6">
@@ -586,7 +622,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#050505] relative">
-      <div className="h-16 flex items-center justify-between px-6 bg-[#09090b] border-b border-zinc-800/80 shrink-0 shadow-sm z-10">
+      <div className="h-16 flex items-center justify-between px-6 bg-[#0a0a0c] border-b border-zinc-800/30 shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-4 overflow-hidden">
           <button onClick={closeDoc} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-xs font-black uppercase tracking-widest bg-zinc-900 px-4 py-2 rounded-xl">
             <ChevronLeft size={16} /> Exit
@@ -595,7 +631,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           <span className="text-sm font-bold text-zinc-200 truncate max-w-[200px] md:max-w-md" title={activeDoc.name}>{activeDoc.name}</span>
         </div>
         <div className="flex items-center gap-4">
-         
           <div className="flex items-center bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden shadow-inner h-11">
             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-5 h-full text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
             <div className="px-4 h-full flex items-center justify-center border-x border-zinc-800 bg-zinc-950">
@@ -628,7 +663,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 }
 function PanelSettings({ settings, setSettings }) {
   return (
-    <div className="p-8 h-full overflow-y-auto custom-scrollbar flex flex-col gap-8 bg-[#09090b]">
+    <div className="p-8 h-full overflow-y-auto custom-scrollbar flex flex-col gap-8 bg-[#0a0a0c]">
       <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/10 border border-indigo-500/30 p-6 rounded-2xl shadow-lg">
         <h3 className="text-base font-black text-indigo-400 flex items-center gap-2 mb-3"><KeyRound size={20}/> OpenAI API Key</h3>
         <p className="text-sm text-indigo-200/70 leading-relaxed mb-6">Enter your OpenAI key (sk-...) to power the AI extraction engine. Keys are saved securely in your browser's local storage and never sent to our servers.</p>
@@ -689,22 +724,54 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       const results = await Promise.all(chunks.map(async (chunk, index) => {
         if (type === 'flashcards') {
           const p = `Create exactly ${Math.ceil(count / chunks.length)} highly accurate study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }\nTEXT:\n${chunk}`;
-          const raw = await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens);
-          return JSON.parse(raw).items;
+          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
         } else if (type === 'exam') {
           const p = `Create extremely difficult, advanced-level ${Math.ceil(count / chunks.length)}-question medical/academic exam from this text ONLY. Respond in JSON format: { "title": "Exam Title Part ${index + 1}", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation using text" } ] }\nTEXT:\n${chunk}`;
-          const raw = await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens);
-          const parsed = JSON.parse(raw);
-          return parsed.items;
-        } // ... similar for other types, but shortened for brevity
+          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
+        } else if (type === 'summary') {
+          const p = `Write a comprehensive, structured summary of this text ONLY. Use markdown headings and bullet points.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'clinical') {
+          const p = `Based ONLY on the medical concepts in this text, create a realistic Clinical Case Study scenario. Include patient presentation, symptoms, and ask a question at the end, followed by the answer. Respond in Markdown.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'eli5') {
+          const p = `Explain the core concepts of this text extremely simply, as if explaining to a beginner or a 5-year-old. Use analogies. Respond in Markdown.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'mnemonics') {
+          const p = `Create extremely memorable, clever mnemonics for the key lists, drugs, or concepts in this text. Respond in Markdown.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'quiz') {
+          const p = `Create ${count} interactive quiz questions from this text ONLY, with multiple choices and explanations. JSON: { "items": [ { "q": "", "options": [], "correct": 0, "explanation": "" } ] }\nTEXT:\n${chunk}`;
+          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
+        } else if (type === 'mindmap') {
+          const p = `Generate a mindmap structure in JSON from this text ONLY: { "nodes": [ { "id": "", "label": "", "parent": "" } ] }\nTEXT:\n${chunk}`;
+          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens));
+        } else if (type === 'translation') {
+          const p = `Translate this text to English, keeping medical terms intact. Respond in Markdown.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'diagram') {
+          const p = `Describe a diagram or flowchart for key concepts in this text in ASCII art or Markdown. \nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'research') {
+          const p = `Summarize research implications from this text ONLY. Use bullet points.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'comparison') {
+          const p = `Compare and contrast key concepts in this text ONLY. Respond in table Markdown.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        } else if (type === 'simulation') {
+          const p = `Create a step-by-step simulation scenario based on this text ONLY. Respond in numbered list.\nTEXT:\n${chunk}`;
+          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
+        }
         return [];
       }));
-      // Combine results
-      if (type === 'flashcards') {
+      // Combine results from chunks
+      if (type === 'flashcards' || type === 'quiz' || type === 'exam') {
         setGenerated({ type, data: results.flat(), pages: `${startPage}-${endPage}` });
-      } else if (type === 'exam') {
-        setGenerated({ type, title: "Combined Exam", data: results.flat(), pages: `${startPage}-${endPage}` });
-      } // Handle other types similarly
+      } else if (type === 'mindmap') {
+        setGenerated({ type, data: results.flat(), pages: `${startPage}-${endPage}` });
+      } else {
+        setGenerated({ type, data: results.join('\n'), pages: `${startPage}-${endPage}` });
+      }
       setStatus({ loading: false, msg: 'Generation Complete.', err: false });
     } catch (e) {
       setStatus({ loading: false, msg: e.message || "Failed.", err: true });
@@ -732,10 +799,10 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
     }
   };
   return (
-    <div className="h-full flex flex-col bg-[#09090b] p-6">
+    <div className="h-full flex flex-col bg-[#0a0a0c] p-6">
      
       {!generated ? (
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl flex-shrink-0 shadow-2xl">
+        <div className="bg-zinc-900/80 border border-zinc-800/50 p-6 rounded-3xl flex-shrink-0 shadow-2xl shadow-black/30">
           <div className="flex items-center justify-between mb-8">
             <div className="w-full mr-4 relative">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Start Pg</label>
@@ -749,15 +816,22 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
           </div>
          
           <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">Extraction Tool</label>
-          <div className="grid grid-cols-2 gap-3 mb-8">
+          <div className="grid grid-cols-3 gap-3 mb-8">
             <ToolBtn id="flashcards" active={type} set={setType} icon={Layers} label="Cards" />
             <ToolBtn id="exam" active={type} set={setType} icon={CheckSquare} label="Exam" />
             <ToolBtn id="summary" active={type} set={setType} icon={BookA} label="Summary" />
             <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="Simplify" />
             <ToolBtn id="clinical" active={type} set={setType} icon={Stethoscope} label="Clinical Case" />
             <ToolBtn id="mnemonics" active={type} set={setType} icon={Lightbulb} label="Mnemonics" />
+            <ToolBtn id="quiz" active={type} set={setType} icon={GraduationCap} label="Quiz" />
+            <ToolBtn id="mindmap" active={type} set={setType} icon={BarChart2} label="Mindmap" />
+            <ToolBtn id="translation" active={type} set={setType} icon={Globe} label="Translate" />
+            <ToolBtn id="diagram" active={type} set={setType} icon={Code} label="Diagram" />
+            <ToolBtn id="research" active={type} set={setType} icon={Search} label="Research" />
+            <ToolBtn id="comparison" active={type} set={setType} icon={Database} label="Compare" />
+            <ToolBtn id="simulation" active={type} set={setType} icon={Bot} label="Simulation" />
           </div>
-          {(type === 'flashcards' || type === 'exam') && (
+          {(type === 'flashcards' || type === 'exam' || type === 'quiz') && (
             <div className="mb-8 bg-zinc-950 p-4 rounded-xl border border-zinc-800">
               <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3 flex justify-between"><span>Quantity</span> <span className="text-indigo-400 text-sm">{count} Items</span></label>
               <input type="range" min="1" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-indigo-500 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
@@ -851,8 +925,8 @@ function PanelChat({ activeDoc, settings }) {
     }
   };
   return (
-    <div className="h-full flex flex-col bg-[#09090b]">
-      <div className="bg-indigo-600 px-5 py-3 flex items-center gap-3 shadow-md shrink-0">
+    <div className="h-full flex flex-col bg-[#0a0a0c]">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-3 flex items-center gap-3 shadow-md shrink-0">
          <Target size={16} className="text-white" />
          <span className="text-[10px] font-black text-white uppercase tracking-widest">Locked: Page {activeDoc.progress}</span>
       </div>
@@ -894,7 +968,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   if (activeItem?.type === 'note') return <InPanelNote note={activeItem.data} onBack={() => setActiveItem(null)} />;
   if (activeItem?.type === 'flashcards') return <InPanelFlashcards cards={docCards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-[#09090b] space-y-12">
+    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-[#0a0a0c] space-y-12">
      
       <div>
         <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
@@ -975,7 +1049,6 @@ function InPanelExam({ exam, onBack }) {
     if (currentQIndex < exam.questions.length - 1) {
       setCurrentQIndex(currentQIndex + 1);
     } else {
-      // Exam finished, perhaps show final score
       alert(`Exam finished! Your score: ${score} / ${exam.questions.length}`);
     }
   };
@@ -990,7 +1063,7 @@ function InPanelExam({ exam, onBack }) {
 
   const q = exam.questions[currentQIndex];
   return (
-    <div className="flex flex-col h-full bg-[#09090b]">
+    <div className="flex flex-col h-full bg-[#0a0a0c]">
       <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-emerald-400 hover:text-emerald-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
         <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Pages {exam.sourcePages}</span>
@@ -1035,24 +1108,21 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
   if (cards.length === 0) return <div className="p-6 text-center text-zinc-500">No cards left.</div>;
   const currentCard = cards[currentIndex];
   const handleRate = (quality) => {
-    // Basic progression logic
     const nextList = [...cards];
     if (quality === 0) {
-      // put at end of list to see again soon
       nextList.push(nextList.splice(currentIndex, 1)[0]);
       setFlashcards(prev => {
          const others = prev.filter(p => p.docId !== currentCard.docId);
          return [...others, ...nextList];
       });
     } else {
-      // next card
       if (currentIndex < cards.length - 1) setCurrentIndex(currentIndex + 1);
       else setCurrentIndex(0); // loop
     }
     setIsFlipped(false);
   };
   return (
-    <div className="flex flex-col h-full bg-[#09090b]">
+    <div className="flex flex-col h-full bg-[#0a0a0c]">
       <div className="bg-indigo-600/10 border-b border-indigo-500/20 p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-indigo-400 hover:text-indigo-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
         <span className="text-[10px] text-indigo-500 font-black uppercase tracking-widest">Card {currentIndex+1} / {cards.length}</span>
@@ -1085,7 +1155,7 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
 }
 function InPanelNote({ note, onBack }) {
   return (
-    <div className="flex flex-col h-full bg-[#09090b]">
+    <div className="flex flex-col h-full bg-[#0a0a0c]">
       <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
       </div>
