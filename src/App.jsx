@@ -7,7 +7,7 @@ import {
   Send, ShieldAlert, LayoutDashboard,
   GraduationCap, Save, X, BookA, Crosshair,
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
-  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby
+  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play
 } from 'lucide-react';
 
 const DB_NAME = 'MariamProDB_v2';
@@ -111,6 +111,7 @@ export default function App() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  const [currentView, setCurrentView] = useState('library');
   const [rightPanelTab, setRightPanelTab] = useState('generate');
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
@@ -185,6 +186,7 @@ export default function App() {
       
       setDocuments(prev => [...prev, newDoc]);
       setActiveDocId(id);
+      setCurrentView('reader');
       setRightPanelTab('generate');
       setRightPanelOpen(true);
     } catch (error) {
@@ -212,21 +214,24 @@ export default function App() {
     <div className="flex h-screen bg-[#09090b] text-zinc-300 font-sans overflow-hidden">
       
       <nav className="w-20 bg-[#09090b] border-r border-zinc-800/50 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50 mb-10 cursor-pointer" onClick={() => setActiveDocId(null)}>
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50 mb-10 cursor-pointer" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
           <BrainCircuit className="text-white w-7 h-7" />
         </div>
         
         <div className="flex-1 flex flex-col gap-6 w-full px-2">
-          <SidebarBtn icon={Library} label="Library" active={!activeDoc} onClick={() => setActiveDocId(null)} />
-          {activeDoc && (
+          <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
+          <SidebarBtn icon={Layers} label="Flashcards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
+          <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
+          <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
+          {activeDocId && (
             <>
               <div className="w-8 h-px bg-zinc-800 mx-auto my-1" />
-              <SidebarBtn icon={BookOpen} label="Reader" active={activeDoc !== undefined} onClick={() => {}} highlight />
+              <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
             </>
           )}
         </div>
 
-        <SidebarBtn icon={Settings} label="API & Settings" active={rightPanelTab === 'settings' && !activeDoc} onClick={() => { setActiveDocId(null); setRightPanelTab('settings'); }} />
+        <SidebarBtn icon={Settings} label="API Key" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
       </nav>
 
       <main className="flex-1 flex flex-col relative bg-[#09090b] min-w-0">
@@ -236,30 +241,36 @@ export default function App() {
           </div>
         )}
 
-        {!activeDoc ? (
-          <LibraryView 
-            documents={documents} 
-            onUpload={handleFileUpload} 
-            onOpen={setActiveDocId} 
-            isUploading={isUploading} 
-            deleteDocument={deleteDocument}
-            flashcards={flashcards}
-            exams={exams}
-            notes={notes}
-          />
-        ) : (
-          <PdfWorkspace 
-            activeDoc={activeDoc} 
-            setDocuments={setDocuments}
-            closeDoc={() => setActiveDocId(null)}
-            rightPanelOpen={rightPanelOpen}
-            setRightPanelOpen={setRightPanelOpen}
-          />
+        {!activeDocId && currentView === 'library' && (
+          <LibraryView documents={documents} onUpload={handleFileUpload} onOpen={setActiveDocId} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} />
+        )}
+        {!activeDocId && currentView === 'flashcards' && (
+          <FlashcardsGlobalView flashcards={flashcards} setFlashcards={setFlashcards} setView={setCurrentView} />
+        )}
+        {!activeDocId && currentView === 'exams' && (
+          <ExamsGlobalView exams={exams} setExams={setExams} setView={setCurrentView} />
+        )}
+        {!activeDocId && currentView === 'notes' && (
+          <NotesGlobalView notes={notes} setNotes={setNotes} setView={setCurrentView} />
+        )}
+        {!activeDocId && currentView === 'settings' && (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="w-full max-w-lg"><PanelSettings settings={userSettings} setSettings={setUserSettings} /></div>
+          </div>
+        )}
+
+        {activeDocId && (
+          <PdfWorkspace activeDoc={activeDoc} setDocuments={setDocuments} closeDoc={() => setActiveDocId(null)} rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen} />
         )}
       </main>
 
-      {rightPanelOpen && activeDoc && (
-        <aside className="w-[450px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative">
+      {rightPanelOpen && activeDocId && (
+        <aside className="w-[450px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
+          <div className="bg-indigo-600 px-4 py-2 flex items-center gap-2 shrink-0 border-b border-indigo-700">
+             <Target size={16} className="text-white"/>
+             <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {activeDoc.progress}</span>
+          </div>
+
           <div className="h-16 flex p-2 bg-[#09090b] border-b border-zinc-800/80 shrink-0 gap-1 items-center">
             <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Tools" icon={Sparkles} />
             <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Chat" icon={MessageSquare} />
@@ -289,17 +300,6 @@ export default function App() {
           </div>
         </aside>
       )}
-
-      {!activeDoc && rightPanelTab === 'settings' && (
-         <aside className="w-[450px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)]">
-           <div className="h-16 flex items-center px-6 border-b border-zinc-800/80">
-             <h2 className="text-lg font-bold text-white flex items-center gap-2"><Settings size={20} className="text-indigo-500"/> System Settings</h2>
-             <button onClick={() => setRightPanelTab('generate')} className="ml-auto p-2 bg-zinc-900 text-zinc-500 hover:text-white rounded-lg transition-colors"><X size={18}/></button>
-           </div>
-           <PanelSettings settings={userSettings} setSettings={setUserSettings} />
-         </aside>
-      )}
-
     </div>
   );
 }
@@ -336,7 +336,9 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
   );
 }
 
-function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes }) {
+// --- GLOBAL VIEWS ---
+
+function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes, setView }) {
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
       <div className="max-w-7xl mx-auto w-full">
@@ -356,15 +358,15 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+           <div onClick={() => setView('notes')} className="cursor-pointer hover:bg-zinc-800/80 transition-all bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
               <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={28}/></div>
               <div><p className="text-3xl font-black text-white">{notes.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Generated Notes</p></div>
            </div>
-           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+           <div onClick={() => setView('flashcards')} className="cursor-pointer hover:bg-zinc-800/80 transition-all bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
               <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={28}/></div>
               <div><p className="text-3xl font-black text-white">{flashcards.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Active Flashcards</p></div>
            </div>
-           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+           <div onClick={() => setView('exams')} className="cursor-pointer hover:bg-zinc-800/80 transition-all bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
               <div className="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={28}/></div>
               <div><p className="text-3xl font-black text-white">{exams.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Strict Exams</p></div>
            </div>
@@ -416,6 +418,100 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
     </div>
   );
 }
+
+function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
+  if (flashcards.length === 0) return (
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+      <Layers size={64} className="text-zinc-800 mb-6" />
+      <h2 className="text-2xl font-bold text-white mb-2">No Flashcards</h2>
+      <p className="text-zinc-500 max-w-md">Open a document and use the AI Generator to extract targeted flashcards.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold">Go to Library</button>
+    </div>
+  );
+
+  return (
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><Layers className="text-indigo-500"/> Global Flashcard Database</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {flashcards.map(c => (
+            <div key={c.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl relative group shadow-sm hover:border-indigo-500/50 transition-all">
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2 block">Pgs {c.sourcePages}</span>
+              <p className="text-sm text-white font-bold mb-3 leading-relaxed"><span className="text-zinc-600 mr-2 text-xs uppercase tracking-widest">Q</span>{c.q}</p>
+              <p className="text-sm text-indigo-300 leading-relaxed bg-indigo-950/30 p-3 rounded-xl border border-indigo-500/10"><span className="text-indigo-900 mr-2 text-xs uppercase tracking-widest">A</span>{c.a}</p>
+              <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-6 right-6 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExamsGlobalView({ exams, setExams, setView }) {
+  if (exams.length === 0) return (
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+      <GraduationCap size={64} className="text-zinc-800 mb-6" />
+      <h2 className="text-2xl font-bold text-white mb-2">No Exams Generated</h2>
+      <p className="text-zinc-500 max-w-md">Open a document and use the AI to generate a strict test on specific pages.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold">Go to Library</button>
+    </div>
+  );
+
+  return (
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><GraduationCap className="text-emerald-500"/> Global Exam Database</h1>
+        <div className="space-y-6">
+          {exams.map(e => (
+            <div key={e.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl flex justify-between items-center group hover:border-emerald-500/50 transition-all">
+              <div>
+                <p className="text-lg text-white font-black mb-2">{e.title}</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">{e.questions.length} Questions</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Source: Pages {e.sourcePages}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-3 bg-zinc-950 text-zinc-600 hover:text-red-400 rounded-xl transition-all"><Trash2 size={18}/></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NotesGlobalView({ notes, setNotes, setView }) {
+  if (notes.length === 0) return (
+    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-[#09090b] text-center">
+      <BookA size={64} className="text-zinc-800 mb-6" />
+      <h2 className="text-2xl font-bold text-white mb-2">No Notes Found</h2>
+      <p className="text-zinc-500 max-w-md">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold">Go to Library</button>
+    </div>
+  );
+
+  return (
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-black text-white tracking-tighter mb-8 flex items-center gap-4"><BookA className="text-blue-500"/> Global Notes Database</h1>
+        <div className="space-y-6">
+          {notes.map(n => (
+            <div key={n.id} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative group hover:border-blue-500/50 transition-all shadow-md">
+              <h3 className="text-xl text-white font-black mb-4 pr-12">{n.title}</h3>
+              <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none">{n.content}</div>
+              <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-8 right-8 p-3 bg-zinc-950 text-zinc-600 hover:text-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash2 size={18}/></button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- WORKSPACE & SIDE-BY-SIDE TOOLS ---
 
 function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen }) {
   const [currentPage, setCurrentPage] = useState(activeDoc.progress || 1);
@@ -484,7 +580,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           </div>
         ) : pdfUrl ? (
           <iframe 
-            key={iframeKey} // Forces iframe reload to guarantee page jump if native navigation fails
+            key={iframeKey} 
             src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0`} 
             className="w-full h-full border-none shadow-[0_0_50px_rgba(0,0,0,1)] max-w-6xl" 
             title="PDF Document" 
@@ -777,15 +873,19 @@ function PanelChat({ activeDoc, settings }) {
 }
 
 function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, notes, setNotes }) {
+  const [activeItem, setActiveItem] = useState(null); // { type: 'exam'|'note'|'flashcards', data: any }
+  
   const docCards = flashcards.filter(f => f.docId === activeDocId);
   const docExams = exams.filter(e => e.docId === activeDocId);
   const docNotes = notes.filter(n => n.docId === activeDocId);
 
-  // Render previews here so user sees them right away
+  if (activeItem?.type === 'exam') return <InPanelExam exam={activeItem.data} onBack={() => setActiveItem(null)} />;
+  if (activeItem?.type === 'note') return <InPanelNote note={activeItem.data} onBack={() => setActiveItem(null)} />;
+  if (activeItem?.type === 'flashcards') return <InPanelFlashcards cards={docCards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
+
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-[#09090b] space-y-12">
       
-      {/* Exams Section First (Highest value) */}
       <div>
         <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No exams created for this document yet.</p> : (
@@ -799,9 +899,9 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
                   </div>
                   <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
                 </div>
-                <div className="text-xs text-zinc-400 line-clamp-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-                  <span className="text-emerald-500 font-bold mr-2">Q1:</span> {e.questions[0]?.q}
-                </div>
+                <button onClick={() => setActiveItem({ type: 'exam', data: e })} className="w-full py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 rounded-xl text-xs font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                  <Play size={14} fill="currentColor" /> Take Exam Side-by-Side
+                </button>
               </div>
             ))}
           </div>
@@ -809,7 +909,10 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
       </div>
 
       <div>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-5 flex items-center gap-2 bg-indigo-500/10 w-fit px-3 py-1.5 rounded-lg border border-indigo-500/20"><Layers size={16}/> Saved Flashcards ({docCards.length})</h3>
+        <div className="flex justify-between items-center mb-5">
+           <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-2 bg-indigo-500/10 w-fit px-3 py-1.5 rounded-lg border border-indigo-500/20"><Layers size={16}/> Saved Flashcards ({docCards.length})</h3>
+           {docCards.length > 0 && <button onClick={() => setActiveItem({ type: 'flashcards' })} className="text-[10px] bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-bold uppercase tracking-widest flex items-center gap-1 shadow-md hover:bg-indigo-500 transition-colors"><Play size={12} fill="currentColor"/> Study</button>}
+        </div>
         {docCards.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No flashcards extracted for this document.</p> : (
           <div className="space-y-4">
             {docCards.slice(0, 5).map(c => (
@@ -818,7 +921,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
                 <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
               </div>
             ))}
-            {docCards.length > 5 && <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-center pt-4 bg-zinc-900/30 rounded-xl py-3 border border-dashed border-zinc-800">+{docCards.length - 5} more in Library Tab</div>}
+            {docCards.length > 5 && <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-center pt-4 bg-zinc-900/30 rounded-xl py-3 border border-dashed border-zinc-800">+{docCards.length - 5} more inside Study Mode</div>}
           </div>
         )}
       </div>
@@ -828,16 +931,186 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
         {docNotes.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No notes or summaries generated.</p> : (
           <div className="space-y-4">
             {docNotes.map(n => (
-              <div key={n.id} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl group relative shadow-md hover:border-blue-500/30 transition-all">
+              <div key={n.id} onClick={() => setActiveItem({ type: 'note', data: n })} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl group relative shadow-md hover:border-blue-500/30 transition-all cursor-pointer">
                 <div className="pr-12">
                    <p className="text-sm text-white font-bold mb-2">{n.title}</p>
                    <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed bg-zinc-950 p-3 rounded-xl border border-zinc-800">{n.content}</p>
                 </div>
-                <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-5 right-4 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
+                <button onClick={(e) => { e.stopPropagation(); setNotes(notes.filter(no => no.id !== n.id)); }} className="absolute top-5 right-4 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
               </div>
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// SIDE-BY-SIDE TOOLS
+
+function InPanelExam({ exam, onBack }) {
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleSelect = (idx) => {
+    if (isSubmitted) return;
+    setSelectedAnswers(prev => ({ ...prev, [currentQIndex]: idx }));
+  };
+
+  const calculateScore = () => {
+    let score = 0;
+    exam.questions.forEach((q, i) => { if (selectedAnswers[i] === q.correct) score++; });
+    return score;
+  };
+
+  const q = exam.questions[currentQIndex];
+  const isAnswered = selectedAnswers[currentQIndex] !== undefined;
+
+  return (
+    <div className="flex flex-col h-full bg-[#09090b]">
+      <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-4 flex items-center justify-between shrink-0">
+        <button onClick={onBack} className="text-emerald-400 hover:text-emerald-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
+        <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Pages {exam.sourcePages}</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+        {!isSubmitted ? (
+          <>
+            <div className="mb-6 flex justify-between items-center border-b border-zinc-800 pb-4">
+              <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Question {currentQIndex + 1} of {exam.questions.length}</span>
+            </div>
+            <h2 className="text-lg text-white font-bold mb-6 leading-relaxed">{q.q}</h2>
+            <div className="space-y-3 mb-8">
+              {q.options.map((opt, idx) => (
+                <button 
+                  key={idx} onClick={() => handleSelect(idx)}
+                  className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 ${
+                    selectedAnswers[currentQIndex] === idx ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-600'
+                  }`}
+                >
+                  <div className={`w-5 h-5 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${selectedAnswers[currentQIndex] === idx ? 'border-emerald-500' : 'border-zinc-600'}`}>
+                    {selectedAnswers[currentQIndex] === idx && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />}
+                  </div>
+                  <span className="text-sm leading-relaxed">{opt}</span>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-between items-center">
+              <button onClick={() => setCurrentQIndex(i => Math.max(0, i - 1))} disabled={currentQIndex === 0} className="px-4 py-2 text-zinc-500 hover:text-white disabled:opacity-30 text-xs font-bold uppercase tracking-widest transition-colors">Previous</button>
+              {currentQIndex === exam.questions.length - 1 ? (
+                <button onClick={() => setIsSubmitted(true)} disabled={Object.keys(selectedAnswers).length < exam.questions.length} className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white rounded-xl text-xs font-black shadow-lg uppercase tracking-widest transition-all">Submit Exam</button>
+              ) : (
+                <button onClick={() => setCurrentQIndex(i => Math.min(exam.questions.length - 1, i + 1))} disabled={!isAnswered} className="px-6 py-3 bg-white hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 disabled:shadow-none rounded-xl text-xs font-black shadow-lg uppercase tracking-widest transition-all flex items-center gap-2">Next <ChevronRight size={14}/></button>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="text-center">
+             <div className="mb-10 p-6 bg-zinc-900 border border-zinc-800 rounded-3xl">
+                <span className="text-[10px] font-black tracking-widest uppercase text-zinc-500 block mb-3">Final Score</span>
+                <span className="text-6xl font-black text-white">{calculateScore()}</span><span className="text-3xl text-zinc-600 mx-2">/</span><span className="text-3xl font-bold text-zinc-400">{exam.questions.length}</span>
+             </div>
+             <div className="space-y-6 text-left">
+               {exam.questions.map((q, idx) => {
+                  const isCorrect = selectedAnswers[idx] === q.correct;
+                  return (
+                    <div key={idx} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
+                       <div className="flex items-start gap-4 mb-4">
+                          <div className={`mt-0.5 p-1 rounded-md ${isCorrect ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                             {isCorrect ? <CheckCircle2 size={18}/> : <XCircle size={18}/>}
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-bold text-white mb-2">{q.q}</h3>
+                            <p className="text-xs text-zinc-400 mb-1"><span className="uppercase tracking-widest text-[10px] text-zinc-600 mr-2 font-bold">You selected:</span> {q.options[selectedAnswers[idx]]}</p>
+                            {!isCorrect && <p className="text-xs text-emerald-400"><span className="uppercase tracking-widest text-[10px] text-emerald-600 mr-2 font-bold">Correct answer:</span> {q.options[q.correct]}</p>}
+                          </div>
+                       </div>
+                       <div className="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl text-xs text-indigo-200/80 leading-relaxed"><span className="font-bold text-indigo-400 uppercase tracking-widest text-[10px] mr-2">Explanation:</span>{q.explanation}</div>
+                    </div>
+                  )
+               })}
+             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InPanelFlashcards({ cards, onBack, setFlashcards }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  if (cards.length === 0) return <div className="p-6 text-center text-zinc-500">No cards left.</div>;
+
+  const currentCard = cards[currentIndex];
+
+  const handleRate = (quality) => {
+    // Basic progression logic
+    const nextList = [...cards];
+    if (quality === 0) {
+      // put at end of list to see again soon
+      nextList.push(nextList.splice(currentIndex, 1)[0]);
+      setFlashcards(prev => {
+         const others = prev.filter(p => p.docId !== currentCard.docId);
+         return [...others, ...nextList];
+      });
+    } else {
+      // next card
+      if (currentIndex < cards.length - 1) setCurrentIndex(currentIndex + 1);
+      else setCurrentIndex(0); // loop
+    }
+    setIsFlipped(false);
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-[#09090b]">
+      <div className="bg-indigo-600/10 border-b border-indigo-500/20 p-4 flex items-center justify-between shrink-0">
+        <button onClick={onBack} className="text-indigo-400 hover:text-indigo-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
+        <span className="text-[10px] text-indigo-500 font-black uppercase tracking-widest">Card {currentIndex+1} / {cards.length}</span>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-80 perspective-1000 cursor-pointer">
+          <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-x-180' : ''}`}>
+            
+            {/* FRONT */}
+            <div className="absolute inset-0 backface-hidden bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-xl">
+              <span className="absolute top-5 left-5 text-[10px] font-black uppercase tracking-widest text-zinc-600">Question</span>
+              <h2 className="text-lg font-bold text-white leading-relaxed">{currentCard.q}</h2>
+              <div className="absolute bottom-5 text-[10px] font-bold uppercase tracking-widest text-indigo-500/50 animate-pulse">Click to reveal</div>
+            </div>
+
+            {/* BACK */}
+            <div className="absolute inset-0 backface-hidden bg-indigo-900 border border-indigo-500/30 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-2xl rotate-x-180 overflow-y-auto custom-scrollbar">
+              <span className="absolute top-5 left-5 text-[10px] font-black uppercase tracking-widest text-indigo-400">Answer</span>
+              <p className="text-base font-bold text-indigo-50 leading-relaxed">{currentCard.a}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={`w-full flex gap-3 mt-8 transition-opacity duration-300 ${isFlipped ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <button onClick={() => handleRate(0)} className="flex-1 py-4 bg-zinc-900 border border-zinc-800 hover:border-red-500/50 rounded-2xl text-red-400 text-xs font-black uppercase tracking-widest transition-all">Again</button>
+          <button onClick={() => handleRate(2)} className="flex-1 py-4 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 rounded-2xl text-emerald-400 text-xs font-black uppercase tracking-widest transition-all">Got It</button>
+        </div>
+      </div>
+      <style>{`.perspective-1000 { perspective: 1000px; } .transform-style-3d { transform-style: preserve-3d; } .backface-hidden { backface-visibility: hidden; } .rotate-x-180 { transform: rotateX(180deg); }`}</style>
+    </div>
+  );
+}
+
+function InPanelNote({ note, onBack }) {
+  return (
+    <div className="flex flex-col h-full bg-[#09090b]">
+      <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 flex items-center justify-between shrink-0">
+        <button onClick={onBack} className="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+         <h2 className="text-xl font-black text-white mb-6 leading-snug">{note.title}</h2>
+         <div className="prose prose-invert prose-sm max-w-none prose-p:text-zinc-300 prose-headings:text-white prose-strong:text-indigo-300 whitespace-pre-wrap leading-relaxed">
+            {note.content}
+         </div>
       </div>
     </div>
   );
