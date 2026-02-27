@@ -3,14 +3,14 @@ import {
   BookOpen, Layers, CheckSquare, Settings, 
   ChevronLeft, ChevronRight, Upload, MessageSquare, 
   CheckCircle2, XCircle, BrainCircuit,
-  Library, Trash2, FileText, Loader2, List,
+  Library, Trash2, Loader2, List,
   Send, ShieldAlert, LayoutDashboard,
   GraduationCap, Save, X, BookA, Crosshair,
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
-  FileUp, Target, Info, Trash, Sparkles
+  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby
 } from 'lucide-react';
 
-const DB_NAME = 'MariamProDB';
+const DB_NAME = 'MariamProDB_v2';
 const STORE_NAME = 'pdfs';
 
 const openDB = () => new Promise((resolve, reject) => {
@@ -70,8 +70,8 @@ const callAI = async (prompt, expectJson, strictMode, apiKey) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
   
   const sysPrompt = strictMode 
-    ? "You are a highly strict AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. Do not use outside knowledge." 
-    : "You are an expert AI tutor.";
+    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. Do not use outside knowledge. If the answer is not in the text, say 'Information not found in the selected pages.'" 
+    : "You are an elite medical AI tutor and diagnostic assistant.";
 
   const res = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
@@ -82,7 +82,7 @@ const callAI = async (prompt, expectJson, strictMode, apiKey) => {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: "system", content: sysPrompt + (expectJson ? " You must respond in valid JSON format." : "") },
+        { role: "system", content: sysPrompt + (expectJson ? " You must respond in strictly valid JSON format." : "") },
         { role: "user", content: prompt }
       ],
       response_format: expectJson ? { type: "json_object" } : { type: "text" }
@@ -140,7 +140,7 @@ export default function App() {
       localStorage.setItem('drMariam_notes', JSON.stringify(notes));
       localStorage.setItem('drMariam_settings', JSON.stringify(userSettings));
     } catch (e) {
-      console.warn("Storage write error - quota exceeded?", e);
+      console.warn("Storage write error", e);
     }
   }, [documents, flashcards, exams, notes, userSettings]);
 
@@ -209,30 +209,30 @@ export default function App() {
   const activeDoc = documents.find(d => d.id === activeDocId);
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-300 font-sans overflow-hidden">
+    <div className="flex h-screen bg-[#09090b] text-zinc-300 font-sans overflow-hidden">
       
-      <nav className="w-16 bg-zinc-950 border-r border-zinc-800 flex flex-col items-center py-4 z-20 shrink-0">
-        <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-900/50 mb-8 cursor-pointer" onClick={() => setActiveDocId(null)}>
-          <BrainCircuit className="text-white w-6 h-6" />
+      <nav className="w-20 bg-[#09090b] border-r border-zinc-800/50 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50 mb-10 cursor-pointer" onClick={() => setActiveDocId(null)}>
+          <BrainCircuit className="text-white w-7 h-7" />
         </div>
         
-        <div className="flex-1 flex flex-col gap-4 w-full px-2">
+        <div className="flex-1 flex flex-col gap-6 w-full px-2">
           <SidebarBtn icon={Library} label="Library" active={!activeDoc} onClick={() => setActiveDocId(null)} />
           {activeDoc && (
             <>
-              <div className="w-8 h-px bg-zinc-800 mx-auto my-2" />
+              <div className="w-8 h-px bg-zinc-800 mx-auto my-1" />
               <SidebarBtn icon={BookOpen} label="Reader" active={activeDoc !== undefined} onClick={() => {}} highlight />
             </>
           )}
         </div>
 
-        <SidebarBtn icon={Settings} label="Global Settings" active={rightPanelTab === 'settings' && !activeDoc} onClick={() => { setActiveDocId(null); setRightPanelTab('settings'); }} />
+        <SidebarBtn icon={Settings} label="API & Settings" active={rightPanelTab === 'settings' && !activeDoc} onClick={() => { setActiveDocId(null); setRightPanelTab('settings'); }} />
       </nav>
 
-      <main className="flex-1 flex flex-col relative bg-zinc-900 min-w-0">
+      <main className="flex-1 flex flex-col relative bg-[#09090b] min-w-0">
         {isUploading && (
-          <div className="absolute top-0 left-0 w-full h-1 bg-zinc-800 z-50">
-            <div className="h-full bg-indigo-500 transition-all duration-300 shadow-[0_0_10px_rgba(99,102,241,0.8)]" style={{ width: `${uploadProgress}%` }}></div>
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-zinc-800 z-50">
+            <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,1)]" style={{ width: `${uploadProgress}%` }}></div>
           </div>
         )}
 
@@ -243,6 +243,9 @@ export default function App() {
             onOpen={setActiveDocId} 
             isUploading={isUploading} 
             deleteDocument={deleteDocument}
+            flashcards={flashcards}
+            exams={exams}
+            notes={notes}
           />
         ) : (
           <PdfWorkspace 
@@ -256,31 +259,28 @@ export default function App() {
       </main>
 
       {rightPanelOpen && activeDoc && (
-        <aside className="w-[400px] bg-zinc-950 border-l border-zinc-800 flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
-          
-          <div className="bg-indigo-600 px-4 py-2 flex items-center gap-2 shrink-0 border-b border-indigo-700">
-             <Target size={16} className="text-white"/>
-             <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {activeDoc.progress}</span>
-          </div>
-
-          <div className="h-12 flex p-1 bg-zinc-900/50 border-b border-zinc-800 shrink-0">
-            <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="Generate" icon={Crosshair} />
+        <aside className="w-[450px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative">
+          <div className="h-16 flex p-2 bg-[#09090b] border-b border-zinc-800/80 shrink-0 gap-1 items-center">
+            <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Tools" icon={Sparkles} />
             <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Chat" icon={MessageSquare} />
-            <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="Review" icon={Layers} />
-            <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Settings" icon={Settings} />
+            <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
+            <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
           </div>
           
           <div className="flex-1 overflow-hidden relative">
             {rightPanelTab === 'settings' ? (
               <PanelSettings settings={userSettings} setSettings={setUserSettings} />
             ) : !userSettings.apiKey?.trim() ? (
-              <div className="p-6 text-center mt-20">
-                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <p className="text-sm text-zinc-300 mb-4">OpenAI API Key Required</p>
-                <button onClick={() => setRightPanelTab('settings')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 transition-colors text-white rounded-lg text-sm font-bold shadow-lg">Go to Settings</button>
+              <div className="p-8 text-center mt-20">
+                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <AlertCircle className="w-10 h-10 text-red-500" />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2">OpenAI Key Required</h2>
+                <p className="text-sm text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
+                <button onClick={() => setRightPanelTab('settings')} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/25">Connect API Key</button>
               </div>
             ) : rightPanelTab === 'generate' ? (
-              <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} />
+              <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} />
             ) : rightPanelTab === 'chat' ? (
               <PanelChat activeDoc={activeDoc} settings={userSettings} />
             ) : rightPanelTab === 'review' ? (
@@ -291,10 +291,10 @@ export default function App() {
       )}
 
       {!activeDoc && rightPanelTab === 'settings' && (
-         <aside className="w-[400px] bg-zinc-950 border-l border-zinc-800 flex flex-col shrink-0 z-20">
-           <div className="h-12 flex items-center px-4 border-b border-zinc-800">
-             <h2 className="text-sm font-bold text-white">System Settings</h2>
-             <button onClick={() => setRightPanelTab('generate')} className="ml-auto text-zinc-500 hover:text-white"><X size={16}/></button>
+         <aside className="w-[450px] bg-[#09090b] border-l border-zinc-800/80 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)]">
+           <div className="h-16 flex items-center px-6 border-b border-zinc-800/80">
+             <h2 className="text-lg font-bold text-white flex items-center gap-2"><Settings size={20} className="text-indigo-500"/> System Settings</h2>
+             <button onClick={() => setRightPanelTab('generate')} className="ml-auto p-2 bg-zinc-900 text-zinc-500 hover:text-white rounded-lg transition-colors"><X size={18}/></button>
            </div>
            <PanelSettings settings={userSettings} setSettings={setUserSettings} />
          </aside>
@@ -309,14 +309,14 @@ function SidebarBtn({ icon: Icon, label, active, onClick, highlight }) {
     <button 
       onClick={onClick}
       title={label}
-      className={`w-12 h-12 mx-auto rounded-xl flex items-center justify-center transition-all group relative ${
+      className={`w-14 h-14 mx-auto rounded-2xl flex items-center justify-center transition-all group relative ${
         active 
-          ? highlight ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20' : 'bg-zinc-800 text-white' 
-          : 'text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300'
+          ? highlight ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/40' : 'bg-zinc-800 text-white shadow-lg' 
+          : 'text-zinc-500 hover:bg-zinc-800/80 hover:text-zinc-200'
       }`}
     >
-      <Icon size={22} />
-      <span className="absolute left-14 bg-zinc-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity border border-zinc-700">
+      <Icon size={24} />
+      <span className="absolute left-16 bg-zinc-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-all border border-zinc-700 shadow-xl translate-x-[-10px] group-hover:translate-x-0">
         {label}
       </span>
     </button>
@@ -327,62 +327,89 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex-1 flex items-center justify-center gap-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${
-        active ? 'bg-zinc-800 text-indigo-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
+      className={`flex-1 flex flex-col items-center justify-center gap-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all h-full ${
+        active ? 'bg-zinc-800/80 text-indigo-400 shadow-inner border border-zinc-700/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900'
       }`}
     >
-      <Icon size={14} /> {label}
+      <Icon size={16} /> {label}
     </button>
   );
 }
 
-function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument }) {
+function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes }) {
   return (
-    <div className="flex-1 overflow-auto p-8 lg:p-12 custom-scrollbar">
-      <div className="max-w-6xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-12">
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-[#09090b]">
+      <div className="max-w-7xl mx-auto w-full">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
           <div>
-            <h1 className="text-4xl font-black text-white tracking-tight">Intelligence Library</h1>
-            <p className="text-zinc-400 mt-2 text-sm">Upload medical PDFs. Content is stored securely in your local browser storage.</p>
+            <h1 className="text-5xl font-black text-white tracking-tighter mb-3 flex items-center gap-4">
+              Intelligence <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">Nexus</span>
+            </h1>
+            <p className="text-zinc-400 text-base max-w-xl leading-relaxed">Your secure, local medical knowledge base. Upload materials and let the elite AI extract exams, notes, and cards.</p>
           </div>
-          <label className={`cursor-pointer bg-white text-zinc-900 hover:bg-zinc-200 px-6 py-3 rounded-lg font-bold text-sm flex items-center gap-2 transition-all shadow-xl shadow-white/10 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-            {isUploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />} 
-            {isUploading ? "Processing..." : "Import PDF"}
+          <label className={`cursor-pointer bg-white text-zinc-950 hover:bg-zinc-200 px-8 py-4 rounded-xl font-black text-sm flex items-center gap-3 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+            {isUploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />} 
+            {isUploading ? "PROCESSING PDF..." : "IMPORT SECURE PDF"}
             <input type="file" accept="application/pdf" className="hidden" onChange={onUpload} disabled={isUploading} />
           </label>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={28}/></div>
+              <div><p className="text-3xl font-black text-white">{notes.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Generated Notes</p></div>
+           </div>
+           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={28}/></div>
+              <div><p className="text-3xl font-black text-white">{flashcards.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Active Flashcards</p></div>
+           </div>
+           <div className="bg-zinc-900/50 border border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={28}/></div>
+              <div><p className="text-3xl font-black text-white">{exams.length}</p><p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Strict Exams</p></div>
+           </div>
+        </div>
         
         {documents.length === 0 ? (
-          <div className="border border-dashed border-zinc-800 rounded-2xl bg-zinc-950/50 p-16 text-center">
-            <FileUp size={48} className="mx-auto text-zinc-700 mb-6" />
-            <h2 className="text-xl font-bold text-zinc-300 mb-2">Repository Empty</h2>
-            <p className="text-zinc-500 text-sm max-w-md mx-auto">Import a textbook or research paper to begin generating highly accurate, localized study materials.</p>
+          <div className="border-2 border-dashed border-zinc-800/80 rounded-[3rem] bg-zinc-900/20 p-24 text-center">
+            <div className="w-32 h-32 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+               <FileUp size={48} className="text-zinc-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3">No Documents Found</h2>
+            <p className="text-zinc-500 text-base max-w-md mx-auto leading-relaxed">Import a textbook, research paper, or clinical guide to begin your enhanced study session.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {documents.map(doc => (
-              <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-zinc-950 rounded-2xl p-5 border border-zinc-800 hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/10 cursor-pointer transition-all flex flex-col h-56 group relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full -z-10 group-hover:bg-indigo-500/10 transition-colors" />
-                <div className="flex items-start justify-between mb-4 z-10">
-                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-500 transition-all">
-                    <BookOpen size={20} />
+          <div>
+            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2"><Library size={20} className="text-indigo-500"/> Your Library</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {documents.map(doc => {
+                const docCards = flashcards.filter(f => f.docId === doc.id).length;
+                const docExams = exams.filter(e => e.docId === doc.id).length;
+                
+                return (
+                <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-zinc-900/80 rounded-3xl p-6 border border-zinc-800 hover:border-indigo-500/50 hover:shadow-[0_10px_40px_rgba(99,102,241,0.1)] cursor-pointer transition-all flex flex-col h-64 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-bl-full -z-10 group-hover:bg-indigo-500/10 transition-colors" />
+                  <div className="flex items-start justify-between mb-6 z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-500 transition-all shadow-sm">
+                      <BookOpen size={24} />
+                    </div>
+                    <button onClick={(e) => deleteDocument(doc.id, e)} className="p-2.5 bg-zinc-950/50 text-zinc-500 hover:text-red-400 hover:bg-red-500/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                      <Trash2 size={18} />
+                    </button>
                   </div>
-                  <button onClick={(e) => deleteDocument(doc.id, e)} className="p-2 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                    <Trash2 size={16} />
-                  </button>
+                  <h3 className="font-bold text-white text-lg leading-snug line-clamp-2 flex-1 z-10">{doc.name}</h3>
+                  <div className="mt-4 pt-4 border-t border-zinc-800/80 z-10">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex gap-2">
+                        <span className="text-[10px] font-bold text-zinc-500 bg-zinc-950 px-2 py-1 rounded-md">{docCards} Cards</span>
+                        <span className="text-[10px] font-bold text-zinc-500 bg-zinc-950 px-2 py-1 rounded-md">{docExams} Exams</span>
+                      </div>
+                      <span className="text-[11px] font-black text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md">PG {doc.progress}/{doc.totalPages}</span>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="font-bold text-zinc-200 text-base leading-snug line-clamp-2 flex-1 z-10">{doc.name}</h3>
-                <div className="mt-4 pt-4 border-t border-zinc-800/50 z-10">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Read Progress</span>
-                    <span className="text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">PG {doc.progress} / {doc.totalPages}</span>
-                  </div>
-                  <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
-                    <div className="bg-indigo-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (doc.progress / doc.totalPages) * 100)}%` }}></div>
-                  </div>
-                </div>
-              </div>
-            ))}
+              )})}
+            </div>
           </div>
         )}
       </div>
@@ -420,40 +447,48 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
   }, [currentPage, activeDoc.id, setDocuments]);
 
+  // Handle visual page jumps via iframe key to force reload to specific page if anchor fails
+  const iframeKey = `${pdfUrl}-page-${currentPage}`;
+
   return (
-    <div className="flex-1 flex flex-col h-full bg-zinc-900 relative">
-      <div className="bg-indigo-600 text-white px-4 py-2 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest shadow-md z-10">
-        <Target size={14} /> AI is tracking your location: Active Page {currentPage}
-      </div>
-      
-      <div className="h-16 flex items-center justify-between px-4 bg-zinc-950 border-b border-zinc-800 shrink-0">
+    <div className="flex-1 flex flex-col h-full bg-[#050505] relative">
+      <div className="h-16 flex items-center justify-between px-6 bg-[#09090b] border-b border-zinc-800/80 shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-4 overflow-hidden">
-          <button onClick={closeDoc} className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-bold uppercase tracking-wider">
+          <button onClick={closeDoc} className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-xs font-black uppercase tracking-widest bg-zinc-900 px-4 py-2 rounded-xl">
             <ChevronLeft size={16} /> Exit
           </button>
           <div className="w-px h-6 bg-zinc-800"></div>
-          <span className="text-sm font-bold text-zinc-300 truncate max-w-[200px] md:max-w-sm" title={activeDoc.name}>{activeDoc.name}</span>
+          <span className="text-sm font-bold text-zinc-200 truncate max-w-[200px] md:max-w-md" title={activeDoc.name}>{activeDoc.name}</span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden shadow-inner h-10">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-4 h-full text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center"><ChevronLeft size={18} /></button>
-            <span className="text-sm font-mono px-4 text-white font-bold tracking-widest h-full flex items-center border-x border-zinc-800">PAGE {currentPage} / {activeDoc.totalPages}</span>
-            <button onClick={() => setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1))} className="px-4 h-full text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center"><ChevronRight size={18} /></button>
+          
+          <div className="flex items-center bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden shadow-inner h-11">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-5 h-full text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
+            <div className="px-4 h-full flex items-center justify-center border-x border-zinc-800 bg-zinc-950">
+               <span className="text-sm font-mono text-white font-black tracking-widest">PG {currentPage} <span className="text-zinc-600 mx-1">/</span> {activeDoc.totalPages}</span>
+            </div>
+            <button onClick={() => setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1))} className="px-5 h-full text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors flex items-center"><ChevronRight size={20} /></button>
           </div>
-          <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2.5 rounded-lg border transition-colors ${rightPanelOpen ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'}`}>
+
+          <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2.5 rounded-xl border transition-all shadow-md ${rightPanelOpen ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'}`}>
             {rightPanelOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
           </button>
         </div>
       </div>
       
-      <div className="flex-1 overflow-hidden bg-[#1e1e24] flex justify-center relative shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+      <div className="flex-1 overflow-hidden bg-[#121214] flex justify-center relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
         {isLoading ? (
-          <div className="flex flex-col items-center gap-4 text-zinc-500 m-auto">
-            <Loader2 className="animate-spin text-indigo-500" size={32}/> 
-            <span className="text-sm font-bold tracking-widest uppercase">Rendering Secure Layer...</span>
+          <div className="flex flex-col items-center gap-6 text-zinc-500 m-auto">
+            <Loader2 className="animate-spin text-indigo-500" size={40}/> 
+            <span className="text-xs font-black tracking-widest uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdfUrl ? (
-          <iframe src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0`} className="w-full h-full border-none shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-5xl" title="PDF Document" />
+          <iframe 
+            key={iframeKey} // Forces iframe reload to guarantee page jump if native navigation fails
+            src={`${pdfUrl}#page=${currentPage}&view=FitH&toolbar=0&navpanes=0&scrollbar=0`} 
+            className="w-full h-full border-none shadow-[0_0_50px_rgba(0,0,0,1)] max-w-6xl" 
+            title="PDF Document" 
+          />
         ) : (
           <div className="m-auto text-red-400 text-sm flex items-center gap-2 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
             <AlertCircle size={16}/> Failed to load PDF visual layer. AI text context is still intact.
@@ -466,26 +501,29 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
 function PanelSettings({ settings, setSettings }) {
   return (
-    <div className="p-6 h-full overflow-y-auto custom-scrollbar flex flex-col gap-6">
-      <div className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-xl">
-        <h3 className="text-sm font-bold text-indigo-400 flex items-center gap-2 mb-2"><KeyRound size={16}/> OpenAI API Key Required</h3>
-        <p className="text-xs text-indigo-300/80 leading-relaxed mb-4">You must provide an OpenAI (ChatGPT) API key to use the extraction and chat features. Your key is stored locally.</p>
+    <div className="p-8 h-full overflow-y-auto custom-scrollbar flex flex-col gap-8 bg-[#09090b]">
+      <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/10 border border-indigo-500/30 p-6 rounded-2xl shadow-lg">
+        <h3 className="text-base font-black text-indigo-400 flex items-center gap-2 mb-3"><KeyRound size={20}/> OpenAI API Key</h3>
+        <p className="text-sm text-indigo-200/70 leading-relaxed mb-6">Enter your OpenAI key (sk-...) to power the AI extraction engine. Keys are saved securely in your browser's local storage and never sent to our servers.</p>
         <input 
           type="password" 
           value={settings.apiKey} 
           onChange={(e) => setSettings({...settings, apiKey: e.target.value})} 
           placeholder="sk-proj-..." 
-          className="w-full bg-zinc-950 border border-indigo-500/50 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono shadow-inner" 
+          className="w-full bg-[#050505] border border-indigo-500/50 rounded-xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono shadow-inner mb-4" 
         />
-        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-[10px] text-indigo-400 mt-3 inline-block hover:underline uppercase tracking-widest font-bold">Get API Key &rarr;</a>
+        <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-xs text-indigo-400 font-bold uppercase tracking-widest hover:text-indigo-300 transition-colors flex items-center gap-1">Get API Key <ChevronRight size={14}/></a>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-xl">
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" checked={settings.strictMode} onChange={(e) => setSettings({...settings, strictMode: e.target.checked})} className="mt-1 accent-indigo-500 w-4 h-4" />
+      <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl">
+        <label className="flex items-start gap-4 cursor-pointer">
+          <div className="mt-1 relative flex items-center justify-center">
+             <input type="checkbox" checked={settings.strictMode} onChange={(e) => setSettings({...settings, strictMode: e.target.checked})} className="peer appearance-none w-5 h-5 border-2 border-zinc-600 rounded bg-zinc-950 checked:bg-indigo-600 checked:border-indigo-600 transition-all" />
+             <CheckSquare size={14} className="text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100" />
+          </div>
           <div>
-            <span className="text-sm font-bold text-white block">Strict Document Grounding</span>
-            <span className="text-xs text-zinc-500 mt-2 block leading-relaxed">Forces the AI to exclusively use the text found in the active PDF pages. Strongly recommended for factual studying to prevent hallucination.</span>
+            <span className="text-base font-bold text-white block">Strict Document Grounding</span>
+            <span className="text-sm text-zinc-500 mt-2 block leading-relaxed">Forces the AI to exclusively use the text found in the active PDF pages. Essential for medical study to guarantee zero hallucinations.</span>
           </div>
         </label>
       </div>
@@ -493,7 +531,7 @@ function PanelSettings({ settings, setSettings }) {
   );
 }
 
-function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes }) {
+function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes, switchToReview }) {
   const [startPage, setStartPage] = useState(activeDoc.progress || 1);
   const [endPage, setEndPage] = useState(activeDoc.progress || 1);
   const [type, setType] = useState('flashcards');
@@ -509,30 +547,42 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes 
   }, [activeDoc.progress, status.loading, generated]);
 
   const handleGenerate = async () => {
-    setStatus({ loading: true, msg: 'Reading text...', err: false });
+    setStatus({ loading: true, msg: 'Reading text from pages...', err: false });
     setGenerated(null);
     try {
       let text = "";
       for (let i = Number(startPage); i <= Number(endPage); i++) if (activeDoc.pagesText[i]) text += activeDoc.pagesText[i] + "\n";
       if (!text.trim()) throw new Error("No readable text found on these pages.");
 
-      setStatus({ loading: true, msg: 'AI generating via OpenAI...', err: false });
+      setStatus({ loading: true, msg: 'Elite AI processing via OpenAI...', err: false });
 
       if (type === 'flashcards') {
-        const p = `Create exactly ${count} study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Question", "a": "Answer"} ] }\n\nTEXT:\n${text}`;
+        const p = `Create exactly ${count} highly accurate study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }\n\nTEXT:\n${text}`;
         const raw = await callAI(p, true, settings.strictMode, settings.apiKey);
         setGenerated({ type, data: JSON.parse(raw).items, pages: `${startPage}-${endPage}` });
       } else if (type === 'exam') {
-        const p = `Create a ${count}-question exam from this text ONLY. Respond in JSON format: { "title": "Exam Title", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Why" } ] }\n\nTEXT:\n${text}`;
+        const p = `Create a ${count}-question medical/academic exam from this text ONLY. Respond in JSON format: { "title": "Exam Title", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation using text" } ] }\n\nTEXT:\n${text}`;
         const raw = await callAI(p, true, settings.strictMode, settings.apiKey);
         const parsed = JSON.parse(raw);
         setGenerated({ type, title: parsed.title, data: parsed.items, pages: `${startPage}-${endPage}` });
-      } else {
-        const p = `Write a detailed summary of this text ONLY in markdown format.\n\nTEXT:\n${text}`;
+      } else if (type === 'summary') {
+        const p = `Write a comprehensive, structured summary of this text ONLY. Use markdown headings and bullet points.\n\nTEXT:\n${text}`;
         const raw = await callAI(p, false, settings.strictMode, settings.apiKey);
         setGenerated({ type, data: raw, pages: `${startPage}-${endPage}` });
+      } else if (type === 'clinical') {
+        const p = `Based ONLY on the medical concepts in this text, create a realistic Clinical Case Study scenario. Include patient presentation, symptoms, and ask a question at the end, followed by the answer. Respond in Markdown.\n\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey);
+        setGenerated({ type: 'summary', data: raw, pages: `${startPage}-${endPage}`, customTitle: 'Clinical Case' });
+      } else if (type === 'eli5') {
+        const p = `Explain the core concepts of this text extremely simply, as if explaining to a beginner or a 5-year-old. Use analogies. Respond in Markdown.\n\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey);
+        setGenerated({ type: 'summary', data: raw, pages: `${startPage}-${endPage}`, customTitle: 'Simplified Explanation' });
+      } else if (type === 'mnemonics') {
+        const p = `Create extremely memorable, clever mnemonics for the key lists, drugs, or concepts in this text. Respond in Markdown.\n\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey);
+        setGenerated({ type: 'summary', data: raw, pages: `${startPage}-${endPage}`, customTitle: 'Mnemonics' });
       }
-      setStatus({ loading: false, msg: 'Complete.', err: false });
+      setStatus({ loading: false, msg: 'Generation Complete.', err: false });
     } catch (e) {
       setStatus({ loading: false, msg: e.message || "Failed.", err: true });
     }
@@ -546,10 +596,11 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes 
     } else if (generated.type === 'exam') {
       setExams(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: generated.pages, title: generated.title || "Exam", questions: generated.data, createdAt: new Date().toISOString() }]);
     } else {
-      setNotes(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, title: `Summary Pgs ${generated.pages}`, content: generated.data }]);
+      setNotes(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, title: `${generated.customTitle || 'Summary'} Pgs ${generated.pages}`, content: generated.data }]);
     }
     setGenerated(null);
-    setStatus({ loading: false, msg: 'Saved successfully!', err: false });
+    setStatus({ loading: false, msg: '', err: false });
+    switchToReview();
   };
 
   const removeItem = (idx) => {
@@ -561,85 +612,99 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes 
   };
 
   return (
-    <div className="h-full flex flex-col bg-zinc-950 p-5">
-      <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex-shrink-0 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
-          <div className="w-full mr-4">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 block">Start Pg</label>
-            <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
-          </div>
-          <div className="w-full">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2 block">End Pg</label>
-            <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-center text-white font-mono outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {['flashcards', 'exam', 'summary'].map(t => (
-            <button key={t} onClick={()=>setType(t)} className={`py-3 px-1 rounded-lg text-[10px] font-bold uppercase tracking-widest border transition-all ${type === t ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}>
-              {t === 'flashcards' ? 'Cards' : t}
-            </button>
-          ))}
-        </div>
-
-        {type !== 'summary' && (
-          <div className="mb-6">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3 flex justify-between"><span>Quantity</span> <span className="text-indigo-400 text-xs">{count}</span></label>
-            <input type="range" min="1" max="15" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-indigo-500 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
-          </div>
-        )}
-
-        <button onClick={handleGenerate} disabled={status.loading} className="w-full py-3.5 bg-white hover:bg-zinc-200 text-zinc-950 rounded-lg text-xs font-black uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2">
-          {status.loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-          {status.loading ? "Generating..." : "Run Extraction"}
-        </button>
-      </div>
-
-      {status.msg && !generated && (
-        <div className={`mt-5 p-4 rounded-xl text-xs font-bold flex items-start gap-3 border ${status.err ? 'bg-red-500/10 text-red-400 border-red-500/20' : status.loading ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'}`}>
-          {status.loading ? <Loader2 size={16} className="animate-spin shrink-0 mt-0.5" /> : status.err ? <AlertCircle size={16} className="shrink-0 mt-0.5" /> : <CheckCircle2 size={16} className="shrink-0 mt-0.5" />} 
-          <span className="leading-relaxed">{status.msg}</span>
-        </div>
-      )}
-
-      {generated && (
-        <div className="mt-5 flex-1 flex flex-col min-h-0 bg-zinc-900 border border-emerald-500/30 rounded-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-xl shadow-emerald-900/10">
-          <div className="bg-emerald-500/10 border-b border-emerald-500/20 p-3 flex justify-between items-center shrink-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 px-2 flex items-center gap-2"><CheckCircle2 size={14}/> Output Ready</span>
-            <div className="flex gap-2">
-              <button onClick={()=>setGenerated(null)} className="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
-              <button onClick={saveItem} className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={14}/> Save</button>
+    <div className="h-full flex flex-col bg-[#09090b] p-6">
+      
+      {!generated ? (
+        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl flex-shrink-0 shadow-2xl">
+          <div className="flex items-center justify-between mb-8">
+            <div className="w-full mr-4 relative">
+              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Start Pg</label>
+              <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-base text-center text-white font-mono font-bold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
+            </div>
+            <div className="mt-6 text-zinc-600 font-bold">TO</div>
+            <div className="w-full ml-4 relative">
+              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">End Pg</label>
+              <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-base text-center text-white font-mono font-bold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner" />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+          
+          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">Extraction Tool</label>
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <ToolBtn id="flashcards" active={type} set={setType} icon={Layers} label="Cards" />
+            <ToolBtn id="exam" active={type} set={setType} icon={CheckSquare} label="Exam" />
+            <ToolBtn id="summary" active={type} set={setType} icon={BookA} label="Summary" />
+            <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="Simplify" />
+            <ToolBtn id="clinical" active={type} set={setType} icon={Stethoscope} label="Clinical Case" />
+            <ToolBtn id="mnemonics" active={type} set={setType} icon={Lightbulb} label="Mnemonics" />
+          </div>
+
+          {(type === 'flashcards' || type === 'exam') && (
+            <div className="mb-8 bg-zinc-950 p-4 rounded-xl border border-zinc-800">
+              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3 flex justify-between"><span>Quantity</span> <span className="text-indigo-400 text-sm">{count} Items</span></label>
+              <input type="range" min="1" max="20" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-indigo-500 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+            </div>
+          )}
+
+          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 bg-white hover:bg-zinc-200 text-zinc-950 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3">
+            {status.loading ? <Loader2 size={20} className="animate-spin" /> : <BrainCircuit size={20} />}
+            {status.loading ? "Running AI Engine..." : "Execute Extraction"}
+          </button>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col min-h-0 bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-2xl shadow-emerald-900/20">
+          <div className="bg-emerald-500/10 border-b border-emerald-500/30 p-4 flex justify-between items-center shrink-0">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2"><CheckCircle2 size={18}/> Review Output</span>
+            <div className="flex gap-3">
+              <button onClick={()=>setGenerated(null)} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
+              <button onClick={saveItem} className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={16}/> Save to DB</button>
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
             {generated.type === 'flashcards' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl relative group pr-10 shadow-sm">
-                <p className="text-sm text-white font-bold mb-2 leading-relaxed"><span className="text-zinc-500 mr-2">Q:</span>{item.q}</p>
-                <p className="text-sm text-indigo-300 leading-relaxed"><span className="text-indigo-500/50 mr-2">A:</span>{item.a}</p>
-                <button onClick={()=>removeItem(idx)} className="absolute top-3 right-3 p-1.5 bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14}/></button>
+              <div key={idx} className="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-sm">
+                <p className="text-sm text-white font-bold mb-3 leading-relaxed"><span className="text-zinc-600 mr-2 text-xs uppercase tracking-widest">Q</span>{item.q}</p>
+                <p className="text-sm text-indigo-300 leading-relaxed"><span className="text-indigo-900 mr-2 text-xs uppercase tracking-widest">A</span>{item.a}</p>
+                <button onClick={()=>removeItem(idx)} className="absolute top-4 right-4 p-2 bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
               </div>
             ))}
             {generated.type === 'exam' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl relative group pr-10 shadow-sm">
-                <p className="text-sm text-white font-bold mb-3 leading-relaxed">{idx+1}. {item.q}</p>
+              <div key={idx} className="bg-zinc-950 border border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-sm">
+                <p className="text-sm text-white font-bold mb-4 leading-relaxed">{idx+1}. {item.q}</p>
                 <div className="space-y-2">
                   {item.options.map((opt, oIdx) => (
-                    <div key={oIdx} className={`text-xs p-2.5 rounded-lg border ${oIdx === item.correct ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-bold' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>{opt}</div>
+                    <div key={oIdx} className={`text-xs p-3 rounded-xl border ${oIdx === item.correct ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-bold shadow-inner' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`}>{opt}</div>
                   ))}
                 </div>
-                <button onClick={()=>removeItem(idx)} className="absolute top-3 right-3 p-1.5 bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14}/></button>
+                <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-xl text-xs text-indigo-300/80"><span className="font-bold text-indigo-400 mr-2 uppercase tracking-widest text-[10px]">Explanation:</span>{item.explanation}</div>
+                <button onClick={()=>removeItem(idx)} className="absolute top-4 right-4 p-2 bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
               </div>
             ))}
             {generated.type === 'summary' && (
-              <div className="bg-zinc-950 border border-zinc-800 p-5 rounded-xl relative group pr-10 shadow-sm">
-                <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{generated.data}</div>
-                <button onClick={()=>removeItem(0)} className="absolute top-3 right-3 p-1.5 bg-zinc-900 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14}/></button>
+              <div className="bg-zinc-950 border border-zinc-800 p-6 rounded-2xl relative group shadow-sm">
+                <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-invert prose-p:text-zinc-300 prose-headings:text-white max-w-none">{generated.data}</div>
               </div>
             )}
           </div>
         </div>
       )}
+
+      {status.msg && !generated && (
+        <div className={`mt-6 p-5 rounded-2xl text-sm font-bold flex items-start gap-4 border ${status.err ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-lg shadow-indigo-900/20'}`}>
+          {status.loading ? <Loader2 size={20} className="animate-spin shrink-0 mt-0.5" /> : <AlertCircle size={20} className="shrink-0 mt-0.5" />} 
+          <span className="leading-relaxed">{status.msg}</span>
+        </div>
+      )}
+
     </div>
+  );
+}
+
+function ToolBtn({ id, active, set, icon: Icon, label }) {
+  const isA = active === id;
+  return (
+    <button onClick={() => set(id)} className={`py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30' : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}>
+      <Icon size={20} className={isA ? "text-white" : "text-zinc-600"}/> {label}
+    </button>
   );
 }
 
@@ -650,7 +715,7 @@ function PanelChat({ activeDoc, settings }) {
   const endRef = useRef(null);
 
   useEffect(() => { 
-    setMessages([{ role: 'assistant', content: `I'm analyzing **Page ${activeDoc.progress}**. Ask me anything about this specific page.` }]); 
+    setMessages([{ role: 'assistant', content: `I am locked onto **Page ${activeDoc.progress}**. What do you need explained?` }]); 
   }, [activeDoc.progress]);
 
   useEffect(() => { 
@@ -677,34 +742,34 @@ function PanelChat({ activeDoc, settings }) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-zinc-950">
-      <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-4 py-2 flex items-center gap-2">
-         <BookOpen size={14} className="text-indigo-400" />
-         <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">Active Context: Page {activeDoc.progress}</span>
+    <div className="h-full flex flex-col bg-[#09090b]">
+      <div className="bg-indigo-600 px-5 py-3 flex items-center gap-3 shadow-md shrink-0">
+         <Target size={16} className="text-white" />
+         <span className="text-[10px] font-black text-white uppercase tracking-widest">Locked: Page {activeDoc.progress}</span>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
         {messages.map((m, i) => (
-          <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${m.role === 'user' ? 'bg-indigo-600' : 'bg-zinc-800 border border-zinc-700'}`}>
-              {m.role === 'user' ? <List size={14} className="text-white" /> : <BrainCircuit size={14} className="text-indigo-400" />}
+          <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${m.role === 'user' ? 'bg-indigo-600' : 'bg-zinc-800 border border-zinc-700'}`}>
+              {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-indigo-400" />}
             </div>
-            <div className={`p-4 max-w-[85%] text-sm leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-sm' : 'bg-zinc-900 border border-zinc-800 rounded-2xl rounded-tl-sm text-zinc-300 whitespace-pre-wrap'}`}>
+            <div className={`p-5 max-w-[85%] text-sm leading-relaxed shadow-md ${m.role === 'user' ? 'bg-indigo-600 text-white rounded-3xl rounded-tr-sm' : 'bg-zinc-900 border border-zinc-800 rounded-3xl rounded-tl-sm text-zinc-300 whitespace-pre-wrap'}`}>
               {m.content}
             </div>
           </div>
         ))}
         {loading && (
-          <div className="flex gap-3">
-             <div className="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 shadow-sm"><Loader2 size={14} className="text-indigo-400 animate-spin" /></div>
-             <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-2xl rounded-tl-sm flex items-center gap-1.5"><span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce"></span><span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.15s'}}></span><span className="w-2 h-2 bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.3s'}}></span></div>
+          <div className="flex gap-4">
+             <div className="w-10 h-10 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 shadow-lg"><Loader2 size={18} className="text-indigo-400 animate-spin" /></div>
+             <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-3xl rounded-tl-sm flex items-center gap-2"><span className="w-2.5 h-2.5 bg-zinc-600 rounded-full animate-bounce"></span><span className="w-2.5 h-2.5 bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.15s'}}></span><span className="w-2.5 h-2.5 bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.3s'}}></span></div>
           </div>
         )}
         <div ref={endRef} />
       </div>
-      <div className="p-4 bg-zinc-950 border-t border-zinc-800 shrink-0">
-        <div className="relative flex items-end bg-zinc-900 border border-zinc-700 rounded-xl focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-inner">
-          <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); handleChat();}}} placeholder={`Ask about page ${activeDoc.progress}...`} disabled={loading} className="w-full bg-transparent p-4 pr-12 text-sm text-white outline-none resize-none max-h-32 custom-scrollbar" style={{minHeight:'54px'}} />
-          <button onClick={handleChat} disabled={loading||!input.trim()} className="absolute right-2 bottom-2 p-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-lg text-white transition-colors shadow-md disabled:shadow-none"><Send size={16}/></button>
+      <div className="p-5 bg-zinc-950 border-t border-zinc-800 shrink-0">
+        <div className="relative flex items-end bg-zinc-900 border border-zinc-700 rounded-2xl focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all shadow-inner p-1">
+          <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); handleChat();}}} placeholder={`Ask about page ${activeDoc.progress}...`} disabled={loading} className="w-full bg-transparent p-4 pr-16 text-sm text-white outline-none resize-none max-h-40 custom-scrollbar" style={{minHeight:'56px'}} />
+          <button onClick={handleChat} disabled={loading||!input.trim()} className="absolute right-3 bottom-3 p-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-600 rounded-xl text-white transition-all shadow-lg disabled:shadow-none"><Send size={18}/></button>
         </div>
       </div>
     </div>
@@ -716,34 +781,27 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   const docExams = exams.filter(e => e.docId === activeDocId);
   const docNotes = notes.filter(n => n.docId === activeDocId);
 
+  // Render previews here so user sees them right away
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-zinc-950 space-y-10">
+    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-[#09090b] space-y-12">
+      
+      {/* Exams Section First (Highest value) */}
       <div>
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-4 flex items-center gap-2"><Layers size={14}/> Saved Flashcards ({docCards.length})</h3>
-        {docCards.length === 0 ? <p className="text-xs text-zinc-600 italic bg-zinc-900/50 p-4 rounded-xl border border-dashed border-zinc-800 text-center">No flashcards for this document.</p> : (
-          <div className="space-y-3">
-            {docCards.slice(0, 5).map(c => (
-              <div key={c.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl relative group pr-10 shadow-sm">
-                <p className="text-xs text-white font-bold truncate"><span className="text-zinc-500 mr-2">Q:</span>{c.q}</p>
-                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-1/2 -translate-y-1/2 right-3 p-1.5 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash size={14}/></button>
-              </div>
-            ))}
-            {docCards.length > 5 && <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 text-center pt-2">+{docCards.length - 5} more in Library</p>}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-4 flex items-center gap-2"><GraduationCap size={14}/> Saved Exams ({docExams.length})</h3>
-        {docExams.length === 0 ? <p className="text-xs text-zinc-600 italic bg-zinc-900/50 p-4 rounded-xl border border-dashed border-zinc-800 text-center">No exams for this document.</p> : (
-          <div className="space-y-3">
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
+        {docExams.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No exams created for this document yet.</p> : (
+          <div className="space-y-4">
             {docExams.map(e => (
-              <div key={e.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex justify-between items-center group shadow-sm">
-                <div>
-                  <p className="text-sm text-white font-bold">{e.title}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mt-1">{e.questions.length} Qs • Pages {e.sourcePages}</p>
+              <div key={e.id} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl group shadow-md transition-all hover:border-emerald-500/30">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm text-white font-bold mb-1">{e.title}</p>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 bg-zinc-950 px-2 py-1 rounded-lg border border-zinc-800">{e.questions.length} Questions • Pgs {e.sourcePages}</span>
+                  </div>
+                  <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
                 </div>
-                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash size={14}/></button>
+                <div className="text-xs text-zinc-400 line-clamp-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                  <span className="text-emerald-500 font-bold mr-2">Q1:</span> {e.questions[0]?.q}
+                </div>
               </div>
             ))}
           </div>
@@ -751,14 +809,31 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
       </div>
 
       <div>
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-4 flex items-center gap-2"><BookA size={14}/> Saved Notes ({docNotes.length})</h3>
-        {docNotes.length === 0 ? <p className="text-xs text-zinc-600 italic bg-zinc-900/50 p-4 rounded-xl border border-dashed border-zinc-800 text-center">No summaries for this document.</p> : (
-          <div className="space-y-3">
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-5 flex items-center gap-2 bg-indigo-500/10 w-fit px-3 py-1.5 rounded-lg border border-indigo-500/20"><Layers size={16}/> Saved Flashcards ({docCards.length})</h3>
+        {docCards.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No flashcards extracted for this document.</p> : (
+          <div className="space-y-4">
+            {docCards.slice(0, 5).map(c => (
+              <div key={c.id} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-md hover:border-indigo-500/30 transition-all">
+                <p className="text-xs text-white font-bold line-clamp-2 leading-relaxed"><span className="text-zinc-600 mr-2 text-[10px] uppercase">Q</span>{c.q}</p>
+                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
+              </div>
+            ))}
+            {docCards.length > 5 && <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-center pt-4 bg-zinc-900/30 rounded-xl py-3 border border-dashed border-zinc-800">+{docCards.length - 5} more in Library Tab</div>}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-5 flex items-center gap-2 bg-blue-500/10 w-fit px-3 py-1.5 rounded-lg border border-blue-500/20"><BookA size={16}/> Saved Notes ({docNotes.length})</h3>
+        {docNotes.length === 0 ? <p className="text-sm text-zinc-600 italic bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-zinc-800 text-center">No notes or summaries generated.</p> : (
+          <div className="space-y-4">
             {docNotes.map(n => (
-              <div key={n.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl group relative pr-10 shadow-sm">
-                <p className="text-sm text-white font-bold">{n.title}</p>
-                <p className="text-xs text-zinc-400 truncate mt-2">{n.content}</p>
-                <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-1/2 -translate-y-1/2 right-3 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash size={14}/></button>
+              <div key={n.id} className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl group relative shadow-md hover:border-blue-500/30 transition-all">
+                <div className="pr-12">
+                   <p className="text-sm text-white font-bold mb-2">{n.title}</p>
+                   <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed bg-zinc-950 p-3 rounded-xl border border-zinc-800">{n.content}</p>
+                </div>
+                <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-5 right-4 p-2 bg-zinc-950 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
               </div>
             ))}
           </div>
