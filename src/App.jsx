@@ -975,42 +975,46 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     }
   };
 
-  return (
-    <div className="flex-1 flex flex-col h-full bg-gray-200 dark:bg-[#050505] relative overflow-hidden">
-      {/* Header */}
-      <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 z-10">
+    return (
+    <div className="flex-1 flex flex-col h-full bg-zinc-100 dark:bg-black relative overflow-hidden" onContextMenu={(e) => {
+      const sel = window.getSelection().toString().trim();
+      if (sel) { e.preventDefault(); setSelectedText(sel); setMenuPos({x: e.pageX, y: e.pageY}); setShowMenu(true); }
+    }}>
+      {/* الهيدر العلوي */}
+      <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 z-10">
         <div className="flex items-center gap-2 overflow-hidden">
-          <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 rounded-xl">
-            <ChevronLeft size={16} /> Exit
+          <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-200/50 dark:bg-zinc-800 px-3 py-1.5 rounded-xl">
+            <ChevronLeft size={16} /> خروج
           </button>
           <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px]">{activeDoc.name}</span>
         </div>
-        <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 rounded-xl border transition-all ${rightPanelOpen ? 'bg-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 text-gray-500'}`}>
+        <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 rounded-xl border transition-all ${rightPanelOpen ? 'bg-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
           {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
         </button>
       </div>
 
-      {/* Scroll Container */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-300 dark:bg-[#121214] flex flex-col relative custom-scrollbar items-center justify-start pb-48">
+      {/* حاوية الـ PDF - تم تعديل justify-center ليكون المحتوى متوازناً */}
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-zinc-200 dark:bg-zinc-950 flex flex-col relative p-4 custom-scrollbar items-center justify-center min-h-0 pb-32">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32} /></div>
         ) : pdf ? (
-          <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto overflow-hidden mb-10">
+          /* تم إضافة my-auto و min-h-fit لضمان عدم ضغط الصفحة */
+          <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto rounded-sm overflow-hidden my-auto min-h-fit">
             <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" />
           </div>
         ) : <AlertCircle className="text-red-500" />}
       </div>
 
-      {/* Floating Buttons */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-2xl z-30">
-        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200"><ChevronLeft size={20}/></button>
-        <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-sm whitespace-nowrap">PG {localPage} / {activeDoc.totalPages}</span>
-        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full hover:opacity-90"><ChevronRight size={20}/></button>
+      {/* أزرار التنقل السفلية - تم خفضها قليلاً وتوضيحها */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-2xl z-30">
+        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200 transition-colors"><ChevronLeft size={20}/></button>
+        <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-sm whitespace-nowrap">صفحة {localPage} / {activeDoc.totalPages}</span>
+        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full hover:opacity-90 shadow-lg shadow-[var(--accent-color)]/20 transition-all"><ChevronRight size={20}/></button>
       </div>
     </div>
   );
-}
+
 
 
 function PanelSettings({ settings, setSettings }) {
