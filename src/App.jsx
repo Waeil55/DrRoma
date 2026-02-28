@@ -9,10 +9,10 @@ import {
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
   FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play, Bookmark, History,
   Dna, Microscope, Pill, Thermometer, ClipboardList, Zap, Database, Search, FileText, BarChart2, Globe, Bot, Code, Palette, Type, Download, Mic,
-  Moon, Sun, HelpCircle, Printer, Menu
+  Moon, Sun, HelpCircle, Printer
 } from 'lucide-react';
 
-const DB_NAME = 'MariamProDB_v6';
+const DB_NAME = 'MariamProDB_v4';
 const STORE_NAME = 'pdfs';
 
 const openDB = () => new Promise((resolve, reject) => {
@@ -24,11 +24,11 @@ const openDB = () => new Promise((resolve, reject) => {
   request.onerror = () => reject(request.error);
 });
 
-const savePdfData = async (id, data) => {
+const savePdfData = async (id, buffer) => {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(data, id);
+    tx.objectStore(STORE_NAME).put(buffer, id);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -81,8 +81,9 @@ const loadJsPDF = async () => {
 
 const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 16384) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
+  
   const sysPrompt = strictMode
-    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array."
+    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE."
     : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
   
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
@@ -92,7 +93,7 @@ const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 16384)
       'Authorization': `Bearer ${apiKey.trim()}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini', 
       messages: [
         { role: "system", content: sysPrompt + (expectJson ? " You MUST respond in strictly valid JSON format. No markdown wrappers." : "") },
         { role: "user", content: prompt }
@@ -100,7 +101,7 @@ const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 16384)
       response_format: expectJson ? { type: "json_object" } : { type: "text" },
       max_tokens: maxTokens,
       temperature: strictMode ? 0.1 : 0.7,
-      stream: false
+      stream: false 
     }),
   });
   
@@ -126,7 +127,7 @@ export default function App() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentView, setCurrentView] = useState('library');
   const [rightPanelTab, setRightPanelTab] = useState('generate');
-  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(true);
   const [online, setOnline] = useState(navigator.onLine);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -180,12 +181,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const docsToSave = documents.map(d => {
-        const copy = { ...d };
-        delete copy.pagesText;
-        return copy;
-      });
-      localStorage.setItem('drMariam_docs', JSON.stringify(docsToSave));
+      localStorage.setItem('drMariam_docs', JSON.stringify(documents));
       localStorage.setItem('drMariam_flashcards', JSON.stringify(flashcards));
       localStorage.setItem('drMariam_exams', JSON.stringify(exams));
       localStorage.setItem('drMariam_notes', JSON.stringify(notes));
@@ -292,17 +288,18 @@ export default function App() {
         id,
         name: file.name,
         totalPages,
+        pagesText,
         progress: 1,
         addedAt: new Date().toISOString()
       };
-      await savePdfData(id, { buffer: arrayBuffer, pagesText });
+      await savePdfData(id, arrayBuffer);
       setDocuments(prev => [...prev, newDoc]);
       setOpenDocs(prev => [...prev, id]);
       setActiveDocId(id);
       setDocPages(prev => ({...prev, [id]: 1}));
       setCurrentView('reader');
       setRightPanelTab('generate');
-      setRightPanelOpen(false); // Default hidden on mobile
+      setRightPanelOpen(true);
     } catch (error) {
       console.error(error);
     } finally {
@@ -326,14 +323,14 @@ export default function App() {
     await deletePdfData(id);
     setDocuments(prev => prev.filter(d => d.id !== id));
     setFlashcards(prev => prev.filter(f => f.docId !== id));
-    setExams(prev => prev.filter(ex => ex.docId !== id));
+    setExams(prev => prev.filter(ex => ex.id !== id));
     setNotes(prev => prev.filter(n => n.docId !== id));
     closeDoc(id);
   };
 
   const activeDoc = documents.find(d => d.id === activeDocId);
 
-  const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
+  const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()) || Object.values(d.pagesText).some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))) : documents;
 
   return (
     <>
@@ -346,44 +343,40 @@ export default function App() {
         }
         body { background-color: var(--bg-root); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
       `}</style>
-      <div className={`flex flex-col-reverse md:flex-row h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`flex flex-col md:flex-row h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
         
-        {/* RESPONSIVE SIDEBAR/BOTTOM NAV */}
-        <nav className="w-full md:w-24 h-16 md:h-full bg-white dark:bg-[#0a0a0c] border-t md:border-t-0 md:border-r border-gray-200 dark:border-zinc-800/50 flex flex-row md:flex-col items-center justify-around md:justify-start py-0 md:py-6 z-50 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)] md:shadow-2xl transition-all">
-          <div className="hidden md:flex w-14 h-14 rounded-full bg-[var(--accent-color)] items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-10 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
-            <BrainCircuit className="text-white w-7 h-7" />
+        {/* RESPONSIVE NAVIGATION BAR */}
+        <nav className="w-full md:w-20 h-16 md:h-full bg-white dark:bg-[#0a0a0c] border-t md:border-t-0 md:border-r border-gray-200 dark:border-zinc-800/30 flex flex-row md:flex-col items-center justify-around md:justify-start py-0 md:py-6 z-50 shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] dark:shadow-black/50 order-last md:order-first">
+          <div className="hidden md:flex w-12 h-12 rounded-full bg-[var(--accent-color)] items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
+            <BrainCircuit className="text-white w-6 h-6" />
           </div>
-          
-          <div className="flex-1 flex flex-row md:flex-col gap-2 md:gap-6 w-full px-2 items-center justify-around md:justify-start overflow-x-auto md:overflow-y-auto custom-scrollbar">
+          <div className="flex-1 flex flex-row md:flex-col gap-2 md:gap-6 w-full px-2 items-center justify-around md:justify-start overflow-x-auto md:overflow-visible">
             <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
-            <SidebarBtn icon={Layers} label="Cards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
+            <SidebarBtn icon={Layers} label="Flashcards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
             <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
             <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
-            <SidebarBtn icon={LayoutDashboard} label="Hub" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} className="hidden md:flex" />
-            
+            <SidebarBtn icon={LayoutDashboard} label="Dashboard" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} className="hidden md:flex" />
             {activeDocId && (
               <>
-                <div className="hidden md:block w-10 h-px bg-gray-300 dark:bg-zinc-800 mx-auto my-1" />
+                <div className="hidden md:block w-8 h-px bg-gray-200 dark:bg-zinc-800 mx-auto my-1" />
                 <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
               </>
             )}
-            <div className="md:hidden w-px h-8 bg-gray-300 dark:bg-zinc-800 mx-1" />
+            <div className="block md:hidden w-px h-8 bg-gray-200 dark:bg-zinc-800 mx-1"></div>
             <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} className="md:hidden" />
           </div>
-          
-          <div className="hidden md:block mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800/30 w-full px-2">
-             <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
+          <div className="hidden md:block w-full">
+            <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
           </div>
-          {!online && <div className="absolute bottom-2 md:bottom-auto md:top-2 bg-red-500/20 text-red-500 font-bold px-2 py-1 rounded text-[10px] uppercase">Offline</div>}
+          {!online && <div className="absolute top-2 right-2 md:bottom-4 md:top-auto bg-red-500/20 text-red-500 px-2 py-1 rounded text-xs font-bold uppercase">Offline</div>}
         </nav>
 
-        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 pb-16 md:pb-0 h-[calc(100vh-4rem)] md:h-screen">
+        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 h-[calc(100vh-4rem)] md:h-screen">
           {isUploading && (
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
               <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
             </div>
           )}
-
           {!activeDocId && currentView === 'library' && (
             <LibraryView documents={filteredDocuments} onUpload={handleFileUpload} onOpen={(id) => { setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setCurrentView('reader'); }} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           )}
@@ -400,15 +393,10 @@ export default function App() {
             <DashboardView documents={documents} flashcards={flashcards} exams={exams} notes={notes} />
           )}
           {!activeDocId && currentView === 'settings' && (
-            <div className="flex-1 overflow-y-auto p-4 md:p-10 lg:p-16 custom-scrollbar bg-gray-50 dark:bg-[#0a0a0c]">
-              <div className="max-w-3xl mx-auto pb-20">
-                 <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 flex items-center gap-4"><Settings className="text-[var(--accent-color)]"/> System Settings</h1>
-                 <PanelSettings settings={userSettings} setSettings={setUserSettings} />
-              </div>
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 flex items-start justify-center custom-scrollbar">
+              <div className="w-full max-w-2xl pb-20"><PanelSettings settings={userSettings} setSettings={setUserSettings} /></div>
             </div>
           )}
-
-          {/* READER WORKSPACE */}
           {activeDocId && (
             <PdfWorkspace 
               activeDoc={activeDoc} 
@@ -434,17 +422,22 @@ export default function App() {
               setRightPanelTab={setRightPanelTab} 
             />
           )}
+          {activeDocId && !rightPanelOpen && (
+            <button onClick={() => setRightPanelOpen(true)} className="fixed bottom-20 md:bottom-8 right-4 md:right-8 p-4 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-105 transition-transform z-30">
+              <Sparkles size={24} />
+            </button>
+          )}
         </main>
 
-        {/* RESPONSIVE RIGHT AI PANEL */}
-        {activeDocId && (
-          <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-0 bottom-16 md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
-            <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center justify-between shrink-0 shadow-md">
-              <div className="flex items-center gap-3">
-                <Target size={18} className="text-white"/>
+        {/* RIGHT AI PANEL */}
+        {rightPanelOpen && activeDocId && (
+          <aside className="fixed inset-0 z-40 md:relative md:flex w-full md:w-[400px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex-col shrink-0 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-all duration-300">
+            <div className="bg-[var(--accent-color)] px-4 py-3 flex items-center justify-between shrink-0 shadow-md">
+              <div className="flex items-center gap-2">
+                <Target size={16} className="text-white"/>
                 <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
               </div>
-              <button onClick={() => setRightPanelOpen(false)} className="md:hidden text-white/80 hover:text-white p-1 rounded-lg"><X size={20} /></button>
+              <button onClick={() => setRightPanelOpen(false)} className="md:hidden text-white hover:bg-white/20 p-1.5 rounded-lg transition-colors"><X size={20}/></button>
             </div>
             <div className="h-16 flex p-2 bg-gray-50/50 dark:bg-[#0a0a0c]/50 border-b border-gray-200 dark:border-zinc-800/30 shrink-0 gap-1 items-center">
               <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Studio" icon={Sparkles} />
@@ -452,17 +445,17 @@ export default function App() {
               <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
               <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+            <div className="flex-1 overflow-hidden relative">
               {rightPanelTab === 'settings' ? (
                 <PanelSettings settings={userSettings} setSettings={setUserSettings} />
               ) : !userSettings.apiKey?.trim() ? (
                 <div className="p-8 text-center mt-20">
-                  <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <AlertCircle className="w-12 h-12 text-red-500" />
+                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <AlertCircle className="w-10 h-10 text-red-500" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">OpenAI Key Required</h2>
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">OpenAI Key Required</h2>
                   <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
-                  <button onClick={() => setRightPanelTab('settings')} className="px-8 py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
+                  <button onClick={() => setRightPanelTab('settings')} className="px-6 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
                 </div>
               ) : rightPanelTab === 'generate' ? (
                 <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
@@ -474,18 +467,17 @@ export default function App() {
             </div>
           </aside>
         )}
-
-        {/* OVERLAYS */}
         {showShortcuts && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
-            <div className="bg-white dark:bg-zinc-900 p-10 rounded-3xl max-w-md w-full shadow-2xl m-4" onClick={e=>e.stopPropagation()}>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800 dark:text-white"><HelpCircle className="text-[var(--accent-color)]"/> Keyboard Shortcuts</h2>
-              <ul className="space-y-4 text-sm text-gray-600 dark:text-zinc-300">
-                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Arrow Left / Right</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold">Change Page</kbd></li>
-                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Show Help</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold">?</kbd></li>
-                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Close Modal</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold">Esc</kbd></li>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
+            <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl max-w-md w-full shadow-2xl m-4" onClick={e=>e.stopPropagation()}>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-white"><HelpCircle className="text-[var(--accent-color)]" /> Keyboard Shortcuts</h2>
+              <ul className="space-y-3 text-sm text-gray-600 dark:text-zinc-300">
+                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Arrow Left / Right</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold shadow-sm">Change Page</kbd></li>
+                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Show Help</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold shadow-sm">?</kbd></li>
+                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Upload PDF</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold shadow-sm">Ctrl + U</kbd></li>
+                <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Close Modal</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold shadow-sm">Esc</kbd></li>
               </ul>
-              <button onClick={() => setShowShortcuts(false)} className="mt-8 w-full py-4 bg-[var(--accent-color)] text-white font-bold tracking-widest uppercase text-xs rounded-xl shadow-lg">Dismiss</button>
+              <button onClick={() => setShowShortcuts(false)} className="mt-6 w-full py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white font-bold rounded-xl shadow-lg transition-colors">Dismiss</button>
             </div>
           </div>
         )}
@@ -493,7 +485,7 @@ export default function App() {
           <div className="fixed inset-0 z-50" onClick={() => setShowMenu(false)}>
             <div className="absolute bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 rounded-xl shadow-2xl p-2 min-w-[200px]" style={{left: menuPos.x, top: menuPos.y}}>
               <button onClick={() => { setShowMenu(false); setGenFromSelection(selectedText); setRightPanelOpen(true); setRightPanelTab('generate'); }} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg w-full text-left text-sm font-bold text-[var(--accent-color)] transition-colors">
-                <Sparkles size={18} /> Generate from Text
+                <Sparkles size={18} /> Generate from Selection
               </button>
             </div>
           </div>
@@ -503,20 +495,21 @@ export default function App() {
   );
 }
 
-function SidebarBtn({ icon: Icon, label, active, onClick, highlight, className = '' }) {
+function SidebarBtn({ icon: Icon, label, active, onClick, highlight, className = "" }) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-1 transition-all group w-16 md:w-full ${className}`}
+      title={label}
+      className={`flex flex-col items-center justify-center gap-1 w-16 md:w-full transition-all group relative ${className}`}
     >
-      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.25rem] flex items-center justify-center transition-all ${
+      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[1rem] flex items-center justify-center transition-all ${
         active
-          ? highlight ? 'bg-[var(--accent-color)] text-white shadow-xl shadow-[var(--accent-color)]/40 scale-105' : 'bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-white shadow-lg md:scale-105'
-          : 'bg-transparent text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800/80 hover:text-gray-800 dark:hover:text-zinc-200'
+          ? highlight ? 'bg-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/40 md:scale-105' : 'bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-white shadow-md md:scale-105'
+          : 'bg-transparent text-gray-500 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-zinc-800/80 hover:text-gray-800 dark:hover:text-zinc-200'
       }`}>
         <Icon size={20} className="md:w-6 md:h-6" />
       </div>
-      <span className={`text-[8px] md:text-[9px] font-bold uppercase tracking-widest transition-all text-center leading-none ${active ? (highlight ? 'text-[var(--accent-color)]' : 'text-gray-800 dark:text-white') : 'text-gray-400 dark:text-zinc-600 group-hover:text-gray-600 dark:group-hover:text-zinc-400'}`}>
+      <span className={`text-[9px] font-bold uppercase tracking-widest transition-all text-center leading-tight mt-1 ${active ? (highlight ? 'text-[var(--accent-color)]' : 'text-gray-800 dark:text-white') : 'text-gray-400 dark:text-zinc-600 group-hover:text-gray-600 dark:group-hover:text-zinc-400'}`}>
         {label}
       </span>
     </button>
@@ -528,7 +521,7 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
     <button
       onClick={onClick}
       className={`flex-1 flex flex-col items-center justify-center gap-1.5 h-full rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all ${
-        active ? 'bg-white dark:bg-zinc-800/90 text-[var(--accent-color)] shadow-sm border border-gray-200 dark:border-zinc-700' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-white dark:hover:bg-zinc-900'
+        active ? 'bg-white dark:bg-zinc-800/90 text-[var(--accent-color)] shadow-sm border border-gray-200 dark:border-zinc-700/50' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100/50 dark:hover:bg-zinc-900/50'
       }`}
     >
       <Icon size={16} /> {label}
@@ -537,81 +530,76 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
 }
 
 function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes, setView, searchQuery, setSearchQuery }) {
-  const totalCardsCount = flashcards.reduce((sum, set) => sum + (set.cards ? set.cards.length : 0), 0);
-
   return (
     <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
       <div className="max-w-7xl mx-auto w-full">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 md:mb-16 gap-6 md:gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-gray-800 dark:text-white tracking-tighter mb-4 flex items-center gap-3 md:gap-4">
+            <h1 className="text-3xl md:text-5xl font-black text-gray-800 dark:text-white tracking-tighter mb-2 md:mb-4 flex items-center gap-3 md:gap-4">
               Intelligence <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-color)] to-purple-500">Nexus</span>
             </h1>
-            <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-2xl leading-relaxed">Your secure, local medical knowledge base. Upload materials and let the elite AI extract exams, notes, and cards seamlessly.</p>
+            <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-2xl leading-relaxed">Your secure, local medical knowledge base. Upload materials and let the elite AI extract exams, notes, and cards.</p>
           </div>
-          <label className={`cursor-pointer w-full lg:w-auto justify-center bg-white dark:bg-zinc-100 text-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-200 px-6 md:px-8 py-4 md:py-5 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-3 md:gap-4 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-            {isUploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
-            {isUploading ? "PROCESSING..." : "IMPORT LOCAL PDF"}
+          <label className={`cursor-pointer w-full md:w-auto justify-center bg-white dark:bg-zinc-100 text-zinc-950 dark:text-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-200 px-6 md:px-8 py-3 md:py-4 rounded-xl font-black text-xs md:text-sm flex items-center gap-3 transition-all shadow-lg hover:shadow-xl ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+            {isUploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+            {isUploading ? "PROCESSING PDF..." : "IMPORT SECURE PDF"}
             <input type="file" accept="application/pdf" className="hidden" onChange={onUpload} disabled={isUploading} />
           </label>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
-          <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-8 md:h-8"/></div>
-            <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{notes.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Generated Notes</p></div>
-          </div>
-          <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-8 md:h-8"/></div>
-            <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{totalCardsCount}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Active Flashcards</p></div>
-          </div>
-          <div onClick={() => setView('exams')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-8 md:h-8"/></div>
-            <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{exams.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Strict Exams</p></div>
+        <div className="mb-6 md:mb-8">
+          <div className="relative shadow-sm group">
+            <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-[var(--accent-color)] transition-colors" size={18}/>
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search documents..." className="w-full bg-white dark:bg-zinc-900/80 backdrop-blur-sm border border-gray-200 dark:border-zinc-800 rounded-xl md:rounded-2xl pl-12 md:pl-14 pr-6 py-3 md:py-4 text-sm font-medium outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all" />
           </div>
         </div>
-
-        {documents.length > 0 && (
-          <div className="mb-8 md:mb-10 relative">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={18}/>
-            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search inside your secure documents..." className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl md:rounded-2xl pl-12 md:pl-16 pr-6 py-4 md:py-5 text-sm md:text-base font-bold text-gray-800 dark:text-white outline-none focus:border-[var(--accent-color)] shadow-sm transition-colors" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
+          <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-transform bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-200 dark:border-zinc-800/50 p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-center gap-4 md:gap-6 shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-7 md:h-7"/></div>
+            <div><p className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white">{notes.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1">Generated Notes</p></div>
           </div>
-        )}
-
+          <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-transform bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-200 dark:border-zinc-800/50 p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-center gap-4 md:gap-6 shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-7 md:h-7"/></div>
+            <div><p className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white">{flashcards.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1">Active Flashcards</p></div>
+          </div>
+          <div onClick={() => setView('exams')} className="cursor-pointer hover:-translate-y-1 transition-transform bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-200 dark:border-zinc-800/50 p-5 md:p-6 rounded-2xl md:rounded-3xl flex items-center gap-4 md:gap-6 shadow-sm hover:shadow-md">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-7 md:h-7"/></div>
+            <div><p className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white">{exams.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1">Strict Exams</p></div>
+          </div>
+        </div>
         {documents.length === 0 ? (
-          <div className="border-2 border-dashed border-gray-300 dark:border-zinc-800/80 rounded-[2rem] md:rounded-[3rem] bg-white/50 dark:bg-zinc-900/20 backdrop-blur-sm p-12 md:p-32 text-center shadow-inner">
-            <div className="w-24 h-24 md:w-40 md:h-40 bg-gray-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-10 shadow-lg">
-              <FileUp size={48} className="md:w-16 md:h-16 text-gray-400 dark:text-zinc-600" />
+          <div className="border-2 border-dashed border-gray-300 dark:border-zinc-800/80 rounded-[2rem] md:rounded-[3rem] bg-white/50 dark:bg-zinc-900/20 backdrop-blur-sm p-12 md:p-24 text-center">
+            <div className="w-20 h-20 md:w-32 md:h-32 bg-gray-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-inner">
+              <FileUp size={32} className="md:w-12 md:h-12 text-gray-400 dark:text-zinc-600" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-3 md:mb-4">Repository Empty</h2>
-            <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-xl mx-auto leading-relaxed">Your library is securely encrypted locally. Import a textbook, research paper, or clinical guide to begin.</p>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2 md:mb-3">No Documents Found</h2>
+            <p className="text-xs md:text-base text-gray-500 dark:text-zinc-500 max-w-md mx-auto leading-relaxed">Import a textbook, research paper, or clinical guide to begin your enhanced study session.</p>
           </div>
         ) : (
           <div>
-            <h3 className="text-lg md:text-xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 flex items-center gap-3 uppercase tracking-widest"><Library size={20} className="md:w-6 md:h-6 text-[var(--accent-color)]"/> Local Documents</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white mb-4 md:mb-6 flex items-center gap-2"><Library size={20} className="text-[var(--accent-color)]"/> Your Library</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {documents.map(doc => {
-                const docCards = flashcards.filter(f => f.docId === doc.id).reduce((sum, set) => sum + (set.cards?set.cards.length:0), 0);
+                const docCards = flashcards.filter(f => f.docId === doc.id).length;
                 const docExams = exams.filter(e => e.docId === doc.id).length;
                 return (
-                  <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 border border-gray-200 dark:border-zinc-800 hover:border-[var(--accent-color)]/50 hover:shadow-[0_20px_60px_rgba(var(--accent-color-rgb),0.15)] cursor-pointer transition-all flex flex-col h-60 md:h-72 group relative overflow-hidden shadow-lg">
-                    <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-[var(--accent-color)]/5 rounded-bl-full -z-10 group-hover:bg-[var(--accent-color)]/10 transition-colors" />
-                    <div className="flex items-start justify-between mb-6 md:mb-8 z-10">
-                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-all shadow-md">
-                        <BookOpen size={24} className="md:w-7 md:h-7"/>
+                  <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl rounded-2xl md:rounded-3xl p-5 md:p-6 border border-gray-200 dark:border-zinc-800 hover:border-[var(--accent-color)]/50 hover:shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.1)] cursor-pointer transition-all flex flex-col h-56 md:h-64 group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-[var(--accent-color)]/5 rounded-bl-full -z-10 group-hover:bg-[var(--accent-color)]/10 transition-colors" />
+                    <div className="flex items-start justify-between mb-4 md:mb-6 z-10">
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-400 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-all shadow-sm">
+                        <BookOpen size={20} className="md:w-6 md:h-6"/>
                       </div>
-                      <button onClick={(e) => deleteDocument(doc.id, e)} className="p-2 md:p-3 bg-gray-100 dark:bg-zinc-950/50 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm">
-                        <Trash2 size={18} className="md:w-5 md:h-5"/>
+                      <button onClick={(e) => deleteDocument(doc.id, e)} className="p-2 md:p-2.5 bg-gray-100 dark:bg-zinc-950/50 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/20 rounded-lg md:rounded-xl transition-all opacity-100 md:opacity-0 group-hover:opacity-100 backdrop-blur-sm">
+                        <Trash2 size={16} />
                       </button>
                     </div>
-                    <h3 className="font-black text-gray-800 dark:text-white text-base md:text-xl leading-snug line-clamp-2 flex-1 z-10">{doc.name}</h3>
-                    <div className="mt-4 pt-4 md:pt-6 border-t border-gray-200 dark:border-zinc-800/80 z-10">
-                      <div className="flex justify-between items-center mb-2 md:mb-4">
-                        <div className="flex gap-2">
-                          <span className="text-[8px] md:text-[10px] font-bold text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 md:py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">{docCards} Cards</span>
-                          <span className="text-[8px] md:text-[10px] font-bold text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 md:py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">{docExams} Exams</span>
+                    <h3 className="font-bold text-gray-800 dark:text-white text-sm md:text-lg leading-snug line-clamp-2 flex-1 z-10">{doc.name}</h3>
+                    <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200 dark:border-zinc-800/80 z-10">
+                      <div className="flex justify-between items-center mb-2 md:mb-3">
+                        <div className="flex gap-1 md:gap-2">
+                          <span className="text-[9px] md:text-[10px] font-bold text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 py-1 rounded-md">{docCards} Sets</span>
+                          <span className="text-[9px] md:text-[10px] font-bold text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 py-1 rounded-md">{docExams} Exams</span>
                         </div>
-                        <span className="text-[10px] md:text-xs font-black text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 md:py-1.5 rounded-lg border border-[var(--accent-color)]/20">PG {doc.progress}/{doc.totalPages}</span>
+                        <span className="text-[9px] md:text-[11px] font-black text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 md:px-2.5 py-1 rounded-md">PG {doc.progress}/{doc.totalPages}</span>
                       </div>
                     </div>
                   </div>
@@ -642,41 +630,44 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
   };
 
   if (studyingSet) {
-    return <InPanelFlashcards title={studyingSet.title} initialCards={studyingSet.cards} onBack={() => setStudyingSet(null)} setFlashcards={setFlashcards} fullScreen={true} />;
+    return (
+      <div className="flex-1 overflow-hidden h-full">
+        <InPanelFlashcards title={studyingSet.title} initialCards={studyingSet.cards} onBack={() => setStudyingSet(null)} setFlashcards={setFlashcards} isGlobal={true} />
+      </div>
+    );
   }
 
   if (flashcards.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-transparent text-center">
-      <Layers size={80} className="text-gray-300 dark:text-zinc-800 mb-8" />
-      <h2 className="text-3xl font-black text-gray-800 dark:text-white mb-4">No Flashcards Created</h2>
-      <p className="text-gray-500 dark:text-zinc-400 max-w-md text-lg">Open a document and use the AI Generator to extract high-yield flashcard sets.</p>
-      <button onClick={() => setView('library')} className="mt-8 px-8 py-4 bg-[var(--accent-color)] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
+    <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
+      <Layers size={64} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-6" />
+      <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">No Flashcards</h2>
+      <p className="text-sm md:text-base text-gray-500 dark:text-zinc-500 max-w-md">Open a document and use the AI Generator to extract targeted flashcards.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-5 md:px-6 py-2.5 md:py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold shadow-md">Go to Library</button>
     </div>
   );
-
   return (
     <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-6">
-          <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter flex items-center gap-4"><Layers className="text-emerald-500" size={32}/> Global Flashcard Vault</h1>
-          <div className="flex flex-wrap gap-3 md:gap-4">
-            <button onClick={exportAnki} className="flex-1 md:flex-none px-4 md:px-6 py-3 md:py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 md:gap-3 shadow-lg hover:-translate-y-1 transition-all uppercase tracking-widest text-[10px] md:text-xs"><Download size={16} /> Export Anki</button>
-            <button onClick={() => setStudyingSet({ id: 'all', title: 'All Flashcards Master Set', cards: flashcards.flatMap(s => s.cards || []) })} className="flex-1 md:flex-none px-5 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl font-black flex items-center justify-center gap-2 md:gap-3 shadow-lg shadow-[var(--accent-color)]/30 hover:scale-105 transition-transform uppercase tracking-widest text-[10px] md:text-xs"><Play size={16} fill="currentColor" /> Study Everything</button>
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
+          <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter flex items-center gap-3 md:gap-4"><Layers className="text-emerald-500"/> Global Flashcard Vault</h1>
+          <div className="flex flex-wrap gap-2 md:gap-4 w-full md:w-auto">
+            <button onClick={exportAnki} className="flex-1 md:flex-none justify-center px-4 md:px-6 py-2.5 md:py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center gap-2 shadow-md text-xs md:text-sm"><Download size={16} /> Export Anki</button>
+            <button onClick={() => setStudyingSet({ id: 'all', title: 'Master Set', cards: flashcards.flatMap(s => s.cards || []) })} className="flex-1 md:flex-none justify-center px-4 md:px-6 py-2.5 md:py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold flex items-center gap-2 shadow-md hover:-translate-y-0.5 transition-transform text-xs md:text-sm"><Play size={16} /> Study All</button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {flashcards.map(set => (
-            <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-3xl relative group shadow-lg hover:shadow-xl hover:border-[var(--accent-color)]/50 transition-all flex flex-col">
-              <div className="flex-1">
-                <p className="text-xl md:text-2xl text-gray-800 dark:text-white font-black mb-4 pr-12 leading-snug">{set.title}</p>
-                <div className="flex flex-wrap items-center gap-3 mb-6 md:mb-8">
-                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-3 py-1.5 rounded-lg border border-[var(--accent-color)]/20">{set.cards ? set.cards.length : 0} Cards</span>
-                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">Source: Pages {set.sourcePages}</span>
+            <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-2xl md:rounded-3xl relative group shadow-sm hover:shadow-md hover:border-[var(--accent-color)]/50 transition-all flex flex-col h-full">
+              <div className="flex-1 mb-4 md:mb-6">
+                <p className="text-base md:text-lg text-gray-800 dark:text-white font-bold mb-2 md:mb-3 pr-8 leading-snug">{set.title}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-[var(--accent-color)]/20">{set.cards ? set.cards.length : 0} Cards</span>
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 md:py-1.5 rounded-md border border-gray-200 dark:border-zinc-800">Pgs {set.sourcePages}</span>
                 </div>
               </div>
-              <div className="flex gap-4 mt-auto">
-                <button onClick={() => setStudyingSet(set)} className="flex-1 py-3 md:py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md"><Play size={16} fill="currentColor" /> Study Set</button>
-                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== set.id))} className="p-3 md:p-4 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18}/></button>
+              <div className="flex gap-2 md:gap-4 mt-auto">
+                <button onClick={() => setStudyingSet(set)} className="flex-1 py-2 md:py-3 bg-[var(--accent-color)]/10 hover:bg-[var(--accent-color)] text-[var(--accent-color)] hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 md:gap-2"><Play size={14} fill="currentColor" /> Study</button>
+                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== set.id))} className="p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><Trash2 size={16}/></button>
               </div>
             </div>
           ))}
@@ -688,7 +679,6 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
 
 function ExamsGlobalView({ exams, setExams, setView }) {
   const [selectedExam, setSelectedExam] = useState(null);
-  
   const exportExamPdf = async (exam) => {
     try {
       await loadJsPDF();
@@ -721,54 +711,51 @@ function ExamsGlobalView({ exams, setExams, setView }) {
 
   if (selectedExam) {
     return (
-      <div className="flex-1 flex flex-col bg-transparent pb-16 md:pb-0">
-        <div className="h-16 md:h-20 flex items-center justify-between px-6 md:px-10 bg-white/90 dark:bg-[#121214]/90 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-md z-10">
+      <div className="flex-1 flex flex-col bg-transparent pb-16 md:pb-0 h-full overflow-hidden">
+        <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/90 dark:bg-[#121214]/90 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-sm z-10">
           <button
             onClick={() => setSelectedExam(null)}
-            className="flex items-center gap-2 md:gap-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-xs md:text-sm font-black uppercase tracking-widest transition-colors bg-emerald-500/10 px-4 md:px-5 py-2 md:py-3 rounded-xl border border-emerald-500/20"
+            className="flex items-center gap-1.5 md:gap-2 text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 text-xs md:text-sm font-bold uppercase tracking-widest transition-colors"
           >
-            <ChevronLeft size={18} /> <span className="hidden sm:inline">Exit Examination</span>
+            <ChevronLeft size={16} /> Exit
           </button>
-          <span className="text-xs md:text-sm font-bold text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[200px] md:max-w-none">
-            {selectedExam.title} <span className="hidden sm:inline mx-3 text-gray-300 dark:text-zinc-700">|</span> <span className="text-emerald-500 ml-2 sm:ml-0">{selectedExam.questions.length} Items</span>
+          <span className="text-[10px] md:text-sm text-gray-500 dark:text-zinc-400 font-bold truncate px-2">
+            {selectedExam.title} <span className="hidden sm:inline">• {selectedExam.questions.length} Qs</span>
           </span>
         </div>
-        <div className="flex-1 overflow-hidden relative">
-          <InPanelExam
-            exam={selectedExam}
-            onBack={() => setSelectedExam(null)}
-            fullScreen={true}
-          />
-        </div>
+        <InPanelExam
+          exam={selectedExam}
+          onBack={() => setSelectedExam(null)}
+        />
       </div>
     );
   }
   if (exams.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-transparent text-center">
-      <GraduationCap size={80} className="text-gray-300 dark:text-zinc-800 mb-8" />
-      <h2 className="text-3xl font-black text-gray-800 dark:text-white mb-4">No Exams Generated</h2>
-      <p className="text-gray-500 dark:text-zinc-400 max-w-md text-lg">Open a document and use the AI to generate a strict, board-level test on specific pages.</p>
-      <button onClick={() => setView('library')} className="mt-8 px-8 py-4 bg-[var(--accent-color)] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
+    <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
+      <GraduationCap size={64} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-6" />
+      <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">No Exams Generated</h2>
+      <p className="text-sm md:text-base text-gray-500 dark:text-zinc-500 max-w-md">Open a document and use the AI to generate a strict test on specific pages.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-5 md:px-6 py-2.5 md:py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold shadow-md">Go to Library</button>
     </div>
   );
   return (
     <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 md:mb-12 flex items-center gap-4"><GraduationCap className="text-emerald-500" size={32}/> Global Examination Vault</h1>
-        <div className="space-y-6">
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-8 flex items-center gap-3 md:gap-4"><GraduationCap className="text-emerald-500" size={32}/> Global Exam Database</h1>
+        <div className="space-y-4 md:space-y-6">
           {exams.map(e => (
-            <div key={e.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-[2rem] flex flex-col md:flex-row justify-between items-start md:items-center group hover:border-emerald-500/50 transition-all shadow-lg hover:shadow-xl gap-6">
-              <div className="flex-1 w-full">
-                <p className="text-xl md:text-2xl text-gray-800 dark:text-white font-black mb-3">{e.title}</p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">{e.questions.length} Questions</span>
-                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">Source: Pgs {e.sourcePages}</span>
+            <div key={e.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-2xl md:rounded-3xl flex flex-col sm:flex-row justify-between sm:items-center group hover:border-emerald-500/50 transition-all shadow-sm gap-4">
+              <div>
+                <p className="text-base md:text-lg text-gray-800 dark:text-white font-black mb-2">{e.title}</p>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg border border-emerald-500/20">{e.questions.length} Qs</span>
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 rounded-md md:rounded-lg border border-gray-200 dark:border-zinc-800">Pgs {e.sourcePages}</span>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <button onClick={() => exportExamPdf(e)} className="flex-1 md:flex-none px-4 md:px-5 py-3 md:py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md"><Printer size={16} /> Export</button>
-                <button onClick={() => setSelectedExam(e)} className="flex-1 md:flex-none px-5 md:px-8 py-3 md:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 hover:scale-105"><Play size={16} fill="currentColor"/> Take Exam</button>
-                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-3 md:p-4 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all shadow-sm"><Trash2 size={18}/></button>
+              <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
+                <button onClick={() => exportExamPdf(e)} className="flex-1 sm:flex-none p-2 md:p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-all flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs font-bold"><Printer size={16} /> <span className="sm:hidden">PDF</span></button>
+                <button onClick={() => setSelectedExam(e)} className="flex-1 sm:flex-none p-2 md:p-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition-all flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs font-bold"><Play size={16} fill="currentColor"/> Take Exam</button>
+                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><Trash2 size={16}/></button>
               </div>
             </div>
           ))}
@@ -780,23 +767,23 @@ function ExamsGlobalView({ exams, setExams, setView }) {
 
 function NotesGlobalView({ notes, setNotes, setView }) {
   if (notes.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-10 bg-transparent text-center">
-      <BookA size={80} className="text-gray-300 dark:text-zinc-800 mb-8" />
-      <h2 className="text-3xl font-black text-gray-800 dark:text-white mb-4">No Notes Found</h2>
-      <p className="text-gray-500 dark:text-zinc-400 max-w-md text-lg">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
-      <button onClick={() => setView('library')} className="mt-8 px-8 py-4 bg-[var(--accent-color)] text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
+    <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
+      <BookA size={64} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-6" />
+      <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">No Notes Found</h2>
+      <p className="text-sm md:text-base text-gray-500 dark:text-zinc-500 max-w-md">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
+      <button onClick={() => setView('library')} className="mt-6 px-5 md:px-6 py-2.5 md:py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold shadow-md">Go to Library</button>
     </div>
   );
   return (
     <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 md:mb-12 flex items-center gap-4"><BookA className="text-blue-500" size={32}/> Global Clinical Notes</h1>
-        <div className="space-y-6 md:space-y-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-8 flex items-center gap-3 md:gap-4"><BookA className="text-blue-500" size={32}/> Global Notes Database</h1>
+        <div className="space-y-4 md:space-y-6">
           {notes.map(n => (
-            <div key={n.id} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] relative group hover:border-blue-500/50 transition-all shadow-xl">
-              <h3 className="text-xl md:text-2xl text-gray-800 dark:text-white font-black mb-4 md:mb-6 pr-12 md:pr-16">{n.title}</h3>
-              <div className="text-sm md:text-base text-gray-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-[var(--accent-color)]">{n.content}</div>
-              <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-6 right-6 md:top-10 md:right-10 p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shadow-md"><Trash2 size={18}/></button>
+            <div key={n.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-2xl md:rounded-3xl relative group hover:border-blue-500/50 transition-all shadow-sm">
+              <h3 className="text-lg md:text-xl text-gray-800 dark:text-white font-black mb-3 md:mb-4 pr-10 md:pr-12 leading-tight">{n.title}</h3>
+              <div className="text-xs md:text-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-sm md:prose-base prose-invert max-w-none">{n.content}</div>
+              <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-5 right-5 md:top-8 md:right-8 p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg md:rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash2 size={16}/></button>
             </div>
           ))}
         </div>
@@ -811,32 +798,32 @@ function DashboardView({ documents, flashcards, exams, notes }) {
   return (
     <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 flex items-center gap-4"><LayoutDashboard className="text-[var(--accent-color)]" size={32}/> Progress Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 md:mb-16">
-          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-[2rem] shadow-sm">
-            <p className="text-4xl font-black text-[var(--accent-color)] mb-2">{totalCardsCount}</p>
-            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Flashcards Created</p>
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-8 flex items-center gap-3 md:gap-4"><LayoutDashboard className="text-[var(--accent-color)]" size={32}/> Progress Dashboard</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm">
+            <p className="text-3xl md:text-4xl font-black text-[var(--accent-color)] mb-1 md:mb-2">{totalCardsCount}</p>
+            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Flashcards</p>
           </div>
-          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-[2rem] shadow-sm">
-            <p className="text-4xl font-black text-purple-500 mb-2">{exams.length}</p>
-            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Exams Generated</p>
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm">
+            <p className="text-3xl md:text-4xl font-black text-purple-500 mb-1 md:mb-2">{exams.length}</p>
+            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Exams</p>
           </div>
-          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-[2rem] shadow-sm">
-            <p className="text-4xl font-black text-blue-500 mb-2">{notes.length}</p>
-            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Notes Saved</p>
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm">
+            <p className="text-3xl md:text-4xl font-black text-blue-500 mb-1 md:mb-2">{notes.length}</p>
+            <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Notes</p>
           </div>
         </div>
-        <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white mb-6">Document Progress</h3>
-        <div className="space-y-4">
+        <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white mb-4 md:mb-6">Document Progress</h3>
+        <div className="space-y-3 md:space-y-4">
           {documents.map(doc => (
-            <div key={doc.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-5 md:p-6 rounded-[1.5rem] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <p className="text-sm font-bold text-gray-800 dark:text-white flex-1">{doc.name}</p>
+            <div key={doc.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
+              <p className="text-xs md:text-sm font-bold text-gray-800 dark:text-white flex-1 truncate">{doc.name}</p>
               <div className="flex-1 w-full">
-                <div className="h-2 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden w-full">
+                <div className="h-1.5 md:h-2 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden w-full">
                   <div className="h-full bg-[var(--accent-color)] transition-all duration-300" style={{width: `${(doc.progress / doc.totalPages * 100)}%`}} />
                 </div>
               </div>
-              <p className="text-xs text-gray-500 dark:text-zinc-400 font-mono md:w-24 text-left md:text-right">{doc.progress} / {doc.totalPages} PGs</p>
+              <p className="text-[10px] md:text-xs text-gray-500 dark:text-zinc-400 font-mono sm:w-24 sm:text-right">{doc.progress} / {doc.totalPages} PGs</p>
             </div>
           ))}
         </div>
@@ -845,7 +832,7 @@ function DashboardView({ documents, flashcards, exams, notes }) {
   );
 }
 
-function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab, pdfBuffer }) {
+function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab }) {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef(null);
@@ -857,26 +844,26 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
 
   useEffect(() => {
-    if (!pdfBuffer) {
-      setIsLoading(true);
-      return;
-    }
     let isMounted = true;
     const loadPdf = async () => {
       setIsLoading(true);
       try {
-        const pdfjsLib = await loadPdfJs();
-        const loadedPdf = await pdfjsLib.getDocument({ data: pdfBuffer }).promise;
-        if(isMounted) setPdf(loadedPdf);
+        const buffer = await getPdfData(activeDoc.id);
+        if (buffer && isMounted) {
+          const actualBuffer = buffer.buffer || buffer; // Handle object vs raw buffer
+          const pdfjsLib = await loadPdfJs();
+          const loadedPdf = await pdfjsLib.getDocument({ data: actualBuffer }).promise;
+          if (isMounted) setPdf(loadedPdf);
+        }
       } catch (e) {
-        console.error("Failed to load PDF from buffer", e);
+        console.error("Failed to load PDF from DB", e);
       } finally {
-        if(isMounted) setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     };
     loadPdf();
     return () => { isMounted = false; };
-  }, [pdfBuffer]);
+  }, [activeDoc.id]);
 
   useEffect(() => {
     if (!pdf) return;
@@ -890,14 +877,16 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         if (!container || !isMounted) return;
         
         const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        if (!containerWidth || !containerHeight) return;
+        
+        if (!containerWidth) return;
 
-        // Perfectly fit the PDF horizontally/vertically without scrollbars
-        const padding = window.innerWidth < 768 ? 20 : 60; // Less padding on mobile
+        // FIT TO WIDTH Logic (allows vertical scrolling, eliminates "square" issue)
+        const padding = window.innerWidth < 768 ? 16 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = Math.min((containerWidth - padding) / tempViewport.width, (containerHeight - padding) / tempViewport.height);
-        const viewport = page.getViewport({ scale: Math.max(scale, 0.5) });
+        const scale = (containerWidth - padding) / tempViewport.width;
+        // Limit max scale so it doesn't get ridiculously huge on ultrawides, but ensure it fits width
+        const finalScale = Math.min(Math.max(scale, 0.5), 3.0); 
+        const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
         if (canvas) {
@@ -957,6 +946,11 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       setLocalPage(next);
       setCurrentPage(next); 
       setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
+      
+      // Scroll to top of PDF container when changing pages
+      if (containerRef.current) {
+        containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
@@ -971,8 +965,10 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-gray-200 dark:bg-[#050505] relative" onContextMenu={handleContextMenu}>
-      <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-300 dark:border-zinc-800/50 shrink-0 shadow-sm z-10">
+    <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-[#050505] relative" onContextMenu={handleContextMenu}>
+      
+      {/* Top Header */}
+      <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 shadow-sm z-10">
         <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
           <button onClick={closeDoc} className="flex items-center gap-1 md:gap-2 text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white transition-colors text-[10px] md:text-xs font-black uppercase tracking-widest bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl">
             <ChevronLeft size={16} /> <span className="hidden sm:inline">Exit</span>
@@ -980,47 +976,52 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           <div className="w-px h-6 bg-gray-300 dark:bg-zinc-800"></div>
           <span className="text-xs md:text-sm font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px] md:max-w-md" title={activeDoc.name}>{activeDoc.name}</span>
         </div>
-        <div className="flex items-center gap-3 md:gap-6">
-          <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 md:p-2.5 rounded-xl border transition-all shadow-md ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-300 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-zinc-800'}`}>
-            {rightPanelOpen ? <PanelRightClose size={18} className="md:w-5 md:h-5" /> : <PanelRightOpen size={18} className="md:w-5 md:h-5" />}
+        <div className="flex items-center gap-3 md:gap-4">
+          <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 md:p-2.5 rounded-xl border transition-all shadow-sm ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'}`}>
+            {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
           </button>
         </div>
       </div>
+
+      {/* Tabs */}
       {openDocs.length > 1 && (
-        <div className="flex gap-2 px-4 md:px-6 py-2 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-300 dark:border-zinc-800/50 overflow-x-auto custom-scrollbar">
+        <div className="flex gap-2 px-4 md:px-6 py-2 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 overflow-x-auto custom-scrollbar">
           {openDocs.map(id => {
             const doc = documents.find(d => d.id === id);
+            if (!doc) return null;
             return (
-              <div key={id} className={`flex items-center gap-2 md:gap-3 px-4 py-2 md:px-5 md:py-2.5 rounded-xl cursor-pointer transition-all font-bold text-[10px] md:text-xs uppercase tracking-widest ${activeDocId === id ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white'}`} onClick={() => setActiveDocId(id)}>
-                <span className="truncate max-w-[100px] md:max-w-[150px]">{doc.name}</span>
-                <button onClick={(e) => { e.stopPropagation(); closeTab(id); }} className={`p-1 rounded-md transition-colors ${activeDocId === id ? 'hover:bg-white/20' : 'hover:bg-gray-300 dark:hover:bg-zinc-700 hover:text-red-500'}`}><X size={12} className="md:w-3.5 md:h-3.5" /></button>
+              <div key={id} className={`flex items-center gap-2 md:gap-3 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl cursor-pointer transition-all font-bold text-[9px] md:text-xs uppercase tracking-widest ${activeDocId === id ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800'}`} onClick={() => setActiveDocId(id)}>
+                <span className="truncate max-w-[80px] md:max-w-[150px]">{doc.name}</span>
+                <button onClick={(e) => { e.stopPropagation(); closeTab(id); }} className={`p-1 rounded-md transition-colors ${activeDocId === id ? 'hover:bg-white/20' : 'hover:bg-gray-300 dark:hover:bg-zinc-700 hover:text-red-500'}`}><X size={12} /></button>
               </div>
             );
           })}
         </div>
       )}
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-2 md:p-5 custom-scrollbar items-center justify-start pb-24 md:pb-5">
+
+      {/* PDF Container (Scrollable) */}
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative shadow-[inset_0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-2 md:p-5 custom-scrollbar items-center justify-start pb-32 md:pb-24">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 md:gap-6 text-gray-500 dark:text-zinc-500">
-            <Loader2 className="animate-spin text-[var(--accent-color)]" size={32} />
+            <Loader2 className="animate-spin text-[var(--accent-color)]" size={32} md:size={48} />
             <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span>
           </div>
         ) : pdf ? (
-          <div className="relative shadow-[0_10px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-sm overflow-hidden" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
+          <div className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-md overflow-hidden" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
             <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
           </div>
         ) : (
-          <div className="m-auto text-red-500 text-xs md:text-sm flex items-center gap-2 md:gap-3 bg-red-50 dark:bg-red-500/10 p-4 md:p-6 rounded-2xl border border-red-200 dark:border-red-500/20 font-bold shadow-sm">
-            <AlertCircle size={16} className="md:w-5 md:h-5" /> Failed to load PDF visual layer. AI text context is still intact.
+          <div className="m-auto text-red-500 text-xs md:text-sm flex items-center gap-2 bg-red-50 dark:bg-red-500/10 p-4 md:p-6 rounded-2xl border border-red-200 dark:border-red-500/20 font-bold shadow-sm">
+            <AlertCircle size={16} /> Failed to load PDF layer.
           </div>
         )}
       </div>
 
-      {/* Floating Bottom Nav for PDF */}
-      <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-1.5 md:p-2 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-30">
+      {/* BOTTOM NAVIGATION FIXED */}
+      <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-1.5 md:p-2 rounded-full shadow-2xl z-30">
         <button onClick={() => handleNav(-1)} className="p-3 md:p-4 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-800 dark:text-white rounded-full transition-colors active:scale-95"><ChevronLeft size={20} className="md:w-6 md:h-6"/></button>
-        <span className="px-3 md:px-6 font-bold text-gray-800 dark:text-white font-mono tracking-widest text-xs md:text-sm whitespace-nowrap">PG <span className="text-[var(--accent-color)]">{localPage}</span> / {activeDoc.totalPages}</span>
+        <span className="px-4 md:px-6 font-bold text-gray-800 dark:text-white font-mono tracking-widest text-xs md:text-sm whitespace-nowrap">PG <span className="text-[var(--accent-color)]">{localPage}</span> / {activeDoc.totalPages}</span>
         <button onClick={() => handleNav(1)} className="p-3 md:p-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-full transition-colors active:scale-95 shadow-md shadow-[var(--accent-color)]/30"><ChevronRight size={20} className="md:w-6 md:h-6"/></button>
       </div>
     </div>
@@ -1029,20 +1030,21 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
 function PanelSettings({ settings, setSettings }) {
   return (
-    <div className="p-4 md:p-8 flex flex-col gap-6 md:gap-8 pb-24 md:pb-8">
-      <div className="bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/30 p-6 md:p-8 rounded-3xl shadow-lg">
-        <h3 className="text-base md:text-lg font-black text-[var(--accent-color)] flex items-center gap-2 md:gap-3 mb-4"><KeyRound size={20} className="md:w-6 md:h-6"/> OpenAI API Key</h3>
-        <p className="text-xs md:text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-6">Enter your OpenAI key (sk-...) to power the AI extraction engine. Keys are saved securely in your browser's local storage and never sent to our servers.</p>
+    <div className="flex flex-col gap-6 md:gap-8 w-full max-w-2xl mx-auto pb-10">
+      <div className="bg-[var(--accent-color)]/5 dark:bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/20 dark:border-[var(--accent-color)]/30 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-lg">
+        <h3 className="text-base md:text-lg font-black text-[var(--accent-color)] flex items-center gap-2 md:gap-3 mb-3 md:mb-4"><KeyRound size={20} className="md:w-6 md:h-6"/> OpenAI API Key</h3>
+        <p className="text-xs md:text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-4 md:mb-6">Enter your OpenAI key (sk-...) to power the AI extraction engine. Keys are saved securely in your browser's local storage and never sent to our servers.</p>
         <input
           type="password"
           value={settings.apiKey}
           onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
           placeholder="sk-proj-..."
-          className="w-full bg-white dark:bg-[#050505] border border-[var(--accent-color)]/50 rounded-2xl px-5 md:px-6 py-4 md:py-5 text-sm md:text-base text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] font-mono shadow-inner mb-4 md:mb-6 transition-all"
+          className="w-full bg-white dark:bg-[#050505] border border-gray-200 dark:border-[var(--accent-color)]/50 rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] font-mono shadow-inner mb-4 transition-all"
         />
         <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="text-[10px] md:text-xs text-[var(--accent-color)] font-bold uppercase tracking-widest hover:text-[var(--accent-color)]/80 transition-colors flex items-center gap-1">Get API Key <ChevronRight size={12} className="md:w-3.5 md:h-3.5"/></a>
       </div>
-      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-sm">
+      
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
         <label className="flex items-start gap-4 md:gap-5 cursor-pointer">
           <div className="mt-1 relative flex items-center justify-center">
             <input type="checkbox" checked={settings.strictMode} onChange={(e) => setSettings({...settings, strictMode: e.target.checked})} className="peer appearance-none w-5 h-5 md:w-6 md:h-6 border-2 border-gray-300 dark:border-zinc-600 rounded-md bg-gray-50 dark:bg-zinc-950 checked:bg-[var(--accent-color)] checked:border-[var(--accent-color)] transition-all" />
@@ -1050,39 +1052,42 @@ function PanelSettings({ settings, setSettings }) {
           </div>
           <div>
             <span className="text-sm md:text-lg font-bold text-gray-800 dark:text-white block">Strict Document Grounding</span>
-            <span className="text-xs md:text-sm text-gray-500 dark:text-zinc-400 mt-2 block leading-relaxed">Forces the AI to exclusively use the text found in the active PDF pages. Essential for medical study to guarantee zero hallucinations.</span>
+            <span className="text-xs md:text-sm text-gray-500 dark:text-zinc-400 mt-1 md:mt-2 block leading-relaxed">Forces the AI to exclusively use the text found in the active PDF pages. Essential for medical study to guarantee zero hallucinations.</span>
           </div>
         </label>
       </div>
-      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-sm">
+
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
         <h3 className="text-sm md:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2 md:gap-3 mb-4 md:mb-6"><Moon size={20} className="text-gray-400 dark:text-zinc-500 md:w-6 md:h-6"/> Interface Theme</h3>
         <div className="flex gap-2 md:gap-4">
-          <button onClick={() => setSettings({...settings, theme: 'system'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'system' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>System</button>
-          <button onClick={() => setSettings({...settings, theme: 'dark'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'dark' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Dark</button>
-          <button onClick={() => setSettings({...settings, theme: 'light'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'light' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Light</button>
+          <button onClick={() => setSettings({...settings, theme: 'system'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'system' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>System</button>
+          <button onClick={() => setSettings({...settings, theme: 'dark'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'dark' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Dark</button>
+          <button onClick={() => setSettings({...settings, theme: 'light'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.theme === 'light' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Light</button>
         </div>
       </div>
-      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-sm">
+
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
         <h3 className="text-sm md:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2 md:gap-3 mb-4 md:mb-6"><Type size={20} className="text-gray-400 dark:text-zinc-500 md:w-6 md:h-6"/> Typography Scale</h3>
         <div className="flex gap-2 md:gap-4">
-          <button onClick={() => setSettings({...settings, fontSize: 'small'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'small' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Small</button>
-          <button onClick={() => setSettings({...settings, fontSize: 'medium'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'medium' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Medium</button>
-          <button onClick={() => setSettings({...settings, fontSize: 'large'})} className={`flex-1 py-3 md:py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'large' ? 'bg-[var(--accent-color)] text-white shadow-md md:scale-105' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Large</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'small'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'small' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Small</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'medium'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'medium' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Medium</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'large'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'large' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Large</button>
         </div>
       </div>
-      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-3xl shadow-sm">
+
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
         <h3 className="text-sm md:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2 md:gap-3 mb-4 md:mb-6"><Palette size={20} className="text-gray-400 dark:text-zinc-500 md:w-6 md:h-6"/> Brand Accent</h3>
         <div className="flex gap-6 md:gap-8 items-center justify-center md:justify-start">
-          <button onClick={() => setSettings({...settings, accentColor: 'indigo'})} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-indigo-500 hover:scale-110 transition-transform ${settings.accentColor === 'indigo' ? 'ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
-          <button onClick={() => setSettings({...settings, accentColor: 'purple'})} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-purple-500 hover:scale-110 transition-transform ${settings.accentColor === 'purple' ? 'ring-4 ring-offset-4 ring-purple-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
-          <button onClick={() => setSettings({...settings, accentColor: 'blue'})} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-blue-500 hover:scale-110 transition-transform ${settings.accentColor === 'blue' ? 'ring-4 ring-offset-4 ring-blue-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
+          <button onClick={() => setSettings({...settings, accentColor: 'indigo'})} className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-indigo-500 hover:scale-110 transition-transform ${settings.accentColor === 'indigo' ? 'ring-4 ring-offset-4 ring-indigo-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
+          <button onClick={() => setSettings({...settings, accentColor: 'purple'})} className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-500 hover:scale-110 transition-transform ${settings.accentColor === 'purple' ? 'ring-4 ring-offset-4 ring-purple-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
+          <button onClick={() => setSettings({...settings, accentColor: 'blue'})} className={`w-12 h-12 md:w-16 md:h-16 rounded-full bg-blue-500 hover:scale-110 transition-transform ${settings.accentColor === 'blue' ? 'ring-4 ring-offset-4 ring-blue-500 dark:ring-offset-zinc-900 shadow-xl' : ''}`} />
         </div>
       </div>
     </div>
   );
 }
 
-function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams, setNotes, switchToReview, genFromSelection, setGenFromSelection, currentPage }) {
+function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes, switchToReview, genFromSelection, setGenFromSelection, currentPage }) {
   const [startPage, setStartPage] = useState(currentPage);
   const [endPage, setEndPage] = useState(currentPage);
   const [type, setType] = useState('exam');
@@ -1106,6 +1111,10 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
     try {
       let text = genFromSelection || "";
       if (!genFromSelection) {
+        // Fetch fresh text if we need to
+        const pdfData = await getPdfData(activeDoc.id);
+        const pagesText = pdfData?.pagesText || activeDoc.pagesText || {};
+        
         for (let i = Number(startPage); i <= Number(endPage); i++) {
           if (pagesText[i]) text += `[Page ${i}]\n${pagesText[i]}\n\n`;
         }
@@ -1113,11 +1122,12 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
       
       if (!text.trim() || text.length < 20) throw new Error("Not enough readable text found on these pages. Ensure the PDF contains actual text, not just scanned images.");
       
-      setStatus({ loading: true, msg: 'Ultra-Fast processing via AI...', err: false });
+      setStatus({ loading: true, msg: 'Ultra-Fast parallel processing via AI...', err: false });
       
       const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
       
-      const chunkSize = 4000; 
+      // Much larger chunk size for 30x speed (reduces API roundtrips)
+      const chunkSize = 15000; 
       const textChunks = [];
       for (let i = 0; i < text.length; i += chunkSize) {
         textChunks.push(text.slice(i, i + chunkSize));
@@ -1136,39 +1146,45 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
             p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
           }
           
-          const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
-          
-          let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-          let parsed;
           try {
-            parsed = JSON.parse(cleaned);
-          } catch (e) {
+            const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
+            
+            // AGGRESSIVE JSON RECOVERY
+            let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const firstBrace = cleaned.indexOf('{');
             const lastBrace = cleaned.lastIndexOf('}');
-            if (lastBrace !== -1) {
-               cleaned = cleaned.substring(0, lastBrace + 1);
-               if (!cleaned.endsWith('}')) cleaned += '}';
-               if (cleaned.startsWith('{') && !cleaned.endsWith('}')) cleaned += '}';
-               if (cleaned.includes('"items": [') && !cleaned.endsWith(']}')) cleaned += ']}';
-               try { 
-                   parsed = JSON.parse(cleaned); 
-               } catch(e2) { 
-                   console.error("JSON Recovery Failed:", e2);
-                   return []; 
-               }
-            } else {
-               console.error("JSON Parse Error: Malformed output from AI.");
-               return [];
+            if (firstBrace !== -1 && lastBrace !== -1) {
+               cleaned = cleaned.substring(firstBrace, lastBrace + 1);
             }
+            
+            // Fix unterminated arrays strings if AI cut off
+            if (!cleaned.endsWith('}')) {
+               if (cleaned.includes('"items": [')) cleaned += ']}';
+               else cleaned += '}';
+            }
+
+            const parsed = JSON.parse(cleaned);
+            return parsed.items || parsed.questions || parsed.data || [];
+          } catch (e) {
+            console.error("Chunk parsing failed safely, recovering valid parts...", e);
+            return []; // Return empty array for this chunk instead of crashing the whole app
           }
-          return parsed.items || parsed.questions || parsed.data || [];
         });
 
-        const allResults = await Promise.all(promises);
-        let combinedItems = allResults.flat();
+        // Use allSettled so if one chunk fails, the others still succeed
+        const allResults = await Promise.allSettled(promises);
+        let combinedItems = [];
         
+        allResults.forEach(res => {
+          if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+            combinedItems.push(...res.value);
+          }
+        });
+        
+        // Ensure exactly requested count
         combinedItems = combinedItems.slice(0, count);
 
-        if (combinedItems.length === 0) throw new Error("AI failed to extract any items from this text. The text might be irrelevant or too short.");
+        if (combinedItems.length === 0) throw new Error("AI failed to extract any valid items from this text. The text might be irrelevant or too short.");
 
         resultData = { type: type === 'quiz' ? 'exam' : type, title: "Generated Assessment", data: combinedItems, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
       } else {
@@ -1220,19 +1236,19 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
   };
 
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar">
+    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-24 md:pb-6">
       {!generated ? (
-        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-6 md:p-8 rounded-[2rem] flex-shrink-0 shadow-xl dark:shadow-black/50">
+        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex-shrink-0 shadow-lg dark:shadow-black/50">
           {!genFromSelection && (
-            <div className="flex items-center justify-between mb-6 md:mb-8 gap-2 md:gap-4">
+            <div className="flex items-center justify-between mb-6 md:mb-8 gap-3 md:gap-4">
               <div className="w-full relative">
                 <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">Start Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl md:rounded-2xl px-3 md:px-5 py-3 md:py-4 text-sm md:text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl md:rounded-2xl px-3 md:px-5 py-3 md:py-4 text-sm md:text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
               </div>
-              <div className="mt-6 text-gray-400 dark:text-zinc-600 font-bold text-xs md:text-base">TO</div>
+              <div className="mt-5 md:mt-6 text-gray-400 dark:text-zinc-600 font-bold text-[10px] md:text-xs uppercase tracking-widest">TO</div>
               <div className="w-full relative">
                 <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">End Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl md:rounded-2xl px-3 md:px-5 py-3 md:py-4 text-sm md:text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl md:rounded-2xl px-3 md:px-5 py-3 md:py-4 text-sm md:text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
               </div>
             </div>
           )}
@@ -1249,54 +1265,54 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
             <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="Simplify" />
           </div>
           {(type === 'flashcards' || type === 'exam' || type === 'quiz') && (
-            <div className="mb-4 md:mb-6 bg-gray-100 dark:bg-zinc-950 p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-200 dark:border-zinc-800">
-              <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
+            <div className="mb-5 md:mb-6 bg-white dark:bg-zinc-950 p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+              <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 md:mb-4 flex justify-between items-center">
                 <span>Quantity</span> 
                 <span className="text-[var(--accent-color)] text-xs md:text-sm bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 rounded-lg">{count} Items</span>
               </label>
-              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-1.5 md:h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
             </div>
           )}
-          <div className="mb-6 md:mb-8 bg-gray-100 dark:bg-zinc-950 p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-200 dark:border-zinc-800">
-            <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
+          <div className="mb-6 md:mb-8 bg-white dark:bg-zinc-950 p-4 md:p-5 rounded-xl md:rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+            <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 md:mb-4 flex justify-between items-center">
               <span>Difficulty Level</span> 
               <span className="text-[var(--accent-color)] text-xs md:text-sm bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 rounded-lg">{difficultyLevels[difficulty - 1]}</span>
             </label>
-            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-1.5 md:h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
           </div>
-          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 md:py-5 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl md:rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.4)] hover:shadow-[0_15px_40px_rgba(var(--accent-color-rgb),0.6)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2 md:gap-3 active:scale-[0.98]">
+          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 md:py-5 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl md:rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.3)] hover:shadow-[0_15px_40px_rgba(var(--accent-color-rgb),0.5)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2 md:gap-3 active:scale-[0.98]">
             {status.loading ? <Loader2 size={20} className="animate-spin md:w-6 md:h-6" /> : <BrainCircuit size={20} className="md:w-6 md:h-6" />}
             {status.loading ? "Running AI Engine..." : "Execute Extraction"}
           </button>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-900/20">
-          <div className="bg-emerald-500/10 border-b border-emerald-500/30 p-4 md:p-5 flex justify-between items-center shrink-0">
-            <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={16} className="md:w-[18px] md:h-[18px]"/> Review Output</span>
+        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/30 dark:border-emerald-500/40 rounded-[1.5rem] md:rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-xl dark:shadow-2xl shadow-emerald-900/10 dark:shadow-emerald-900/20">
+          <div className="bg-emerald-500/10 border-b border-emerald-500/20 dark:border-emerald-500/30 p-4 md:p-5 flex justify-between items-center shrink-0">
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={16} className="md:w-[18px] md:h-[18px]"/> Output Ready</span>
             <div className="flex gap-2 md:gap-3">
-              <button onClick={()=>setGenerated(null)} className="px-3 md:px-5 py-2 md:py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
-              <button onClick={saveItem} className="px-4 md:px-6 py-2 md:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-1.5 md:gap-2 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={14} className="md:w-4 md:h-4"/> Save to DB</button>
+              <button onClick={()=>setGenerated(null)} className="px-3 md:px-5 py-2 md:py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
+              <button onClick={saveItem} className="px-4 md:px-6 py-2 md:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest flex items-center gap-1.5 md:gap-2 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={14} className="md:w-4 md:h-4"/> Save to DB</button>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-4 md:space-y-6">
             {generated.type === 'flashcards' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-4 md:p-6 rounded-2xl relative group pr-12 md:pr-16 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
-                <p className="text-xs md:text-sm text-gray-800 dark:text-white font-bold mb-3 md:mb-4 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-2 md:mr-3 text-[10px] md:text-xs uppercase tracking-widest">Q</span>{item.q}</p>
-                <div className="bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 p-3 md:p-4 rounded-xl">
-                  <p className="text-xs md:text-sm text-[var(--accent-color)] leading-relaxed font-medium"><span className="text-[var(--accent-color)]/50 mr-2 md:mr-3 text-[10px] md:text-xs uppercase tracking-widest">A</span>{item.a}</p>
+              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-4 md:p-6 rounded-xl md:rounded-2xl relative group pr-12 md:pr-16 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
+                <p className="text-xs md:text-sm text-gray-800 dark:text-white font-bold mb-3 md:mb-4 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-2 md:mr-3 text-[9px] md:text-xs uppercase tracking-widest">Q</span>{item.q}</p>
+                <div className="bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 p-3 md:p-4 rounded-lg md:rounded-xl">
+                  <p className="text-xs md:text-sm text-[var(--accent-color)] leading-relaxed font-medium"><span className="text-[var(--accent-color)]/50 mr-2 md:mr-3 text-[9px] md:text-xs uppercase tracking-widest">A</span>{item.a}</p>
                 </div>
-                <button onClick={()=>removeItem(idx)} className="absolute top-4 md:top-6 right-4 md:right-6 p-1.5 md:p-2 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg md:rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} className="md:w-[18px] md:h-[18px]"/></button>
+                <button onClick={()=>removeItem(idx)} className="absolute top-4 md:top-6 right-4 md:right-6 p-1.5 md:p-2 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-md md:rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={14} className="md:w-[18px] md:h-[18px]"/></button>
               </div>
             ))}
             {generated.type === 'exam' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-2xl relative group shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
+              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-xl md:rounded-2xl relative group shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
                 <div className="flex justify-between items-start mb-4 md:mb-6 gap-4 md:gap-6">
-                   <p className="text-base md:text-lg text-gray-800 dark:text-white font-bold leading-relaxed flex-1"><span className="text-gray-400 dark:text-zinc-500 mr-2">{idx+1}.</span> {item.q}</p>
+                   <p className="text-sm md:text-base text-gray-800 dark:text-white font-bold leading-relaxed flex-1"><span className="text-gray-400 dark:text-zinc-500 mr-2">{idx+1}.</span> {item.q}</p>
                    <button onClick={()=>removeItem(idx)} className="p-2 md:p-2.5 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg md:rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shrink-0"><Trash2 size={16} className="md:w-[18px] md:h-[18px]"/></button>
                 </div>
                 <div className="space-y-2 md:space-y-3">
                   {item.options.map((opt, oIdx) => (
-                    <div key={oIdx} className={`text-xs md:text-sm p-3 md:p-4 rounded-xl border ${oIdx === item.correct ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-400 font-bold' : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'}`}>
+                    <div key={oIdx} className={`text-xs md:text-sm p-3 md:p-4 rounded-lg md:rounded-xl border ${oIdx === item.correct ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-700 dark:text-emerald-400 font-bold' : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'}`}>
                       <span className="font-mono text-gray-400 dark:text-zinc-500 mr-2 md:mr-3">{String.fromCharCode(65 + oIdx)}.</span> {opt}
                     </div>
                   ))}
@@ -1316,7 +1332,7 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
         </div>
       )}
       {status.msg && !generated && (
-        <div className={`mt-4 md:mt-6 p-4 md:p-5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 md:gap-4 border ${status.err ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-lg shadow-[var(--accent-color)]/20'}`}>
+        <div className={`mt-4 md:mt-6 p-4 md:p-5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 md:gap-4 border ${status.err ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-sm dark:shadow-lg shadow-[var(--accent-color)]/10 dark:shadow-[var(--accent-color)]/20'}`}>
           {status.loading ? <Loader2 size={20} className="animate-spin shrink-0 text-[var(--accent-color)] md:w-6 md:h-6" /> : <AlertCircle size={20} className="shrink-0 text-red-500 md:w-6 md:h-6" />}
           <span className="leading-relaxed">{status.msg}</span>
         </div>
@@ -1328,7 +1344,7 @@ function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams
 function ToolBtn({ id, active, set, icon: Icon, label }) {
   const isA = active === id;
   return (
-    <button onClick={() => set(id)} className={`py-3 md:py-4 px-2 flex flex-col items-center justify-center gap-2 md:gap-3 rounded-xl md:rounded-2xl text-[9px] md:text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/30 scale-105' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
+    <button onClick={() => set(id)} className={`py-3 md:py-4 px-1 md:px-2 flex flex-col items-center justify-center gap-2 md:gap-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-md md:shadow-lg shadow-[var(--accent-color)]/30 scale-105' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
       <Icon size={18} className={`md:w-6 md:h-6 ${isA ? "text-white" : "text-gray-400 dark:text-zinc-600"}`}/> {label}
     </button>
   );
@@ -1376,7 +1392,8 @@ function PanelChat({ activeDoc, pagesText, settings, currentPage }) {
     setLoading(true);
     
     try {
-      const text = pagesText[currentPage] || "No readable text found on this page.";
+      // Ensure we have actual text, fallback to empty string so AI doesn't crash, it just says it can't find it
+      const text = pagesText ? (pagesText[currentPage] || "No readable text found on this page.") : "No readable text found on this page.";
       const prompt = `DOCUMENT CONTEXT FROM PAGE ${currentPage}:\n${text}\n\nSTUDENT QUESTION:\n${msg}`;
       
       const res = await callAI(prompt, false, settings.strictMode, settings.apiKey);
@@ -1389,15 +1406,15 @@ function PanelChat({ activeDoc, pagesText, settings, currentPage }) {
   };
   
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar">
-      <div className="bg-[var(--accent-color)] px-4 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-3 shadow-md shrink-0 rounded-xl md:rounded-2xl mb-4 md:mb-6">
-         <Target size={14} className="text-white md:w-4 md:h-4" />
-         <span className="text-[9px] md:text-[10px] font-black text-white uppercase tracking-widest">Locked: Page {currentPage}</span>
+    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-24 md:pb-6">
+      <div className="bg-[var(--accent-color)]/10 px-4 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-3 shadow-sm shrink-0 rounded-xl md:rounded-2xl mb-4 md:mb-6 border border-[var(--accent-color)]/20">
+         <Target size={14} className="text-[var(--accent-color)] md:w-4 md:h-4" />
+         <span className="text-[9px] md:text-[10px] font-black text-[var(--accent-color)] uppercase tracking-widest">Locked: Page {currentPage}</span>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 md:space-y-6 mb-4 md:mb-6">
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-3 md:gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-sm md:shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-sm md:shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
               {m.role === 'user' ? <List size={14} className="text-white md:w-[18px] md:h-[18px]" /> : <BrainCircuit size={14} className="text-[var(--accent-color)] md:w-[18px] md:h-[18px]" />}
             </div>
             <div className={`p-4 md:p-5 max-w-[85%] text-xs md:text-sm leading-relaxed shadow-sm md:shadow-inner ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-2xl md:rounded-3xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl md:rounded-3xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>
@@ -1407,7 +1424,7 @@ function PanelChat({ activeDoc, pagesText, settings, currentPage }) {
         ))}
         {loading && (
           <div className="flex gap-3 md:gap-4">
-             <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 shadow-sm md:shadow-lg"><Loader2 size={14} className="text-[var(--accent-color)] animate-spin md:w-[18px] md:h-[18px]" /></div>
+             <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center shrink-0 shadow-sm md:shadow-lg"><Loader2 size={14} className="text-[var(--accent-color)] animate-spin md:w-[18px] md:h-[18px]" /></div>
              <div className="p-4 md:p-5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl md:rounded-3xl rounded-tl-sm flex items-center gap-1.5 md:gap-2"><span className="w-2 h-2 md:w-2.5 md:h-2.5 bg-gray-300 dark:bg-zinc-600 rounded-full animate-bounce"></span><span className="w-2 h-2 md:w-2.5 md:h-2.5 bg-gray-300 dark:bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.15s'}}></span><span className="w-2 h-2 md:w-2.5 md:h-2.5 bg-gray-300 dark:bg-zinc-600 rounded-full animate-bounce" style={{animationDelay:'0.3s'}}></span></div>
           </div>
         )}
@@ -1436,7 +1453,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   if (activeItem?.type === 'flashcards') return <InPanelFlashcards title={activeItem.data.title} initialCards={activeItem.data.cards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12">
+    <div className="h-full overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12 pb-24 md:pb-6">
       <div>
         <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-4 md:mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl border border-emerald-500/20"><GraduationCap size={14} className="md:w-[18px] md:h-[18px]"/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-xs md:text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
@@ -1543,7 +1560,7 @@ function InPanelExam({ exam, onBack }) {
         <button onClick={onBack} className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Exam</button>
         <span className="text-[8px] md:text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest bg-emerald-500/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Pages {exam.sourcePages}</span>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-8">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-8 pb-24 md:pb-8">
         <>
           <div className="mb-6 md:mb-8 flex justify-between items-center border-b border-gray-200 dark:border-zinc-800 pb-3 md:pb-4">
             <span className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Question {currentQIndex + 1} of {exam.questions.length}</span>
@@ -1605,8 +1622,10 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
     const nextReview = Date.now() + newInterval * 86400000;
     const newCard = {...currentCard, repetitions: newRep, ef: newEf, interval: newInterval, lastReview: Date.now(), nextReview };
     
+    // Update local state
     setCards(prev => prev.map(c => c.id === newCard.id ? newCard : c));
     
+    // Update global state by matching the nested card IDs
     setFlashcards(globalSets => globalSets.map(set => ({
       ...set,
       cards: set.cards ? set.cards.map(c => c.id === newCard.id ? newCard : c) : set.cards
@@ -1627,8 +1646,8 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
         <button onClick={onBack} className="text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Study</button>
         <span className="text-[8px] md:text-[10px] text-[var(--accent-color)] font-black uppercase tracking-widest bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Card {currentIndex+1} / {cards.length}</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
-        <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-72 md:h-96 perspective-1000 cursor-pointer">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 pb-24 md:pb-8">
+        <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-[60vh] md:h-96 perspective-1000 cursor-pointer">
           <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-x-180' : ''}`}>
             {/* FRONT */}
             <div className="absolute inset-0 backface-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl md:rounded-3xl p-6 md:p-10 flex flex-col items-center justify-center text-center shadow-xl">
@@ -1643,7 +1662,7 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
             </div>
           </div>
         </div>
-        <div className={`w-full flex flex-wrap md:flex-nowrap gap-2 md:gap-4 mt-8 md:mt-12 transition-opacity duration-300 ${isFlipped ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`w-full flex flex-wrap md:flex-nowrap gap-2 md:gap-4 mt-6 md:mt-12 transition-opacity duration-300 ${isFlipped ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <button onClick={() => handleRate(0)} className="flex-1 min-w-[45%] md:min-w-0 py-3 md:py-5 bg-red-500/10 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-xl md:rounded-2xl text-red-600 dark:text-red-400 text-xs md:text-sm font-black uppercase tracking-widest transition-all shadow-sm">Again</button>
           <button onClick={() => handleRate(3)} className="flex-1 min-w-[45%] md:min-w-0 py-3 md:py-5 bg-yellow-500/10 border border-yellow-500/20 hover:bg-yellow-500 hover:text-white rounded-xl md:rounded-2xl text-yellow-600 dark:text-yellow-400 text-xs md:text-sm font-black uppercase tracking-widest transition-all shadow-sm">Hard</button>
           <button onClick={() => handleRate(4)} className="flex-1 min-w-[45%] md:min-w-0 py-3 md:py-5 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white rounded-xl md:rounded-2xl text-emerald-600 dark:text-emerald-400 text-xs md:text-sm font-black uppercase tracking-widest transition-all shadow-sm">Good</button>
@@ -1661,9 +1680,9 @@ function InPanelNote({ note, onBack }) {
       <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 md:p-5 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Back to Notes</button>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 pb-24 md:pb-10">
          <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 leading-snug">{note.title}</h2>
-         <div className="prose prose-invert prose-base md:prose-lg max-w-none prose-p:text-gray-600 dark:prose-p:text-zinc-300 prose-headings:text-gray-800 dark:prose-headings:text-white prose-strong:text-[var(--accent-color)] whitespace-pre-wrap leading-relaxed">
+         <div className="prose prose-invert prose-sm md:prose-lg max-w-none prose-p:text-gray-600 dark:prose-p:text-zinc-300 prose-headings:text-gray-800 dark:prose-headings:text-white prose-strong:text-[var(--accent-color)] whitespace-pre-wrap leading-relaxed">
             {note.content}
          </div>
       </div>
