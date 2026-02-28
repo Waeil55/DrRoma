@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  BookOpen, Layers, CheckSquare, Settings,
-  ChevronLeft, ChevronRight, Upload, MessageSquare,
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  BookOpen, Layers, CheckSquare, Settings, 
+  ChevronLeft, ChevronRight, Upload, MessageSquare, 
   CheckCircle2, XCircle, BrainCircuit,
   Library, Trash2, Loader2, List,
   Send, ShieldAlert, LayoutDashboard,
   GraduationCap, Save, X, BookA, Crosshair,
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
-  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play,
-  Database, Search, FileText, BarChart2, Globe, Bot, Code, Palette, Type, Download, Mic,
+  FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play, Bookmark, History,
+  Dna, Microscope, Pill, Thermometer, ClipboardList, Zap, Database, Search, FileText, BarChart2, Globe, Bot, Code, Palette, Type, Download, Mic,
   Moon, Sun, HelpCircle, Printer
 } from 'lucide-react';
 
@@ -79,11 +79,11 @@ const loadJsPDF = async () => {
   });
 };
 
-const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 1000) => {
+const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
   const sysPrompt = strictMode
     ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. Do not use outside knowledge. If the answer is not in the text, say 'Information not found in the selected pages.'"
-    : "You are an elite medical AI tutor and diagnostic assistant.";
+    : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -91,7 +91,7 @@ const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 1000) 
       'Authorization': `Bearer ${apiKey.trim()}`,
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [
         { role: "system", content: sysPrompt + (expectJson ? " Respond in strictly valid JSON format." : "") },
         { role: "user", content: prompt }
@@ -379,7 +379,29 @@ export default function App() {
           </div>
         )}
         {activeDocId && (
-          <PdfWorkspace activeDoc={activeDoc} setDocuments={setDocuments} closeDoc={() => closeDoc(activeDocId)} rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen} currentPage={docPages[activeDocId] || 1} setCurrentPage={(p) => setDocPages(prev => ({...prev, [activeDocId]: p}))} openDocs={openDocs} setActiveDocId={setActiveDocId} closeTab={closeDoc} setShowMenu={setShowMenu} setMenuPos={setMenuPos} setSelectedText={setSelectedText} setGenFromSelection={setGenFromSelection} setRightPanelTab={setRightPanelTab} setType={(t) => {}} />
+          <PdfWorkspace 
+            activeDoc={activeDoc} 
+            setDocuments={setDocuments} 
+            closeDoc={() => closeDoc(activeDocId)} 
+            rightPanelOpen={rightPanelOpen} 
+            setRightPanelOpen={setRightPanelOpen} 
+            currentPage={docPages[activeDocId] || 1} 
+            setCurrentPage={(updater) => {
+              setDocPages(prev => {
+                const oldVal = prev[activeDocId] || 1;
+                const newVal = typeof updater === 'function' ? updater(oldVal) : updater;
+                return {...prev, [activeDocId]: newVal};
+              });
+            }} 
+            openDocs={openDocs} 
+            setActiveDocId={setActiveDocId} 
+            closeTab={closeDoc} 
+            setShowMenu={setShowMenu} 
+            setMenuPos={setMenuPos} 
+            setSelectedText={setSelectedText} 
+            setGenFromSelection={setGenFromSelection} 
+            setRightPanelTab={setRightPanelTab} 
+          />
         )}
         {activeDocId && !rightPanelOpen && (
           <button onClick={() => setRightPanelOpen(true)} className="fixed bottom-8 right-8 p-4 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-105 transition-transform z-30">
@@ -388,14 +410,14 @@ export default function App() {
         )}
       </main>
       {rightPanelOpen && activeDocId && (
-        <aside className="w-[550px] bg-gray-50 dark:bg-[#0a0a0c] border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
+        <aside className="w-full lg:w-[600px] xl:w-[650px] bg-gray-50 dark:bg-[#0a0a0c] border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
           <div className="bg-[var(--accent-color)] px-4 py-2 flex items-center gap-2 shrink-0 border-b border-[var(--accent-color)]/50 shadow-md">
             <Target size={16} className="text-white"/>
-            <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId]}</span>
+            <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
           </div>
           <div className="h-16 flex p-2 bg-gray-50 dark:bg-[#0a0a0c] border-b border-gray-200 dark:border-zinc-800/30 shrink-0 gap-1 items-center">
-            <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Tools" icon={Sparkles} />
-            <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Chat" icon={MessageSquare} />
+            <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Studio" icon={Sparkles} />
+            <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Professor" icon={MessageSquare} />
             <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
             <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
           </div>
@@ -412,9 +434,9 @@ export default function App() {
                 <button onClick={() => setRightPanelTab('settings')} className="px-6 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
               </div>
             ) : rightPanelTab === 'generate' ? (
-              <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId]} />
+              <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
             ) : rightPanelTab === 'chat' ? (
-              <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId]} />
+              <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId] || 1} />
             ) : rightPanelTab === 'review' ? (
               <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
             ) : null}
@@ -471,7 +493,7 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex flex-col items-center justify-center gap-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all h-full ${
+      className={`flex-1 flex flex-col items-center justify-center gap-1.5 h-full rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
         active ? 'bg-gray-200 dark:bg-zinc-800/80 text-[var(--accent-color)] shadow-inner border border-gray-300 dark:border-zinc-700/50' : 'text-gray-500 dark:text-zinc-500 hover:text-gray-300 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-900'
       }`}
     >
@@ -479,8 +501,6 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
     </button>
   );
 }
-
-// --- GLOBAL VIEWS ---
 
 function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes, setView, searchQuery, setSearchQuery }) {
   return (
@@ -761,12 +781,13 @@ function DashboardView({ documents, flashcards, exams, notes }) {
 
 // --- WORKSPACE & SIDE-BY-SIDE TOOLS ---
 
-function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab, setType }) {
+function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab }) {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
+  
   useEffect(() => {
     const loadPdf = async () => {
       setIsLoading(true);
@@ -788,6 +809,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
   useEffect(() => {
     if (!pdf) return;
+    let renderTask = null;
     const renderPage = async () => {
       try {
         const page = await pdf.getPage(currentPage);
@@ -806,9 +828,9 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
             canvasContext: canvas.getContext('2d'),
             viewport,
           };
-          await page.render(renderContext).promise;
+          renderTask = page.render(renderContext);
+          await renderTask.promise;
         }
-        // Text layer
         const textLayer = textLayerRef.current;
         if (textLayer) {
           textLayer.innerHTML = '';
@@ -823,10 +845,15 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           }).promise;
         }
       } catch (e) {
-        console.error("Failed to render page", e);
+        if (e.name !== 'RenderingCancelledException') {
+          console.error("Failed to render page", e);
+        }
       }
     };
     renderPage();
+    return () => {
+      if (renderTask) renderTask.cancel();
+    };
   }, [currentPage, pdf]);
 
   useEffect(() => {
@@ -839,7 +866,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [activeDoc.totalPages]);
+  }, [activeDoc.totalPages, setCurrentPage]);
 
   useEffect(() => {
     setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
@@ -975,6 +1002,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   const [difficulty, setDifficulty] = useState(2);
   const [status, setStatus] = useState({ loading: false, msg: '', err: false });
   const [generated, setGenerated] = useState(null);
+  
   useEffect(() => {
     if (!status.loading && !generated && !genFromSelection) {
       setStartPage(currentPage);
@@ -983,14 +1011,6 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   }, [currentPage, status.loading, generated, genFromSelection]);
 
   const difficultyLevels = ['Hard', 'Expert', 'Insane'];
-
-  const chunkText = (text, maxLength = 8000) => {
-    const chunks = [];
-    for (let i = 0; i < text.length; i += maxLength) {
-      chunks.push(text.substring(i, i + maxLength));
-    }
-    return chunks;
-  };
 
   const handleGenerate = async () => {
     setStatus({ loading: true, msg: 'Reading text from pages...', err: false });
@@ -1001,62 +1021,49 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
         for (let i = Number(startPage); i <= Number(endPage); i++) if (activeDoc.pagesText[i]) text += activeDoc.pagesText[i] + "\n";
       }
       if (!text.trim()) throw new Error("No readable text found on these pages.");
+      
       setStatus({ loading: true, msg: 'Elite AI processing via OpenAI...', err: false });
-      const diffPrompt = `Make it ${difficultyLevels[difficulty - 1]} level: very very hard, long, detailed, and advanced, requiring deep analysis, clinical reasoning, multi-step thinking.`;
-      const maxTokens = type === 'exam' ? 800 : 500;
-      const chunks = chunkText(text);
-      const results = await Promise.all(chunks.map(async (chunk, index) => {
-        let p = diffPrompt + "\n";
-        if (type === 'flashcards') {
-          p += `Create exactly ${Math.ceil(count / chunks.length)} highly accurate study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }\nTEXT:\n${chunk}`;
-          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
-        } else if (type === 'exam') {
-          p += `Create extremely difficult, advanced-level ${Math.ceil(count / chunks.length)}-question medical/academic exam from this text ONLY. Respond in JSON format: { "title": "Exam Title Part ${index + 1}", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation using text" } ] }\nTEXT:\n${chunk}`;
-          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
-        } else if (type === 'summary') {
-          p += `Write a comprehensive, structured summary of this text ONLY. Use markdown headings and bullet points.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'clinical') {
-          p += `Based ONLY on the medical concepts in this text, create a realistic Clinical Case Study scenario. Include patient presentation, symptoms, and ask a question at the end, followed by the answer. Respond in Markdown.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'eli5') {
-          p += `Explain the core concepts of this text extremely simply, as if explaining to a beginner or a 5-year-old. Use analogies. Respond in Markdown.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'mnemonics') {
-          p += `Create extremely memorable, clever mnemonics for the key lists, drugs, or concepts in this text. Respond in Markdown.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'quiz') {
-          p += `Create ${count} interactive quiz questions from this text ONLY, with multiple choices and explanations. JSON: { "items": [ { "q": "", "options": [], "correct": 0, "explanation": "" } ] }\nTEXT:\n${chunk}`;
-          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens)).items;
-        } else if (type === 'mindmap') {
-          p += `Generate a mindmap structure in JSON from this text ONLY: { "nodes": [ { "id": "", "label": "", "parent": "" } ] }\nTEXT:\n${chunk}`;
-          return JSON.parse(await callAI(p, true, settings.strictMode, settings.apiKey, maxTokens));
-        } else if (type === 'translation') {
-          p += `Translate this text to English, keeping medical terms intact. Respond in Markdown.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'diagram') {
-          p += `Describe a diagram or flowchart for key concepts in this text in ASCII art or Markdown. \nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'research') {
-          p += `Summarize research implications from this text ONLY. Use bullet points.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'comparison') {
-          p += `Compare and contrast key concepts in this text ONLY. Respond in table Markdown.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        } else if (type === 'simulation') {
-          p += `Create a step-by-step simulation scenario based on this text ONLY. Respond in numbered list.\nTEXT:\n${chunk}`;
-          return await callAI(p, false, settings.strictMode, settings.apiKey, maxTokens);
-        }
-        return [];
-      }));
-      // Combine results from chunks
-      if (type === 'flashcards' || type === 'quiz' || type === 'exam') {
-        setGenerated({ type, data: results.flat(), pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
-      } else if (type === 'mindmap') {
-        setGenerated({ type, data: results.flat(), pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
-      } else {
-        setGenerated({ type, data: results.join('\n'), pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
+      const diffPrompt = `Make it ${difficultyLevels[difficulty - 1]} level: Insanely hard, extremely long, exhaustive detail, professional medical specialty level. Vignettes MUST be massive and multi-step.`;
+      
+      if (type === 'flashcards') {
+        const p = `${diffPrompt}\nCreate exactly ${count} highly accurate study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }\nTEXT:\n${text}`;
+        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type, data: JSON.parse(raw).items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
+      } else if (type === 'exam') {
+        const p = `${diffPrompt}\nCreate extremely difficult, advanced-level ${count}-question medical/academic exam from this text ONLY. Respond in JSON format: { "title": "Exam Title", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation using text" } ] }\nTEXT:\n${text}`;
+        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 2500);
+        const parsed = JSON.parse(raw);
+        setGenerated({ type, title: parsed.title, data: parsed.items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
+      } else if (type === 'summary') {
+        const p = `${diffPrompt}\nWrite a comprehensive, structured summary of this text ONLY. Use markdown headings and bullet points.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type, data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
+      } else if (type === 'clinical') {
+        const p = `${diffPrompt}\nBased ONLY on the medical concepts in this text, create a realistic Clinical Case Study scenario. Include patient presentation, symptoms, and ask a question at the end, followed by the answer. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Clinical Case' });
+      } else if (type === 'differential') {
+        const p = `${diffPrompt}\nGenerate a comprehensive Differential Diagnosis list based on the symptoms and diseases mentioned in this text ONLY. Provide reasoning for each. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Differential Diagnosis' });
+      } else if (type === 'treatment') {
+        const p = `${diffPrompt}\nExtract and detail all Treatment Plans, pharmacology, and management strategies mentioned in this text ONLY. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Treatment Plan' });
+      } else if (type === 'labs') {
+        const p = `${diffPrompt}\nDetail all Laboratory findings, imaging, and diagnostic criteria mentioned in this text ONLY. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Lab Interpretation' });
+      } else if (type === 'mnemonics') {
+        const p = `Create extremely memorable, clever mnemonics for the key lists, drugs, or concepts in this text. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Mnemonics' });
+      } else if (type === 'eli5') {
+        const p = `Explain the core concepts of this text extremely simply, as if explaining to a beginner or a 5-year-old. Use analogies. Respond in Markdown.\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
+        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Simplified Explanation' });
       }
+      
       setStatus({ loading: false, msg: 'Generation Complete.', err: false });
     } catch (e) {
       setStatus({ loading: false, msg: e.message || "Failed.", err: true });
@@ -1089,7 +1096,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-[#0a0a0c] p-6">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-[#0a0a0c] p-6 overflow-y-auto custom-scrollbar">
       {!generated ? (
         <div className="bg-white dark:bg-zinc-900/80 border border-gray-200 dark:border-zinc-800/50 p-6 rounded-3xl flex-shrink-0 shadow-2xl dark:shadow-black/30">
           {!genFromSelection && (
@@ -1111,17 +1118,13 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
             <ToolBtn id="exam" active={type} set={setType} icon={CheckSquare} label="Hard Exam" />
             <ToolBtn id="summary" active={type} set={setType} icon={BookA} label="Summary" />
             <ToolBtn id="clinical" active={type} set={setType} icon={Stethoscope} label="Clinical Case" />
+            <ToolBtn id="differential" active={type} set={setType} icon={Activity} label="Differential" />
+            <ToolBtn id="treatment" active={type} set={setType} icon={Pill} label="Treatment" />
+            <ToolBtn id="labs" active={type} set={setType} icon={Thermometer} label="Labs / Dx" />
             <ToolBtn id="mnemonics" active={type} set={setType} icon={Lightbulb} label="Mnemonics" />
-            <ToolBtn id="quiz" active={type} set={setType} icon={GraduationCap} label="Quiz" />
-            <ToolBtn id="mindmap" active={type} set={setType} icon={BarChart2} label="Mindmap" />
-            <ToolBtn id="diagram" active={type} set={setType} icon={Code} label="Diagram" />
-            <ToolBtn id="research" active={type} set={setType} icon={Search} label="Research" />
-            <ToolBtn id="comparison" active={type} set={setType} icon={Database} label="Compare" />
-            <ToolBtn id="simulation" active={type} set={setType} icon={Bot} label="Simulation" />
-            <ToolBtn id="translation" active={type} set={setType} icon={Globe} label="Translate" />
             <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="ELI5" />
           </div>
-          {(type === 'flashcards' || type === 'exam' || type === 'quiz') && (
+          {(type === 'flashcards' || type === 'exam') && (
             <div className="mb-8 bg-white dark:bg-zinc-950 p-4 rounded-xl border border-gray-200 dark:border-zinc-800">
               <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 flex justify-between"><span>Quantity</span> <span className="text-[var(--accent-color)] text-sm">{count} Items</span></label>
               <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
@@ -1158,7 +1161,9 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
                 <p className="text-sm text-gray-800 dark:text-white font-bold mb-4 leading-relaxed">{idx+1}. {item.q}</p>
                 <div className="space-y-2">
                   {item.options.map((opt, oIdx) => (
-                    <div key={oIdx} className={`text-xs p-3 rounded-xl border bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400`}>{opt}</div>
+                    <div key={oIdx} className={`text-xs p-3 rounded-xl border bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400`}>
+                      {String.fromCharCode(65 + oIdx)}. {opt}
+                    </div>
                   ))}
                 </div>
                 <button onClick={()=>removeItem(idx)} className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
@@ -1343,7 +1348,6 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   );
 }
 
-// SIDE-BY-SIDE TOOLS
 function InPanelExam({ exam, onBack }) {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -1392,21 +1396,21 @@ function InPanelExam({ exam, onBack }) {
                 key={idx} onClick={() => handleSelect(idx)}
                 disabled={showFeedback}
                 className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 ${
-                  selectedAnswer === idx ? (idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-red-500 bg-red-500/10 text-red-100 shadow-inner') : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
+                  selectedAnswer === idx ? (idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-red-500 bg-red-500/10 text-red-100 shadow-inner') : showFeedback && idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
                 }`}
               >
-                <div className={`w-5 h-5 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${selectedAnswer === idx ? 'border-emerald-500' : 'border-gray-300 dark:border-zinc-600'}`}>
-                  {selectedAnswer === idx && <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />}
+                <div className={`w-5 h-5 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${selectedAnswer === idx || (showFeedback && idx === q.correct) ? (idx === q.correct ? 'border-emerald-500' : 'border-red-500') : 'border-gray-300 dark:border-zinc-600'}`}>
+                  {(selectedAnswer === idx || (showFeedback && idx === q.correct)) && <div className={`w-2.5 h-2.5 rounded-full ${idx === q.correct ? 'bg-emerald-500' : 'bg-red-500'}`} />}
                 </div>
                 <span className="text-sm leading-relaxed">{opt}</span>
               </button>
             ))}
           </div>
           {showFeedback && (
-            <div className="mt-4 p-3 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 rounded-xl text-xs text-[var(--accent-color)]/80"><span className="font-bold text-[var(--accent-color)] mr-2 uppercase tracking-widest text-[10px]">Explanation:</span>{q.explanation}</div>
+            <div className="mt-4 p-4 mb-6 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 rounded-xl text-xs text-[var(--accent-color)]/90 leading-relaxed"><span className="font-bold text-[var(--accent-color)] mr-2 uppercase tracking-widest text-[10px]">Explanation:</span>{q.explanation}</div>
           )}
           <div className="flex justify-between items-center">
-                      <button onClick={prevQuestion} disabled={currentQIndex === 0} className="px-4 py-2 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-white disabled:opacity-30 text-xs font-bold uppercase tracking-widest transition-colors">Previous</button>
+            <button onClick={prevQuestion} disabled={currentQIndex === 0} className="px-4 py-2 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-white disabled:opacity-30 text-xs font-bold uppercase tracking-widest transition-colors">Previous</button>
             <button onClick={nextQuestion} disabled={!showFeedback} className="px-6 py-3 bg-white dark:bg-white hover:bg-gray-100 dark:hover:bg-zinc-200 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 text-zinc-950 dark:text-zinc-950 disabled:shadow-none rounded-xl text-xs font-black shadow-lg uppercase tracking-widest transition-all flex items-center gap-2">Next <ChevronRight size={14}/></button>
           </div>
         </>
@@ -1435,7 +1439,7 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
       else if (newRep === 2) newInterval = 6;
       else newInterval = Math.round(newInterval * newEf);
     }
-    const nextReview = Date.now() + newInterval * 86400000; // days to ms
+    const nextReview = Date.now() + newInterval * 86400000;
     const newCard = {...currentCard, repetitions: newRep, ef: newEf, interval: newInterval, lastReview: Date.now(), nextReview };
     setFlashcards(prev => prev.map(c => c.id === newCard.id ? newCard : c));
     setIsFlipped(false);
@@ -1455,13 +1459,11 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-80 perspective-1000 cursor-pointer">
           <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-x-180' : ''}`}>
-            {/* FRONT */}
             <div className="absolute inset-0 backface-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-xl">
               <span className="absolute top-5 left-5 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-zinc-600">Question</span>
               <h2 className="text-lg font-bold text-gray-800 dark:text-white leading-relaxed">{currentCard.q}</h2>
               <div className="absolute bottom-5 text-[10px] font-bold uppercase tracking-widest text-[var(--accent-color)]/50 animate-pulse">Click to reveal</div>
             </div>
-            {/* BACK */}
             <div className="absolute inset-0 backface-hidden bg-[var(--accent-color)]/90 border border-[var(--accent-color)]/30 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-2xl rotate-x-180 overflow-y-auto custom-scrollbar">
               <span className="absolute top-5 left-5 text-[10px] font-black uppercase tracking-widest text-white/80">Answer</span>
               <p className="text-base font-bold text-white leading-relaxed">{currentCard.a}</p>
