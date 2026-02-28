@@ -907,44 +907,46 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     return () => { isMounted = false; };
   }, [activeDoc.id]);
 
-    useEffect(() => {
+      useEffect(() => {
     if (!pdf) return;
     let renderTask = null;
     let isMounted = true;
 
     const renderPage = async () => {
       try {
-        const page = await pdf.getPage(localPage);
         const container = containerRef.current;
         if (!container || !isMounted) return;
         
-        // Wait for one animation frame to ensure container dimensions are stable
-        await new Promise(resolve => requestAnimationFrame(resolve));
+        // 1. Wait briefly for layout/sidebar transitions to finish 
+        // This prevents the "snap" caused by calculating while the width is shifting.
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        const containerWidth = container.clientWidth;
-        if (!containerWidth) return;
+        const containerWidth = container.getBoundingClientRect().width;
+        if (!containerWidth || containerWidth < 50) return;
 
-        // Use minimal padding on mobile (8px) vs desktop (40px)
-        const padding = window.innerWidth < 768 ? 8 : 40; 
+        const page = await pdf.getPage(localPage);
+        if (!isMounted) return;
+
+        // 2. Aggressive scaling for mobile: virtually no padding to maximize space
+        const padding = window.innerWidth < 768 ? 4 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
         
-        // Calculate scale to fit width
-        const scale = (containerWidth - padding) / tempViewport.width;
+        // Calculate scale to fill the width
+        let scale = (containerWidth - padding) / tempViewport.width;
         
-        // Set a minimum floor for the scale to prevent the "tiny page" snap
-        const finalScale = Math.max(scale, 0.8); 
+        // 3. Prevent the page from ever being too small (Force it to be readable)
+        const finalScale = window.innerWidth < 768 ? Math.max(scale, 1.1) : scale;
         const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
-        if (canvas) {
-          // Internal canvas resolution
+        if (canvas && isMounted) {
+          // Set internal resolution
           canvas.height = viewport.height;
           canvas.width = viewport.width;
           
-          // CSS Display: Force 100% width immediately to prevent snapping
+          // 4. Force CSS width to 100% to lock it into the container immediately
           canvas.style.width = '100%';
           canvas.style.height = 'auto';
-          canvas.style.maxWidth = `${viewport.width}px`; // Don't blur on giant screens
 
           const renderContext = { 
             canvasContext: canvas.getContext('2d', { alpha: false }), 
@@ -958,19 +960,19 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const textLayer = textLayerRef.current;
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
-          // Ensure text layer matches the canvas exactly
-          textLayer.style.width = canvas.style.width === '100%' ? '100%' : `${viewport.width}px`;
+          // Link text layer size to the canvas display size
+          textLayer.style.width = '100%';
           textLayer.style.height = 'auto';
           textLayer.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
-          textLayer.style.setProperty('--scale-factor', viewport.scale);
+          textLayer.style.setProperty('--scale-factor', (canvas.clientWidth / tempViewport.width));
           
           const textContent = await page.getTextContent();
-          window.pdfjsLib.renderTextLayer({
+          await window.pdfjsLib.renderTextLayer({
             textContentSource: textContent,
             container: textLayer,
-            viewport,
+            viewport: viewport,
             textDivs: []
-          });
+          }).promise;
         }
       } catch (e) {
         if (e.name !== 'RenderingCancelledException') {
@@ -979,14 +981,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       }
     };
 
-    renderPage();
-    return () => { 
-      isMounted = false; 
-      if (renderTask) renderTask.cancel(); 
-    };
-  }, [localPage, pdf, rightPanelOpen]);
-
-
+    
 
     renderPage();
     return () => { 
@@ -994,6 +989,10 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       if (renderTask) renderTask.cancel(); 
     };
   }, [localPage, pdf, rightPanelOpen]);
+
+
+
+    
 
   useEffect(() => {
     const handleKeyDown = (e) => {
