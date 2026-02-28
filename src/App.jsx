@@ -146,8 +146,32 @@ export default function App() {
       const savedSettings = localStorage.getItem('drMariam_settings');
       const savedOpen = localStorage.getItem('drMariam_openDocs');
       const savedPages = localStorage.getItem('drMariam_docPages');
+      
       if (savedDocs) setDocuments(JSON.parse(savedDocs) || []);
-      if (savedCards) setFlashcards(JSON.parse(savedCards) || []);
+      
+      if (savedCards) {
+        const parsedCards = JSON.parse(savedCards) || [];
+        // Migration to Set structure for backward compatibility
+        if (parsedCards.length > 0 && !parsedCards[0].cards) {
+          const migrated = [];
+          const docIds = [...new Set(parsedCards.map(c => c.docId))];
+          docIds.forEach(docId => {
+            const docCards = parsedCards.filter(c => c.docId === docId);
+            migrated.push({
+               id: 'migrated-' + docId,
+               docId: docId,
+               sourcePages: 'Various',
+               title: 'Legacy Flashcards',
+               cards: docCards,
+               createdAt: new Date().toISOString()
+            });
+          });
+          setFlashcards(migrated);
+        } else {
+          setFlashcards(parsedCards);
+        }
+      }
+      
       if (savedExams) setExams(JSON.parse(savedExams) || []);
       if (savedNotes) setNotes(JSON.parse(savedNotes) || []);
       if (savedSettings) setUserSettings(JSON.parse(savedSettings) || { apiKey: '', strictMode: true, theme: 'system', fontSize: 'medium', accentColor: 'indigo' });
@@ -401,7 +425,7 @@ export default function App() {
           )}
         </main>
         {rightPanelOpen && activeDocId && (
-          <aside className="w-full lg:w-[500px] xl:w-[600px] bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-xl border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] relative transition-all duration-300">
+          <aside className="w-full lg:w-[600px] xl:w-[750px] bg-white/80 dark:bg-[#0a0a0c]/80 backdrop-blur-xl border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] relative transition-all duration-300">
             <div className="bg-[var(--accent-color)] px-4 py-3 flex items-center gap-2 shrink-0 shadow-md">
               <Target size={16} className="text-white"/>
               <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
@@ -495,6 +519,8 @@ function PanelTab({ active, onClick, label, icon: Icon }) {
 }
 
 function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, notes, setView, searchQuery, setSearchQuery }) {
+  const totalCardsCount = flashcards.reduce((sum, set) => sum + set.cards.length, 0);
+
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-transparent">
       <div className="max-w-7xl mx-auto w-full">
@@ -521,7 +547,7 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
           </div>
           <div onClick={() => setView('flashcards')} className="cursor-pointer hover:scale-105 transition-all bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-200 dark:border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6 shadow-sm hover:shadow-lg">
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={28}/></div>
-            <div><p className="text-3xl font-black text-gray-800 dark:text-white">{flashcards.length}</p><p className="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1">Active Flashcards</p></div>
+            <div><p className="text-3xl font-black text-gray-800 dark:text-white">{totalCardsCount}</p><p className="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1">Active Flashcards</p></div>
           </div>
           <div onClick={() => setView('exams')} className="cursor-pointer hover:scale-105 transition-all bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md border border-gray-200 dark:border-zinc-800/50 p-6 rounded-3xl flex items-center gap-6 shadow-sm hover:shadow-lg">
             <div className="w-16 h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={28}/></div>
@@ -541,7 +567,7 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2"><Library size={20} className="text-[var(--accent-color)]"/> Your Library</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {documents.map(doc => {
-                const docCards = flashcards.filter(f => f.docId === doc.id).length;
+                const docCards = flashcards.filter(f => f.docId === doc.id).reduce((sum, set) => sum + set.cards.length, 0);
                 const docExams = exams.filter(e => e.docId === doc.id).length;
                 return (
                   <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-zinc-800 hover:border-[var(--accent-color)]/50 hover:shadow-[0_10px_40px_rgba(var(--accent-color-rgb),0.1)] cursor-pointer transition-all flex flex-col h-64 group relative overflow-hidden shadow-sm">
@@ -576,9 +602,11 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
 }
 
 function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
-  const [studying, setStudying] = useState(false);
+  const [studyingSet, setStudyingSet] = useState(null);
+  
   const exportAnki = () => {
-    const csvContent = 'Front,Back\n' + flashcards.map(f => `"${f.q.replace(/"/g, '""')}","${f.a.replace(/"/g, '""')}"`).join('\n');
+    const allCards = flashcards.flatMap(set => set.cards);
+    const csvContent = 'Front,Back\n' + allCards.map(f => `"${f.q.replace(/"/g, '""')}","${f.a.replace(/"/g, '""')}"`).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -587,9 +615,11 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
     link.click();
     URL.revokeObjectURL(url);
   };
-  if (studying) {
-    return <InPanelFlashcards cards={flashcards} onBack={() => setStudying(false)} setFlashcards={setFlashcards} />;
+
+  if (studyingSet) {
+    return <InPanelFlashcards title={studyingSet.title} initialCards={studyingSet.cards} onBack={() => setStudyingSet(null)} setFlashcards={setFlashcards} />;
   }
+
   if (flashcards.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-10 bg-transparent text-center">
       <Layers size={64} className="text-gray-300 dark:text-zinc-800 mb-6" />
@@ -598,6 +628,7 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
       <button onClick={() => setView('library')} className="mt-6 px-6 py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold shadow-lg">Go to Library</button>
     </div>
   );
+
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-transparent">
       <div className="max-w-4xl mx-auto">
@@ -605,16 +636,23 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
           <h1 className="text-4xl font-black text-gray-800 dark:text-white tracking-tighter flex items-center gap-4"><Layers className="text-emerald-500"/> Global Flashcard Database</h1>
           <div className="flex gap-4">
             <button onClick={exportAnki} className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center gap-2 shadow-md">Export to Anki <Download size={18} /></button>
-            <button onClick={() => setStudying(true)} className="px-6 py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold flex items-center gap-2 shadow-md hover:scale-105 transition-transform">Study All <Play size={18} /></button>
+            <button onClick={() => setStudyingSet({ id: 'all', title: 'All Flashcards', cards: flashcards.flatMap(s => s.cards) })} className="px-6 py-3 bg-[var(--accent-color)] text-white rounded-xl font-bold flex items-center gap-2 shadow-md hover:scale-105 transition-transform">Study All <Play size={18} /></button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {flashcards.map(c => (
-            <div key={c.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 rounded-3xl relative group shadow-sm hover:border-[var(--accent-color)]/50 transition-all">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] mb-2 block">Pgs {c.sourcePages}</span>
-              <p className="text-sm text-gray-800 dark:text-white font-bold mb-3 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-2 text-xs uppercase tracking-widest">Q</span>{c.q}</p>
-              <p className="text-sm text-[var(--accent-color)] leading-relaxed bg-[var(--accent-color)]/10 p-3 rounded-xl border border-[var(--accent-color)]/10"><span className="text-[var(--accent-color)]/50 mr-2 text-xs uppercase tracking-widest">A</span>{c.a}</p>
-              <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-6 right-6 p-2.5 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-400 hover:bg-red-500/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"><Trash2 size={16}/></button>
+        <div className="space-y-6">
+          {flashcards.map(set => (
+            <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 rounded-3xl flex justify-between items-center group hover:border-[var(--accent-color)]/50 transition-all shadow-sm">
+              <div>
+                <p className="text-lg text-gray-800 dark:text-white font-black mb-2">{set.title}</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 py-1 rounded-lg border border-[var(--accent-color)]/20">{set.cards.length} Cards</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500">Source: Pages {set.sourcePages}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => setStudyingSet(set)} className="p-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl transition-all flex items-center gap-2 shadow-md"><Play size={18} /> Study Set</button>
+                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== set.id))} className="p-3 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-600 hover:text-red-400 rounded-xl transition-all"><Trash2 size={18}/></button>
+              </div>
             </div>
           ))}
         </div>
@@ -736,13 +774,15 @@ function NotesGlobalView({ notes, setNotes, setView }) {
 }
 
 function DashboardView({ documents, flashcards, exams, notes }) {
+  const totalCardsCount = flashcards.reduce((sum, set) => sum + set.cards.length, 0);
+
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-transparent">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 flex items-center gap-4"><LayoutDashboard className="text-[var(--accent-color)]"/> Personal Progress Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
-            <p className="text-4xl font-black text-[var(--accent-color)] mb-2">{flashcards.length}</p>
+            <p className="text-4xl font-black text-[var(--accent-color)] mb-2">{totalCardsCount}</p>
             <p className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Flashcards Created</p>
           </div>
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
@@ -865,6 +905,10 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [activeDoc.totalPages, setCurrentPage]);
+
+  useEffect(() => {
+    setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
+  }, [currentPage, activeDoc.id, setDocuments]);
 
   const handleContextMenu = (e) => {
     const sel = window.getSelection().toString().trim();
@@ -1040,12 +1084,31 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
           if (type === 'flashcards') {
             p += `\n\nFormat as JSON strictly like this: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }`;
           } else {
-            p += `\n\nFormat as JSON strictly like this: { "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
+            p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
           }
           
           const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
           let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-          return JSON.parse(cleaned).items || [];
+          let parsed;
+          try {
+            parsed = JSON.parse(cleaned);
+          } catch (e) {
+            const lastBrace = cleaned.lastIndexOf('}');
+            if (lastBrace !== -1) {
+               cleaned = cleaned.substring(0, lastBrace + 1);
+               if (!cleaned.endsWith('}')) cleaned += '}';
+               if (cleaned.startsWith('{') && !cleaned.endsWith('}')) cleaned += '}';
+               if (cleaned.includes('"items": [') && !cleaned.endsWith(']}')) cleaned += ']}';
+               try { 
+                   parsed = JSON.parse(cleaned); 
+               } catch(e2) { 
+                   throw new Error("JSON Parse Error: Output was too long or malformed."); 
+               }
+            } else {
+               throw new Error("JSON Parse Error: Malformed output from AI.");
+            }
+          }
+          return parsed.items || parsed.questions || parsed.data || [];
         });
 
         const allResults = await Promise.all(promises);
@@ -1083,8 +1146,9 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   const saveItem = () => {
     if (!generated) return;
     if (generated.type === 'flashcards') {
-      const cards = generated.data.map(c => ({ id: Date.now()+Math.random(), docId: activeDoc.id, sourcePages: generated.pages, q: c.q, a: c.a, level: 0, nextReview: Date.now(), repetitions: 0, ef: 2.5, interval: 1, lastReview: Date.now() }));
-      setFlashcards(p => [...p, ...cards]);
+      const cards = generated.data.map(c => ({ id: Date.now()+Math.random(), q: c.q, a: c.a, level: 0, nextReview: Date.now(), repetitions: 0, ef: 2.5, interval: 1, lastReview: Date.now() }));
+      const newSet = { id: Date.now().toString(), docId: activeDoc.id, sourcePages: generated.pages, title: `Flashcards (Pgs ${generated.pages})`, cards: cards, createdAt: new Date().toISOString() };
+      setFlashcards(p => [...p, newSet]);
     } else if (generated.type === 'exam') {
       setExams(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: generated.pages, title: generated.title || "Exam", questions: generated.data, createdAt: new Date().toISOString() }]);
     } else {
@@ -1106,21 +1170,21 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-[#0a0a0c] p-6 overflow-y-auto custom-scrollbar">
       {!generated ? (
-        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-8 rounded-[2rem] flex-shrink-0 shadow-xl dark:shadow-black/50">
+        <div className="bg-white dark:bg-zinc-900/80 border border-gray-200 dark:border-zinc-800/50 p-6 rounded-3xl flex-shrink-0 shadow-2xl dark:shadow-black/30">
           {!genFromSelection && (
             <div className="flex items-center justify-between mb-8 gap-4">
               <div className="w-full relative">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">Start Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl px-4 py-3 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-base text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all shadow-inner" />
               </div>
               <div className="mt-6 text-gray-400 dark:text-zinc-600 font-bold">TO</div>
               <div className="w-full relative">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">End Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl px-4 py-3 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-base text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-1 focus:ring-[var(--accent-color)] transition-all shadow-inner" />
               </div>
             </div>
           )}
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 block ml-1">Extraction Engine</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 block ml-1">Extraction Tool</label>
           <div className="grid grid-cols-3 gap-3 mb-8">
             <ToolBtn id="flashcards" active={type} set={setType} icon={Layers} label="Cards" />
             <ToolBtn id="exam" active={type} set={setType} icon={CheckSquare} label="Hard Exam" />
@@ -1130,76 +1194,64 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
             <ToolBtn id="treatment" active={type} set={setType} icon={Pill} label="Treatment" />
             <ToolBtn id="labs" active={type} set={setType} icon={Thermometer} label="Labs / Dx" />
             <ToolBtn id="mnemonics" active={type} set={setType} icon={Lightbulb} label="Mnemonics" />
-            <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="Simplify" />
+            <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="ELI5" />
           </div>
           {(type === 'flashcards' || type === 'exam' || type === 'quiz') && (
-            <div className="mb-6 bg-gray-100 dark:bg-zinc-950 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
-                <span>Quantity</span> 
-                <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{count} Items</span>
-              </label>
-              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+            <div className="mb-8 bg-white dark:bg-zinc-950 p-4 rounded-xl border border-gray-200 dark:border-zinc-800">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 flex justify-between"><span>Quantity</span> <span className="text-[var(--accent-color)] text-sm">{count} Items</span></label>
+              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
             </div>
           )}
-          <div className="mb-8 bg-gray-100 dark:bg-zinc-950 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800">
-            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
-              <span>Difficulty Level</span> 
-              <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{difficultyLevels[difficulty - 1]}</span>
-            </label>
-            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+          <div className="mb-8 bg-white dark:bg-zinc-950 p-4 rounded-xl border border-gray-200 dark:border-zinc-800">
+            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 flex justify-between"><span>Difficulty</span> <span className="text-[var(--accent-color)] text-sm">{difficultyLevels[difficulty - 1]}</span></label>
+            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
           </div>
-          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-5 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.4)] hover:shadow-[0_15px_40px_rgba(var(--accent-color-rgb),0.6)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 active:scale-[0.98]">
-            {status.loading ? <Loader2 size={24} className="animate-spin" /> : <BrainCircuit size={24} />}
+          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.3)] hover:shadow-[0_0_40px_rgba(var(--accent-color-rgb),0.5)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3">
+            {status.loading ? <Loader2 size={20} className="animate-spin" /> : <BrainCircuit size={20} />}
             {status.loading ? "Running AI Engine..." : "Execute Extraction"}
           </button>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-900/20">
-          <div className="bg-emerald-500/10 border-b border-emerald-500/30 p-5 flex justify-between items-center shrink-0">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={18}/> Review Output</span>
+        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-2xl shadow-emerald-900/20">
+          <div className="bg-emerald-500/10 border-b border-emerald-500/30 p-4 flex justify-between items-center shrink-0">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2"><CheckCircle2 size={18}/> Review Output</span>
             <div className="flex gap-3">
-              <button onClick={()=>setGenerated(null)} className="px-5 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
-              <button onClick={saveItem} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={16}/> Save to DB</button>
+              <button onClick={()=>setGenerated(null)} className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-colors">Discard</button>
+              <button onClick={saveItem} className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-emerald-900/50 transition-colors"><Save size={16}/> Save to DB</button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
             {generated.type === 'flashcards' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-6 rounded-2xl relative group pr-16 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
-                <p className="text-sm text-gray-800 dark:text-white font-bold mb-4 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-3 text-xs uppercase tracking-widest">Q</span>{item.q}</p>
-                <div className="bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 p-4 rounded-xl">
-                  <p className="text-sm text-[var(--accent-color)] leading-relaxed"><span className="text-[var(--accent-color)]/50 mr-3 text-xs uppercase tracking-widest">A</span>{item.a}</p>
-                </div>
-                <button onClick={()=>removeItem(idx)} className="absolute top-6 right-6 p-2 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18}/></button>
+              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-sm">
+                <p className="text-sm text-gray-800 dark:text-white font-bold mb-3 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-2 text-xs uppercase tracking-widest">Q</span>{item.q}</p>
+                <p className="text-sm text-[var(--accent-color)] leading-relaxed"><span className="text-[var(--accent-color)]/50 mr-2 text-xs uppercase tracking-widest">A</span>{item.a}</p>
+                <button onClick={()=>removeItem(idx)} className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
               </div>
             ))}
             {generated.type === 'exam' && generated.data.map((item, idx) => (
-              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-6 rounded-2xl relative group pr-16 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
-                <p className="text-base text-gray-800 dark:text-white font-bold mb-6 leading-relaxed"><span className="text-gray-400 dark:text-zinc-500 mr-2">{idx+1}.</span> {item.q}</p>
-                <div className="space-y-3">
+              <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-sm">
+                <p className="text-sm text-gray-800 dark:text-white font-bold mb-4 leading-relaxed">{idx+1}. {item.q}</p>
+                <div className="space-y-2">
                   {item.options.map((opt, oIdx) => (
-                    <div key={oIdx} className={`text-sm p-4 rounded-xl border ${oIdx === item.correct ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold' : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'}`}>
-                      <span className="font-mono text-gray-400 dark:text-zinc-500 mr-3">{String.fromCharCode(65 + oIdx)}.</span> {opt}
+                    <div key={oIdx} className={`text-xs p-3 rounded-xl border bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400`}>
+                      {String.fromCharCode(65 + oIdx)}. {opt}
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 rounded-xl">
-                  <span className="font-black text-[var(--accent-color)] mr-2 uppercase tracking-widest text-[10px] block mb-2">Explanation</span>
-                  <p className="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{item.explanation}</p>
-                </div>
-                <button onClick={()=>removeItem(idx)} className="absolute top-6 right-6 p-2 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18}/></button>
+                <button onClick={()=>removeItem(idx)} className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16}/></button>
               </div>
             ))}
             {generated.type !== 'flashcards' && generated.type !== 'exam' && (
-              <div className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-8 rounded-2xl relative group shadow-sm">
-                <div className="text-base text-gray-600 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-invert prose-p:text-gray-600 dark:prose-p:text-zinc-300 prose-headings:text-gray-800 dark:prose-headings:text-white max-w-none">{generated.data}</div>
+              <div className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-6 rounded-2xl relative group shadow-sm">
+                <div className="text-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-invert prose-p:text-gray-600 dark:prose-p:text-zinc-300 prose-headings:text-gray-800 dark:prose-headings:text-white max-w-none">{generated.data}</div>
               </div>
             )}
           </div>
         </div>
       )}
       {status.msg && !generated && (
-        <div className={`mt-6 p-5 rounded-2xl text-sm font-bold flex items-center gap-4 border ${status.err ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-lg shadow-[var(--accent-color)]/20'}`}>
-          {status.loading ? <Loader2 size={24} className="animate-spin shrink-0" /> : <AlertCircle size={24} className="shrink-0" />}
+        <div className={`mt-6 p-5 rounded-2xl text-sm font-bold flex items-start gap-4 border ${status.err ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-lg shadow-[var(--accent-color)]/20'}`}>
+          {status.loading ? <Loader2 size={20} className="animate-spin shrink-0 mt-0.5" /> : <AlertCircle size={20} className="shrink-0 mt-0.5" />}
           <span className="leading-relaxed">{status.msg}</span>
         </div>
       )}
@@ -1210,8 +1262,8 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
 function ToolBtn({ id, active, set, icon: Icon, label }) {
   const isA = active === id;
   return (
-    <button onClick={() => set(id)} className={`py-4 px-2 flex flex-col items-center justify-center gap-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/30 scale-105' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
-      <Icon size={22} className={isA ? "text-white" : "text-gray-400 dark:text-zinc-600"}/> {label}
+    <button onClick={() => set(id)} className={`py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/30' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
+      <Icon size={20} className={isA ? "text-white" : "text-gray-400 dark:text-zinc-600"}/> {label}
     </button>
   );
 }
@@ -1280,7 +1332,7 @@ function PanelChat({ activeDoc, settings, currentPage }) {
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
-              {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-[var(--accent-color)] text-white" />}
+              {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-[var(--accent-color)]" />}
             </div>
             <div className={`p-5 max-w-[85%] text-sm leading-relaxed shadow-inner ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-3xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>
               {m.content}
@@ -1308,29 +1360,29 @@ function PanelChat({ activeDoc, settings, currentPage }) {
 
 function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, notes, setNotes }) {
   const [activeItem, setActiveItem] = useState(null);
-  const docCards = flashcards.filter(f => f.docId === activeDocId);
+  const docCardSets = flashcards.filter(f => f.docId === activeDocId);
   const docExams = exams.filter(e => e.docId === activeDocId);
   const docNotes = notes.filter(n => n.docId === activeDocId);
   if (activeItem?.type === 'exam') return <InPanelExam exam={activeItem.data} onBack={() => setActiveItem(null)} />;
   if (activeItem?.type === 'note') return <InPanelNote note={activeItem.data} onBack={() => setActiveItem(null)} />;
-  if (activeItem?.type === 'flashcards') return <InPanelFlashcards cards={docCards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
+  if (activeItem?.type === 'flashcards') return <InPanelFlashcards title={activeItem.data.title} initialCards={activeItem.data.cards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-gray-50 dark:bg-[#0a0a0c] space-y-12">
       <div>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
           <div className="space-y-4">
             {docExams.map(e => (
-              <div key={e.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 rounded-3xl group shadow-sm transition-all hover:border-emerald-500/30">
+              <div key={e.id} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl group shadow-md transition-all hover:border-emerald-500/30">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-sm text-gray-800 dark:text-white font-bold mb-2">{e.title}</p>
+                    <p className="text-sm text-gray-800 dark:text-white font-bold mb-1">{e.title}</p>
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 py-1 rounded-lg border border-gray-200 dark:border-zinc-800">{e.questions.length} Questions • Pgs {e.sourcePages}</span>
                   </div>
-                  <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
+                  <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
                 </div>
-                <button onClick={() => setActiveItem({ type: 'exam', data: e })} className="w-full py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center justify-center gap-2">
-                  <Play size={16} fill="currentColor" /> Take Exam Side-by-Side
+                <button onClick={() => setActiveItem({ type: 'exam', data: e })} className="w-full py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                  <Play size={14} fill="currentColor" /> Take Exam Side-by-Side
                 </button>
               </div>
             ))}
@@ -1339,32 +1391,39 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
       </div>
       <div>
         <div className="flex justify-between items-center mb-5">
-           <h3 className="text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] flex items-center gap-2 bg-[var(--accent-color)]/10 w-fit px-3 py-1.5 rounded-lg border border-[var(--accent-color)]/20"><Layers size={16}/> Saved Flashcards ({docCards.length})</h3>
-           {docCards.length > 0 && <button onClick={() => setActiveItem({ type: 'flashcards' })} className="text-[10px] bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg font-bold uppercase tracking-widest flex items-center gap-1 shadow-md hover:bg-[var(--accent-color)]/90 transition-colors"><Play size={14} fill="currentColor"/> Study</button>}
+           <h3 className="text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] flex items-center gap-2 bg-[var(--accent-color)]/10 w-fit px-3 py-1.5 rounded-lg border border-[var(--accent-color)]/20"><Layers size={16}/> Saved Flashcard Sets ({docCardSets.length})</h3>
+           {docCardSets.length > 0 && <button onClick={() => setActiveItem({ type: 'flashcards', data: { title: 'All Doc Cards', cards: docCardSets.flatMap(s => s.cards) } })} className="text-[10px] bg-[var(--accent-color)] text-white px-4 py-2 rounded-lg font-bold uppercase tracking-widest flex items-center gap-1 shadow-md hover:bg-[var(--accent-color)]/90 transition-colors"><Play size={14} fill="currentColor"/> Study All</button>}
         </div>
-        {docCards.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No flashcards extracted for this document.</p> : (
+        {docCardSets.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No flashcards extracted for this document.</p> : (
           <div className="space-y-4">
-            {docCards.slice(0, 5).map(c => (
-              <div key={c.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl relative group pr-12 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
-                <p className="text-xs text-gray-800 dark:text-white font-bold line-clamp-2 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-2 text-[10px] uppercase">Q</span>{c.q}</p>
-                <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== c.id))} className="absolute top-1/2 -translate-y-1/2 right-4 p-2 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
+            {docCardSets.map(set => (
+              <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl group shadow-sm transition-all hover:border-[var(--accent-color)]/30">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-sm text-gray-800 dark:text-white font-bold mb-1">{set.title}</p>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 py-1 rounded-lg border border-gray-200 dark:border-zinc-800">{set.cards?.length || 0} Cards • Pgs {set.sourcePages}</span>
+                  </div>
+                  <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== set.id))} className="p-2 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
+                </div>
+                <button onClick={() => setActiveItem({ type: 'flashcards', data: set })} className="w-full py-2 bg-[var(--accent-color)]/10 hover:bg-[var(--accent-color)]/20 text-[var(--accent-color)] rounded-xl text-xs font-bold uppercase tracking-widest border border-[var(--accent-color)]/20 transition-all flex items-center justify-center gap-2">
+                  <Play size={14} fill="currentColor" /> Study Set
+                </button>
               </div>
             ))}
-            {docCards.length > 5 && <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 text-center pt-4 bg-white dark:bg-zinc-900/30 rounded-xl py-3 border border-dashed border-gray-200 dark:border-zinc-800">+{docCards.length - 5} more inside Study Mode</div>}
           </div>
         )}
       </div>
       <div>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-500 mb-5 flex items-center gap-2 bg-blue-500/10 w-fit px-3 py-1.5 rounded-lg border border-blue-500/20"><BookA size={16}/> Saved Notes ({docNotes.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-5 flex items-center gap-2 bg-blue-500/10 w-fit px-3 py-1.5 rounded-lg border border-blue-500/20"><BookA size={16}/> Saved Notes ({docNotes.length})</h3>
         {docNotes.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No notes or summaries generated.</p> : (
           <div className="space-y-4">
             {docNotes.map(n => (
-              <div key={n.id} onClick={() => setActiveItem({ type: 'note', data: n })} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 rounded-2xl group relative shadow-sm hover:border-blue-500/30 transition-all cursor-pointer">
+              <div key={n.id} onClick={() => setActiveItem({ type: 'note', data: n })} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-5 rounded-2xl group relative shadow-md hover:border-blue-500/30 transition-all cursor-pointer">
                 <div className="pr-12">
                    <p className="text-sm text-gray-800 dark:text-white font-bold mb-2">{n.title}</p>
                    <p className="text-xs text-gray-500 dark:text-zinc-400 line-clamp-3 leading-relaxed bg-gray-100 dark:bg-zinc-950 p-3 rounded-xl border border-gray-200 dark:border-zinc-800">{n.content}</p>
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); setNotes(notes.filter(no => no.id !== n.id)); }} className="absolute top-5 right-4 p-2 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
+                <button onClick={(e) => { e.stopPropagation(); setNotes(notes.filter(no => no.id !== n.id)); }} className="absolute top-5 right-4 p-2 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"><Trash size={16}/></button>
               </div>
             ))}
           </div>
@@ -1450,11 +1509,12 @@ function InPanelExam({ exam, onBack }) {
   );
 }
 
-function InPanelFlashcards({ cards, onBack, setFlashcards }) {
+function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
+  const [cards, setCards] = useState(initialCards || []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   
-  if (cards.length === 0) return <div className="p-6 text-center text-gray-500 dark:text-zinc-500">No cards left.</div>;
+  if (!cards || cards.length === 0) return <div className="p-6 text-center text-gray-500 dark:text-zinc-500">No cards left.</div>;
   
   const currentCard = cards[currentIndex];
   
@@ -1475,7 +1535,16 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
     }
     const nextReview = Date.now() + newInterval * 86400000;
     const newCard = {...currentCard, repetitions: newRep, ef: newEf, interval: newInterval, lastReview: Date.now(), nextReview };
-    setFlashcards(prev => prev.map(c => c.id === newCard.id ? newCard : c));
+    
+    // Update local state
+    setCards(prev => prev.map(c => c.id === newCard.id ? newCard : c));
+    
+    // Update global state by matching the nested card IDs
+    setFlashcards(globalSets => globalSets.map(set => ({
+      ...set,
+      cards: set.cards ? set.cards.map(c => c.id === newCard.id ? newCard : c) : set.cards
+    })));
+
     setIsFlipped(false);
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -1489,17 +1558,19 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
     <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-[var(--accent-color)]/10 border-b border-[var(--accent-color)]/20 p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
-        <span className="text-[10px] text-[var(--accent-color)] font-black uppercase tracking-widest">Card {currentIndex+1} / {cards.length}</span>
+        <span className="text-[10px] text-[var(--accent-color)] font-black uppercase tracking-widest">{title} • Card {currentIndex+1} / {cards.length}</span>
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-96 perspective-1000 cursor-pointer">
           <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-x-180' : ''}`}>
+            {/* FRONT */}
             <div className="absolute inset-0 backface-hidden bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-xl">
               <span className="absolute top-6 left-6 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-zinc-600">Question</span>
               <h2 className="text-xl font-bold text-gray-800 dark:text-white leading-relaxed">{currentCard.q}</h2>
               <div className="absolute bottom-6 text-[10px] font-bold uppercase tracking-widest text-[var(--accent-color)]/50 animate-pulse">Click to reveal</div>
             </div>
-            <div className="absolute inset-0 backface-hidden bg-[var(--accent-color)]/90 border border-[var(--accent-color)]/30 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-2xl rotate-x-180 overflow-y-auto custom-scrollbar">
+            {/* BACK */}
+            <div className="absolute inset-0 backface-hidden bg-[var(--accent-color)] border border-[var(--accent-color)]/50 rounded-3xl p-10 flex flex-col items-center justify-center text-center shadow-2xl rotate-x-180 overflow-y-auto custom-scrollbar">
               <span className="absolute top-6 left-6 text-[10px] font-black uppercase tracking-widest text-white/80">Answer</span>
               <p className="text-lg font-bold text-white leading-relaxed">{currentCard.a}</p>
             </div>
