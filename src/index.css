@@ -7,10 +7,9 @@ html, body, #root {
   padding: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
+  max-width: none !important;
   text-align: left !important;
-  background-color: #050505;
+  overflow: hidden !important;
 }
 
 @layer utilities {
