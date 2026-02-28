@@ -908,7 +908,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     if (!pdf || !containerRef.current) return;
     let renderTask = null;
     let isMounted = true;
-    let resizeTimeout = null;
 
     const renderPage = async (currentWidth) => {
       try {
@@ -916,24 +915,23 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const page = await pdf.getPage(localPage);
         if (!isMounted) return;
 
-        // إلغاء الهوامش تماماً في الجوال لضمان أكبر حجم ممكن
-        const padding = window.innerWidth < 768 ? 0 : 40; 
+        // 1. حساب المقياس لملء العرض بالضبط بدون هوامش (Padding = 0 للجوال)
+        const padding = window.innerWidth < 768 ? 0 : 20; 
         const tempViewport = page.getViewport({ scale: 1 });
+        const scale = (currentWidth - padding) / tempViewport.width;
         
-        // حساب المقياس بحيث يملأ العرض المتاح تماماً
-        let scale = (currentWidth - padding) / tempViewport.width;
-        
-        // منع التصغير المفاجئ: رفع الحد الأدنى للمقياس في الجوال
-        const finalScale = window.innerWidth < 768 ? Math.max(scale, 1.3) : scale;
-        const viewport = page.getViewport({ scale: finalScale });
+        // 2. استخدام المقياس المحسوب مباشرة (بدون حد أدنى مبالغ فيه)
+        const viewport = page.getViewport({ scale: scale });
         
         const canvas = canvasRef.current;
         if (canvas && isMounted) {
           const context = canvas.getContext('2d', { alpha: false });
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
           
-          // قفل العرض بنسبة 100% لمنع القفز
+          // 3. تعيين أبعاد الكانفاس الداخلية لتطابق الفيو-بورت (يحافظ على النسبة)
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          
+          // 4. تعيين عرض الـ CSS ليكون 100% والطول تلقائي
           canvas.style.width = '100%';
           canvas.style.height = 'auto';
 
@@ -945,8 +943,9 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
           textLayer.style.width = '100%';
+          // استخدام aspectRatio لضمان تطابق طبقة النص مع الكانفاس
           textLayer.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
-          textLayer.style.setProperty('--scale-factor', (canvas.clientWidth / tempViewport.width));
+          textLayer.style.setProperty('--scale-factor', scale);
           const textContent = await page.getTextContent();
           window.pdfjsLib.renderTextLayer({ textContentSource: textContent, container: textLayer, viewport });
         }
@@ -954,20 +953,15 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     };
 
     const observer = new ResizeObserver((entries) => {
-      if (resizeTimeout) clearTimeout(resizeTimeout);
-      // تأخير الرندر 200ms للسماح للأنيميشن بالانتهاء ومنع الـ Snap
-      resizeTimeout = setTimeout(() => {
-        const width = entries[0].contentRect.width;
-        if (width > 0 && isMounted) renderPage(width);
-      }, 200);
+      const width = entries[0].contentRect.width;
+      if (width > 0 && isMounted) {
+        // طلب الرندر في الإطار القادم لضمان استقرار الأبعاد
+        requestAnimationFrame(() => renderPage(width));
+      }
     });
 
     observer.observe(containerRef.current);
-    return () => { 
-      isMounted = false; 
-      observer.disconnect(); 
-      if (resizeTimeout) clearTimeout(resizeTimeout);
-    };
+    return () => { isMounted = false; observer.disconnect(); };
   }, [localPage, pdf, rightPanelOpen]);
 
   const handleNav = (dir) => {
@@ -976,15 +970,14 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       setLocalPage(next);
       setCurrentPage(next); 
       setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
-      if (containerRef.current) containerRef.current.scrollTo({ top: 0 });
+      // التمرير للأعلى عند تغيير الصفحة
+      if (containerRef.current) containerRef.current.scrollTo(0, 0);
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-[#050505] relative overflow-hidden" onContextMenu={(e) => {
-      const sel = window.getSelection().toString().trim();
-      if (sel) { e.preventDefault(); setSelectedText(sel); setMenuPos({x: e.pageX, y: e.pageY}); setShowMenu(true); }
-    }}>
+    <div className="flex-1 flex flex-col h-full bg-gray-200 dark:bg-[#050505] relative overflow-hidden">
+      {/* Header */}
       <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 z-10">
         <div className="flex items-center gap-2 overflow-hidden">
           <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 rounded-xl">
@@ -997,7 +990,8 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </button>
       </div>
 
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative p-0 md:p-5 custom-scrollbar items-center justify-start pb-48">
+      {/* Scroll Container */}
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-300 dark:bg-[#121214] flex flex-col relative custom-scrollbar items-center justify-start pb-48">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32} /></div>
         ) : pdf ? (
@@ -1008,14 +1002,16 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         ) : <AlertCircle className="text-red-500" />}
       </div>
 
+      {/* Floating Buttons */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-2xl z-30">
-        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full"><ChevronLeft size={20}/></button>
+        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200"><ChevronLeft size={20}/></button>
         <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-sm whitespace-nowrap">PG {localPage} / {activeDoc.totalPages}</span>
-        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full"><ChevronRight size={20}/></button>
+        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full hover:opacity-90"><ChevronRight size={20}/></button>
       </div>
     </div>
   );
 }
+
 
 function PanelSettings({ settings, setSettings }) {
   return (
