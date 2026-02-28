@@ -886,7 +886,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
   useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
 
-  // Load PDF from IndexedDB
   useEffect(() => {
     let isMounted = true;
     const loadPdf = async () => {
@@ -905,11 +904,11 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     return () => { isMounted = false; };
   }, [activeDoc.id]);
 
-  // Handle Rendering and Resizing
   useEffect(() => {
     if (!pdf || !containerRef.current) return;
     let renderTask = null;
     let isMounted = true;
+    let resizeTimeout = null;
 
     const renderPage = async (currentWidth) => {
       try {
@@ -917,12 +916,15 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const page = await pdf.getPage(localPage);
         if (!isMounted) return;
 
-        const padding = window.innerWidth < 768 ? 4 : 40; 
+        // إلغاء الهوامش تماماً في الجوال لضمان أكبر حجم ممكن
+        const padding = window.innerWidth < 768 ? 0 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = (currentWidth - padding) / tempViewport.width;
         
-        // Force a crisp scale for mobile
-        const finalScale = window.innerWidth < 768 ? Math.max(scale, 1.2) : scale;
+        // حساب المقياس بحيث يملأ العرض المتاح تماماً
+        let scale = (currentWidth - padding) / tempViewport.width;
+        
+        // منع التصغير المفاجئ: رفع الحد الأدنى للمقياس في الجوال
+        const finalScale = window.innerWidth < 768 ? Math.max(scale, 1.3) : scale;
         const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
@@ -930,6 +932,8 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           const context = canvas.getContext('2d', { alpha: false });
           canvas.height = viewport.height;
           canvas.width = viewport.width;
+          
+          // قفل العرض بنسبة 100% لمنع القفز
           canvas.style.width = '100%';
           canvas.style.height = 'auto';
 
@@ -949,14 +953,21 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       } catch (e) { if (e.name !== 'RenderingCancelledException') console.error(e); }
     };
 
-    // Use ResizeObserver to prevent snapping when sidebar opens/closes
     const observer = new ResizeObserver((entries) => {
-      const width = entries[0].contentRect.width;
-      if (width > 0) renderPage(width);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      // تأخير الرندر 200ms للسماح للأنيميشن بالانتهاء ومنع الـ Snap
+      resizeTimeout = setTimeout(() => {
+        const width = entries[0].contentRect.width;
+        if (width > 0 && isMounted) renderPage(width);
+      }, 200);
     });
 
     observer.observe(containerRef.current);
-    return () => { isMounted = false; observer.disconnect(); };
+    return () => { 
+      isMounted = false; 
+      observer.disconnect(); 
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+    };
   }, [localPage, pdf, rightPanelOpen]);
 
   const handleNav = (dir) => {
@@ -974,7 +985,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       const sel = window.getSelection().toString().trim();
       if (sel) { e.preventDefault(); setSelectedText(sel); setMenuPos({x: e.pageX, y: e.pageY}); setShowMenu(true); }
     }}>
-      {/* Header */}
       <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 z-10">
         <div className="flex items-center gap-2 overflow-hidden">
           <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 rounded-xl">
@@ -987,19 +997,17 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </button>
       </div>
 
-      {/* Scroll Container */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative p-2 md:p-5 custom-scrollbar items-center justify-start pb-48">
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative p-0 md:p-5 custom-scrollbar items-center justify-start pb-48">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32} /></div>
         ) : pdf ? (
-          <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto rounded-sm overflow-hidden mb-10">
+          <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto overflow-hidden mb-10">
             <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" />
           </div>
         ) : <AlertCircle className="text-red-500" />}
       </div>
 
-      {/* Floating Controls */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-2xl z-30">
         <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full"><ChevronLeft size={20}/></button>
         <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-sm whitespace-nowrap">PG {localPage} / {activeDoc.totalPages}</span>
