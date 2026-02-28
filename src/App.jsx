@@ -79,11 +79,13 @@ const loadJsPDF = async () => {
   });
 };
 
-const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) => {
+const callAI = async (prompt, expectJson, strictMode, apiKey) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
+  
   const sysPrompt = strictMode
-    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. Do not use outside knowledge. If the answer is not in the text, say 'Information not found in the selected pages.'"
+    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array if expecting JSON."
     : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
+  
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -93,52 +95,21 @@ const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) 
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: "system", content: sysPrompt + (expectJson ? " Respond in strictly valid JSON format." : "") },
+        { role: "system", content: sysPrompt + (expectJson ? " You MUST respond in strictly valid JSON format. Do not use markdown wrappers if format is json_object." : "") },
         { role: "user", content: prompt }
       ],
       response_format: expectJson ? { type: "json_object" } : { type: "text" },
-      max_tokens: maxTokens,
-      stream: true,
+      temperature: strictMode ? 0.1 : 0.7,
     }),
   });
+
   if (!response.ok) {
     const errData = await response.json().catch(() => ({}));
-    throw new Error(`${errData.error?.message || response.statusText || 'API Error'}`);
+    throw new Error(`API Error: ${errData.error?.message || response.statusText}`);
   }
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let fullContent = '';
-  let buffer = '';
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop();
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === 'data: [DONE]') continue;
-      if (trimmed.startsWith('data: ')) {
-        const jsonStr = trimmed.slice(6);
-        try {
-          const chunk = JSON.parse(jsonStr);
-          const delta = chunk.choices?.[0]?.delta?.content;
-          if (delta) fullContent += delta;
-        } catch (e) {
-          console.warn('Failed to parse chunk:', trimmed, e);
-        }
-      }
-    }
-  }
-  if (buffer.trim().startsWith('data: ')) {
-    const jsonStr = buffer.trim().slice(6);
-    try {
-      const chunk = JSON.parse(jsonStr);
-      const delta = chunk.choices?.[0]?.delta?.content;
-      if (delta) fullContent += delta;
-    } catch {}
-  }
-  return fullContent.trim();
+
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
 };
 
 export default function App() {
@@ -198,22 +169,14 @@ export default function App() {
     }
   }, [documents, flashcards, exams, notes, userSettings, openDocs, docPages]);
 
-  useEffect(() => {
-    const updateTheme = () => {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
-      document.documentElement.classList.toggle('dark', isDark);
-    };
-    updateTheme();
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    media.addEventListener('change', updateTheme);
-    return () => media.removeEventListener('change', updateTheme);
-  }, [userSettings.theme]);
-
-  useEffect(() => {
-    document.documentElement.classList.remove('font-small', 'font-medium', 'font-large');
-    document.documentElement.classList.add(`font-${userSettings.fontSize}`);
-  }, [userSettings.fontSize]);
+  const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
+  
+  const fontSizeMap = {
+    small: '14px',
+    medium: '16px',
+    large: '18px'
+  };
 
   useEffect(() => {
     document.documentElement.style.setProperty('--accent-color', getAccentColor(userSettings.accentColor));
@@ -331,7 +294,7 @@ export default function App() {
   const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()) || Object.values(d.pagesText).some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))) : documents;
 
   return (
-    <div className={`flex h-screen text-zinc-800 dark:text-zinc-200 font-sans overflow-hidden text-base font-medium ${`font-${userSettings.fontSize}`} bg-white dark:bg-[#0a0a0c]`} style={{'--accent-color': getAccentColor(userSettings.accentColor)}}>
+    <div className={`flex h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`} style={{'--accent-color': getAccentColor(userSettings.accentColor), fontSize: fontSizeMap[userSettings.fontSize]}}>
       <nav className="w-20 bg-gray-50 dark:bg-[#0a0a0c] border-r border-gray-200 dark:border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl dark:shadow-black/50">
         <div className="w-12 h-12 rounded-full bg-[var(--accent-color)] flex items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
           <BrainCircuit className="text-white w-6 h-6" />
@@ -1018,54 +981,48 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
     try {
       let text = genFromSelection || "";
       if (!genFromSelection) {
-        for (let i = Number(startPage); i <= Number(endPage); i++) if (activeDoc.pagesText[i]) text += activeDoc.pagesText[i] + "\n";
+        for (let i = Number(startPage); i <= Number(endPage); i++) {
+          if (activeDoc.pagesText[i]) text += `[Page ${i}]\n${activeDoc.pagesText[i]}\n\n`;
+        }
       }
-      if (!text.trim()) throw new Error("No readable text found on these pages.");
+      
+      if (!text.trim()) throw new Error("No readable text found on these pages. Make sure the PDF contains text, not just scanned images.");
       
       setStatus({ loading: true, msg: 'Elite AI processing via OpenAI...', err: false });
-      const diffPrompt = `Make it ${difficultyLevels[difficulty - 1]} level: Insanely hard, extremely long, exhaustive detail, professional medical specialty level. Vignettes MUST be massive and multi-step.`;
+      const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
       
-      if (type === 'flashcards') {
-        const p = `${diffPrompt}\nCreate exactly ${count} highly accurate study flashcards from this text ONLY. Respond in JSON format: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }\nTEXT:\n${text}`;
-        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type, data: JSON.parse(raw).items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
-      } else if (type === 'exam') {
-        const p = `${diffPrompt}\nCreate extremely difficult, advanced-level ${count}-question medical/academic exam from this text ONLY. Respond in JSON format: { "title": "Exam Title", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation using text" } ] }\nTEXT:\n${text}`;
-        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 2500);
+      let resultData = null;
+
+      if (type === 'flashcards' || type === 'exam' || type === 'quiz') {
+        let p = `${diffPrompt}\nCreate exactly ${count} highly accurate items from this text ONLY.\n\nTEXT:\n${text}`;
+        
+        if (type === 'flashcards') {
+          p += `\n\nFormat as JSON strictly like this: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }`;
+        } else {
+          p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
+        }
+        
+        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
         const parsed = JSON.parse(raw);
-        setGenerated({ type, title: parsed.title, data: parsed.items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
-      } else if (type === 'summary') {
-        const p = `${diffPrompt}\nWrite a comprehensive, structured summary of this text ONLY. Use markdown headings and bullet points.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type, data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` });
-      } else if (type === 'clinical') {
-        const p = `${diffPrompt}\nBased ONLY on the medical concepts in this text, create a realistic Clinical Case Study scenario. Include patient presentation, symptoms, and ask a question at the end, followed by the answer. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Clinical Case' });
-      } else if (type === 'differential') {
-        const p = `${diffPrompt}\nGenerate a comprehensive Differential Diagnosis list based on the symptoms and diseases mentioned in this text ONLY. Provide reasoning for each. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Differential Diagnosis' });
-      } else if (type === 'treatment') {
-        const p = `${diffPrompt}\nExtract and detail all Treatment Plans, pharmacology, and management strategies mentioned in this text ONLY. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Treatment Plan' });
-      } else if (type === 'labs') {
-        const p = `${diffPrompt}\nDetail all Laboratory findings, imaging, and diagnostic criteria mentioned in this text ONLY. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Lab Interpretation' });
-      } else if (type === 'mnemonics') {
-        const p = `Create extremely memorable, clever mnemonics for the key lists, drugs, or concepts in this text. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Mnemonics' });
-      } else if (type === 'eli5') {
-        const p = `Explain the core concepts of this text extremely simply, as if explaining to a beginner or a 5-year-old. Use analogies. Respond in Markdown.\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 2500);
-        setGenerated({ type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle: 'Simplified Explanation' });
+        resultData = { type, title: parsed.title, data: parsed.items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
+      } else {
+        const p = `${diffPrompt}\nPerform the following task based ONLY on the medical concepts in this text.\nTASK: ${type}\nRespond in Markdown.\n\nTEXT:\n${text}`;
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 4000);
+        
+        let customTitle = type.charAt(0).toUpperCase() + type.slice(1);
+        if (type === 'clinical') customTitle = 'Clinical Case';
+        if (type === 'differential') customTitle = 'Differential Diagnosis';
+        if (type === 'treatment') customTitle = 'Treatment Plan';
+        if (type === 'labs') customTitle = 'Lab Interpretation';
+        if (type === 'eli5') customTitle = 'Simplified Explanation';
+
+        resultData = { type: 'summary', data: raw, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}`, customTitle };
       }
-      
+
+      setGenerated(resultData);
       setStatus({ loading: false, msg: 'Generation Complete.', err: false });
     } catch (e) {
+      console.error(e);
       setStatus({ loading: false, msg: e.message || "Failed.", err: true });
     } finally {
       setGenFromSelection('');
