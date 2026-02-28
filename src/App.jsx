@@ -1099,6 +1099,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   const [difficulty, setDifficulty] = useState(3);
   const [status, setStatus] = useState({ loading: false, msg: '', err: false });
   const [generated, setGenerated] = useState(null);
+  const wakeLockRef = useRef(null);
   
   useEffect(() => {
     if (!status.loading && !generated && !genFromSelection) {
@@ -1107,11 +1108,41 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
     }
   }, [currentPage, status.loading, generated, genFromSelection]);
 
+  useEffect(() => {
+    return () => {
+      if (wakeLockRef.current !== null) {
+        wakeLockRef.current.release().catch(console.error);
+      }
+    };
+  }, []);
+
   const difficultyLevels = ['Hard', 'Expert', 'Insane'];
+
+  const requestWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen');
+      }
+    } catch (err) {
+      console.error("Wake Lock error:", err);
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    try {
+      if (wakeLockRef.current !== null) {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+    } catch (err) {
+      console.error("Wake Lock release error:", err);
+    }
+  };
 
   const handleGenerate = async () => {
     setStatus({ loading: true, msg: 'Indexing medical context...', err: false });
     setGenerated(null);
+    await requestWakeLock();
     try {
       let text = genFromSelection || "";
       if (!genFromSelection) {
@@ -1124,64 +1155,42 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       
       if (!text.trim() || text.length < 20) throw new Error("Not enough readable text found on these pages. Ensure the PDF contains actual text, not just scanned images.");
       
-      setStatus({ loading: true, msg: 'Ultra-Fast processing via AI...', err: false });
+      setStatus({ loading: true, msg: 'Turbo processing via AI...', err: false });
       
       const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
       
-      const chunkSize = 15000; 
-      const textChunks = [];
-      for (let i = 0; i < text.length; i += chunkSize) {
-        textChunks.push(text.slice(i, i + chunkSize));
-      }
-
       let resultData = null;
 
       if (type === 'flashcards' || type === 'exam' || type === 'quiz') {
-        const itemsPerChunk = Math.ceil(count / textChunks.length);
+        const p = `${diffPrompt}\nCreate exactly ${count} highly accurate items from this text ONLY.\n\nTEXT:\n${text}`;
         
-        const promises = textChunks.map(async (chunk) => {
-          let p = `${diffPrompt}\nCreate exactly ${itemsPerChunk} highly accurate items from this text ONLY.\n\nTEXT:\n${chunk}`;
-          if (type === 'flashcards') {
-            p += `\n\nFormat as JSON strictly like this: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }`;
-          } else {
-            p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
-          }
-          
-          try {
-            const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
-            let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-            const firstBrace = cleaned.indexOf('{');
-            const lastBrace = cleaned.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-               cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-            }
-            if (!cleaned.endsWith('}')) {
-               if (cleaned.includes('"items": [')) cleaned += ']}';
-               else cleaned += '}';
-            }
-            const parsed = JSON.parse(cleaned);
-            return parsed.items || parsed.questions || parsed.data || [];
-          } catch (e) {
-            console.error("Chunk parsing failed safely, recovering...", e);
-            return [];
-          }
-        });
+        let formatPrompt = '';
+        if (type === 'flashcards') {
+          formatPrompt = `\n\nFormat as JSON strictly like this: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }`;
+        } else {
+          formatPrompt = `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
+        }
+        
+        const raw = await callAI(p + formatPrompt, true, settings.strictMode, settings.apiKey, 8000);
+        let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const firstBrace = cleaned.indexOf('{');
+        const lastBrace = cleaned.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1) {
+           cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+        }
+        if (!cleaned.endsWith('}')) {
+           if (cleaned.includes('"items": [')) cleaned += ']}';
+           else cleaned += '}';
+        }
+        const parsed = JSON.parse(cleaned);
+        const combinedItems = parsed.items || parsed.questions || parsed.data || [];
 
-        const allResults = await Promise.allSettled(promises);
-        let combinedItems = [];
-        allResults.forEach(res => {
-          if (res.status === 'fulfilled' && Array.isArray(res.value)) {
-            combinedItems.push(...res.value);
-          }
-        });
-        
-        combinedItems = combinedItems.slice(0, count);
         if (combinedItems.length === 0) throw new Error("AI failed to extract any valid items from this text. The text might be irrelevant or too short.");
 
-        resultData = { type: type === 'quiz' ? 'exam' : type, title: "Generated Assessment", data: combinedItems, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
+        resultData = { type: type === 'quiz' ? 'exam' : type, title: "Generated Assessment", data: combinedItems.slice(0, count), pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
       } else {
         const p = `${diffPrompt}\nPerform the following task based ONLY on the medical concepts in this text.\nTASK: ${type}\nRespond in Markdown.\n\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 4000);
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 8000);
         
         let customTitle = type.charAt(0).toUpperCase() + type.slice(1);
         if (type === 'clinical') customTitle = 'Clinical Case';
@@ -1200,6 +1209,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       setStatus({ loading: false, msg: e.message || "Generation Failed.", err: true });
     } finally {
       setGenFromSelection('');
+      await releaseWakeLock();
     }
   };
 
@@ -1228,7 +1238,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-[100px] md:pb-6">
       {!generated ? (
         <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex-shrink-0 shadow-lg dark:shadow-black/50">
           {!genFromSelection && (
@@ -1324,7 +1334,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
         </div>
       )}
       {status.msg && !generated && (
-        <div className={`mt-4 md:mt-6 p-4 md:p-5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 md:gap-4 border ${status.err ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-sm dark:shadow-lg shadow-[var(--accent-color)]/10 dark:shadow-[var(--accent-color)]/20'}`}>
+        <div className={`mt-4 md:mt-6 p-4 md:p-5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3 md:gap-4 border shrink-0 ${status.err ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20' : 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] border-[var(--accent-color)]/20 shadow-sm dark:shadow-lg shadow-[var(--accent-color)]/10 dark:shadow-[var(--accent-color)]/20'}`}>
           {status.loading ? <Loader2 size={20} className="animate-spin shrink-0 text-[var(--accent-color)] md:w-6 md:h-6" /> : <AlertCircle size={20} className="shrink-0 text-red-500 md:w-6 md:h-6" />}
           <span className="leading-relaxed">{status.msg}</span>
         </div>
@@ -1398,12 +1408,12 @@ function PanelChat({ activeDoc, settings, currentPage }) {
   };
   
   return (
-    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-[100px] md:pb-6 flex flex-col">
       <div className="bg-[var(--accent-color)]/10 px-4 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-3 shadow-sm shrink-0 rounded-xl md:rounded-2xl mb-4 md:mb-6 border border-[var(--accent-color)]/20">
          <Target size={14} className="text-[var(--accent-color)] md:w-4 md:h-4" />
          <span className="text-[9px] md:text-[10px] font-black text-[var(--accent-color)] uppercase tracking-widest">Locked: Page {currentPage}</span>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 md:space-y-6 mb-4 md:mb-6">
+      <div className="flex-1 space-y-4 md:space-y-6 mb-4 md:mb-6">
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-3 md:gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0 shadow-sm md:shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
@@ -1445,7 +1455,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   if (activeItem?.type === 'flashcards') return <InPanelFlashcards title={activeItem.data.title} initialCards={activeItem.data.cards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12 pb-[100px] md:pb-6">
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12 pb-[100px] md:pb-6">
       <div>
         <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-4 md:mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl border border-emerald-500/20"><GraduationCap size={14} className="md:w-[18px] md:h-[18px]"/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-xs md:text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
@@ -1547,7 +1557,7 @@ function InPanelExam({ exam, onBack }) {
   const q = exam.questions[currentQIndex];
   
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-3 md:p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Exam</button>
         <span className="text-[8px] md:text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest bg-emerald-500/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Pages {exam.sourcePages}</span>
@@ -1631,7 +1641,7 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
   };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-[var(--accent-color)]/10 border-b border-[var(--accent-color)]/20 p-3 md:p-5 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Study</button>
         <span className="text-[8px] md:text-[10px] text-[var(--accent-color)] font-black uppercase tracking-widest bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Card {currentIndex+1} / {cards.length}</span>
@@ -1666,7 +1676,7 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
 
 function InPanelNote({ note, onBack }) {
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 md:p-5 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Back to Notes</button>
       </div>
