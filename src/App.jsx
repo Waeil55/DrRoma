@@ -404,6 +404,7 @@ export default function App() {
         </nav>
 
         <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 overflow-hidden">
+
           {isUploading && (
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
               <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
@@ -464,7 +465,8 @@ export default function App() {
         {activeDocId && (
           
           
-          <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-0 bottom-[4rem] md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
+        <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-x-0 bottom-16 md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
+
 
             <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-3">
@@ -884,6 +886,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
   useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
 
+  // Load PDF from IndexedDB
   useEffect(() => {
     let isMounted = true;
     const loadPdf = async () => {
@@ -891,41 +894,34 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       try {
         const buffer = await getPdfData(activeDoc.id);
         if (buffer && isMounted) {
-          const actualBuffer = buffer.buffer || buffer;
           const pdfjsLib = await loadPdfJs();
-          const loadedPdf = await pdfjsLib.getDocument({ data: actualBuffer }).promise;
+          const loadedPdf = await pdfjsLib.getDocument({ data: buffer.buffer || buffer }).promise;
           if (isMounted) setPdf(loadedPdf);
         }
-      } catch (e) { console.error("Failed to load PDF", e); }
+      } catch (e) { console.error(e); }
       finally { if (isMounted) setIsLoading(false); }
     };
     loadPdf();
     return () => { isMounted = false; };
   }, [activeDoc.id]);
 
+  // Handle Rendering and Resizing
   useEffect(() => {
-    if (!pdf) return;
+    if (!pdf || !containerRef.current) return;
     let renderTask = null;
     let isMounted = true;
 
-    const renderPage = async () => {
+    const renderPage = async (currentWidth) => {
       try {
-        const container = containerRef.current;
-        if (!container || !isMounted) return;
-        
-        // Wait for layout to settle (prevents the snap)
-        await new Promise(resolve => requestAnimationFrame(resolve));
-
+        if (renderTask) renderTask.cancel();
         const page = await pdf.getPage(localPage);
-        const containerWidth = container.clientWidth;
-        if (!containerWidth || !isMounted) return;
+        if (!isMounted) return;
 
-        // Mobile-optimized scaling
         const padding = window.innerWidth < 768 ? 4 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = (containerWidth - padding) / tempViewport.width;
+        const scale = (currentWidth - padding) / tempViewport.width;
         
-        // Use a 1.2x scale multiplier on mobile for better clarity
+        // Force a crisp scale for mobile
         const finalScale = window.innerWidth < 768 ? Math.max(scale, 1.2) : scale;
         const viewport = page.getViewport({ scale: finalScale });
         
@@ -934,8 +930,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           const context = canvas.getContext('2d', { alpha: false });
           canvas.height = viewport.height;
           canvas.width = viewport.width;
-          
-          // Force CSS to fill container immediately
           canvas.style.width = '100%';
           canvas.style.height = 'auto';
 
@@ -947,28 +941,22 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
           textLayer.style.width = '100%';
-          textLayer.style.height = 'auto';
           textLayer.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
           textLayer.style.setProperty('--scale-factor', (canvas.clientWidth / tempViewport.width));
-          
           const textContent = await page.getTextContent();
-          window.pdfjsLib.renderTextLayer({
-            textContentSource: textContent,
-            container: textLayer,
-            viewport,
-            textDivs: []
-          });
+          window.pdfjsLib.renderTextLayer({ textContentSource: textContent, container: textLayer, viewport });
         }
-      } catch (e) {
-        if (e.name !== 'RenderingCancelledException') console.error(e);
-      }
+      } catch (e) { if (e.name !== 'RenderingCancelledException') console.error(e); }
     };
 
-    renderPage();
-    return () => { 
-      isMounted = false; 
-      if (renderTask) renderTask.cancel(); 
-    };
+    // Use ResizeObserver to prevent snapping when sidebar opens/closes
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0].contentRect.width;
+      if (width > 0) renderPage(width);
+    });
+
+    observer.observe(containerRef.current);
+    return () => { isMounted = false; observer.disconnect(); };
   }, [localPage, pdf, rightPanelOpen]);
 
   const handleNav = (dir) => {
@@ -977,55 +965,49 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       setLocalPage(next);
       setCurrentPage(next); 
       setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
-      if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      if (containerRef.current) containerRef.current.scrollTo({ top: 0 });
     }
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-[#050505] relative" onContextMenu={(e) => {
+    <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-[#050505] relative overflow-hidden" onContextMenu={(e) => {
       const sel = window.getSelection().toString().trim();
       if (sel) { e.preventDefault(); setSelectedText(sel); setMenuPos({x: e.pageX, y: e.pageY}); setShowMenu(true); }
     }}>
-      <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 z-10">
-        <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
-          <button onClick={closeDoc} className="flex items-center gap-1 md:gap-2 text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white transition-colors text-[10px] md:text-xs font-black uppercase tracking-widest bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl">
-            <ChevronLeft size={16} /> <span className="hidden sm:inline">Exit</span>
+      {/* Header */}
+      <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 z-10">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 rounded-xl">
+            <ChevronLeft size={16} /> Exit
           </button>
-          <span className="text-xs md:text-sm font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px] md:max-w-md">{activeDoc.name}</span>
+          <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px]">{activeDoc.name}</span>
         </div>
         <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 rounded-xl border transition-all ${rightPanelOpen ? 'bg-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 text-gray-500'}`}>
           {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
         </button>
       </div>
 
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative p-2 md:p-5 custom-scrollbar items-center justify-start pb-40">
+      {/* Scroll Container */}
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative p-2 md:p-5 custom-scrollbar items-center justify-start pb-48">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500">
-            <Loader2 className="animate-spin text-[var(--accent-color)]" size={32} />
-            <span className="text-[10px] uppercase font-black tracking-widest">Loading Page...</span>
-          </div>
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32} /></div>
         ) : pdf ? (
-          /* REMOVED INLINE PIXEL WIDTH HERE TO FIX SNAPPING */
           <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto rounded-sm overflow-hidden mb-10">
             <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" />
           </div>
-        ) : (
-          <div className="m-auto text-red-500 flex items-center gap-2 bg-red-50 p-4 rounded-xl border border-red-200 font-bold">
-            <AlertCircle size={16} /> Layer Load Error
-          </div>
-        )}
+        ) : <AlertCircle className="text-red-500" />}
       </div>
 
+      {/* Floating Controls */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-2xl z-30">
-        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full active:scale-95"><ChevronLeft size={20}/></button>
+        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full"><ChevronLeft size={20}/></button>
         <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-sm whitespace-nowrap">PG {localPage} / {activeDoc.totalPages}</span>
-        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full active:scale-95"><ChevronRight size={20}/></button>
+        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full"><ChevronRight size={20}/></button>
       </div>
     </div>
   );
 }
-
 
 function PanelSettings({ settings, setSettings }) {
   return (
