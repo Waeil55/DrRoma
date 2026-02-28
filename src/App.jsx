@@ -403,7 +403,7 @@ export default function App() {
           {!online && <div className="absolute bottom-2 md:bottom-auto md:top-2 bg-red-500/20 text-red-500 font-bold px-2 py-1 rounded text-[10px] uppercase">Offline</div>}
         </nav>
 
-        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 h-[calc(100vh-4rem)] md:h-screen">
+        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 overflow-hidden">
           {isUploading && (
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
               <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
@@ -462,7 +462,10 @@ export default function App() {
         </main>
 
         {activeDocId && (
-          <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-0 bottom-16 md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
+          
+          
+          <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-0 bottom-[4rem] md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
+
             <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-3">
                 <Target size={18} className="text-white"/>
