@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   BookOpen, Layers, CheckSquare, Settings, 
   ChevronLeft, ChevronRight, Upload, MessageSquare, 
@@ -79,13 +79,11 @@ const loadJsPDF = async () => {
   });
 };
 
-const callAI = async (prompt, expectJson, strictMode, apiKey) => {
+const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
-  
   const sysPrompt = strictMode
-    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array if expecting JSON."
+    ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array."
     : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
-  
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -95,19 +93,18 @@ const callAI = async (prompt, expectJson, strictMode, apiKey) => {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: "system", content: sysPrompt + (expectJson ? " You MUST respond in strictly valid JSON format. Do not use markdown wrappers if format is json_object." : "") },
+        { role: "system", content: sysPrompt + (expectJson ? " You MUST respond in strictly valid JSON format." : "") },
         { role: "user", content: prompt }
       ],
       response_format: expectJson ? { type: "json_object" } : { type: "text" },
+      max_tokens: maxTokens,
       temperature: strictMode ? 0.1 : 0.7,
     }),
   });
-
   if (!response.ok) {
     const errData = await response.json().catch(() => ({}));
     throw new Error(`API Error: ${errData.error?.message || response.statusText}`);
   }
-
   const data = await response.json();
   return data.choices[0].message.content.trim();
 };
@@ -177,6 +174,21 @@ export default function App() {
     medium: '16px',
     large: '18px'
   };
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      root.style.setProperty('color-scheme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.style.setProperty('color-scheme', 'light');
+    }
+  }, [isDark]);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = fontSizeMap[userSettings.fontSize] || '16px';
+  }, [userSettings.fontSize]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--accent-color', getAccentColor(userSettings.accentColor));
@@ -294,142 +306,153 @@ export default function App() {
   const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()) || Object.values(d.pagesText).some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))) : documents;
 
   return (
-    <div className={`flex h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`} style={{'--accent-color': getAccentColor(userSettings.accentColor), fontSize: fontSizeMap[userSettings.fontSize]}}>
-      <nav className="w-20 bg-gray-50 dark:bg-[#0a0a0c] border-r border-gray-200 dark:border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl dark:shadow-black/50">
-        <div className="w-12 h-12 rounded-full bg-[var(--accent-color)] flex items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
-          <BrainCircuit className="text-white w-6 h-6" />
-        </div>
-        <div className="flex-1 flex flex-col gap-6 w-full px-2">
-          <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
-          <SidebarBtn icon={Layers} label="Flashcards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
-          <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
-          <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
-          <SidebarBtn icon={LayoutDashboard} label="Dashboard" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} />
-          {activeDocId && (
-            <>
-              <div className="w-8 h-px bg-gray-200 dark:bg-zinc-800 mx-auto my-1" />
-              <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
-            </>
+    <>
+      <style>{`
+        :root {
+          --bg-root: ${isDark ? '#050505' : '#f9fafb'};
+          --bg-panel: ${isDark ? '#0a0a0c' : '#ffffff'};
+          --bg-surface: ${isDark ? '#121214' : '#f3f4f6'};
+          --text-main: ${isDark ? '#e4e4e7' : '#1f2937'};
+        }
+        body { background-color: var(--bg-root); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
+      `}</style>
+      <div className={`flex h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
+        <nav className="w-20 bg-gray-50 dark:bg-[#0a0a0c] border-r border-gray-200 dark:border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl dark:shadow-black/50">
+          <div className="w-12 h-12 rounded-full bg-[var(--accent-color)] flex items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
+            <BrainCircuit className="text-white w-6 h-6" />
+          </div>
+          <div className="flex-1 flex flex-col gap-6 w-full px-2">
+            <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
+            <SidebarBtn icon={Layers} label="Flashcards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
+            <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
+            <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
+            <SidebarBtn icon={LayoutDashboard} label="Dashboard" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} />
+            {activeDocId && (
+              <>
+                <div className="w-8 h-px bg-gray-200 dark:bg-zinc-800 mx-auto my-1" />
+                <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
+              </>
+            )}
+          </div>
+          <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
+          {!online && <div className="absolute bottom-4 bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs">Offline</div>}
+        </nav>
+        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0">
+          {isUploading && (
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
+              <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
+            </div>
           )}
-        </div>
-        <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
-        {!online && <div className="absolute bottom-4 bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs">Offline</div>}
-      </nav>
-      <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0">
-        {isUploading && (
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
-            <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
-          </div>
-        )}
-        {!activeDocId && currentView === 'library' && (
-          <LibraryView documents={filteredDocuments} onUpload={handleFileUpload} onOpen={(id) => { setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setCurrentView('reader'); }} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        )}
-        {!activeDocId && currentView === 'flashcards' && (
-          <FlashcardsGlobalView flashcards={flashcards} setFlashcards={setFlashcards} setView={setCurrentView} />
-        )}
-        {!activeDocId && currentView === 'exams' && (
-          <ExamsGlobalView exams={exams} setExams={setExams} setView={setCurrentView} />
-        )}
-        {!activeDocId && currentView === 'notes' && (
-          <NotesGlobalView notes={notes} setNotes={setNotes} setView={setCurrentView} />
-        )}
-        {!activeDocId && currentView === 'dashboard' && (
-          <DashboardView documents={documents} flashcards={flashcards} exams={exams} notes={notes} />
-        )}
-        {!activeDocId && currentView === 'settings' && (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="w-full max-w-lg"><PanelSettings settings={userSettings} setSettings={setUserSettings} /></div>
-          </div>
-        )}
-        {activeDocId && (
-          <PdfWorkspace 
-            activeDoc={activeDoc} 
-            setDocuments={setDocuments} 
-            closeDoc={() => closeDoc(activeDocId)} 
-            rightPanelOpen={rightPanelOpen} 
-            setRightPanelOpen={setRightPanelOpen} 
-            currentPage={docPages[activeDocId] || 1} 
-            setCurrentPage={(updater) => {
-              setDocPages(prev => {
-                const oldVal = prev[activeDocId] || 1;
-                const newVal = typeof updater === 'function' ? updater(oldVal) : updater;
-                return {...prev, [activeDocId]: newVal};
-              });
-            }} 
-            openDocs={openDocs} 
-            setActiveDocId={setActiveDocId} 
-            closeTab={closeDoc} 
-            setShowMenu={setShowMenu} 
-            setMenuPos={setMenuPos} 
-            setSelectedText={setSelectedText} 
-            setGenFromSelection={setGenFromSelection} 
-            setRightPanelTab={setRightPanelTab} 
-          />
-        )}
-        {activeDocId && !rightPanelOpen && (
-          <button onClick={() => setRightPanelOpen(true)} className="fixed bottom-8 right-8 p-4 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-105 transition-transform z-30">
-            <Sparkles size={24} />
-          </button>
-        )}
-      </main>
-      {rightPanelOpen && activeDocId && (
-        <aside className="w-full lg:w-[600px] xl:w-[650px] bg-gray-50 dark:bg-[#0a0a0c] border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
-          <div className="bg-[var(--accent-color)] px-4 py-2 flex items-center gap-2 shrink-0 border-b border-[var(--accent-color)]/50 shadow-md">
-            <Target size={16} className="text-white"/>
-            <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
-          </div>
-          <div className="h-16 flex p-2 bg-gray-50 dark:bg-[#0a0a0c] border-b border-gray-200 dark:border-zinc-800/30 shrink-0 gap-1 items-center">
-            <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Studio" icon={Sparkles} />
-            <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Professor" icon={MessageSquare} />
-            <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
-            <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
-          </div>
-          <div className="flex-1 overflow-hidden relative">
-            {rightPanelTab === 'settings' ? (
-              <PanelSettings settings={userSettings} setSettings={setUserSettings} />
-            ) : !userSettings.apiKey?.trim() ? (
-              <div className="p-8 text-center mt-20">
-                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <AlertCircle className="w-10 h-10 text-red-500" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">OpenAI Key Required</h2>
-                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
-                <button onClick={() => setRightPanelTab('settings')} className="px-6 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
-              </div>
-            ) : rightPanelTab === 'generate' ? (
-              <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
-            ) : rightPanelTab === 'chat' ? (
-              <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId] || 1} />
-            ) : rightPanelTab === 'review' ? (
-              <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
-            ) : null}
-          </div>
-        </aside>
-      )}
-      {showShortcuts && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl max-w-md w-full shadow-2xl">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><HelpCircle /> Keyboard Shortcuts</h2>
-            <ul className="space-y-2 text-sm">
-              <li className="flex justify-between"><span>Arrow Left / Right</span><span>Change Page</span></li>
-              <li className="flex justify-between"><span>?</span><span>Show Help</span></li>
-              <li className="flex justify-between"><span>Ctrl + U</span><span>Upload PDF</span></li>
-              <li className="flex justify-between"><span>Esc</span><span>Close Panel / Modal</span></li>
-            </ul>
-            <button onClick={() => setShowShortcuts(false)} className="mt-6 w-full py-2 bg-[var(--accent-color)] text-white rounded-xl">Close</button>
-          </div>
-        </div>
-      )}
-      {showMenu && (
-        <div className="fixed inset-0 z-50" onClick={() => setShowMenu(false)}>
-          <div className="absolute bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-2xl p-2" style={{left: menuPos.x, top: menuPos.y}}>
-            <button onClick={() => { setShowMenu(false); setGenFromSelection(selectedText); setRightPanelOpen(true); setRightPanelTab('generate'); }} className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg w-full text-left text-sm">
-              <Sparkles size={16} /> Generate from Selection
+          {!activeDocId && currentView === 'library' && (
+            <LibraryView documents={filteredDocuments} onUpload={handleFileUpload} onOpen={(id) => { setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setCurrentView('reader'); }} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          )}
+          {!activeDocId && currentView === 'flashcards' && (
+            <FlashcardsGlobalView flashcards={flashcards} setFlashcards={setFlashcards} setView={setCurrentView} />
+          )}
+          {!activeDocId && currentView === 'exams' && (
+            <ExamsGlobalView exams={exams} setExams={setExams} setView={setCurrentView} />
+          )}
+          {!activeDocId && currentView === 'notes' && (
+            <NotesGlobalView notes={notes} setNotes={setNotes} setView={setCurrentView} />
+          )}
+          {!activeDocId && currentView === 'dashboard' && (
+            <DashboardView documents={documents} flashcards={flashcards} exams={exams} notes={notes} />
+          )}
+          {!activeDocId && currentView === 'settings' && (
+            <div className="flex-1 flex items-center justify-center p-8">
+              <div className="w-full max-w-lg"><PanelSettings settings={userSettings} setSettings={setUserSettings} /></div>
+            </div>
+          )}
+          {activeDocId && (
+            <PdfWorkspace 
+              activeDoc={activeDoc} 
+              setDocuments={setDocuments} 
+              closeDoc={() => closeDoc(activeDocId)} 
+              rightPanelOpen={rightPanelOpen} 
+              setRightPanelOpen={setRightPanelOpen} 
+              currentPage={docPages[activeDocId] || 1} 
+              setCurrentPage={(updater) => {
+                setDocPages(prev => {
+                  const oldVal = prev[activeDocId] || 1;
+                  const newVal = typeof updater === 'function' ? updater(oldVal) : updater;
+                  return {...prev, [activeDocId]: newVal};
+                });
+              }} 
+              openDocs={openDocs} 
+              setActiveDocId={setActiveDocId} 
+              closeTab={closeDoc} 
+              setShowMenu={setShowMenu} 
+              setMenuPos={setMenuPos} 
+              setSelectedText={setSelectedText} 
+              setGenFromSelection={setGenFromSelection} 
+              setRightPanelTab={setRightPanelTab} 
+            />
+          )}
+          {activeDocId && !rightPanelOpen && (
+            <button onClick={() => setRightPanelOpen(true)} className="fixed bottom-8 right-8 p-4 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-105 transition-transform z-30">
+              <Sparkles size={24} />
             </button>
+          )}
+        </main>
+        {rightPanelOpen && activeDocId && (
+          <aside className="w-full lg:w-[600px] xl:w-[750px] bg-gray-50 dark:bg-[#0a0a0c] border-l border-gray-200 dark:border-zinc-800/30 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.7)] relative transition-all duration-300">
+            <div className="bg-[var(--accent-color)] px-4 py-2 flex items-center gap-2 shrink-0 border-b border-[var(--accent-color)]/50 shadow-md">
+              <Target size={16} className="text-white"/>
+              <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
+            </div>
+            <div className="h-16 flex p-2 bg-gray-50 dark:bg-[#0a0a0c] border-b border-gray-200 dark:border-zinc-800/30 shrink-0 gap-1 items-center">
+              <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Studio" icon={Sparkles} />
+              <PanelTab active={rightPanelTab === 'chat'} onClick={() => setRightPanelTab('chat')} label="Professor" icon={MessageSquare} />
+              <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="My Data" icon={Layers} />
+              <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
+            </div>
+            <div className="flex-1 overflow-hidden relative">
+              {rightPanelTab === 'settings' ? (
+                <PanelSettings settings={userSettings} setSettings={setUserSettings} />
+              ) : !userSettings.apiKey?.trim() ? (
+                <div className="p-8 text-center mt-20">
+                  <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <AlertCircle className="w-10 h-10 text-red-500" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">OpenAI Key Required</h2>
+                  <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
+                  <button onClick={() => setRightPanelTab('settings')} className="px-6 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
+                </div>
+              ) : rightPanelTab === 'generate' ? (
+                <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
+              ) : rightPanelTab === 'chat' ? (
+                <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId] || 1} />
+              ) : rightPanelTab === 'review' ? (
+                <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
+              ) : null}
+            </div>
+          </aside>
+        )}
+        {showShortcuts && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-zinc-900 p-8 rounded-2xl max-w-md w-full shadow-2xl">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><HelpCircle /> Keyboard Shortcuts</h2>
+              <ul className="space-y-2 text-sm">
+                <li className="flex justify-between"><span>Arrow Left / Right</span><span>Change Page</span></li>
+                <li className="flex justify-between"><span>?</span><span>Show Help</span></li>
+                <li className="flex justify-between"><span>Ctrl + U</span><span>Upload PDF</span></li>
+                <li className="flex justify-between"><span>Esc</span><span>Close Panel / Modal</span></li>
+              </ul>
+              <button onClick={() => setShowShortcuts(false)} className="mt-6 w-full py-2 bg-[var(--accent-color)] text-white rounded-xl">Close</button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        {showMenu && (
+          <div className="fixed inset-0 z-50" onClick={() => setShowMenu(false)}>
+            <div className="absolute bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-2xl p-2" style={{left: menuPos.x, top: menuPos.y}}>
+              <button onClick={() => { setShowMenu(false); setGenFromSelection(selectedText); setRightPanelOpen(true); setRightPanelTab('generate'); }} className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg w-full text-left text-sm">
+                <Sparkles size={16} /> Generate from Selection
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -742,14 +765,15 @@ function DashboardView({ documents, flashcards, exams, notes }) {
   );
 }
 
-// --- WORKSPACE & SIDE-BY-SIDE TOOLS ---
-
 function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab }) {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
+  const [localPage, setLocalPage] = useState(currentPage);
+
+  useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
   
   useEffect(() => {
     const loadPdf = async () => {
@@ -775,37 +799,39 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     let renderTask = null;
     const renderPage = async () => {
       try {
-        const page = await pdf.getPage(currentPage);
+        const page = await pdf.getPage(localPage);
         const container = containerRef.current;
         if (!container) return;
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
+        if (!containerWidth || !containerHeight) return;
+
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = Math.min((containerWidth / tempViewport.width) * 0.95, (containerHeight / tempViewport.height) * 0.95);
+        const scale = Math.max(0.1, Math.min((containerWidth - 40) / tempViewport.width, (containerHeight - 40) / tempViewport.height));
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
+        
         if (canvas) {
           canvas.height = viewport.height;
           canvas.width = viewport.width;
-          const renderContext = {
-            canvasContext: canvas.getContext('2d'),
-            viewport,
-          };
+          const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
           renderTask = page.render(renderContext);
           await renderTask.promise;
         }
+
         const textLayer = textLayerRef.current;
         if (textLayer) {
           textLayer.innerHTML = '';
           textLayer.style.width = `${viewport.width}px`;
           textLayer.style.height = `${viewport.height}px`;
+          textLayer.style.setProperty('--scale-factor', scale);
           const textContent = await page.getTextContent();
           window.pdfjsLib.renderTextLayer({
             textContentSource: textContent,
             container: textLayer,
             viewport,
             textDivs: []
-          }).promise;
+          });
         }
       } catch (e) {
         if (e.name !== 'RenderingCancelledException') {
@@ -813,27 +839,31 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         }
       }
     };
+
     renderPage();
-    return () => {
-      if (renderTask) renderTask.cancel();
-    };
-  }, [currentPage, pdf]);
+    return () => { if (renderTask) renderTask.cancel(); };
+  }, [localPage, pdf]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') {
-        setCurrentPage(p => Math.max(1, p - 1));
+        handleNav(-1);
       } else if (e.key === 'ArrowRight') {
-        setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1));
+        handleNav(1);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [activeDoc.totalPages, setCurrentPage]);
+  }, [activeDoc.totalPages, localPage]);
 
-  useEffect(() => {
-    setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
-  }, [currentPage, activeDoc.id, setDocuments]);
+  const handleNav = (dir) => {
+    const next = Math.max(1, Math.min(activeDoc.totalPages, localPage + dir));
+    if (next !== localPage) {
+      setLocalPage(next);
+      setCurrentPage(next); 
+      setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
+    }
+  };
 
   const handleContextMenu = (e) => {
     const sel = window.getSelection().toString().trim();
@@ -857,11 +887,11 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center bg-gray-100 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-inner h-11">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
+            <button onClick={() => handleNav(-1)} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
             <div className="px-4 h-full flex items-center justify-center border-x border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
-              <span className="text-sm font-mono text-gray-800 dark:text-white font-black tracking-widest">PG {currentPage} <span className="text-gray-400 dark:text-zinc-600 mx-1">/</span> {activeDoc.totalPages}</span>
+              <span className="text-sm font-mono text-gray-800 dark:text-white font-black tracking-widest">PG {localPage} <span className="text-gray-400 dark:text-zinc-600 mx-1">/</span> {activeDoc.totalPages}</span>
             </div>
-            <button onClick={() => setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1))} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronRight size={20} /></button>
+            <button onClick={() => handleNav(1)} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronRight size={20} /></button>
           </div>
           <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2.5 rounded-xl border transition-all shadow-md ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-400 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-zinc-800'}`}>
             {rightPanelOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
@@ -881,17 +911,17 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           })}
         </div>
       )}
-      <div ref={containerRef} className="flex-1 overflow-hidden bg-gray-100 dark:bg-[#121214] flex justify-center items-center relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]">
+      <div ref={containerRef} className="flex-1 overflow-hidden bg-gray-200 dark:bg-[#121214] flex justify-center items-center relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-5">
         {isLoading ? (
           <div className="flex flex-col items-center gap-6 text-gray-500 dark:text-zinc-500 m-auto">
             <Loader2 className="animate-spin text-[var(--accent-color)]" size={40}/>
             <span className="text-xs font-black tracking-widest uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdf ? (
-          <>
-            <canvas ref={canvasRef} className="shadow-[0_0_50px_rgba(0,0,0,1)]" />
-            <div ref={textLayerRef} className="absolute top-0 left-0 select-text pointer-events-auto" style={{color: 'transparent', userSelect: 'text'}} />
-          </>
+          <div className="relative shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white">
+            <canvas ref={canvasRef} className="block" />
+            <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
+          </div>
         ) : (
           <div className="m-auto text-red-400 text-sm flex items-center gap-2 bg-red-500/10 p-4 rounded-xl border border-red-500/20">
             <AlertCircle size={16}/> Failed to load PDF visual layer. AI text context is still intact.
@@ -905,7 +935,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 function PanelSettings({ settings, setSettings }) {
   return (
     <div className="p-8 h-full overflow-y-auto custom-scrollbar flex flex-col gap-8 bg-gray-50 dark:bg-[#0a0a0c]">
-      <div className="bg-[var(--accent-color)]/20 border border-[var(--accent-color)]/30 p-6 rounded-2xl shadow-lg">
+      <div className="bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/30 p-6 rounded-2xl shadow-lg">
         <h3 className="text-base font-black text-[var(--accent-color)] flex items-center gap-2 mb-3"><KeyRound size={20}/> OpenAI API Key</h3>
         <p className="text-sm text-gray-600 dark:text-[var(--accent-color)]/70 leading-relaxed mb-6">Enter your OpenAI key (sk-...) to power the AI extraction engine. Keys are saved securely in your browser's local storage and never sent to our servers.</p>
         <input
@@ -986,7 +1016,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
         }
       }
       
-      if (!text.trim()) throw new Error("No readable text found on these pages. Make sure the PDF contains text, not just scanned images.");
+      if (!text.trim() || text.length < 20) throw new Error("Not enough readable text found on these pages. Ensure the PDF contains actual text, not just scanned images.");
       
       setStatus({ loading: true, msg: 'Elite AI processing via OpenAI...', err: false });
       const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
@@ -999,12 +1029,17 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
         if (type === 'flashcards') {
           p += `\n\nFormat as JSON strictly like this: { "items": [ {"q": "Clear Question", "a": "Precise Answer"} ] }`;
         } else {
-          p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
+          p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
         }
         
         const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
-        const parsed = JSON.parse(raw);
-        resultData = { type, title: parsed.title, data: parsed.items, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
+        let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(cleaned);
+        const parsedItems = parsed.items || parsed.questions || parsed.data || [];
+        
+        if (!parsedItems || parsedItems.length === 0) throw new Error("AI failed to extract any items from this text. The text might be irrelevant or too short.");
+
+        resultData = { type, title: parsed.title || "Exam", data: parsedItems, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
       } else {
         const p = `${diffPrompt}\nPerform the following task based ONLY on the medical concepts in this text.\nTASK: ${type}\nRespond in Markdown.\n\nTEXT:\n${text}`;
         const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 4000);
@@ -1023,7 +1058,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       setStatus({ loading: false, msg: 'Generation Complete.', err: false });
     } catch (e) {
       console.error(e);
-      setStatus({ loading: false, msg: e.message || "Failed.", err: true });
+      setStatus({ loading: false, msg: e.message || "Generation Failed.", err: true });
     } finally {
       setGenFromSelection('');
     }
@@ -1091,7 +1126,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
             <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 flex justify-between"><span>Difficulty</span> <span className="text-[var(--accent-color)] text-sm">{difficultyLevels[difficulty - 1]}</span></label>
             <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
           </div>
-          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 bg-white dark:bg-white hover:bg-gray-100 dark:hover:bg-zinc-200 text-zinc-950 dark:text-zinc-950 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3">
+          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_0_30px_rgba(var(--accent-color-rgb),0.3)] hover:shadow-[0_0_40px_rgba(var(--accent-color-rgb),0.5)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3">
             {status.loading ? <Loader2 size={20} className="animate-spin" /> : <BrainCircuit size={20} />}
             {status.loading ? "Running AI Engine..." : "Execute Extraction"}
           </button>
@@ -1147,7 +1182,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
 function ToolBtn({ id, active, set, icon: Icon, label }) {
   const isA = active === id;
   return (
-    <button onClick={() => set(id)} className={`py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/30' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-300 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
+    <button onClick={() => set(id)} className={`py-3 px-2 flex flex-col items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isA ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white shadow-lg shadow-[var(--accent-color)]/30' : 'bg-gray-50 dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}>
       <Icon size={20} className={isA ? "text-white" : "text-gray-400 dark:text-zinc-600"}/> {label}
     </button>
   );
@@ -1211,7 +1246,7 @@ function PanelChat({ activeDoc, settings, currentPage }) {
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
-              {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-[var(--accent-color)]" />}
+              {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-[var(--accent-color)] text-white" />}
             </div>
             <div className={`p-5 max-w-[85%] text-sm leading-relaxed shadow-inner ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-3xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>
               {m.content}
@@ -1248,7 +1283,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   return (
     <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-gray-50 dark:bg-[#0a0a0c] space-y-12">
       <div>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-400 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20"><GraduationCap size={16}/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
           <div className="space-y-4">
             {docExams.map(e => (
@@ -1260,7 +1295,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
                   </div>
                   <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-sm"><Trash size={16}/></button>
                 </div>
-                <button onClick={() => setActiveItem({ type: 'exam', data: e })} className="w-full py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 rounded-xl text-xs font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                <button onClick={() => setActiveItem({ type: 'exam', data: e })} className="w-full py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-500 rounded-xl text-xs font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center justify-center gap-2">
                   <Play size={14} fill="currentColor" /> Take Exam Side-by-Side
                 </button>
               </div>
@@ -1286,7 +1321,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
         )}
       </div>
       <div>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-5 flex items-center gap-2 bg-blue-500/10 w-fit px-3 py-1.5 rounded-lg border border-blue-500/20"><BookA size={16}/> Saved Notes ({docNotes.length})</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-5 flex items-center gap-2 bg-blue-500/10 w-fit px-3 py-1.5 rounded-lg border border-blue-500/20"><BookA size={16}/> Saved Notes ({docNotes.length})</h3>
         {docNotes.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No notes or summaries generated.</p> : (
           <div className="space-y-4">
             {docNotes.map(n => (
@@ -1338,8 +1373,8 @@ function InPanelExam({ exam, onBack }) {
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-4 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-emerald-400 hover:text-emerald-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
-        <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Pages {exam.sourcePages}</span>
+        <button onClick={onBack} className="text-emerald-500 hover:text-emerald-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
+        <span className="text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest">Pages {exam.sourcePages}</span>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
         <>
@@ -1353,7 +1388,7 @@ function InPanelExam({ exam, onBack }) {
                 key={idx} onClick={() => handleSelect(idx)}
                 disabled={showFeedback}
                 className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 ${
-                  selectedAnswer === idx ? (idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-red-500 bg-red-500/10 text-red-100 shadow-inner') : showFeedback && idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-100 shadow-inner' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
+                  selectedAnswer === idx ? (idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-100 shadow-inner' : 'border-red-500 bg-red-500/10 text-red-700 dark:text-red-100 shadow-inner') : showFeedback && idx === q.correct ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-100 shadow-inner' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
                 }`}
               >
                 <div className={`w-5 h-5 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${selectedAnswer === idx || (showFeedback && idx === q.correct) ? (idx === q.correct ? 'border-emerald-500' : 'border-red-500') : 'border-gray-300 dark:border-zinc-600'}`}>
@@ -1364,11 +1399,11 @@ function InPanelExam({ exam, onBack }) {
             ))}
           </div>
           {showFeedback && (
-            <div className="mt-4 p-4 mb-6 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 rounded-xl text-xs text-[var(--accent-color)]/90 leading-relaxed"><span className="font-bold text-[var(--accent-color)] mr-2 uppercase tracking-widest text-[10px]">Explanation:</span>{q.explanation}</div>
+            <div className="mt-4 p-4 mb-6 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 rounded-xl text-xs text-gray-800 dark:text-[var(--accent-color)]/90 leading-relaxed"><span className="font-bold text-[var(--accent-color)] mr-2 uppercase tracking-widest text-[10px]">Explanation:</span>{q.explanation}</div>
           )}
           <div className="flex justify-between items-center">
             <button onClick={prevQuestion} disabled={currentQIndex === 0} className="px-4 py-2 text-gray-500 dark:text-zinc-500 hover:text-gray-800 dark:hover:text-white disabled:opacity-30 text-xs font-bold uppercase tracking-widest transition-colors">Previous</button>
-            <button onClick={nextQuestion} disabled={!showFeedback} className="px-6 py-3 bg-white dark:bg-white hover:bg-gray-100 dark:hover:bg-zinc-200 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 text-zinc-950 dark:text-zinc-950 disabled:shadow-none rounded-xl text-xs font-black shadow-lg uppercase tracking-widest transition-all flex items-center gap-2">Next <ChevronRight size={14}/></button>
+            <button onClick={nextQuestion} disabled={!showFeedback} className="px-6 py-3 bg-gray-800 dark:bg-white hover:bg-gray-700 dark:hover:bg-zinc-200 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 text-white dark:text-zinc-950 disabled:shadow-none rounded-xl text-xs font-black shadow-lg uppercase tracking-widest transition-all flex items-center gap-2">Next <ChevronRight size={14}/></button>
           </div>
         </>
       </div>
@@ -1428,10 +1463,10 @@ function InPanelFlashcards({ cards, onBack, setFlashcards }) {
           </div>
         </div>
         <div className={`w-full flex gap-3 mt-8 transition-opacity duration-300 ${isFlipped ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-          <button onClick={() => handleRate(0)} className="flex-1 py-4 bg-red-500/10 border border-red-500/20 hover:border-red-500/50 rounded-2xl text-red-400 text-xs font-black uppercase tracking-widest transition-all">Again</button>
-          <button onClick={() => handleRate(3)} className="flex-1 py-4 bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/50 rounded-2xl text-yellow-400 text-xs font-black uppercase tracking-widest transition-all">Hard</button>
-          <button onClick={() => handleRate(4)} className="flex-1 py-4 bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/50 rounded-2xl text-emerald-400 text-xs font-black uppercase tracking-widest transition-all">Good</button>
-          <button onClick={() => handleRate(5)} className="flex-1 py-4 bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/50 rounded-2xl text-blue-400 text-xs font-black uppercase tracking-widest transition-all">Easy</button>
+          <button onClick={() => handleRate(0)} className="flex-1 py-4 bg-red-500/10 border border-red-500/20 hover:border-red-500/50 rounded-2xl text-red-600 dark:text-red-400 text-xs font-black uppercase tracking-widest transition-all">Again</button>
+          <button onClick={() => handleRate(3)} className="flex-1 py-4 bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/50 rounded-2xl text-yellow-600 dark:text-yellow-400 text-xs font-black uppercase tracking-widest transition-all">Hard</button>
+          <button onClick={() => handleRate(4)} className="flex-1 py-4 bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/50 rounded-2xl text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all">Good</button>
+          <button onClick={() => handleRate(5)} className="flex-1 py-4 bg-blue-500/10 border border-blue-500/20 hover:border-blue-500/50 rounded-2xl text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all">Easy</button>
         </div>
       </div>
       <style>{`.perspective-1000 { perspective: 1000px; } .transform-style-3d { transform-style: preserve-3d; } .backface-hidden { backface-visibility: hidden; } .rotate-x-180 { transform: rotateX(180deg); }`}</style>
@@ -1443,7 +1478,7 @@ function InPanelNote({ note, onBack }) {
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
+        <button onClick={onBack} className="text-blue-500 hover:text-blue-400 text-xs font-bold uppercase tracking-widest flex items-center gap-1"><ChevronLeft size={14}/> Back</button>
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
          <h2 className="text-xl font-black text-gray-800 dark:text-white mb-6 leading-snug">{note.title}</h2>
