@@ -299,7 +299,7 @@ export default function App() {
     await deletePdfData(id);
     setDocuments(prev => prev.filter(d => d.id !== id));
     setFlashcards(prev => prev.filter(f => f.docId !== id));
-    setExams(prev => prev.filter(ex => ex.id !== id));
+    setExams(prev => prev.filter(ex => ex.docId !== id));
     setNotes(prev => prev.filter(n => n.docId !== id));
     closeDoc(id);
   };
@@ -803,17 +803,21 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const container = containerRef.current;
         if (!container) return;
         const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
         
-        if (!containerWidth) return;
+        if (!containerWidth || !containerHeight) return;
 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = (containerWidth - 60) / tempViewport.width;
-        const viewport = page.getViewport({ scale });
-        const canvas = canvasRef.current;
+        const scale = Math.min((containerWidth - 60) / tempViewport.width, (containerHeight - 60) / tempViewport.height);
+        const viewport = page.getViewport({ scale: Math.max(scale, 0.5) });
         
+        const canvas = canvasRef.current;
         if (canvas) {
           canvas.height = viewport.height;
           canvas.width = viewport.width;
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
+
           const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
           renderTask = page.render(renderContext);
           await renderTask.promise;
@@ -824,7 +828,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           textLayer.innerHTML = '';
           textLayer.style.width = `${viewport.width}px`;
           textLayer.style.height = `${viewport.height}px`;
-          textLayer.style.setProperty('--scale-factor', scale);
+          textLayer.style.setProperty('--scale-factor', viewport.scale);
           const textContent = await page.getTextContent();
           window.pdfjsLib.renderTextLayer({
             textContentSource: textContent,
@@ -913,8 +917,8 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
             <span className="text-xs font-black tracking-widest uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdf ? (
-          <div className="relative shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white mx-auto" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
-            <canvas ref={canvasRef} className="block w-full h-auto" />
+          <div className="relative shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white mx-auto transition-all duration-300" style={{ width: 'fit-content', height: 'fit-content' }}>
+            <canvas ref={canvasRef} className="block max-w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
           </div>
         ) : (
@@ -1013,7 +1017,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       
       if (!text.trim() || text.length < 20) throw new Error("Not enough readable text found on these pages. Ensure the PDF contains actual text, not just scanned images.");
       
-      setStatus({ loading: true, msg: 'Elite AI processing via OpenAI...', err: false });
+      setStatus({ loading: true, msg: 'Elite AI processing via OpenAI (Ultra-Fast)...', err: false });
       const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
       
       let resultData = null;
