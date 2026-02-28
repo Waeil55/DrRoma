@@ -7,9 +7,9 @@ html, body, #root {
   padding: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  max-width: none !important;
-  text-align: left !important;
+  max-width: 100% !important;
   overflow: hidden !important;
+  text-align: left !important;
 }
 
 @layer utilities {
@@ -28,4 +28,5 @@ html, body, #root {
     background-color: rgba(82, 82, 91, 0.5);
   }
 }
+
 
