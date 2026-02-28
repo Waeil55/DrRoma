@@ -1003,7 +1003,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       </div>
     </div>
   );
-
+}
 
 
 
