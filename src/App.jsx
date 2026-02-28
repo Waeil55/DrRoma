@@ -79,11 +79,12 @@ const loadJsPDF = async () => {
   });
 };
 
-const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) => {
+const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 16384) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
   const sysPrompt = strictMode
     ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array."
     : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
+  
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
     headers: {
@@ -101,10 +102,12 @@ const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 2500) 
       temperature: strictMode ? 0.1 : 0.7,
     }),
   });
+  
   if (!response.ok) {
     const errData = await response.json().catch(() => ({}));
     throw new Error(`API Error: ${errData.error?.message || response.statusText}`);
   }
+  
   const data = await response.json();
   return data.choices[0].message.content.trim();
 };
@@ -771,9 +774,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
-  const [localPage, setLocalPage] = useState(currentPage);
-
-  useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
   
   useEffect(() => {
     const loadPdf = async () => {
@@ -799,15 +799,15 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     let renderTask = null;
     const renderPage = async () => {
       try {
-        const page = await pdf.getPage(localPage);
+        const page = await pdf.getPage(currentPage);
         const container = containerRef.current;
         if (!container) return;
         const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        if (!containerWidth || !containerHeight) return;
+        
+        if (!containerWidth) return;
 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = Math.max(0.1, Math.min((containerWidth - 40) / tempViewport.width, (containerHeight - 40) / tempViewport.height));
+        const scale = (containerWidth - 60) / tempViewport.width;
         const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         
@@ -842,28 +842,23 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
     renderPage();
     return () => { if (renderTask) renderTask.cancel(); };
-  }, [localPage, pdf]);
+  }, [currentPage, pdf]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') {
-        handleNav(-1);
+        setCurrentPage(p => Math.max(1, p - 1));
       } else if (e.key === 'ArrowRight') {
-        handleNav(1);
+        setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1));
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [activeDoc.totalPages, localPage]);
+  }, [activeDoc.totalPages, setCurrentPage]);
 
-  const handleNav = (dir) => {
-    const next = Math.max(1, Math.min(activeDoc.totalPages, localPage + dir));
-    if (next !== localPage) {
-      setLocalPage(next);
-      setCurrentPage(next); 
-      setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
-    }
-  };
+  useEffect(() => {
+    setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
+  }, [currentPage, activeDoc.id, setDocuments]);
 
   const handleContextMenu = (e) => {
     const sel = window.getSelection().toString().trim();
@@ -887,11 +882,11 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center bg-gray-100 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-inner h-11">
-            <button onClick={() => handleNav(-1)} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronLeft size={20} /></button>
             <div className="px-4 h-full flex items-center justify-center border-x border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
-              <span className="text-sm font-mono text-gray-800 dark:text-white font-black tracking-widest">PG {localPage} <span className="text-gray-400 dark:text-zinc-600 mx-1">/</span> {activeDoc.totalPages}</span>
+              <span className="text-sm font-mono text-gray-800 dark:text-white font-black tracking-widest">PG {currentPage} <span className="text-gray-400 dark:text-zinc-600 mx-1">/</span> {activeDoc.totalPages}</span>
             </div>
-            <button onClick={() => handleNav(1)} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronRight size={20} /></button>
+            <button onClick={() => setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1))} className="px-5 h-full text-gray-400 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-800 dark:hover:text-white transition-colors flex items-center"><ChevronRight size={20} /></button>
           </div>
           <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2.5 rounded-xl border transition-all shadow-md ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-400 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-zinc-800'}`}>
             {rightPanelOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
@@ -911,15 +906,15 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           })}
         </div>
       )}
-      <div ref={containerRef} className="flex-1 overflow-hidden bg-gray-200 dark:bg-[#121214] flex justify-center items-center relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-5">
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-5 custom-scrollbar items-center justify-start">
         {isLoading ? (
           <div className="flex flex-col items-center gap-6 text-gray-500 dark:text-zinc-500 m-auto">
             <Loader2 className="animate-spin text-[var(--accent-color)]" size={40}/>
             <span className="text-xs font-black tracking-widest uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdf ? (
-          <div className="relative shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white">
-            <canvas ref={canvasRef} className="block" />
+          <div className="relative shadow-[0_0_50px_rgba(0,0,0,0.3)] bg-white mx-auto" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
+            <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
           </div>
         ) : (
@@ -1032,17 +1027,36 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
           p += `\n\nFormat as JSON strictly like this: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Detailed explanation" } ] }`;
         }
         
-        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 4000);
-        let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const parsed = JSON.parse(cleaned);
-        const parsedItems = parsed.items || parsed.questions || parsed.data || [];
+        const raw = await callAI(p, true, settings.strictMode, settings.apiKey, 16384);
         
+        let cleaned = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+        let parsed;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch (e) {
+          const lastBrace = cleaned.lastIndexOf('}');
+          if (lastBrace !== -1) {
+             cleaned = cleaned.substring(0, lastBrace + 1);
+             if (!cleaned.endsWith('}')) cleaned += '}';
+             if (cleaned.startsWith('{') && !cleaned.endsWith('}')) cleaned += '}';
+             if (cleaned.includes('"items": [') && !cleaned.endsWith(']}')) cleaned += ']}';
+             try { 
+                 parsed = JSON.parse(cleaned); 
+             } catch(e2) { 
+                 throw new Error("JSON Parse Error: Output was too long or malformed."); 
+             }
+          } else {
+             throw new Error("JSON Parse Error: Malformed output from AI.");
+          }
+        }
+        
+        const parsedItems = parsed.items || parsed.questions || parsed.data || [];
         if (!parsedItems || parsedItems.length === 0) throw new Error("AI failed to extract any items from this text. The text might be irrelevant or too short.");
 
         resultData = { type, title: parsed.title || "Exam", data: parsedItems, pages: genFromSelection ? 'Selection' : `${startPage}-${endPage}` };
       } else {
         const p = `${diffPrompt}\nPerform the following task based ONLY on the medical concepts in this text.\nTASK: ${type}\nRespond in Markdown.\n\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 4000);
+        const raw = await callAI(p, false, settings.strictMode, settings.apiKey, 16384);
         
         let customTitle = type.charAt(0).toUpperCase() + type.slice(1);
         if (type === 'clinical') customTitle = 'Clinical Case';
