@@ -907,41 +907,44 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     return () => { isMounted = false; };
   }, [activeDoc.id]);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!pdf) return;
     let renderTask = null;
     let isMounted = true;
 
-        const renderPage = async () => {
+    const renderPage = async () => {
       try {
         const page = await pdf.getPage(localPage);
         const container = containerRef.current;
         if (!container || !isMounted) return;
         
-        // Use clientWidth for the base calculation
+        // Wait for one animation frame to ensure container dimensions are stable
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
         const containerWidth = container.clientWidth;
         if (!containerWidth) return;
 
-        // Minimize padding on mobile (8px) vs desktop (40px) to prevent shrinking
+        // Use minimal padding on mobile (8px) vs desktop (40px)
         const padding = window.innerWidth < 768 ? 8 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
         
-        // Calculate the ideal scale to fill the width
+        // Calculate scale to fit width
         const scale = (containerWidth - padding) / tempViewport.width;
         
-        // Use a higher floor (0.8) to prevent the "tiny page" bug
+        // Set a minimum floor for the scale to prevent the "tiny page" snap
         const finalScale = Math.max(scale, 0.8); 
         const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
         if (canvas) {
-          // Internal resolution
+          // Internal canvas resolution
           canvas.height = viewport.height;
           canvas.width = viewport.width;
           
-          // CSS Display: Force 100% width to lock the layout and prevent snapping
+          // CSS Display: Force 100% width immediately to prevent snapping
           canvas.style.width = '100%';
           canvas.style.height = 'auto';
+          canvas.style.maxWidth = `${viewport.width}px`; // Don't blur on giant screens
 
           const renderContext = { 
             canvasContext: canvas.getContext('2d', { alpha: false }), 
@@ -955,9 +958,10 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const textLayer = textLayerRef.current;
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
-          // Match text layer exactly to the viewport dimensions
-          textLayer.style.width = `${viewport.width}px`;
-          textLayer.style.height = `${viewport.height}px`;
+          // Ensure text layer matches the canvas exactly
+          textLayer.style.width = canvas.style.width === '100%' ? '100%' : `${viewport.width}px`;
+          textLayer.style.height = 'auto';
+          textLayer.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
           textLayer.style.setProperty('--scale-factor', viewport.scale);
           
           const textContent = await page.getTextContent();
@@ -974,6 +978,14 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         }
       }
     };
+
+    renderPage();
+    return () => { 
+      isMounted = false; 
+      if (renderTask) renderTask.cancel(); 
+    };
+  }, [localPage, pdf, rightPanelOpen]);
+
 
 
     renderPage();
