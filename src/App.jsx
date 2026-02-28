@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   BookOpen, Layers, CheckSquare, Settings, 
   ChevronLeft, ChevronRight, Upload, MessageSquare, 
@@ -135,7 +135,6 @@ export default function App() {
   const [selectedText, setSelectedText] = useState('');
   const [genFromSelection, setGenFromSelection] = useState('');
 
-  // Force strict resets via JS to bypass GitHub Mobile / Vite defaults
   useEffect(() => {
     let meta = document.querySelector('meta[name="viewport"]');
     if (!meta) {
@@ -144,20 +143,6 @@ export default function App() {
       document.head.appendChild(meta);
     }
     meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
-    
-    const rootEl = document.getElementById('root');
-    if (rootEl) {
-      rootEl.style.setProperty('max-width', 'none', 'important');
-      rootEl.style.setProperty('margin', '0', 'important');
-      rootEl.style.setProperty('padding', '0', 'important');
-      rootEl.style.setProperty('width', '100vw', 'important');
-      rootEl.style.setProperty('height', '100dvh', 'important');
-      rootEl.style.setProperty('text-align', 'left', 'important');
-    }
-    document.body.style.setProperty('margin', '0', 'important');
-    document.body.style.setProperty('padding', '0', 'important');
-    document.documentElement.style.setProperty('margin', '0', 'important');
-    document.documentElement.style.setProperty('padding', '0', 'important');
   }, []);
 
   useEffect(() => {
@@ -171,28 +156,7 @@ export default function App() {
       const savedPages = localStorage.getItem('drMariam_docPages');
       
       if (savedDocs) setDocuments(JSON.parse(savedDocs) || []);
-      if (savedCards) {
-        const parsedCards = JSON.parse(savedCards) || [];
-        if (parsedCards.length > 0 && !parsedCards[0].cards) {
-          const migrated = [];
-          const docIds = [...new Set(parsedCards.map(c => c.docId))];
-          docIds.forEach(docId => {
-            const docCards = parsedCards.filter(c => c.docId === docId);
-            migrated.push({
-               id: 'migrated-' + docId,
-               docId: docId,
-               sourcePages: 'Various',
-               title: 'Legacy Flashcards',
-               cards: docCards,
-               createdAt: new Date().toISOString()
-            });
-          });
-          setFlashcards(migrated);
-        } else {
-          setFlashcards(parsedCards);
-        }
-      }
-      
+      if (savedCards) setFlashcards(JSON.parse(savedCards) || []);
       if (savedExams) setExams(JSON.parse(savedExams) || []);
       if (savedNotes) setNotes(JSON.parse(savedNotes) || []);
       if (savedSettings) setUserSettings(JSON.parse(savedSettings) || { apiKey: '', strictMode: true, theme: 'system', fontSize: 'medium', accentColor: 'indigo' });
@@ -225,11 +189,7 @@ export default function App() {
   const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
   
-  const fontSizeMap = {
-    small: '14px',
-    medium: '16px',
-    large: '18px'
-  };
+  const fontSizeMap = { small: '14px', medium: '16px', large: '18px' };
 
   useEffect(() => {
     const root = document.documentElement;
@@ -247,27 +207,15 @@ export default function App() {
   }, [userSettings.fontSize]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--accent-color', getAccentColor(userSettings.accentColor));
-    document.documentElement.style.setProperty('--accent-color-rgb', getAccentRgb(userSettings.accentColor));
+    const colors = {
+      indigo: { hex: '#6366f1', rgb: '99, 102, 241' },
+      purple: { hex: '#a855f7', rgb: '168, 85, 247' },
+      blue: { hex: '#3b82f6', rgb: '59, 130, 246' }
+    };
+    const color = colors[userSettings.accentColor] || colors.indigo;
+    document.documentElement.style.setProperty('--accent-color', color.hex);
+    document.documentElement.style.setProperty('--accent-color-rgb', color.rgb);
   }, [userSettings.accentColor]);
-
-  const getAccentColor = (color) => {
-    switch (color) {
-      case 'indigo': return '#6366f1';
-      case 'purple': return '#a855f7';
-      case 'blue': return '#3b82f6';
-      default: return '#6366f1';
-    }
-  };
-
-  const getAccentRgb = (color) => {
-    switch (color) {
-      case 'indigo': return '99, 102, 241';
-      case 'purple': return '168, 85, 247';
-      case 'blue': return '59, 130, 246';
-      default: return '99, 102, 241';
-    }
-  };
 
   useEffect(() => {
     const updateOnline = () => setOnline(navigator.onLine);
@@ -313,13 +261,7 @@ export default function App() {
         setUploadProgress(50 + Math.floor((i / totalPages) * 40));
       }
       const id = Date.now().toString();
-      const newDoc = {
-        id,
-        name: file.name,
-        totalPages,
-        progress: 1,
-        addedAt: new Date().toISOString()
-      };
+      const newDoc = { id, name: file.name, totalPages, progress: 1, addedAt: new Date().toISOString() };
       await savePdfData(id, { buffer: arrayBuffer, pagesText });
       setDocuments(prev => [...prev, newDoc]);
       setOpenDocs(prev => [...prev, id]);
@@ -357,7 +299,6 @@ export default function App() {
   };
 
   const activeDoc = documents.find(d => d.id === activeDocId);
-
   const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
 
   return (
@@ -365,46 +306,28 @@ export default function App() {
       <style>{`
         :root {
           --bg-root: ${isDark ? '#050505' : '#f9fafb'};
-          --bg-panel: ${isDark ? '#0a0a0c' : '#ffffff'};
-          --bg-surface: ${isDark ? '#121214' : '#f3f4f6'};
           --text-main: ${isDark ? '#e4e4e7' : '#1f2937'};
         }
-        body { background-color: var(--bg-root); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
-        html, body, #root { margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100vw !important; height: 100dvh !important; overflow: hidden !important; text-align: left !important; }
+        html, body, #root { 
+          margin: 0 !important; 
+          padding: 0 !important; 
+          width: 100vw !important; 
+          height: 100dvh !important; 
+          overflow: hidden !important; 
+          background-color: var(--bg-root); 
+          color: var(--text-main); 
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        * {
+          -webkit-tap-highlight-color: transparent;
+        }
       `}</style>
-      <div className={`flex flex-col-reverse md:flex-row h-[100dvh] w-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
-
+      
+      {/* Root Layout Container: 100dvh ensures it fully respects mobile Safari address bar */}
+      <div className="flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden relative">
         
-        <nav className="w-full md:w-24 h-16 md:h-full bg-white dark:bg-[#0a0a0c] border-t md:border-t-0 md:border-r border-gray-200 dark:border-zinc-800/50 flex flex-row md:flex-col items-center justify-around md:justify-start py-0 md:py-6 z-50 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)] md:shadow-2xl transition-all">
-          <div className="hidden md:flex w-14 h-14 rounded-full bg-[var(--accent-color)] items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-10 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
-            <BrainCircuit className="text-white w-7 h-7" />
-          </div>
-          
-          <div className="flex-1 flex flex-row md:flex-col gap-2 md:gap-6 w-full px-2 items-center justify-around md:justify-start overflow-x-auto md:overflow-y-auto custom-scrollbar">
-            <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
-            <SidebarBtn icon={Layers} label="Cards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
-            <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
-            <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
-            <SidebarBtn icon={LayoutDashboard} label="Hub" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} className="hidden md:flex" />
-            
-            {activeDocId && (
-              <>
-                <div className="hidden md:block w-10 h-px bg-gray-300 dark:bg-zinc-800 mx-auto my-1" />
-                <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
-              </>
-            )}
-            <div className="md:hidden w-px h-8 bg-gray-300 dark:bg-zinc-800 mx-1" />
-            <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} className="md:hidden" />
-          </div>
-          
-          <div className="hidden md:block mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800/30 w-full px-2">
-             <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
-          </div>
-          {!online && <div className="absolute bottom-2 md:bottom-auto md:top-2 bg-red-500/20 text-red-500 font-bold px-2 py-1 rounded text-[10px] uppercase">Offline</div>}
-        </nav>
-
-        <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0 overflow-hidden">
-
+        {/* MAIN CONTENT AREA - Takes remaining space */}
+        <main className="flex-1 flex flex-col min-h-0 min-w-0 bg-gray-50 dark:bg-[#0a0a0c] relative z-10">
           {isUploading && (
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
               <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
@@ -427,8 +350,8 @@ export default function App() {
             <DashboardView documents={documents} flashcards={flashcards} exams={exams} notes={notes} />
           )}
           {!activeDocId && currentView === 'settings' && (
-            <div className="flex-1 overflow-y-auto p-4 md:p-10 lg:p-16 custom-scrollbar bg-gray-50 dark:bg-[#0a0a0c]">
-              <div className="max-w-3xl mx-auto pb-20">
+            <div className="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar">
+              <div className="max-w-3xl mx-auto pb-10">
                  <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 flex items-center gap-4"><Settings className="text-[var(--accent-color)]"/> System Settings</h1>
                  <PanelSettings settings={userSettings} setSettings={setUserSettings} />
               </div>
@@ -460,20 +383,53 @@ export default function App() {
               setRightPanelTab={setRightPanelTab} 
             />
           )}
+
+          {/* AI Floating Button on Mobile when panel is closed */}
+          {activeDocId && !rightPanelOpen && (
+            <button onClick={() => setRightPanelOpen(true)} className="md:hidden absolute bottom-6 right-6 p-4 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-105 transition-transform z-30">
+              <Sparkles size={24} />
+            </button>
+          )}
         </main>
 
+        {/* BOTTOM NAV / SIDEBAR (Order first on desktop to place on left) */}
+        <nav className="md:order-first w-full h-[80px] md:h-full md:w-24 shrink-0 bg-white/75 dark:bg-[#0a0a0c]/80 backdrop-blur-xl border-t md:border-t-0 md:border-r border-gray-200/50 dark:border-zinc-800/50 flex flex-row md:flex-col items-center justify-around md:justify-start pb-4 pt-2 md:py-6 z-40 shadow-[0_-5px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_-5px_30px_rgba(0,0,0,0.5)]">
+          <div className="hidden md:flex w-14 h-14 rounded-[1.25rem] bg-[var(--accent-color)] items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-10 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
+            <BrainCircuit className="text-white w-7 h-7" />
+          </div>
+          
+          <div className="flex-1 flex flex-row md:flex-col gap-1 md:gap-6 w-full px-2 items-center justify-around md:justify-start">
+            <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
+            <SidebarBtn icon={Layers} label="Cards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
+            <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
+            <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
+            <SidebarBtn icon={LayoutDashboard} label="Hub" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} className="hidden md:flex" />
+            
+            {activeDocId && (
+              <>
+                <div className="hidden md:block w-10 h-px bg-gray-300 dark:bg-zinc-800 mx-auto my-1" />
+                <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
+              </>
+            )}
+            
+            <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} className="md:hidden" />
+          </div>
+          
+          <div className="hidden md:block mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800/30 w-full px-2">
+             <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
+          </div>
+          {!online && <div className="absolute top-2 right-2 md:bottom-2 md:top-auto bg-red-500/20 text-red-500 font-bold px-2 py-1 rounded text-[10px] uppercase">Offline</div>}
+        </nav>
+
+        {/* RIGHT AI PANEL */}
         {activeDocId && (
-          
-          
-        <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} fixed inset-x-0 bottom-16 md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-40 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
-
-
+          <aside className={`${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'} absolute inset-0 bottom-[80px] md:bottom-0 md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-30 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out`}>
             <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-3">
                 <Target size={18} className="text-white"/>
                 <span className="text-xs font-bold text-white uppercase tracking-widest">Target: Page {docPages[activeDocId] || 1}</span>
               </div>
-              <button onClick={() => setRightPanelOpen(false)} className="md:hidden text-white/80 hover:text-white p-1 rounded-lg"><X size={20} /></button>
+              <button onClick={() => setRightPanelOpen(false)} className="md:hidden text-white/80 hover:text-white p-1 rounded-lg"><X size={24} /></button>
             </div>
             <div className="h-16 flex p-2 bg-gray-50/50 dark:bg-[#0a0a0c]/50 border-b border-gray-200 dark:border-zinc-800/30 shrink-0 gap-1 items-center">
               <PanelTab active={rightPanelTab === 'generate'} onClick={() => setRightPanelTab('generate')} label="AI Studio" icon={Sparkles} />
@@ -489,7 +445,7 @@ export default function App() {
                   <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <AlertCircle className="w-12 h-12 text-red-500" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">OpenAI Key Required</h2>
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-3">OpenAI Key Required</h2>
                   <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
                   <button onClick={() => setRightPanelTab('settings')} className="px-8 py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
                 </div>
@@ -504,10 +460,11 @@ export default function App() {
           </aside>
         )}
 
+        {/* OVERLAYS */}
         {showShortcuts && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
-            <div className="bg-white dark:bg-zinc-900 p-10 rounded-3xl max-w-md w-full shadow-2xl m-4" onClick={e=>e.stopPropagation()}>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800 dark:text-white"><HelpCircle className="text-[var(--accent-color)]"/> Keyboard Shortcuts</h2>
+            <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl max-w-md w-full shadow-2xl m-4" onClick={e=>e.stopPropagation()}>
+              <h2 className="text-xl md:text-2xl font-bold mb-6 flex items-center gap-3 text-gray-800 dark:text-white"><HelpCircle className="text-[var(--accent-color)]"/> Keyboard Shortcuts</h2>
               <ul className="space-y-4 text-sm text-gray-600 dark:text-zinc-300">
                 <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Arrow Left / Right</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold">Change Page</kbd></li>
                 <li className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2"><span>Show Help</span><kbd className="bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded font-mono text-xs font-bold">?</kbd></li>
@@ -537,14 +494,14 @@ function SidebarBtn({ icon: Icon, label, active, onClick, highlight, className =
       onClick={onClick}
       className={`flex flex-col items-center justify-center gap-1 transition-all group w-16 md:w-full ${className}`}
     >
-      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.25rem] flex items-center justify-center transition-all ${
+      <div className={`w-8 h-8 md:w-14 md:h-14 rounded-lg md:rounded-[1.25rem] flex items-center justify-center transition-all ${
         active
-          ? highlight ? 'bg-[var(--accent-color)] text-white shadow-xl shadow-[var(--accent-color)]/40 scale-105' : 'bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-white shadow-lg md:scale-105'
-          : 'bg-transparent text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800/80 hover:text-gray-800 dark:hover:text-zinc-200'
+          ? highlight ? 'text-[var(--accent-color)] md:bg-[var(--accent-color)] md:text-white shadow-none md:shadow-xl md:shadow-[var(--accent-color)]/40 md:scale-105' : 'text-[var(--accent-color)] md:bg-gray-200 md:dark:bg-zinc-800 md:text-gray-800 md:dark:text-white md:shadow-lg md:scale-105'
+          : 'text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 md:bg-transparent md:hover:bg-gray-200 md:dark:hover:bg-zinc-800/80 md:hover:text-gray-800 md:dark:hover:text-zinc-200'
       }`}>
-        <Icon size={20} className="md:w-6 md:h-6" />
+        <Icon size={24} className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
       </div>
-      <span className={`text-[8px] md:text-[9px] font-bold uppercase tracking-widest transition-all text-center leading-none ${active ? (highlight ? 'text-[var(--accent-color)]' : 'text-gray-800 dark:text-white') : 'text-gray-400 dark:text-zinc-600 group-hover:text-gray-600 dark:group-hover:text-zinc-400'}`}>
+      <span className={`text-[10px] md:text-[9px] font-semibold md:font-bold md:uppercase tracking-wide md:tracking-widest transition-all text-center leading-none mt-1 md:mt-0 ${active ? (highlight ? 'text-[var(--accent-color)] md:text-[var(--accent-color)]' : 'text-[var(--accent-color)] md:text-gray-800 md:dark:text-white') : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:group-hover:text-zinc-400'}`}>
         {label}
       </span>
     </button>
@@ -568,41 +525,41 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
   const totalCardsCount = flashcards.reduce((sum, set) => sum + (set.cards ? set.cards.length : 0), 0);
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-7xl mx-auto w-full">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-10 md:mb-16 gap-8">
+    <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-7xl mx-auto w-full pb-8">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 md:mb-16 gap-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black text-gray-800 dark:text-white tracking-tighter mb-4 flex items-center gap-3 md:gap-4">
+            <h1 className="text-3xl md:text-5xl font-black text-gray-800 dark:text-white tracking-tighter mb-2 md:mb-4 flex items-center gap-2 md:gap-4">
               Intelligence <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent-color)] to-purple-500">Nexus</span>
             </h1>
             <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-2xl leading-relaxed">Your secure, local medical knowledge base. Upload materials and let the elite AI extract exams, notes, and cards seamlessly.</p>
           </div>
           <label className={`cursor-pointer w-full lg:w-auto justify-center bg-white dark:bg-zinc-100 text-zinc-950 hover:bg-gray-100 dark:hover:bg-zinc-200 px-6 md:px-8 py-4 md:py-5 rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-3 md:gap-4 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-            {isUploading ? <Loader2 className="animate-spin" size={24} /> : <Upload size={24} />}
-            {isUploading ? "PROCESSING SECURE PDF..." : "IMPORT LOCAL PDF"}
+            {isUploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
+            {isUploading ? "PROCESSING..." : "IMPORT LOCAL PDF"}
             <input type="file" accept="application/pdf" className="hidden" onChange={onUpload} disabled={isUploading} />
           </label>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
-          <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-lg hover:shadow-xl">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-8 md:h-8"/></div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-16">
+          <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{notes.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Generated Notes</p></div>
           </div>
-          <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-lg hover:shadow-xl">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-8 md:h-8"/></div>
+          <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{totalCardsCount}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Active Flashcards</p></div>
           </div>
-          <div onClick={() => setView('exams')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-lg hover:shadow-xl">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-8 md:h-8"/></div>
+          <div onClick={() => setView('exams')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{exams.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Strict Exams</p></div>
           </div>
         </div>
 
         {documents.length > 0 && (
-          <div className="mb-10 relative">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20}/>
-            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search inside your secure documents..." className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl pl-16 pr-6 py-4 md:py-5 text-sm md:text-base font-bold text-gray-800 dark:text-white outline-none focus:border-[var(--accent-color)] shadow-sm transition-colors" />
+          <div className="mb-8 md:mb-10 relative">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={18}/>
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search inside your secure documents..." className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl md:rounded-2xl pl-12 md:pl-16 pr-6 py-4 md:py-5 text-sm md:text-base font-bold text-gray-800 dark:text-white outline-none focus:border-[var(--accent-color)] shadow-sm transition-colors" />
           </div>
         )}
 
@@ -611,13 +568,13 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
             <div className="w-24 h-24 md:w-40 md:h-40 bg-gray-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-10 shadow-lg">
               <FileUp size={48} className="md:w-16 md:h-16 text-gray-400 dark:text-zinc-600" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-3 md:mb-4">Repository Empty</h2>
+            <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-3 md:mb-4">Repository Empty</h2>
             <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-xl mx-auto leading-relaxed">Your library is securely encrypted locally. Import a textbook, research paper, or clinical guide to begin.</p>
           </div>
         ) : (
           <div>
-            <h3 className="text-lg md:text-xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 flex items-center gap-3 uppercase tracking-widest"><Library size={24} className="text-[var(--accent-color)]"/> Local Documents</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            <h3 className="text-lg md:text-xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 flex items-center gap-3 uppercase tracking-widest"><Library size={20} className="md:w-6 md:h-6 text-[var(--accent-color)]"/> Local Documents</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
               {documents.map(doc => {
                 const docCards = flashcards.filter(f => f.docId === doc.id).reduce((sum, set) => sum + (set.cards?set.cards.length:0), 0);
                 const docExams = exams.filter(e => e.docId === doc.id).length;
@@ -625,11 +582,11 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
                   <div key={doc.id} onClick={() => onOpen(doc.id)} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 border border-gray-200 dark:border-zinc-800 hover:border-[var(--accent-color)]/50 hover:shadow-[0_20px_60px_rgba(var(--accent-color-rgb),0.15)] cursor-pointer transition-all flex flex-col h-60 md:h-72 group relative overflow-hidden shadow-lg">
                     <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-[var(--accent-color)]/5 rounded-bl-full -z-10 group-hover:bg-[var(--accent-color)]/10 transition-colors" />
                     <div className="flex items-start justify-between mb-6 md:mb-8 z-10">
-                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-all shadow-md">
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 flex items-center justify-center text-gray-400 dark:text-zinc-500 group-hover:bg-[var(--accent-color)] group-hover:text-white group-hover:border-[var(--accent-color)] transition-all shadow-md">
                         <BookOpen size={24} className="md:w-7 md:h-7"/>
                       </div>
                       <button onClick={(e) => deleteDocument(doc.id, e)} className="p-2 md:p-3 bg-gray-100 dark:bg-zinc-950/50 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/20 rounded-xl transition-all opacity-100 md:opacity-0 group-hover:opacity-100 backdrop-blur-sm">
-                        <Trash2 size={20} className="md:w-5 md:h-5"/>
+                        <Trash2 size={18} className="md:w-5 md:h-5"/>
                       </button>
                     </div>
                     <h3 className="font-black text-gray-800 dark:text-white text-base md:text-xl leading-snug line-clamp-2 flex-1 z-10">{doc.name}</h3>
@@ -672,41 +629,41 @@ function FlashcardsGlobalView({ flashcards, setFlashcards, setView }) {
   if (studyingSet) {
     return (
       <div className="flex-1 overflow-hidden h-full">
-        <InPanelFlashcards title={studyingSet.title} initialCards={studyingSet.cards} onBack={() => setStudyingSet(null)} setFlashcards={setFlashcards} />
+        <InPanelFlashcards title={studyingSet.title} initialCards={studyingSet.cards} onBack={() => setStudyingSet(null)} setFlashcards={setFlashcards} fullScreen={true} />
       </div>
     );
   }
 
   if (flashcards.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
-      <Layers size={80} className="text-gray-300 dark:text-zinc-800 mb-6 md:mb-8" />
-      <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Flashcards Created</h2>
+      <Layers size={64} md:size={80} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-8" />
+      <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Flashcards Created</h2>
       <p className="text-sm md:text-lg text-gray-500 dark:text-zinc-400 max-w-md">Open a document and use the AI Generator to extract high-yield flashcard sets.</p>
       <button onClick={() => setView('library')} className="mt-6 md:mt-8 px-6 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
     </div>
   );
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-5xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-5xl mx-auto pb-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4 md:gap-6">
-          <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter flex items-center gap-3 md:gap-4"><Layers className="text-emerald-500" size={32} md:size={40}/> Global Flashcard Vault</h1>
-          <div className="flex flex-wrap gap-3 md:gap-4 w-full md:w-auto">
+          <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter flex items-center gap-3 md:gap-4"><Layers className="text-emerald-500" size={32} md:size={40}/> Global Flashcard Vault</h1>
+          <div className="flex flex-wrap gap-2 md:gap-4 w-full md:w-auto">
             <button onClick={exportAnki} className="flex-1 md:flex-none justify-center px-4 md:px-6 py-3 md:py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center gap-2 md:gap-3 shadow-lg hover:-translate-y-1 transition-all uppercase tracking-widest text-[10px] md:text-xs"><Download size={16} md:size={18} /> Export Anki</button>
             <button onClick={() => setStudyingSet({ id: 'all', title: 'All Flashcards Master Set', cards: flashcards.flatMap(s => s.cards || []) })} className="flex-1 md:flex-none justify-center px-5 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl font-black flex items-center gap-2 md:gap-3 shadow-lg shadow-[var(--accent-color)]/30 hover:scale-105 transition-transform uppercase tracking-widest text-[10px] md:text-xs"><Play size={16} md:size={18} fill="currentColor" /> Study Everything</button>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
           {flashcards.map(set => (
-            <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-2xl md:rounded-3xl relative group shadow-lg hover:shadow-xl hover:border-[var(--accent-color)]/50 transition-all flex flex-col h-full">
+            <div key={set.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-2xl md:rounded-3xl relative group shadow-lg hover:shadow-xl hover:border-[var(--accent-color)]/50 transition-all flex flex-col h-full">
               <div className="flex-1 mb-4 md:mb-0">
-                <p className="text-lg md:text-2xl text-gray-800 dark:text-white font-black mb-3 md:mb-4 pr-12 leading-snug">{set.title}</p>
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-6 md:mb-8">
+                <p className="text-lg md:text-2xl text-gray-800 dark:text-white font-black mb-3 md:mb-4 pr-10 md:pr-12 leading-snug">{set.title}</p>
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4 md:mb-8">
                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg border border-[var(--accent-color)]/20">{set.cards ? set.cards.length : 0} Cards</span>
                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg border border-gray-200 dark:border-zinc-800">Source: Pages {set.sourcePages}</span>
                 </div>
               </div>
-              <div className="flex gap-3 md:gap-4 mt-auto">
+              <div className="flex gap-2 md:gap-4 mt-auto">
                 <button onClick={() => setStudyingSet(set)} className="flex-1 py-3 md:py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md"><Play size={14} md:size={16} fill="currentColor" /> Study Set</button>
                 <button onClick={() => setFlashcards(flashcards.filter(f => f.id !== set.id))} className="p-3 md:p-4 bg-gray-100 dark:bg-zinc-950 text-gray-600 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl md:rounded-2xl transition-all"><Trash2 size={18} md:size={20}/></button>
               </div>
@@ -753,15 +710,15 @@ function ExamsGlobalView({ exams, setExams, setView }) {
 
   if (selectedExam) {
     return (
-      <div className="flex-1 flex flex-col bg-transparent pb-16 md:pb-0 h-full overflow-hidden">
-        <div className="h-16 md:h-20 flex items-center justify-between px-6 md:px-10 bg-white/90 dark:bg-[#121214]/90 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-md z-10">
+      <div className="flex-1 flex flex-col bg-transparent h-full overflow-hidden">
+        <div className="h-14 md:h-20 flex items-center justify-between px-4 md:px-10 bg-white/90 dark:bg-[#121214]/90 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 shadow-md z-10">
           <button
             onClick={() => setSelectedExam(null)}
-            className="flex items-center gap-2 md:gap-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-xs md:text-sm font-black uppercase tracking-widest transition-colors bg-emerald-500/10 px-4 md:px-5 py-2 md:py-3 rounded-xl border border-emerald-500/20"
+            className="flex items-center gap-1.5 md:gap-3 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 text-[10px] md:text-sm font-black uppercase tracking-widest transition-colors bg-emerald-500/10 px-3 md:px-5 py-2 md:py-3 rounded-lg md:rounded-xl border border-emerald-500/20"
           >
-            <ChevronLeft size={18} md:size={20} /> <span className="hidden sm:inline">Exit Examination</span>
+            <ChevronLeft size={16} md:size={20} /> <span className="hidden sm:inline">Exit Examination</span>
           </button>
-          <span className="text-xs md:text-sm font-bold text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[150px] md:max-w-none">
+          <span className="text-[10px] md:text-sm font-bold text-gray-800 dark:text-white uppercase tracking-widest truncate max-w-[180px] md:max-w-none">
             {selectedExam.title} <span className="hidden sm:inline mx-3 text-gray-300 dark:text-zinc-700">|</span> <span className="text-emerald-500 ml-2 sm:ml-0">{selectedExam.questions.length} Items</span>
           </span>
         </div>
@@ -769,6 +726,7 @@ function ExamsGlobalView({ exams, setExams, setView }) {
           <InPanelExam
             exam={selectedExam}
             onBack={() => setSelectedExam(null)}
+            fullScreen={true}
           />
         </div>
       </div>
@@ -777,29 +735,29 @@ function ExamsGlobalView({ exams, setExams, setView }) {
   if (exams.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
       <GraduationCap size={64} md:size={80} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-8" />
-      <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Exams Generated</h2>
+      <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Exams Generated</h2>
       <p className="text-sm md:text-lg text-gray-500 dark:text-zinc-400 max-w-md">Open a document and use the AI to generate a strict, board-level test on specific pages.</p>
       <button onClick={() => setView('library')} className="mt-6 md:mt-8 px-6 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
     </div>
   );
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 md:mb-12 flex items-center gap-3 md:gap-4"><GraduationCap className="text-emerald-500" size={32} md:size={40}/> Global Examination Vault</h1>
+    <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-4xl mx-auto pb-8">
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-12 flex items-center gap-3 md:gap-4"><GraduationCap className="text-emerald-500" size={32} md:size={40}/> Global Examination Vault</h1>
         <div className="space-y-4 md:space-y-6">
           {exams.map(e => (
-            <div key={e.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col sm:flex-row justify-between sm:items-center group hover:border-emerald-500/50 transition-all shadow-lg hover:shadow-xl gap-4 md:gap-6">
+            <div key={e.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex flex-col sm:flex-row justify-between sm:items-center group hover:border-emerald-500/50 transition-all shadow-sm md:shadow-lg hover:shadow-xl gap-4 md:gap-6">
               <div className="flex-1 w-full">
-                <p className="text-lg md:text-2xl text-gray-800 dark:text-white font-black mb-2 md:mb-3">{e.title}</p>
+                <p className="text-base md:text-2xl text-gray-800 dark:text-white font-black mb-2 md:mb-3">{e.title}</p>
                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg border border-emerald-500/20">{e.questions.length} Questions</span>
                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-950 px-2 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-lg border border-gray-200 dark:border-zinc-800">Source: Pgs {e.sourcePages}</span>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full sm:w-auto">
-                <button onClick={() => exportExamPdf(e)} className="flex-1 sm:flex-none px-4 md:px-5 py-3 md:py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl md:rounded-2xl font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-md"><Printer size={16} md:size={18} /> <span className="sm:hidden lg:inline">Export PDF</span></button>
-                <button onClick={() => setSelectedExam(e)} className="flex-1 sm:flex-none px-5 md:px-8 py-3 md:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 hover:scale-105"><Play size={16} md:size={18} fill="currentColor"/> Take Exam</button>
-                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-3 md:p-4 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl md:rounded-2xl transition-all shadow-sm"><Trash2 size={18} md:size={20}/></button>
+                <button onClick={() => exportExamPdf(e)} className="flex-1 sm:flex-none px-3 md:px-5 py-2.5 md:py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl md:rounded-2xl font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 md:gap-2 shadow-md"><Printer size={14} md:size={18} /> <span className="sm:hidden lg:inline">Export PDF</span></button>
+                <button onClick={() => setSelectedExam(e)} className="flex-1 sm:flex-none px-4 md:px-8 py-2.5 md:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 md:gap-2 shadow-lg shadow-emerald-600/30 hover:scale-105"><Play size={14} md:size={18} fill="currentColor"/> Take Exam</button>
+                <button onClick={() => setExams(exams.filter(ex => ex.id !== e.id))} className="p-2.5 md:p-4 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl md:rounded-2xl transition-all shadow-sm"><Trash2 size={16} md:size={20}/></button>
               </div>
             </div>
           ))}
@@ -813,21 +771,21 @@ function NotesGlobalView({ notes, setNotes, setView }) {
   if (notes.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
       <BookA size={64} md:size={80} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-8" />
-      <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Notes Found</h2>
+      <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Notes Found</h2>
       <p className="text-sm md:text-lg text-gray-500 dark:text-zinc-400 max-w-md">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
       <button onClick={() => setView('library')} className="mt-6 md:mt-8 px-6 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
     </div>
   );
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 md:mb-12 flex items-center gap-3 md:gap-4"><BookA className="text-blue-500" size={32} md:size={40}/> Global Clinical Notes</h1>
-        <div className="space-y-6 md:space-y-8">
+    <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-5xl mx-auto pb-8">
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-12 flex items-center gap-3 md:gap-4"><BookA className="text-blue-500" size={32} md:size={40}/> Global Clinical Notes</h1>
+        <div className="space-y-4 md:space-y-8">
           {notes.map(n => (
-            <div key={n.id} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-6 md:p-10 rounded-2xl md:rounded-[2.5rem] relative group hover:border-blue-500/50 transition-all shadow-md md:shadow-xl">
-              <h3 className="text-xl md:text-2xl text-gray-800 dark:text-white font-black mb-4 md:mb-6 pr-12 md:pr-16">{n.title}</h3>
-              <div className="text-sm md:text-base text-gray-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-sm md:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-[var(--accent-color)]">{n.content}</div>
-              <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-6 right-6 md:top-10 md:right-10 p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shadow-sm md:shadow-md"><Trash2 size={18} md:size={20}/></button>
+            <div key={n.id} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-10 rounded-2xl md:rounded-[2.5rem] relative group hover:border-blue-500/50 transition-all shadow-sm md:shadow-xl">
+              <h3 className="text-lg md:text-2xl text-gray-800 dark:text-white font-black mb-3 md:mb-6 pr-10 md:pr-16">{n.title}</h3>
+              <div className="text-xs md:text-base text-gray-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed prose prose-sm md:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-strong:text-[var(--accent-color)]">{n.content}</div>
+              <button onClick={() => setNotes(notes.filter(no => no.id !== n.id))} className="absolute top-5 right-5 md:top-10 md:right-10 p-2 md:p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 dark:text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg md:rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all shadow-sm md:shadow-md"><Trash2 size={16} md:size={20}/></button>
             </div>
           ))}
         </div>
@@ -840,10 +798,10 @@ function DashboardView({ documents, flashcards, exams, notes }) {
   const totalCardsCount = flashcards.reduce((sum, set) => sum + (set.cards ? set.cards.length : 0), 0);
 
   return (
-    <div className="flex-1 overflow-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent pb-24 md:pb-16">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-8 flex items-center gap-3 md:gap-4"><LayoutDashboard className="text-[var(--accent-color)]" size={32} md:size={32}/> Progress Dashboard</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
+    <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-7xl mx-auto pb-8">
+        <h1 className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-6 md:mb-8 flex items-center gap-3 md:gap-4"><LayoutDashboard className="text-[var(--accent-color)]" size={32} md:size={32}/> Progress Dashboard</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-16">
           <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-2xl md:rounded-[2rem] shadow-sm">
             <p className="text-3xl md:text-4xl font-black text-[var(--accent-color)] mb-1 md:mb-2">{totalCardsCount}</p>
             <p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Flashcards Created</p>
@@ -882,6 +840,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
+  
   const [localPage, setLocalPage] = useState(currentPage);
 
   useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
@@ -893,66 +852,92 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       try {
         const buffer = await getPdfData(activeDoc.id);
         if (buffer && isMounted) {
+          const actualBuffer = buffer.buffer || buffer;
           const pdfjsLib = await loadPdfJs();
-          const loadedPdf = await pdfjsLib.getDocument({ data: buffer.buffer || buffer }).promise;
+          const loadedPdf = await pdfjsLib.getDocument({ data: actualBuffer }).promise;
           if (isMounted) setPdf(loadedPdf);
         }
-      } catch (e) { console.error(e); }
-      finally { if (isMounted) setIsLoading(false); }
+      } catch (e) {
+        console.error("Failed to load PDF from DB", e);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
     };
     loadPdf();
     return () => { isMounted = false; };
   }, [activeDoc.id]);
 
   useEffect(() => {
-    if (!pdf || !containerRef.current) return;
+    if (!pdf) return;
     let renderTask = null;
     let isMounted = true;
 
-    const renderPage = async (currentWidth) => {
+    const renderPage = async () => {
       try {
-        if (renderTask) renderTask.cancel();
         const page = await pdf.getPage(localPage);
-        if (!isMounted) return;
+        const container = containerRef.current;
+        if (!container || !isMounted) return;
+        
+        const containerWidth = container.clientWidth;
+        if (!containerWidth) return;
 
-        const padding = window.innerWidth < 768 ? 0 : 20; 
+        const padding = window.innerWidth < 768 ? 16 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = (currentWidth - padding) / tempViewport.width;
-        const viewport = page.getViewport({ scale: scale });
+        const scale = (containerWidth - padding) / tempViewport.width;
+        const finalScale = Math.min(Math.max(scale, 0.5), 3.0); 
+        const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
-        if (canvas && isMounted) {
-          const context = canvas.getContext('2d', { alpha: false });
-          canvas.width = viewport.width;
+        if (canvas) {
           canvas.height = viewport.height;
-          canvas.style.width = '100%';
-          canvas.style.height = 'auto';
-          renderTask = page.render({ canvasContext: context, viewport });
+          canvas.width = viewport.width;
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
+
+          const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
+          renderTask = page.render(renderContext);
           await renderTask.promise;
         }
 
         const textLayer = textLayerRef.current;
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
-          textLayer.style.width = '100%';
-          textLayer.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
-          textLayer.style.setProperty('--scale-factor', scale);
+          textLayer.style.width = `${viewport.width}px`;
+          textLayer.style.height = `${viewport.height}px`;
+          textLayer.style.setProperty('--scale-factor', viewport.scale);
           const textContent = await page.getTextContent();
-          window.pdfjsLib.renderTextLayer({ textContentSource: textContent, container: textLayer, viewport });
+          window.pdfjsLib.renderTextLayer({
+            textContentSource: textContent,
+            container: textLayer,
+            viewport,
+            textDivs: []
+          });
         }
-      } catch (e) { if (e.name !== 'RenderingCancelledException') console.error(e); }
+      } catch (e) {
+        if (e.name !== 'RenderingCancelledException') {
+          console.error("Failed to render page", e);
+        }
+      }
     };
 
-    const observer = new ResizeObserver((entries) => {
-      const width = entries[0].contentRect.width;
-      if (width > 0 && isMounted) {
-        requestAnimationFrame(() => renderPage(width));
-      }
-    });
-
-    observer.observe(containerRef.current);
-    return () => { isMounted = false; observer.disconnect(); };
+    renderPage();
+    return () => { 
+      isMounted = false; 
+      if (renderTask) renderTask.cancel(); 
+    };
   }, [localPage, pdf, rightPanelOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        handleNav(-1);
+      } else if (e.key === 'ArrowRight') {
+        handleNav(1);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activeDoc.totalPages, localPage]);
 
   const handleNav = (dir) => {
     const next = Math.max(1, Math.min(activeDoc.totalPages, localPage + dir));
@@ -960,53 +945,80 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       setLocalPage(next);
       setCurrentPage(next); 
       setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
-      if (containerRef.current) containerRef.current.scrollTo(0, 0);
+      if (containerRef.current) {
+        containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
-    return (
-    <div className="flex-1 flex flex-col h-full bg-zinc-100 dark:bg-black relative overflow-hidden" onContextMenu={(e) => {
-      const sel = window.getSelection().toString().trim();
-      if (sel) { e.preventDefault(); setSelectedText(sel); setMenuPos({x: e.pageX, y: e.pageY}); setShowMenu(true); }
-    }}>
-      {/* الهيدر العلوي */}
-      <div className="h-14 md:h-16 flex items-center justify-between px-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shrink-0 z-10">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <button onClick={closeDoc} className="flex items-center gap-1 text-gray-500 hover:text-white transition-colors text-[10px] uppercase font-black bg-gray-200/50 dark:bg-zinc-800 px-3 py-1.5 rounded-xl">
-            <ChevronLeft size={16} /> خروج
+  const handleContextMenu = (e) => {
+    const sel = window.getSelection().toString().trim();
+    if (sel) {
+      e.preventDefault();
+      setSelectedText(sel);
+      setMenuPos({x: e.pageX, y: e.pageY});
+      setShowMenu(true);
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-[#050505] relative" onContextMenu={handleContextMenu}>
+      <div className="h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 shrink-0 shadow-sm z-10">
+        <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+          <button onClick={closeDoc} className="flex items-center gap-1 md:gap-2 text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white transition-colors text-[10px] md:text-xs font-black uppercase tracking-widest bg-gray-100 dark:bg-zinc-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl">
+            <ChevronLeft size={16} /> <span className="hidden sm:inline">Exit</span>
           </button>
-          <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px]">{activeDoc.name}</span>
+          <div className="w-px h-6 bg-gray-300 dark:bg-zinc-800"></div>
+          <span className="text-xs md:text-sm font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[150px] md:max-w-md" title={activeDoc.name}>{activeDoc.name}</span>
         </div>
-        <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 rounded-xl border transition-all ${rightPanelOpen ? 'bg-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
-          {rightPanelOpen ? <PanelRightClose size={18} /> : <PanelRightOpen size={18} />}
-        </button>
+        <div className="flex items-center gap-3 md:gap-4">
+          <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2 md:p-2.5 rounded-xl border transition-all shadow-sm ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'}`}>
+            {rightPanelOpen ? <PanelRightClose size={18} className="md:w-5 md:h-5" /> : <PanelRightOpen size={18} className="md:w-5 md:h-5" />}
+          </button>
+        </div>
       </div>
 
-      {/* الحاوية: تم تغيير justify-center إلى justify-start وتقليل الـ pb لإنهاء مشكلة المنطقة السوداء */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-zinc-200 dark:bg-zinc-950 flex flex-col relative p-0 custom-scrollbar items-center justify-start pb-24">
+      {openDocs.length > 1 && (
+        <div className="flex gap-2 px-4 md:px-6 py-2 bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800/30 overflow-x-auto custom-scrollbar">
+          {openDocs.map(id => {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return null;
+            return (
+              <div key={id} className={`flex items-center gap-2 md:gap-3 px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl cursor-pointer transition-all font-bold text-[9px] md:text-xs uppercase tracking-widest ${activeDocId === id ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800'}`} onClick={() => setActiveDocId(id)}>
+                <span className="truncate max-w-[80px] md:max-w-[150px]">{doc.name}</span>
+                <button onClick={(e) => { e.stopPropagation(); closeTab(id); }} className={`p-1 rounded-md transition-colors ${activeDocId === id ? 'hover:bg-white/20' : 'hover:bg-gray-300 dark:hover:bg-zinc-700 hover:text-red-500'}`}><X size={12} /></button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-200 dark:bg-[#121214] flex flex-col relative shadow-[inset_0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_80px_rgba(0,0,0,0.8)] p-2 md:p-5 custom-scrollbar items-center justify-start pb-24 md:pb-24">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32} /></div>
-        ) : pdf ? (
-          /* حذفنا my-auto لمنع الصفحة من الطفو في المنتصف */
-          <div className="relative shadow-2xl bg-white w-full max-w-4xl mx-auto rounded-sm overflow-hidden">
-            <canvas ref={canvasRef} className="block w-full h-auto" />
-            <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" />
+          <div className="flex flex-col items-center justify-center h-full gap-4 md:gap-6 text-gray-500 dark:text-zinc-500">
+            <Loader2 className="animate-spin text-[var(--accent-color)]" size={32} />
+            <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span>
           </div>
-        ) : <AlertCircle className="text-red-500" />}
+        ) : pdf ? (
+          <div className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-md overflow-hidden mb-8" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
+            <canvas ref={canvasRef} className="block w-full h-auto" />
+            <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
+          </div>
+        ) : (
+          <div className="m-auto text-red-500 text-xs md:text-sm flex items-center gap-2 bg-red-50 dark:bg-red-500/10 p-4 md:p-6 rounded-2xl border border-red-200 dark:border-red-500/20 font-bold shadow-sm">
+            <AlertCircle size={16} /> Failed to load PDF layer.
+          </div>
+        )}
       </div>
 
-      {/* أزرار التنقل السفلية: تم تقريبها من الأسفل لمنعها من تغطية الصفحة */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-1.5 rounded-full shadow-2xl z-30">
-        <button onClick={() => handleNav(-1)} className="p-3 bg-gray-100 dark:bg-zinc-800 rounded-full hover:bg-gray-200"><ChevronLeft size={18}/></button>
-        <span className="px-4 font-bold text-gray-800 dark:text-white font-mono text-xs whitespace-nowrap">PG {localPage} / {activeDoc.totalPages}</span>
-        <button onClick={() => handleNav(1)} className="p-3 bg-[var(--accent-color)] text-white rounded-full hover:opacity-90"><ChevronRight size={18}/></button>
+      <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl border border-gray-200/50 dark:border-zinc-700/50 p-1.5 md:p-2 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.8)] z-30">
+        <button onClick={() => handleNav(-1)} className="p-3 md:p-4 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-800 dark:text-white rounded-full transition-colors active:scale-95 shadow-sm"><ChevronLeft size={20} className="md:w-6 md:h-6"/></button>
+        <span className="px-4 md:px-6 font-bold text-gray-800 dark:text-white font-mono tracking-widest text-xs md:text-sm whitespace-nowrap">PG <span className="text-[var(--accent-color)]">{localPage}</span> / {activeDoc.totalPages}</span>
+        <button onClick={() => handleNav(1)} className="p-3 md:p-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-full transition-colors active:scale-95 shadow-md shadow-[var(--accent-color)]/30"><ChevronRight size={20} className="md:w-6 md:h-6"/></button>
       </div>
     </div>
   );
 }
-
-
-
 
 function PanelSettings({ settings, setSettings }) {
   return (
