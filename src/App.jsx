@@ -151,7 +151,7 @@ export default function App() {
       rootEl.style.setProperty('margin', '0', 'important');
       rootEl.style.setProperty('padding', '0', 'important');
       rootEl.style.setProperty('width', '100vw', 'important');
-      rootEl.style.setProperty('height', '100vh', 'important');
+      rootEl.style.setProperty('height', '100dvh', 'important');
       rootEl.style.setProperty('text-align', 'left', 'important');
     }
     document.body.style.setProperty('margin', '0', 'important');
@@ -370,9 +370,10 @@ export default function App() {
           --text-main: ${isDark ? '#e4e4e7' : '#1f2937'};
         }
         body { background-color: var(--bg-root); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
-        html, body, #root { margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100vw !important; height: 100vh !important; overflow: hidden !important; text-align: left !important; }
+        html, body, #root { margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100vw !important; height: 100dvh !important; overflow: hidden !important; text-align: left !important; }
       `}</style>
-      <div className={`flex flex-col-reverse md:flex-row h-screen w-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
+      <div className={`flex flex-col-reverse md:flex-row h-[100dvh] w-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
+
         
         <nav className="w-full md:w-24 h-16 md:h-full bg-white dark:bg-[#0a0a0c] border-t md:border-t-0 md:border-r border-gray-200 dark:border-zinc-800/50 flex flex-row md:flex-col items-center justify-around md:justify-start py-0 md:py-6 z-50 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.5)] md:shadow-2xl transition-all">
           <div className="hidden md:flex w-14 h-14 rounded-full bg-[var(--accent-color)] items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-10 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
