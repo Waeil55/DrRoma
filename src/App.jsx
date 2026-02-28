@@ -12,7 +12,7 @@ import {
   Moon, Sun, HelpCircle, Printer
 } from 'lucide-react';
 
-const DB_NAME = 'MariamProDB_v4';
+const DB_NAME = 'MariamProDB_v5';
 const STORE_NAME = 'pdfs';
 
 const openDB = () => new Promise((resolve, reject) => {
@@ -24,11 +24,11 @@ const openDB = () => new Promise((resolve, reject) => {
   request.onerror = () => reject(request.error);
 });
 
-const savePdfData = async (id, buffer) => {
+const savePdfData = async (id, data) => {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(buffer, id);
+    tx.objectStore(STORE_NAME).put(data, id);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -117,6 +117,7 @@ export default function App() {
   const [documents, setDocuments] = useState([]);
   const [openDocs, setOpenDocs] = useState([]);
   const [activeDocId, setActiveDocId] = useState(null);
+  const [activeFileData, setActiveFileData] = useState({ buffer: null, pagesText: {} });
   const [docPages, setDocPages] = useState({});
   const [flashcards, setFlashcards] = useState([]);
   const [exams, setExams] = useState([]);
@@ -180,7 +181,12 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('drMariam_docs', JSON.stringify(documents));
+      const docsToSave = documents.map(d => {
+        const copy = { ...d };
+        delete copy.pagesText;
+        return copy;
+      });
+      localStorage.setItem('drMariam_docs', JSON.stringify(docsToSave));
       localStorage.setItem('drMariam_flashcards', JSON.stringify(flashcards));
       localStorage.setItem('drMariam_exams', JSON.stringify(exams));
       localStorage.setItem('drMariam_notes', JSON.stringify(notes));
@@ -191,6 +197,23 @@ export default function App() {
       console.warn("Storage write error", e);
     }
   }, [documents, flashcards, exams, notes, userSettings, openDocs, docPages]);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (activeDocId) {
+      setActiveFileData({ buffer: null, pagesText: {} });
+      getPdfData(activeDocId).then(data => {
+        if (isMounted && data) {
+          const buffer = data.buffer || data; 
+          const pagesText = data.pagesText || documents.find(d => d.id === activeDocId)?.pagesText || {};
+          setActiveFileData({ buffer, pagesText });
+        }
+      }).catch(err => console.error("Error loading active doc data", err));
+    } else {
+      setActiveFileData({ buffer: null, pagesText: {} });
+    }
+    return () => { isMounted = false; };
+  }, [activeDocId]);
 
   const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
@@ -287,11 +310,10 @@ export default function App() {
         id,
         name: file.name,
         totalPages,
-        pagesText,
         progress: 1,
         addedAt: new Date().toISOString()
       };
-      await savePdfData(id, arrayBuffer);
+      await savePdfData(id, { buffer: arrayBuffer, pagesText });
       setDocuments(prev => [...prev, newDoc]);
       setOpenDocs(prev => [...prev, id]);
       setActiveDocId(id);
@@ -328,8 +350,7 @@ export default function App() {
   };
 
   const activeDoc = documents.find(d => d.id === activeDocId);
-
-  const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase()) || Object.values(d.pagesText).some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))) : documents;
+  const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
 
   return (
     <>
@@ -343,41 +364,34 @@ export default function App() {
         body { background-color: var(--bg-root); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
       `}</style>
       <div className={`flex h-screen font-sans overflow-hidden ${isDark ? 'dark bg-[#0a0a0c] text-zinc-200' : 'bg-gray-50 text-gray-800'}`}>
-        
-        {/* SIDEBAR */}
-        <nav className="w-24 bg-gray-50 dark:bg-[#0a0a0c] border-r border-gray-200 dark:border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl dark:shadow-black/50">
-          <div className="w-14 h-14 rounded-full bg-[var(--accent-color)] flex items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-10 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
-            <BrainCircuit className="text-white w-7 h-7" />
+        <nav className="w-20 bg-gray-50 dark:bg-[#0a0a0c] border-r border-gray-200 dark:border-zinc-800/30 flex flex-col items-center py-6 z-20 shrink-0 shadow-2xl dark:shadow-black/50">
+          <div className="w-12 h-12 rounded-full bg-[var(--accent-color)] flex items-center justify-center shadow-xl shadow-[var(--accent-color)]/40 mb-12 cursor-pointer transition-transform hover:scale-105" onClick={() => { setActiveDocId(null); setCurrentView('library'); }}>
+            <BrainCircuit className="text-white w-6 h-6" />
           </div>
-          
           <div className="flex-1 flex flex-col gap-6 w-full px-2 overflow-y-auto custom-scrollbar">
             <SidebarBtn icon={Library} label="Library" active={currentView === 'library' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('library'); }} />
             <SidebarBtn icon={Layers} label="Cards" active={currentView === 'flashcards' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('flashcards'); }} />
             <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('exams'); }} />
             <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('notes'); }} />
-            
+            <SidebarBtn icon={LayoutDashboard} label="Hub" active={currentView === 'dashboard' && !activeDocId} onClick={() => { setActiveDocId(null); setCurrentView('dashboard'); }} />
             {activeDocId && (
               <>
-                <div className="w-10 h-px bg-gray-300 dark:bg-zinc-800 mx-auto my-1" />
+                <div className="w-8 h-px bg-gray-200 dark:bg-zinc-800 mx-auto my-1" />
                 <SidebarBtn icon={BookOpen} label="Reader" active={activeDocId !== null} onClick={() => setCurrentView('reader')} highlight />
               </>
             )}
           </div>
-          
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800/30 w-full px-2">
-             <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
+            <SidebarBtn icon={Settings} label="Settings" active={currentView === 'settings'} onClick={() => { setActiveDocId(null); setCurrentView('settings'); }} />
           </div>
           {!online && <div className="absolute bottom-2 bg-red-500/20 text-red-500 font-bold px-2 py-1 rounded text-[10px] uppercase">Offline</div>}
         </nav>
-
         <main className="flex-1 flex flex-col relative bg-gray-50 dark:bg-[#0a0a0c] min-w-0">
           {isUploading && (
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gray-200 dark:bg-zinc-800 z-50">
               <div className="h-full bg-[var(--accent-color)] transition-all duration-300 shadow-[0_0_15px_var(--accent-color)]" style={{ width: `${uploadProgress}%` }}></div>
             </div>
           )}
-
-          {/* VIEWS */}
           {!activeDocId && currentView === 'library' && (
             <LibraryView documents={filteredDocuments} onUpload={handleFileUpload} onOpen={(id) => { setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setCurrentView('reader'); }} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           )}
@@ -390,6 +404,9 @@ export default function App() {
           {!activeDocId && currentView === 'notes' && (
             <NotesGlobalView notes={notes} setNotes={setNotes} setView={setCurrentView} />
           )}
+          {!activeDocId && currentView === 'dashboard' && (
+            <DashboardView documents={documents} flashcards={flashcards} exams={exams} notes={notes} />
+          )}
           {!activeDocId && currentView === 'settings' && (
             <div className="flex-1 overflow-y-auto p-10 lg:p-16 custom-scrollbar bg-gray-50 dark:bg-[#0a0a0c]">
               <div className="max-w-3xl mx-auto">
@@ -398,8 +415,6 @@ export default function App() {
               </div>
             </div>
           )}
-
-          {/* READER WORKSPACE */}
           {activeDocId && (
             <PdfWorkspace 
               activeDoc={activeDoc} 
@@ -422,19 +437,16 @@ export default function App() {
               setMenuPos={setMenuPos} 
               setSelectedText={setSelectedText} 
               setGenFromSelection={setGenFromSelection} 
-              setRightPanelTab={setRightPanelTab} 
+              setRightPanelTab={setRightPanelTab}
+              pdfBuffer={activeFileData.buffer}
             />
           )}
-
-          {/* FAB FOR AI */}
           {activeDocId && !rightPanelOpen && (
             <button onClick={() => setRightPanelOpen(true)} className="fixed bottom-8 right-8 p-5 bg-[var(--accent-color)] rounded-full text-white shadow-2xl hover:scale-110 transition-transform z-30">
               <Sparkles size={28} />
             </button>
           )}
         </main>
-
-        {/* RIGHT AI PANEL */}
         {rightPanelOpen && activeDocId && (
           <aside className="w-full lg:w-[450px] xl:w-[500px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-xl border-l border-gray-200 dark:border-zinc-800/50 flex flex-col shrink-0 z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] relative transition-all duration-300">
             <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center gap-3 shrink-0 shadow-md">
@@ -460,17 +472,15 @@ export default function App() {
                   <button onClick={() => setRightPanelTab('settings')} className="px-8 py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
                 </div>
               ) : rightPanelTab === 'generate' ? (
-                <PanelGenerate activeDoc={activeDoc} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
+                <PanelGenerate activeDoc={activeDoc} pagesText={activeFileData.pagesText} settings={userSettings} setFlashcards={setFlashcards} setExams={setExams} setNotes={setNotes} switchToReview={() => setRightPanelTab('review')} genFromSelection={genFromSelection} setGenFromSelection={setGenFromSelection} currentPage={docPages[activeDocId] || 1} />
               ) : rightPanelTab === 'chat' ? (
-                <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId] || 1} />
+                <PanelChat activeDoc={activeDoc} pagesText={activeFileData.pagesText} settings={userSettings} currentPage={docPages[activeDocId] || 1} />
               ) : rightPanelTab === 'review' ? (
                 <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards} exams={exams} setExams={setExams} notes={notes} setNotes={setNotes} />
               ) : null}
             </div>
           </aside>
         )}
-
-        {/* OVERLAYS */}
         {showShortcuts && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm" onClick={() => setShowShortcuts(false)}>
             <div className="bg-white dark:bg-zinc-900 p-10 rounded-3xl max-w-md w-full shadow-2xl" onClick={e=>e.stopPropagation()}>
@@ -537,8 +547,6 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
   return (
     <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-transparent">
       <div className="max-w-7xl mx-auto w-full">
-        
-        {/* Header & Upload */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 gap-8">
           <div>
             <h1 className="text-5xl font-black text-gray-800 dark:text-white tracking-tighter mb-4 flex items-center gap-4">
@@ -553,7 +561,6 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
           </label>
         </div>
 
-        {/* Global Dashboard inside Library */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-8 rounded-[2rem] flex items-center gap-6 shadow-lg hover:shadow-xl">
             <div className="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={32}/></div>
@@ -569,7 +576,6 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
           </div>
         </div>
 
-        {/* Document Search & List */}
         {documents.length > 0 && (
           <div className="mb-10 relative">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20}/>
@@ -736,7 +742,6 @@ function ExamsGlobalView({ exams, setExams, setView }) {
           <InPanelExam
             exam={selectedExam}
             onBack={() => setSelectedExam(null)}
-            standalone={true}
           />
         </div>
       </div>
@@ -804,23 +809,68 @@ function NotesGlobalView({ notes, setNotes, setView }) {
   );
 }
 
-function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab }) {
+function DashboardView({ documents, flashcards, exams, notes }) {
+  const totalCardsCount = flashcards.reduce((sum, set) => sum + (set.cards ? set.cards.length : 0), 0);
+
+  return (
+    <div className="flex-1 overflow-auto p-10 lg:p-16 custom-scrollbar bg-transparent">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-black text-gray-800 dark:text-white tracking-tighter mb-8 flex items-center gap-4"><LayoutDashboard className="text-[var(--accent-color)]"/> Personal Progress Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
+            <p className="text-4xl font-black text-[var(--accent-color)] mb-2">{totalCardsCount}</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Flashcards Created</p>
+          </div>
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
+            <p className="text-4xl font-black text-purple-500 mb-2">{exams.length}</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Exams Generated</p>
+          </div>
+          <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-8 rounded-3xl shadow-sm">
+            <p className="text-4xl font-black text-blue-500 mb-2">{notes.length}</p>
+            <p className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-1">Notes Saved</p>
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Document Progress</h3>
+        <div className="space-y-4">
+          {documents.map(doc => (
+            <div key={doc.id} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <p className="text-sm font-bold text-gray-800 dark:text-white flex-1">{doc.name}</p>
+              <div className="flex-1">
+                <div className="h-2 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden w-full">
+                  <div className="h-full bg-[var(--accent-color)] transition-width duration-300" style={{width: `${(doc.progress / doc.totalPages * 100)}%`}} />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-zinc-400 font-mono w-24 text-right">{doc.progress} / {doc.totalPages} PGs</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab, pdfBuffer }) {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
   
+  const [localPage, setLocalPage] = useState(currentPage);
+
+  useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
+
   useEffect(() => {
+    if (!pdfBuffer) {
+      setIsLoading(true);
+      return;
+    }
     const loadPdf = async () => {
       setIsLoading(true);
       try {
-        const buffer = await getPdfData(activeDoc.id);
-        if (buffer) {
-          const pdfjsLib = await loadPdfJs();
-          const loadedPdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-          setPdf(loadedPdf);
-        }
+        const pdfjsLib = await loadPdfJs();
+        const loadedPdf = await pdfjsLib.getDocument({ data: pdfBuffer }).promise;
+        setPdf(loadedPdf);
       } catch (e) {
         console.error("Failed to load PDF from DB", e);
       } finally {
@@ -828,28 +878,32 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       }
     };
     loadPdf();
-  }, [activeDoc.id]);
+  }, [pdfBuffer]);
 
   useEffect(() => {
     if (!pdf) return;
     let renderTask = null;
     const renderPage = async () => {
       try {
-        const page = await pdf.getPage(currentPage);
+        const page = await pdf.getPage(localPage);
         const container = containerRef.current;
         if (!container) return;
         const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
         
-        if (!containerWidth) return;
+        if (!containerWidth || !containerHeight) return;
 
         const tempViewport = page.getViewport({ scale: 1 });
-        const scale = (containerWidth - 60) / tempViewport.width;
-        const viewport = page.getViewport({ scale: Math.max(scale, 0.5) }); // ensure minimum scale
+        const scale = Math.min((containerWidth - 40) / tempViewport.width, (containerHeight - 40) / tempViewport.height);
+        const viewport = page.getViewport({ scale: Math.max(scale, 0.5) });
         
         const canvas = canvasRef.current;
         if (canvas) {
           canvas.height = viewport.height;
           canvas.width = viewport.width;
+          canvas.style.width = `${viewport.width}px`;
+          canvas.style.height = `${viewport.height}px`;
+
           const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
           renderTask = page.render(renderContext);
           await renderTask.promise;
@@ -878,23 +932,28 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
 
     renderPage();
     return () => { if (renderTask) renderTask.cancel(); };
-  }, [currentPage, pdf, rightPanelOpen]); // re-render when right panel opens/closes to adjust size
+  }, [localPage, pdf, rightPanelOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') {
-        setCurrentPage(p => Math.max(1, p - 1));
+        handleNav(-1);
       } else if (e.key === 'ArrowRight') {
-        setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1));
+        handleNav(1);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [activeDoc.totalPages, setCurrentPage]);
+  }, [activeDoc.totalPages, localPage]);
 
-  useEffect(() => {
-    setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: currentPage } : doc));
-  }, [currentPage, activeDoc.id, setDocuments]);
+  const handleNav = (dir) => {
+    const next = Math.max(1, Math.min(activeDoc.totalPages, localPage + dir));
+    if (next !== localPage) {
+      setLocalPage(next);
+      setCurrentPage(next); 
+      setDocuments(prev => prev.map(doc => doc.id === activeDoc.id ? { ...doc, progress: next } : doc));
+    }
+  };
 
   const handleContextMenu = (e) => {
     const sel = window.getSelection().toString().trim();
@@ -917,13 +976,6 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           <span className="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate max-w-[200px] md:max-w-md" title={activeDoc.name}>{activeDoc.name}</span>
         </div>
         <div className="flex items-center gap-6">
-          <div className="flex items-center bg-gray-100 dark:bg-zinc-900 rounded-xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-inner h-11">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="px-5 h-full text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center active:scale-95"><ChevronLeft size={20} /></button>
-            <div className="px-5 h-full flex items-center justify-center border-x border-gray-300 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950">
-              <span className="text-sm font-mono text-gray-800 dark:text-white font-black tracking-widest">PG <span className="text-[var(--accent-color)]">{currentPage}</span> <span className="text-gray-400 dark:text-zinc-600 mx-2">/</span> {activeDoc.totalPages}</span>
-            </div>
-            <button onClick={() => setCurrentPage(p => Math.min(activeDoc.totalPages, p + 1))} className="px-5 h-full text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center active:scale-95"><ChevronRight size={20} /></button>
-          </div>
           <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className={`p-2.5 rounded-xl border transition-all shadow-md ${rightPanelOpen ? 'bg-[var(--accent-color)] border-[var(--accent-color)] text-white' : 'bg-gray-100 dark:bg-zinc-900 border-gray-300 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-zinc-800'}`}>
             {rightPanelOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
           </button>
@@ -949,7 +1001,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
             <span className="text-sm font-black tracking-[0.2em] uppercase">Rendering Secure Viewer...</span>
           </div>
         ) : pdf ? (
-          <div className="relative shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-sm overflow-hidden" style={{ width: 'fit-content', height: 'fit-content' }}>
+          <div className="relative shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-sm overflow-hidden" style={{ width: 'fit-content', height: 'fit-content', marginBottom: '80px' }}>
             <canvas ref={canvasRef} className="block" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
           </div>
@@ -959,6 +1011,14 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
           </div>
         )}
       </div>
+
+      {/* Floating Bottom Nav */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-gray-200 dark:border-zinc-700 p-2 rounded-full shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-50">
+        <button onClick={() => handleNav(-1)} className="p-4 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-800 dark:text-white rounded-full transition-colors active:scale-95"><ChevronLeft size={24}/></button>
+        <span className="px-6 font-bold text-gray-800 dark:text-white font-mono tracking-widest text-sm">PG <span className="text-[var(--accent-color)]">{localPage}</span> / {activeDoc.totalPages}</span>
+        <button onClick={() => handleNav(1)} className="p-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-full transition-colors active:scale-95 shadow-md shadow-[var(--accent-color)]/30"><ChevronRight size={24}/></button>
+      </div>
+
     </div>
   );
 }
@@ -1018,7 +1078,7 @@ function PanelSettings({ settings, setSettings }) {
   );
 }
 
-function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes, switchToReview, genFromSelection, setGenFromSelection, currentPage }) {
+function PanelGenerate({ activeDoc, pagesText, settings, setFlashcards, setExams, setNotes, switchToReview, genFromSelection, setGenFromSelection, currentPage }) {
   const [startPage, setStartPage] = useState(currentPage);
   const [endPage, setEndPage] = useState(currentPage);
   const [type, setType] = useState('exam');
@@ -1043,7 +1103,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       let text = genFromSelection || "";
       if (!genFromSelection) {
         for (let i = Number(startPage); i <= Number(endPage); i++) {
-          if (activeDoc.pagesText[i]) text += `[Page ${i}]\n${activeDoc.pagesText[i]}\n\n`;
+          if (pagesText[i]) text += `[Page ${i}]\n${pagesText[i]}\n\n`;
         }
       }
       
@@ -1053,7 +1113,6 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
       
       const diffPrompt = `Difficulty Level: ${difficultyLevels[difficulty - 1]}. Make the output incredibly advanced, detailed, extremely long, and at a professional medical specialty level. Questions/Vignettes MUST be massive and multi-step.`;
       
-      // Parallelize generation (30x faster methodology via chunking)
       const chunkSize = 4000; 
       const textChunks = [];
       for (let i = 0; i < text.length; i += chunkSize) {
@@ -1157,24 +1216,24 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   };
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-[#0a0a0c] p-6 overflow-y-auto custom-scrollbar">
+    <div className="h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
       {!generated ? (
-        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-8 rounded-3xl flex-shrink-0 shadow-2xl dark:shadow-black/30">
+        <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-8 rounded-[2rem] flex-shrink-0 shadow-xl dark:shadow-black/50">
           {!genFromSelection && (
             <div className="flex items-center justify-between mb-8 gap-4">
               <div className="w-full relative">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">Start Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-2xl px-5 py-4 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={startPage} onChange={e=>setStartPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl px-4 py-3 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
               </div>
               <div className="mt-6 text-gray-400 dark:text-zinc-600 font-bold">TO</div>
               <div className="w-full relative">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-2 block ml-1">End Pg</label>
-                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 rounded-2xl px-5 py-4 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
+                <input type="number" min={1} max={activeDoc.totalPages} value={endPage} onChange={e=>setEndPage(Number(e.target.value))} className="w-full bg-gray-100 dark:bg-zinc-950 border border-gray-300 dark:border-zinc-700 rounded-xl px-4 py-3 text-lg text-center text-gray-800 dark:text-white font-mono font-bold outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/50 transition-all shadow-inner" />
               </div>
             </div>
           )}
-          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 block ml-1">Extraction Tool</label>
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-3 block ml-1">Extraction Engine</label>
+          <div className="grid grid-cols-3 gap-3 mb-8">
             <ToolBtn id="flashcards" active={type} set={setType} icon={Layers} label="Cards" />
             <ToolBtn id="exam" active={type} set={setType} icon={CheckSquare} label="Hard Exam" />
             <ToolBtn id="summary" active={type} set={setType} icon={BookA} label="Summary" />
@@ -1183,25 +1242,31 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
             <ToolBtn id="treatment" active={type} set={setType} icon={Pill} label="Treatment" />
             <ToolBtn id="labs" active={type} set={setType} icon={Thermometer} label="Labs / Dx" />
             <ToolBtn id="mnemonics" active={type} set={setType} icon={Lightbulb} label="Mnemonics" />
-            <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="ELI5" />
+            <ToolBtn id="eli5" active={type} set={setType} icon={Baby} label="Simplify" />
           </div>
           {(type === 'flashcards' || type === 'exam' || type === 'quiz') && (
-            <div className="mb-8 bg-gray-50 dark:bg-zinc-950 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center"><span>Quantity</span> <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{count} Items</span></label>
-              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+            <div className="mb-6 bg-gray-100 dark:bg-zinc-950 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
+                <span>Quantity</span> 
+                <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{count} Items</span>
+              </label>
+              <input type="range" min="5" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
             </div>
           )}
-          <div className="mb-8 bg-gray-50 dark:bg-zinc-950 p-6 rounded-2xl border border-gray-200 dark:border-zinc-800">
-            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center"><span>Difficulty Level</span> <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{difficultyLevels[difficulty - 1]}</span></label>
-            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
+          <div className="mb-8 bg-gray-100 dark:bg-zinc-950 p-5 rounded-2xl border border-gray-200 dark:border-zinc-800">
+            <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500 mb-4 flex justify-between items-center">
+              <span>Difficulty Level</span> 
+              <span className="text-[var(--accent-color)] text-sm bg-[var(--accent-color)]/10 px-3 py-1 rounded-lg">{difficultyLevels[difficulty - 1]}</span>
+            </label>
+            <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(parseInt(e.target.value))} className="w-full accent-[var(--accent-color)] h-2 bg-gray-300 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer" />
           </div>
-          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-5 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.3)] hover:shadow-[0_15px_40px_rgba(var(--accent-color-rgb),0.5)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 active:scale-[0.98]">
+          <button onClick={handleGenerate} disabled={status.loading} className="w-full py-5 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_10px_30px_rgba(var(--accent-color-rgb),0.4)] hover:shadow-[0_15px_40px_rgba(var(--accent-color-rgb),0.6)] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 active:scale-[0.98]">
             {status.loading ? <Loader2 size={24} className="animate-spin" /> : <BrainCircuit size={24} />}
             {status.loading ? "Running AI Engine..." : "Execute Extraction"}
           </button>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-2xl shadow-emerald-900/20">
+        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 border border-emerald-500/40 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-emerald-900/20">
           <div className="bg-emerald-500/10 border-b border-emerald-500/30 p-5 flex justify-between items-center shrink-0">
             <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={18}/> Review Output</span>
             <div className="flex gap-3">
@@ -1212,11 +1277,11 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
           <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
             {generated.type === 'flashcards' && generated.data.map((item, idx) => (
               <div key={idx} className="bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-6 rounded-2xl relative group pr-16 shadow-sm hover:border-[var(--accent-color)]/30 transition-all">
-                <p className="text-base text-gray-800 dark:text-white font-bold mb-4 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-3 text-xs uppercase tracking-widest">Q</span>{item.q}</p>
-                <div className="bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 p-5 rounded-xl">
+                <p className="text-sm text-gray-800 dark:text-white font-bold mb-4 leading-relaxed"><span className="text-gray-400 dark:text-zinc-600 mr-3 text-xs uppercase tracking-widest">Q</span>{item.q}</p>
+                <div className="bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/10 p-4 rounded-xl">
                   <p className="text-sm text-[var(--accent-color)] leading-relaxed font-medium"><span className="text-[var(--accent-color)]/50 mr-3 text-xs uppercase tracking-widest">A</span>{item.a}</p>
                 </div>
-                <button onClick={()=>removeItem(idx)} className="absolute top-6 right-6 p-2.5 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18}/></button>
+                <button onClick={()=>removeItem(idx)} className="absolute top-6 right-6 p-2 bg-gray-200 dark:bg-zinc-900 text-gray-500 dark:text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18}/></button>
               </div>
             ))}
             {generated.type === 'exam' && generated.data.map((item, idx) => (
@@ -1265,7 +1330,7 @@ function ToolBtn({ id, active, set, icon: Icon, label }) {
   );
 }
 
-function PanelChat({ activeDoc, settings, currentPage }) {
+function PanelChat({ activeDoc, pagesText, settings, currentPage }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1307,7 +1372,7 @@ function PanelChat({ activeDoc, settings, currentPage }) {
     setLoading(true);
     
     try {
-      const text = activeDoc.pagesText[currentPage] || "No readable text found on this page.";
+      const text = pagesText[currentPage] || "No readable text found on this page.";
       const prompt = `DOCUMENT CONTEXT FROM PAGE ${currentPage}:\n${text}\n\nSTUDENT QUESTION:\n${msg}`;
       
       const res = await callAI(prompt, false, settings.strictMode, settings.apiKey);
@@ -1320,18 +1385,18 @@ function PanelChat({ activeDoc, settings, currentPage }) {
   };
   
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
-      <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center gap-3 shadow-md shrink-0">
+    <div className="h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
+      <div className="bg-[var(--accent-color)] px-5 py-3 flex items-center gap-3 shadow-md shrink-0 rounded-2xl mb-6">
          <Target size={16} className="text-white" />
          <span className="text-[10px] font-black text-white uppercase tracking-widest">Locked: Page {currentPage}</span>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 mb-6">
         {messages.map((m, i) => (
           <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>
               {m.role === 'user' ? <List size={18} className="text-white" /> : <BrainCircuit size={18} className="text-[var(--accent-color)]" />}
             </div>
-            <div className={`p-5 max-w-[85%] text-sm leading-relaxed shadow-inner ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-3xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>
+            <div className={`p-5 max-w-[85%] text-sm leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-3xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>
               {m.content}
             </div>
           </div>
@@ -1344,11 +1409,11 @@ function PanelChat({ activeDoc, settings, currentPage }) {
         )}
         <div ref={endRef} />
       </div>
-      <div className="p-5 bg-gray-100 dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 shrink-0">
+      <div className="shrink-0">
         <div className="relative flex items-end bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl focus-within:border-[var(--accent-color)] focus-within:ring-2 focus-within:ring-[var(--accent-color)]/50 transition-all shadow-inner p-1">
           <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault(); handleChat();}}} placeholder={`Ask about page ${currentPage}...`} disabled={loading} className="w-full bg-transparent p-4 pr-16 text-sm text-gray-800 dark:text-white outline-none resize-none max-h-40 custom-scrollbar" style={{minHeight:'56px'}} />
-          <button onClick={toggleRecognition} className={`absolute right-20 bottom-3 p-3 transition-colors ${recognizing ? 'text-red-500 animate-pulse' : 'text-[var(--accent-color)]'}`}><Mic size={20} fill={recognizing ? 'currentColor' : 'none'} /></button>
-          <button onClick={handleChat} disabled={loading||!input.trim()} className="absolute right-3 bottom-3 p-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 rounded-xl text-white transition-all shadow-lg disabled:shadow-none"><Send size={18}/></button>
+          <button onClick={toggleRecognition} className={`absolute right-16 bottom-3 p-3 transition-colors ${recognizing ? 'text-red-500 animate-pulse' : 'text-[var(--accent-color)]'}`}><Mic size={20} fill={recognizing ? 'currentColor' : 'none'} /></button>
+          <button onClick={handleChat} disabled={loading||!input.trim()} className="absolute right-2 bottom-2 p-3 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 rounded-xl text-white transition-all shadow-lg disabled:shadow-none"><Send size={18}/></button>
         </div>
       </div>
     </div>
@@ -1367,7 +1432,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   if (activeItem?.type === 'flashcards') return <InPanelFlashcards title={activeItem.data.title} initialCards={activeItem.data.cards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-gray-50 dark:bg-[#0a0a0c] space-y-12">
+    <div className="h-full overflow-y-auto custom-scrollbar p-6 bg-transparent space-y-12">
       <div>
         <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-4 py-2 rounded-xl border border-emerald-500/20"><GraduationCap size={18}/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-6 rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
@@ -1470,7 +1535,7 @@ function InPanelExam({ exam, onBack }) {
   
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
-      <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-5 flex items-center justify-between shrink-0">
+      <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest flex items-center gap-2"><ChevronLeft size={16}/> Exit Exam</button>
         <span className="text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-lg">Pages {exam.sourcePages}</span>
       </div>
@@ -1497,7 +1562,7 @@ function InPanelExam({ exam, onBack }) {
             ))}
           </div>
           {showFeedback && (
-            <div className="mt-8 p-6 mb-8 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/20 rounded-2xl text-sm text-gray-800 dark:text-[var(--accent-color)]/90 leading-relaxed shadow-sm"><span className="font-black text-[var(--accent-color)] mr-2 uppercase tracking-widest text-xs block mb-3">Explanation:</span>{q.explanation}</div>
+            <div className="mt-6 p-6 mb-8 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/20 rounded-2xl text-sm text-gray-800 dark:text-[var(--accent-color)]/90 leading-relaxed shadow-sm"><span className="font-black text-[var(--accent-color)] mr-2 uppercase tracking-widest text-xs block mb-3">Explanation:</span>{q.explanation}</div>
           )}
           <div className="flex justify-between items-center mt-10">
             <button onClick={prevQuestion} disabled={currentQIndex === 0} className="px-6 py-4 text-gray-500 dark:text-zinc-500 hover:bg-gray-200 dark:hover:bg-zinc-800 rounded-xl disabled:opacity-30 text-xs font-bold uppercase tracking-widest transition-colors">Previous</button>
@@ -1536,10 +1601,8 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
     const nextReview = Date.now() + newInterval * 86400000;
     const newCard = {...currentCard, repetitions: newRep, ef: newEf, interval: newInterval, lastReview: Date.now(), nextReview };
     
-    // Update local state
     setCards(prev => prev.map(c => c.id === newCard.id ? newCard : c));
     
-    // Update global state by matching the nested card IDs
     setFlashcards(globalSets => globalSets.map(set => ({
       ...set,
       cards: set.cards ? set.cards.map(c => c.id === newCard.id ? newCard : c) : set.cards
@@ -1603,3 +1666,5 @@ function InPanelNote({ note, onBack }) {
     </div>
   );
 }
+
+
