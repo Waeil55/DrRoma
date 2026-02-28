@@ -912,29 +912,42 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     let renderTask = null;
     let isMounted = true;
 
-    const renderPage = async () => {
+        const renderPage = async () => {
       try {
         const page = await pdf.getPage(localPage);
         const container = containerRef.current;
         if (!container || !isMounted) return;
         
+        // Use clientWidth for the base calculation
         const containerWidth = container.clientWidth;
         if (!containerWidth) return;
 
-        const padding = window.innerWidth < 768 ? 16 : 40; 
+        // Minimize padding on mobile (8px) vs desktop (40px) to prevent shrinking
+        const padding = window.innerWidth < 768 ? 8 : 40; 
         const tempViewport = page.getViewport({ scale: 1 });
+        
+        // Calculate the ideal scale to fill the width
         const scale = (containerWidth - padding) / tempViewport.width;
-        const finalScale = Math.min(Math.max(scale, 0.5), 3.0); 
+        
+        // Use a higher floor (0.8) to prevent the "tiny page" bug
+        const finalScale = Math.max(scale, 0.8); 
         const viewport = page.getViewport({ scale: finalScale });
         
         const canvas = canvasRef.current;
         if (canvas) {
+          // Internal resolution
           canvas.height = viewport.height;
           canvas.width = viewport.width;
-          canvas.style.width = `${viewport.width}px`;
-          canvas.style.height = `${viewport.height}px`;
+          
+          // CSS Display: Force 100% width to lock the layout and prevent snapping
+          canvas.style.width = '100%';
+          canvas.style.height = 'auto';
 
-          const renderContext = { canvasContext: canvas.getContext('2d'), viewport };
+          const renderContext = { 
+            canvasContext: canvas.getContext('2d', { alpha: false }), 
+            viewport 
+          };
+          
           renderTask = page.render(renderContext);
           await renderTask.promise;
         }
@@ -942,9 +955,11 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         const textLayer = textLayerRef.current;
         if (textLayer && isMounted) {
           textLayer.innerHTML = '';
+          // Match text layer exactly to the viewport dimensions
           textLayer.style.width = `${viewport.width}px`;
           textLayer.style.height = `${viewport.height}px`;
           textLayer.style.setProperty('--scale-factor', viewport.scale);
+          
           const textContent = await page.getTextContent();
           window.pdfjsLib.renderTextLayer({
             textContentSource: textContent,
@@ -959,6 +974,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         }
       }
     };
+
 
     renderPage();
     return () => { 
