@@ -189,7 +189,7 @@ export default function App() {
   const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
   
-  const fontSizeMap = { small: '14px', medium: '16px', large: '18px' };
+  const fontSizeMap = { small: '14px', medium: '16px', large: '18px', xl: '20px', xxl: '24px', xxxl: '28px' };
 
   useEffect(() => {
     const root = document.documentElement;
@@ -325,7 +325,6 @@ export default function App() {
       
       <div className={`flex flex-col md:flex-row h-[100dvh] w-screen overflow-hidden relative`}>
         
-        {/* DESKTOP SIDEBAR / MOBILE FLOATING NAV */}
         <nav className="
           fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md h-[76px] z-[100]
           bg-white/80 dark:bg-[#121214]/80 backdrop-blur-xl border border-gray-200/50 dark:border-zinc-800/80
@@ -428,9 +427,9 @@ export default function App() {
 
         {activeDocId && (
           <aside className={`
-            fixed inset-0 z-[110] md:relative md:flex w-full md:w-[450px] lg:w-[500px] xl:w-[600px] 
+            fixed inset-0 z-[110] flex flex-col md:relative w-full md:w-[450px] lg:w-[500px] xl:w-[600px] 
             bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 
-            flex-col shrink-0 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] 
+            shrink-0 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] 
             transition-transform duration-300 ease-in-out
             ${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'}
           `}>
@@ -447,16 +446,18 @@ export default function App() {
               <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="Vault" icon={Layers} />
               <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+            <div className="flex-1 overflow-hidden relative flex flex-col min-h-0">
               {rightPanelTab === 'settings' ? (
-                <PanelSettings settings={userSettings} setSettings={setUserSettings} />
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-[100px] md:pb-6">
+                  <PanelSettings settings={userSettings} setSettings={setUserSettings} />
+                </div>
               ) : !userSettings.apiKey?.trim() ? (
-                <div className="p-8 text-center mt-20">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-8 flex flex-col items-center justify-center text-center pb-[100px] md:pb-6">
                   <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                     <AlertCircle className="w-12 h-12 text-red-500" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">OpenAI Key Required</h2>
-                  <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
+                  <p className="text-sm text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed max-w-sm">You must connect your OpenAI API key to unlock the elite AI extraction and generation tools.</p>
                   <button onClick={() => setRightPanelTab('settings')} className="px-8 py-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 transition-colors text-white rounded-xl text-sm font-bold shadow-lg shadow-[var(--accent-color)]/25">Connect API Key</button>
                 </div>
               ) : rightPanelTab === 'generate' ? (
@@ -552,23 +553,23 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-16">
           <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-8 md:h-8"/></div>
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{notes.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Generated Notes</p></div>
           </div>
           <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-8 md:h-8"/></div>
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{totalCardsCount}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Active Flashcards</p></div>
           </div>
           <div onClick={() => setView('exams')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-8 md:h-8"/></div>
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center shrink-0"><GraduationCap size={24} className="md:w-8 md:h-8"/></div>
             <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{exams.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Strict Exams</p></div>
           </div>
         </div>
 
         {documents.length > 0 && (
-          <div className="mb-8 md:mb-10 relative">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={18}/>
-            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search inside your secure documents..." className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl md:rounded-2xl pl-12 md:pl-16 pr-6 py-4 md:py-5 text-sm md:text-base font-bold text-gray-800 dark:text-white outline-none focus:border-[var(--accent-color)] shadow-sm transition-colors" />
+          <div className="mb-10 relative">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500" size={20}/>
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search inside your secure documents..." className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl pl-16 pr-6 py-4 md:py-5 text-sm md:text-base font-bold text-gray-800 dark:text-white outline-none focus:border-[var(--accent-color)] shadow-sm transition-colors" />
           </div>
         )}
 
@@ -577,12 +578,12 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
             <div className="w-24 h-24 md:w-40 md:h-40 bg-gray-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-10 shadow-lg">
               <FileUp size={48} className="md:w-16 md:h-16 text-gray-400 dark:text-zinc-600" />
             </div>
-            <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-3 md:mb-4">Repository Empty</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-gray-800 dark:text-white mb-3 md:mb-4">Repository Empty</h2>
             <p className="text-gray-500 dark:text-zinc-400 text-sm md:text-lg max-w-xl mx-auto leading-relaxed">Your library is securely encrypted locally. Import a textbook, research paper, or clinical guide to begin.</p>
           </div>
         ) : (
           <div>
-            <h3 className="text-lg md:text-xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 flex items-center gap-3 uppercase tracking-widest"><Library size={20} className="md:w-6 md:h-6 text-[var(--accent-color)]"/> Local Documents</h3>
+            <h3 className="text-lg md:text-xl font-black text-gray-800 dark:text-white mb-6 md:mb-8 flex items-center gap-3 uppercase tracking-widest"><Library size={24} className="text-[var(--accent-color)]"/> Local Documents</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
               {documents.map(doc => {
                 const docCards = flashcards.filter(f => f.docId === doc.id).reduce((sum, set) => sum + (set.cards?set.cards.length:0), 0);
@@ -779,7 +780,7 @@ function NotesGlobalView({ notes, setNotes, setView }) {
   if (notes.length === 0) return (
     <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-10 bg-transparent text-center h-full">
       <BookA size={64} md:size={80} className="text-gray-300 dark:text-zinc-800 mb-4 md:mb-8" />
-      <h2 className="text-xl md:text-3xl font-black text-gray-800 dark:text-white mb-2 md:mb-4">No Notes Found</h2>
+      <h2 className="text-xl md:text-3xl font-bold text-gray-800 dark:text-white mb-2 md:mb-4">No Notes Found</h2>
       <p className="text-sm md:text-lg text-gray-500 dark:text-zinc-400 max-w-md">Open a document and use the AI to generate clinical cases, mnemonics, or summaries.</p>
       <button onClick={() => setView('library')} className="mt-6 md:mt-8 px-6 md:px-8 py-3 md:py-4 bg-[var(--accent-color)] text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button>
     </div>
@@ -1008,7 +1009,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
             <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span>
           </div>
         ) : pdf ? (
-          <div className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-md overflow-hidden" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
+          <div className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white mx-auto transition-all duration-300 rounded-md overflow-hidden mb-8" style={{ width: canvasRef.current?.width ? `${canvasRef.current.width}px` : 'auto', height: canvasRef.current?.height ? `${canvasRef.current.height}px` : 'auto' }}>
             <canvas ref={canvasRef} className="block w-full h-auto" />
             <div ref={textLayerRef} className="absolute top-0 left-0 right-0 bottom-0 select-text text-transparent overflow-hidden" style={{color: 'transparent'}} />
           </div>
@@ -1019,10 +1020,10 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         )}
       </div>
 
-      <div className="absolute bottom-[100px] md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-2xl border border-gray-200/50 dark:border-zinc-700/50 p-1.5 md:p-2 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.8)] z-[90]">
-        <button onClick={() => handleNav(-1)} className="p-3 md:p-4 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-800 dark:text-white rounded-full transition-colors active:scale-95 shadow-sm border border-gray-100 dark:border-zinc-700"><ChevronLeft size={20} className="md:w-6 md:h-6"/></button>
+      <div className="absolute bottom-[100px] md:bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-2xl border border-gray-200/50 dark:border-zinc-700/50 p-1.5 md:p-2 rounded-[2rem] shadow-[0_8px_32px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.8)] z-[90]">
+        <button onClick={() => handleNav(-1)} className="p-3 md:p-4 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-800 dark:text-white rounded-[1.5rem] transition-colors active:scale-95 shadow-sm border border-gray-100 dark:border-zinc-700"><ChevronLeft size={20} className="md:w-6 md:h-6"/></button>
         <span className="px-4 md:px-6 font-bold text-gray-800 dark:text-white font-mono tracking-widest text-xs md:text-sm whitespace-nowrap">PG <span className="text-[var(--accent-color)]">{localPage}</span> / {activeDoc.totalPages}</span>
-        <button onClick={() => handleNav(1)} className="p-3 md:p-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-full transition-colors active:scale-95 shadow-md shadow-[var(--accent-color)]/30"><ChevronRight size={20} className="md:w-6 md:h-6"/></button>
+        <button onClick={() => handleNav(1)} className="p-3 md:p-4 bg-[var(--accent-color)] hover:bg-[var(--accent-color)]/90 text-white rounded-[1.5rem] transition-colors active:scale-95 shadow-md shadow-[var(--accent-color)]/30"><ChevronRight size={20} className="md:w-6 md:h-6"/></button>
       </div>
     </div>
   );
@@ -1068,10 +1069,13 @@ function PanelSettings({ settings, setSettings }) {
 
       <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-sm">
         <h3 className="text-sm md:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2 md:gap-3 mb-4 md:mb-6"><Type size={20} className="text-gray-400 dark:text-zinc-500 md:w-6 md:h-6"/> Typography Scale</h3>
-        <div className="flex gap-2 md:gap-4">
-          <button onClick={() => setSettings({...settings, fontSize: 'small'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'small' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Small</button>
-          <button onClick={() => setSettings({...settings, fontSize: 'medium'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'medium' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Medium</button>
-          <button onClick={() => setSettings({...settings, fontSize: 'large'})} className={`flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'large' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Large</button>
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <button onClick={() => setSettings({...settings, fontSize: 'small'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'small' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Small</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'medium'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'medium' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Medium</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'large'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'large' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>Large</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'xl'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'xl' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>XL</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'xxl'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'xxl' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>2XL</button>
+          <button onClick={() => setSettings({...settings, fontSize: 'xxxl'})} className={`py-3 md:py-4 rounded-xl md:rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs transition-all ${settings.fontSize === 'xxxl' ? 'bg-[var(--accent-color)] text-white shadow-md' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700'}`}>3XL</button>
         </div>
       </div>
 
@@ -1224,7 +1228,7 @@ function PanelGenerate({ activeDoc, settings, setFlashcards, setExams, setNotes,
   };
 
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
+    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
       {!generated ? (
         <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200 dark:border-zinc-800/50 p-5 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex-shrink-0 shadow-lg dark:shadow-black/50">
           {!genFromSelection && (
@@ -1394,7 +1398,7 @@ function PanelChat({ activeDoc, settings, currentPage }) {
   };
   
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
+    <div className="flex-1 min-h-0 flex flex-col p-4 md:p-6 overflow-y-auto custom-scrollbar pb-[100px] md:pb-6">
       <div className="bg-[var(--accent-color)]/10 px-4 md:px-5 py-2.5 md:py-3 flex items-center gap-2 md:gap-3 shadow-sm shrink-0 rounded-xl md:rounded-2xl mb-4 md:mb-6 border border-[var(--accent-color)]/20">
          <Target size={14} className="text-[var(--accent-color)] md:w-4 md:h-4" />
          <span className="text-[9px] md:text-[10px] font-black text-[var(--accent-color)] uppercase tracking-widest">Locked: Page {currentPage}</span>
@@ -1441,7 +1445,7 @@ function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, 
   if (activeItem?.type === 'flashcards') return <InPanelFlashcards title={activeItem.data.title} initialCards={activeItem.data.cards} onBack={() => setActiveItem(null)} setFlashcards={setFlashcards} />;
   
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12 pb-[100px] md:pb-6">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-6 bg-transparent space-y-8 md:space-y-12 pb-[100px] md:pb-6">
       <div>
         <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-4 md:mb-5 flex items-center gap-2 bg-emerald-500/10 w-fit px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl border border-emerald-500/20"><GraduationCap size={14} className="md:w-[18px] md:h-[18px]"/> Generated Exams ({docExams.length})</h3>
         {docExams.length === 0 ? <p className="text-xs md:text-sm text-gray-400 dark:text-zinc-600 italic bg-white dark:bg-zinc-900/50 p-4 md:p-6 rounded-xl md:rounded-2xl border border-dashed border-gray-200 dark:border-zinc-800 text-center">No exams created for this document yet.</p> : (
@@ -1543,7 +1547,7 @@ function InPanelExam({ exam, onBack }) {
   const q = exam.questions[currentQIndex];
   
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-emerald-600/10 border-b border-emerald-500/20 p-3 md:p-4 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Exam</button>
         <span className="text-[8px] md:text-[10px] text-emerald-600 dark:text-emerald-500 font-black uppercase tracking-widest bg-emerald-500/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Pages {exam.sourcePages}</span>
@@ -1627,12 +1631,12 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-[var(--accent-color)]/10 border-b border-[var(--accent-color)]/20 p-3 md:p-5 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-[var(--accent-color)] hover:text-[var(--accent-color)]/80 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Exit Study</button>
         <span className="text-[8px] md:text-[10px] text-[var(--accent-color)] font-black uppercase tracking-widest bg-[var(--accent-color)]/10 px-2 md:px-3 py-1 rounded-md md:rounded-lg">Card {currentIndex+1} / {cards.length}</span>
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 pb-[100px] md:pb-8">
+      <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center p-4 md:p-8 pb-[100px] md:pb-8">
         <div onClick={() => !isFlipped && setIsFlipped(true)} className="w-full h-[60vh] md:h-96 perspective-1000 cursor-pointer">
           <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-x-180' : ''}`}>
             {/* FRONT */}
@@ -1662,7 +1666,7 @@ function InPanelFlashcards({ title, initialCards, onBack, setFlashcards }) {
 
 function InPanelNote({ note, onBack }) {
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
+    <div className="flex-1 min-h-0 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
       <div className="bg-blue-600/10 border-b border-blue-500/20 p-4 md:p-5 flex items-center justify-between shrink-0">
         <button onClick={onBack} className="text-blue-600 dark:text-blue-400 hover:text-blue-500 text-[10px] md:text-xs font-bold uppercase tracking-widest flex items-center gap-1 md:gap-2"><ChevronLeft size={14}/> Back to Notes</button>
       </div>
