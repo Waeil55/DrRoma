@@ -1248,7 +1248,8 @@ function ChatGlobalView({ documents, settings, chatSessions, setChatSessions }) 
           )}
         </div>
 
-        <div className="absolute bottom-24 md:bottom-6 left-0 right-0 px-4 md:px-0">
+       <div className="absolute bottom-[100px] md:bottom-6 left-0 right-0 px-4 md:px-0">
+
           <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] focus-within:border-[var(--accent-color)] focus-within:ring-2 focus-within:ring-[var(--accent-color)]/20 transition-all p-2 relative">
             <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}}} placeholder="Ask anything, anytime..." disabled={loading} className="w-full bg-transparent p-4 pr-16 text-sm text-gray-800 dark:text-white outline-none resize-none max-h-40 custom-scrollbar" style={{minHeight:'60px'}}/>
             <button onClick={handleSend} disabled={loading||!input.trim()} className="absolute right-4 bottom-4 p-3 bg-[var(--accent-color)] disabled:bg-gray-200 dark:disabled:bg-zinc-800 rounded-xl text-white disabled:text-gray-400 transition-all hover:scale-105 active:scale-95"><Send size={18}/></button>
@@ -1445,7 +1446,8 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       )}
 
       {/* Core Viewer Area */}
-      <div ref={containerRef} className="flex-1 overflow-auto bg-gray-200 dark:bg-[#121214] block relative custom-scrollbar p-0 m-0">
+     <div ref={containerRef} className="flex-1 min-h-0 overflow-auto bg-gray-200 dark:bg-[#121214] block relative custom-scrollbar p-0 m-0">
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500 dark:text-zinc-500 min-h-[50vh]"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32}/><span className="text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span></div>
         ) : pdf ? (
