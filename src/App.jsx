@@ -9,16 +9,20 @@ import {
   PanelRightClose, PanelRightOpen, KeyRound, AlertCircle,
   FileUp, Target, Info, Trash, Sparkles, Activity, Stethoscope, Lightbulb, Baby, Play, Bookmark, History,
   Dna, Microscope, Pill, Thermometer, ClipboardList, Zap, Database, Search, FileText, BarChart2, Globe, Bot, Code, Palette, Type, Download, Mic,
-  Moon, Sun, HelpCircle, Printer, Menu, FlaskConical, UserCircle2, TrendingUp, TrendingDown, Minus, Plus, ZoomIn, ZoomOut, Maximize
+  Moon, Sun, HelpCircle, Printer, Menu, FlaskConical, UserCircle2, TrendingUp, TrendingDown, Minus, Plus, ZoomIn, ZoomOut, Maximize,
+  PlusCircle, RefreshCcw
 } from 'lucide-react';
 
-const DB_NAME = 'MariamProDB_v8';
-const STORE_NAME = 'pdfs';
+const DB_NAME = 'MariamProDB_v9'; // Upgraded to v9
+const STORE_PDFS = 'pdfs';
+const STORE_STATE = 'appState'; // New store to bypass localStorage limits
 
 const openDB = () => new Promise((resolve, reject) => {
-  const request = indexedDB.open(DB_NAME, 1);
+  const request = indexedDB.open(DB_NAME, 2);
   request.onupgradeneeded = (e) => {
-    e.target.result.createObjectStore(STORE_NAME);
+    const db = e.target.result;
+    if (!db.objectStoreNames.contains(STORE_PDFS)) db.createObjectStore(STORE_PDFS);
+    if (!db.objectStoreNames.contains(STORE_STATE)) db.createObjectStore(STORE_STATE);
   };
   request.onsuccess = () => resolve(request.result);
   request.onerror = () => reject(request.error);
@@ -27,8 +31,8 @@ const openDB = () => new Promise((resolve, reject) => {
 const savePdfData = async (id, data) => {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(data, id);
+    const tx = db.transaction(STORE_PDFS, 'readwrite');
+    tx.objectStore(STORE_PDFS).put(data, id);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -37,8 +41,8 @@ const savePdfData = async (id, data) => {
 const getPdfData = async (id) => {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const request = tx.objectStore(STORE_NAME).get(id);
+    const tx = db.transaction(STORE_PDFS, 'readonly');
+    const request = tx.objectStore(STORE_PDFS).get(id);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
@@ -47,10 +51,31 @@ const getPdfData = async (id) => {
 const deletePdfData = async (id) => {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).delete(id);
+    const tx = db.transaction(STORE_PDFS, 'readwrite');
+    tx.objectStore(STORE_PDFS).delete(id);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
+  });
+};
+
+// New functions for App State persistence (replacing localStorage)
+const saveAppState = async (key, data) => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_STATE, 'readwrite');
+    tx.objectStore(STORE_STATE).put(data, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+};
+
+const getAppState = async (key) => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_STATE, 'readonly');
+    const request = tx.objectStore(STORE_STATE).get(key);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
   });
 };
 
@@ -81,9 +106,10 @@ const loadJsPDF = async () => {
 
 const callAI = async (prompt, expectJson, strictMode, apiKey, maxTokens = 16384) => {
   if (!apiKey?.trim()) throw new Error("OpenAI API Key is missing. Please add it in Settings.");
+  
   const sysPrompt = strictMode
     ? "You are a highly strict, elite medical AI data extractor. You MUST use ONLY the text provided in the prompt. Do not hallucinate. NO OUTSIDE KNOWLEDGE. If the requested information is not in the text, clearly state 'Information not found in the selected pages.' or return an empty array."
-    : "You are an elite medical AI tutor and diagnostic assistant. Provide extremely detailed, advanced-level clinical insights.";
+    : "You are an elite, hyper-intelligent medical AI assistant (Gemini/GPT-4 level). You possess vast clinical knowledge. When given context from a document, prioritize it heavily. HOWEVER, if the document lacks the specific answer, DO NOT just say 'information not found'. Instead, synthesize a brilliant, highly advanced answer using your internal medical knowledge, clearly delineating what is from the text versus what is from general medical science. Always be incredibly smart, helpful, and detailed.";
 
   const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
     method: 'POST',
@@ -196,7 +222,6 @@ function PanelPatientCases({ activeDoc, settings, setNotes, setExams, currentPag
 
       setStatus({ loading: true, msg: `TURBO MODE ACTIVATED: Spawning ${caseCount} cases in parallel...`, err: false });
 
-      // PARALLEL BATCHING ENGINE (chunk size reduced to 2 to guarantee massive lab tables don't hit token limits)
       const CHUNK_SIZE = 2; 
       const numChunks = Math.ceil(caseCount / CHUNK_SIZE);
       const taskFunctions = [];
@@ -319,8 +344,6 @@ ${text}`;
 
   const saveAllAsExam = () => {
     if (!cases) return;
-    
-    // Crucial fix: We now pass vignette and labPanels into the exam question object
     const questions = cases.map(c => ({
       vignette: c.vignette,
       q: c.examQuestion.q,
@@ -356,9 +379,6 @@ ${text}`;
               <h2 className="text-lg font-black text-gray-800 dark:text-white">{selectedCase.title}</h2>
               <p className="text-sm font-bold text-[var(--accent-color)]">{selectedCase.diagnosis}</p>
             </div>
-            <button onClick={() => saveAsNote(selectedCase)} className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-md hover:bg-emerald-500 transition-colors">
-              <Save size={12} /> Save
-            </button>
           </div>
           <p className="text-sm text-gray-800 dark:text-zinc-200 leading-relaxed bg-white/60 dark:bg-black/30 p-5 rounded-xl whitespace-pre-wrap shadow-sm border border-white/40 dark:border-white/5">{selectedCase.vignette}</p>
         </div>
@@ -523,6 +543,7 @@ ${text}`;
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [openDocs, setOpenDocs] = useState([]);
   const [activeDocId, setActiveDocId] = useState(null);
@@ -530,6 +551,7 @@ export default function App() {
   const [flashcards, setFlashcards] = useState([]);
   const [exams, setExams] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [chatSessions, setChatSessions] = useState([]);
   const [userSettings, setUserSettings] = useState({ apiKey: '', strictMode: true, theme: 'system', fontSize: 'medium', accentColor: 'indigo' });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -544,43 +566,64 @@ export default function App() {
   const [selectedText, setSelectedText] = useState('');
   const [genFromSelection, setGenFromSelection] = useState('');
 
+  // Drag to Resize State
+  const [aiWidth, setAiWidth] = useState(700); 
+  const [isResizing, setIsResizing] = useState(false);
+
   useEffect(() => {
     let meta = document.querySelector('meta[name="viewport"]');
     if (!meta) { meta = document.createElement('meta'); meta.name = "viewport"; document.head.appendChild(meta); }
     meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
   }, []);
 
+  // Load state from IndexedDB
   useEffect(() => {
-    try {
-      const savedDocs = localStorage.getItem('drMariam_docs');
-      const savedCards = localStorage.getItem('drMariam_flashcards');
-      const savedExams = localStorage.getItem('drMariam_exams');
-      const savedNotes = localStorage.getItem('drMariam_notes');
-      const savedSettings = localStorage.getItem('drMariam_settings');
-      const savedOpen = localStorage.getItem('drMariam_openDocs');
-      const savedPages = localStorage.getItem('drMariam_docPages');
-      if (savedDocs) setDocuments(JSON.parse(savedDocs) || []);
-      if (savedCards) setFlashcards(JSON.parse(savedCards) || []);
-      if (savedExams) setExams(JSON.parse(savedExams) || []);
-      if (savedNotes) setNotes(JSON.parse(savedNotes) || []);
-      if (savedSettings) setUserSettings(JSON.parse(savedSettings) || { apiKey: '', strictMode: true, theme: 'system', fontSize: 'medium', accentColor: 'indigo' });
-      if (savedOpen) setOpenDocs(JSON.parse(savedOpen) || []);
-      if (savedPages) setDocPages(JSON.parse(savedPages) || {});
-    } catch (e) { console.warn("Storage read error", e); }
+    const loadData = async () => {
+      try {
+        const savedDocs = await getAppState('docs');
+        const savedCards = await getAppState('flashcards');
+        const savedExams = await getAppState('exams');
+        const savedNotes = await getAppState('notes');
+        const savedChats = await getAppState('chats');
+        const savedSettings = await getAppState('settings');
+        const savedOpen = await getAppState('openDocs');
+        const savedPages = await getAppState('docPages');
+
+        if (savedDocs) setDocuments(savedDocs);
+        if (savedCards) setFlashcards(savedCards);
+        if (savedExams) setExams(savedExams);
+        if (savedNotes) setNotes(savedNotes);
+        if (savedChats) setChatSessions(savedChats);
+        if (savedSettings) setUserSettings(savedSettings);
+        if (savedOpen) setOpenDocs(savedOpen);
+        if (savedPages) setDocPages(savedPages);
+      } catch (e) { 
+        console.warn("Storage read error", e); 
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    loadData();
   }, []);
 
+  // Save state to IndexedDB
   useEffect(() => {
-    try {
-      const docsToSave = documents.map(d => { const copy = { ...d }; delete copy.pagesText; return copy; });
-      localStorage.setItem('drMariam_docs', JSON.stringify(docsToSave));
-      localStorage.setItem('drMariam_flashcards', JSON.stringify(flashcards));
-      localStorage.setItem('drMariam_exams', JSON.stringify(exams));
-      localStorage.setItem('drMariam_notes', JSON.stringify(notes));
-      localStorage.setItem('drMariam_settings', JSON.stringify(userSettings));
-      localStorage.setItem('drMariam_openDocs', JSON.stringify(openDocs));
-      localStorage.setItem('drMariam_docPages', JSON.stringify(docPages));
-    } catch (e) { console.warn("Storage write error", e); }
-  }, [documents, flashcards, exams, notes, userSettings, openDocs, docPages]);
+    if (!isLoaded) return;
+    const saveData = async () => {
+      try {
+        const docsToSave = documents.map(d => { const copy = { ...d }; delete copy.pagesText; return copy; });
+        await saveAppState('docs', docsToSave);
+        await saveAppState('flashcards', flashcards);
+        await saveAppState('exams', exams);
+        await saveAppState('notes', notes);
+        await saveAppState('chats', chatSessions);
+        await saveAppState('settings', userSettings);
+        await saveAppState('openDocs', openDocs);
+        await saveAppState('docPages', docPages);
+      } catch (e) { console.warn("Storage write error", e); }
+    };
+    saveData();
+  }, [documents, flashcards, exams, notes, chatSessions, userSettings, openDocs, docPages, isLoaded]);
 
   const prefersDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   const isDark = userSettings.theme === 'dark' || (userSettings.theme === 'system' && prefersDark);
@@ -615,6 +658,36 @@ export default function App() {
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   }, []);
+
+  // Drag to Resize Logic (Fixes PC + Touch Support)
+  useEffect(() => {
+    const handleMove = (e) => {
+      if (!isResizing) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let newWidth = window.innerWidth - clientX;
+      newWidth = Math.max(300, Math.min(newWidth, window.innerWidth - 300));
+      setAiWidth(newWidth);
+    };
+    const handleUp = () => {
+      if (isResizing) setIsResizing(false);
+    };
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('mouseup', handleUp);
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('touchend', handleUp);
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.userSelect = '';
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleUp);
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -684,6 +757,15 @@ export default function App() {
   const activeDoc = documents.find(d => d.id === activeDocId);
   const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
 
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-col h-screen w-screen items-center justify-center bg-gray-50 dark:bg-[#0a0a0c]">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" />
+        <span className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-zinc-500">Loading Local Vault</span>
+      </div>
+    );
+  }
+
   return (
     <>
       <style>{`
@@ -718,7 +800,7 @@ export default function App() {
             <SidebarBtn icon={BookOpen} label="Library" active={currentView === 'library'} onClick={() => setCurrentView('library')} />
             <SidebarBtn icon={Layers} label="Cards" active={currentView === 'flashcards'} onClick={() => setCurrentView('flashcards')} />
             <SidebarBtn icon={GraduationCap} label="Exams" active={currentView === 'exams'} onClick={() => setCurrentView('exams')} />
-            <SidebarBtn icon={BookA} label="Notes" active={currentView === 'notes'} onClick={() => setCurrentView('notes')} className="hidden md:flex" />
+            <SidebarBtn icon={MessageSquare} label="Chat" active={currentView === 'chat'} onClick={() => setCurrentView('chat')} />
             {activeDocId && (
               <>
                 <div className="hidden md:block w-10 h-px bg-gray-200 dark:bg-zinc-800 mx-auto my-1" />
@@ -740,6 +822,9 @@ export default function App() {
             </div>
           )}
           
+          {/* Prevent invisible elements from eating clicks during resize */}
+          {isResizing && <div className="absolute inset-0 z-[200] cursor-col-resize" />}
+
           <div className={currentView === 'library' ? "flex-1 overflow-y-auto h-full" : "hidden"}>
             <LibraryView documents={filteredDocuments} onUpload={handleFileUpload} onOpen={(id) => { setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setCurrentView('reader'); }} isUploading={isUploading} deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} notes={notes} setView={setCurrentView} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           </div>
@@ -752,8 +837,8 @@ export default function App() {
             <ExamsGlobalView exams={exams} setExams={setExams} setView={setCurrentView} />
           </div>
 
-          <div className={currentView === 'notes' ? "flex-1 overflow-y-auto h-full" : "hidden"}>
-            <NotesGlobalView notes={notes} setNotes={setNotes} setView={setCurrentView} />
+          <div className={currentView === 'chat' ? "flex-1 h-full" : "hidden"}>
+            <ChatGlobalView documents={documents} settings={userSettings} chatSessions={chatSessions} setChatSessions={setChatSessions} />
           </div>
 
           <div className={currentView === 'settings' ? "flex-1 overflow-y-auto h-full p-4 md:p-10 custom-scrollbar pb-[140px] md:pb-10" : "hidden"}>
@@ -765,7 +850,7 @@ export default function App() {
 
           <div className={currentView === 'reader' && activeDocId ? "flex-1 flex flex-col h-full overflow-hidden" : "hidden"}>
             {activeDocId && (
-              <PdfWorkspace activeDoc={activeDoc} setDocuments={setDocuments} closeDoc={() => { closeDoc(activeDocId); setCurrentView('library'); }} rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen} currentPage={docPages[activeDocId] || 1} setCurrentPage={(updater) => { setDocPages(prev => { const oldVal = prev[activeDocId] || 1; const newVal = typeof updater === 'function' ? updater(oldVal) : updater; return {...prev, [activeDocId]: newVal}; }); }} openDocs={openDocs} setActiveDocId={setActiveDocId} closeTab={closeDoc} setShowMenu={setShowMenu} setMenuPos={setMenuPos} setSelectedText={setSelectedText} setGenFromSelection={setGenFromSelection} setRightPanelTab={setRightPanelTab} documents={documents} settings={userSettings} setSettings={setUserSettings} />
+              <PdfWorkspace activeDoc={activeDoc} setDocuments={setDocuments} closeDoc={() => { closeDoc(activeDocId); setCurrentView('library'); }} rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen} currentPage={docPages[activeDocId] || 1} setCurrentPage={(updater) => { setDocPages(prev => { const oldVal = prev[activeDocId] || 1; const newVal = typeof updater === 'function' ? updater(oldVal) : updater; return {...prev, [activeDocId]: newVal}; }); }} openDocs={openDocs} setActiveDocId={setActiveDocId} closeTab={closeDoc} setShowMenu={setShowMenu} setMenuPos={setMenuPos} setSelectedText={setSelectedText} setGenFromSelection={setGenFromSelection} setRightPanelTab={setRightPanelTab} documents={documents} settings={userSettings} setSettings={setUserSettings} isResizing={isResizing} />
             )}
           </div>
           
@@ -776,9 +861,28 @@ export default function App() {
           )}
         </main>
 
-        {/* Made the AI Tools section wider here (w-[600px] lg:w-[750px] xl:w-[900px] 2xl:w-[1000px]) */}
+        {/* CUSTOM SPLITTER - Added standard Touch Event Triggers */}
+        {activeDocId && currentView === 'reader' && rightPanelOpen && (
+          <div
+            className="flex w-2 hover:w-3 cursor-col-resize bg-gray-200 dark:bg-zinc-800 hover:bg-[var(--accent-color)] dark:hover:bg-[var(--accent-color)] items-center justify-center shrink-0 z-[120]"
+            onMouseDown={(e) => { e.preventDefault(); setIsResizing(true); }}
+            onTouchStart={(e) => { setIsResizing(true); }}
+            style={{
+              transition: isResizing ? 'none' : 'background-color 0.2s, width 0.2s',
+              backgroundColor: isResizing ? 'var(--accent-color)' : '',
+              width: isResizing ? '8px' : ''
+            }}
+          >
+            <div className="w-0.5 h-16 bg-gray-400 dark:bg-zinc-500 rounded-full pointer-events-none" />
+          </div>
+        )}
+
+        {/* Dynamic Width AI Tools Aside */}
         {activeDocId && currentView === 'reader' && (
-          <aside className={`fixed inset-0 z-[110] flex flex-col md:relative w-full md:w-[600px] lg:w-[750px] xl:w-[900px] 2xl:w-[1000px] bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 shrink-0 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out ${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'}`}>
+          <aside
+            style={ typeof window !== 'undefined' && window.innerWidth > 768 && rightPanelOpen ? { width: `${aiWidth}px` } : {} }
+            className={`fixed inset-0 z-[110] flex flex-col md:relative w-full bg-white/95 dark:bg-[#0a0a0c]/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-gray-200 dark:border-zinc-800/50 shrink-0 md:z-20 shadow-[-20px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[-20px_0_40px_rgba(0,0,0,0.8)] ${isResizing ? 'transition-none' : 'transition-transform duration-300'} ease-in-out ${rightPanelOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0 md:hidden'}`}
+          >
             <div className="bg-[var(--accent-color)] px-5 py-4 md:py-3 flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-3">
                 <Target size={18} className="text-white"/>
@@ -793,7 +897,9 @@ export default function App() {
               <PanelTab active={rightPanelTab === 'review'} onClick={() => setRightPanelTab('review')} label="Vault" icon={Layers} />
               <PanelTab active={rightPanelTab === 'settings'} onClick={() => setRightPanelTab('settings')} label="Key" icon={KeyRound} />
             </div>
-            <div className="flex-1 overflow-hidden relative flex flex-col min-h-0">
+            
+            {/* Disable pointer events during drag to prevent iframe/scroll hitching */}
+            <div className="flex-1 overflow-hidden relative flex flex-col min-h-0" style={{ pointerEvents: isResizing ? 'none' : 'auto' }}>
               {rightPanelTab === 'settings' ? (
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-[100px] md:pb-6">
                   <PanelSettings settings={userSettings} setSettings={setUserSettings} />
@@ -886,9 +992,9 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
           </label>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-16">
-          <div onClick={() => setView('notes')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><BookA size={24} /></div>
-            <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">{notes.length}</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Generated Notes</p></div>
+          <div onClick={() => setView('chat')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
+            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0"><MessageSquare size={24} /></div>
+            <div><p className="text-2xl md:text-4xl font-black text-gray-800 dark:text-white">Smart</p><p className="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mt-1 md:mt-2">Global AI Chat</p></div>
           </div>
           <div onClick={() => setView('flashcards')} className="cursor-pointer hover:-translate-y-1 transition-all bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-gray-200 dark:border-zinc-800/60 p-5 md:p-8 rounded-2xl md:rounded-[2rem] flex items-center gap-4 md:gap-6 shadow-md hover:shadow-lg">
             <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0"><Layers size={24} /></div>
@@ -1012,21 +1118,141 @@ function ExamsGlobalView({ exams, setExams, setView }) {
   );
 }
 
-// ─── NOTES GLOBAL VIEW ───────────────────────────────────────────────────────
-function NotesGlobalView({ notes, setNotes, setView }) {
-  if (notes.length === 0) return <div className="flex-1 flex flex-col items-center justify-center p-6 text-center h-full"><BookA size={80} className="text-gray-300 dark:text-zinc-800 mb-6"/><h2 className="text-2xl font-black text-gray-800 dark:text-white mb-2">No Notes</h2><button onClick={() => setView('library')} className="mt-6 px-8 py-3 bg-[var(--accent-color)] text-white rounded-xl font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">Go to Library</button></div>;
+// ─── CHAT GLOBAL VIEW (NEW GEMINI/ADVANCED CHAT PAGE) ────────────────────────
+function ChatGlobalView({ documents, settings, chatSessions, setChatSessions }) {
+  const [activeSessionId, setActiveSessionId] = useState(null);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState("none");
+  const endRef = useRef(null);
+
+  const activeSession = chatSessions.find(s => s.id === activeSessionId) || null;
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [activeSession?.messages, loading]);
+
+  const createNewChat = () => {
+    setActiveSessionId(null);
+    setInput("");
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+
+    const sessionId = activeSessionId || Date.now().toString();
+    const isNew = !activeSessionId;
+    const msg = input;
+    setInput("");
+    
+    let currentMessages = isNew ? [] : chatSessions.find(s => s.id === sessionId)?.messages || [];
+    currentMessages = [...currentMessages, { role: 'user', content: msg }];
+    
+    let docIdToUse = isNew ? (selectedDocId !== "none" ? selectedDocId : null) : chatSessions.find(s => s.id === sessionId)?.docId;
+    const newTitle = isNew ? msg.substring(0, 30) + "..." : chatSessions.find(s => s.id === sessionId)?.title;
+
+    setChatSessions(prev => {
+      const exists = prev.find(s => s.id === sessionId);
+      if (exists) return prev.map(s => s.id === sessionId ? { ...s, messages: currentMessages } : s);
+      return [{ id: sessionId, title: newTitle, messages: currentMessages, docId: docIdToUse }, ...prev];
+    });
+    
+    if (isNew) setActiveSessionId(sessionId);
+    setLoading(true);
+
+    try {
+      let contextText = "";
+      if (docIdToUse) {
+        const pdfData = await getPdfData(docIdToUse);
+        if (pdfData && pdfData.pagesText) {
+          contextText = Object.entries(pdfData.pagesText).slice(0, 30).map(([p, t]) => `[Page ${p}] ${t}`).join('\n').substring(0, 60000);
+        }
+      }
+
+      const prompt = contextText ? `DOCUMENT CONTEXT:\n${contextText}\n\nUSER QUESTION:\n${msg}` : msg;
+      const res = await callAI(prompt, false, false, settings.apiKey, 16384);
+      
+      setChatSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...s.messages, { role: 'assistant', content: res }] } : s));
+    } catch (e) {
+      setChatSessions(prev => prev.map(s => s.id === sessionId ? { ...s, messages: [...s.messages, { role: 'assistant', content: `⚠️ Error: ${e.message}` }] } : s));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar pb-[140px] md:pb-16">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-black text-gray-800 dark:text-white mb-8 flex items-center gap-3"><BookA className="text-blue-500"/> Clinical Notes</h1>
-        <div className="space-y-6">
-          {notes.map(n => (
-            <div key={n.id} className="bg-white/90 dark:bg-zinc-900/90 border border-gray-200 dark:border-zinc-800 p-8 rounded-[2.5rem] relative group hover:border-blue-500/50 transition-all shadow-md">
-              <h3 className="text-2xl font-black text-gray-800 dark:text-white mb-4 pr-12">{n.title}</h3>
-              <div className="text-sm text-gray-700 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">{n.content}</div>
-              <button onClick={() => setNotes(notes.filter(no=>no.id!==n.id))} className="absolute top-8 right-8 p-3 bg-gray-100 dark:bg-zinc-950 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18}/></button>
+    <div className="flex h-full w-full bg-white dark:bg-[#0a0a0c]">
+      <div className="hidden md:flex w-72 flex-col border-r border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-[#121214]">
+        <div className="p-4 border-b border-gray-200 dark:border-zinc-800">
+          <button onClick={createNewChat} className="w-full flex items-center justify-center gap-2 bg-[var(--accent-color)] text-white py-3 rounded-xl font-bold text-sm shadow-md hover:bg-[var(--accent-color)]/90 transition-colors">
+            <PlusCircle size={18} /> New Chat
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+          {chatSessions.length === 0 && <div className="text-center p-4 text-xs font-bold text-gray-400 uppercase tracking-widest mt-4">No History</div>}
+          {chatSessions.map(session => (
+            <div key={session.id} className="relative group mb-1">
+              <button onClick={() => setActiveSessionId(session.id)} className={`w-full text-left p-3 rounded-xl text-sm transition-colors ${activeSessionId === session.id ? 'bg-[var(--accent-color)]/10 text-[var(--accent-color)] font-bold' : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-800'}`}>
+                <div className="truncate pr-6">{session.title}</div>
+              </button>
+              <button onClick={() => setChatSessions(prev => prev.filter(s => s.id !== session.id))} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg hover:bg-red-500/10"><Trash size={14}/></button>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col h-full relative">
+        <div className="h-16 border-b border-gray-200 dark:border-zinc-800 bg-white/95 dark:bg-[#0a0a0c]/95 flex items-center justify-between px-6 shrink-0 z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent-color)]/10 text-[var(--accent-color)] flex items-center justify-center"><Bot size={18}/></div>
+            <span className="font-bold text-gray-800 dark:text-white">Smart Global Chat</span>
+          </div>
+          {!activeSessionId && (
+            <select value={selectedDocId} onChange={e => setSelectedDocId(e.target.value)} className="bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-800 dark:text-zinc-300 text-xs font-bold rounded-lg px-3 py-1.5 outline-none max-w-[150px] md:max-w-xs truncate">
+              <option value="none">No Document Attached</option>
+              {documents.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            </select>
+          )}
+          {activeSessionId && activeSession?.docId && (
+            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2 py-1 rounded-md flex items-center gap-1"><BookOpen size={12}/> Document Attached</span>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 pb-[100px] md:pb-[140px] flex flex-col">
+          {!activeSession ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center opacity-70">
+              <Sparkles size={64} className="text-gray-300 dark:text-zinc-700 mb-6" />
+              <h2 className="text-2xl font-black text-gray-800 dark:text-white mb-2">How can I help you today?</h2>
+              <p className="text-gray-500 max-w-sm">Attach a document above to ground the AI in specific clinical text, or chat globally for elite medical insights.</p>
+            </div>
+          ) : (
+            <div className="max-w-3xl mx-auto w-full space-y-6">
+              {activeSession.messages.map((m, i) => (
+                <div key={i} className={`flex gap-4 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-[var(--accent-color)]' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow-sm'}`}>
+                    {m.role === 'user' ? <UserCircle2 size={18} className="text-white"/> : <BrainCircuit size={18} className="text-[var(--accent-color)]"/>}
+                  </div>
+                  <div className={`p-5 text-sm leading-relaxed shadow-sm ${m.role === 'user' ? 'bg-[var(--accent-color)] text-white rounded-[1.5rem] rounded-tr-sm max-w-[80%]' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[1.5rem] rounded-tl-sm text-gray-700 dark:text-zinc-300 w-full whitespace-pre-wrap'}`}>
+                    {m.content}
+                  </div>
+                </div>
+              ))}
+              {loading && (
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 flex items-center justify-center"><Loader2 size={18} className="text-[var(--accent-color)] animate-spin"/></div>
+                  <div className="p-5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[1.5rem] rounded-tl-sm flex gap-1.5 items-center"><span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></span><span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{animationDelay:'0.15s'}}></span><span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{animationDelay:'0.3s'}}></span></div>
+                </div>
+              )}
+              <div ref={endRef} />
+            </div>
+          )}
+        </div>
+
+        <div className="absolute bottom-20 md:bottom-6 left-0 right-0 px-4 md:px-0">
+          <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] focus-within:border-[var(--accent-color)] focus-within:ring-2 focus-within:ring-[var(--accent-color)]/20 transition-all p-2 relative">
+            <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}}} placeholder="Ask anything, anytime..." disabled={loading} className="w-full bg-transparent p-4 pr-16 text-sm text-gray-800 dark:text-white outline-none resize-none max-h-40 custom-scrollbar" style={{minHeight:'60px'}}/>
+            <button onClick={handleSend} disabled={loading||!input.trim()} className="absolute right-4 bottom-4 p-3 bg-[var(--accent-color)] disabled:bg-gray-200 dark:disabled:bg-zinc-800 rounded-xl text-white disabled:text-gray-400 transition-all hover:scale-105 active:scale-95"><Send size={18}/></button>
+          </div>
         </div>
       </div>
     </div>
@@ -1034,19 +1260,26 @@ function NotesGlobalView({ notes, setNotes, setView }) {
 }
 
 // ─── PDF WORKSPACE (PERFECT RENDERING ENGINE) ────────────────────────────────
-function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab, documents, settings, setSettings }) {
+function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, setShowMenu, setMenuPos, setSelectedText, setGenFromSelection, setRightPanelTab, documents, settings, setSettings, isResizing }) {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pageDims, setPageDims] = useState({ w: 0, h: 0 }); 
   const [scaleMultiplier, setScaleMultiplier] = useState(1); 
-  
+  const [resizeTrigger, setResizeTrigger] = useState(0); 
+
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const textLayerRef = useRef(null);
   const renderTaskRef = useRef(null);
   const [localPage, setLocalPage] = useState(currentPage);
-  
+
   useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
+
+  useEffect(() => {
+    if (!isResizing) {
+      setResizeTrigger(prev => prev + 1);
+    }
+  }, [isResizing]);
   
   useEffect(() => {
     let isMounted = true;
@@ -1123,7 +1356,7 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
     
     renderPage();
     return () => { isMounted = false; if (renderTaskRef.current) renderTaskRef.current.cancel(); };
-  }, [localPage, pdf, rightPanelOpen, scaleMultiplier]); 
+  }, [localPage, pdf, rightPanelOpen, scaleMultiplier, resizeTrigger]);
 
   useEffect(() => {
     const handleKeyDown = (e) => { 
@@ -1211,13 +1444,13 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
         </div>
       )}
 
-      {/* Core Viewer Area (Now fills completely - removed padding and flex centering) */}
+      {/* Core Viewer Area */}
       <div ref={containerRef} className="flex-1 overflow-auto bg-gray-200 dark:bg-[#121214] block relative custom-scrollbar p-0 m-0">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500 dark:text-zinc-500 min-h-[50vh]"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32}/><span className="text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span></div>
         ) : pdf ? (
           <div 
-            className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white shrink-0 transition-transform duration-200 origin-top-left m-0" 
+            className="relative shadow-xl dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] bg-white shrink-0 origin-top-left m-0 p-0" 
             style={{ width: pageDims.w ? `${pageDims.w}px` : '100%', height: pageDims.h ? `${pageDims.h}px` : 'auto' }}
           >
             <canvas ref={canvasRef} className="block m-0 p-0" />
@@ -1492,12 +1725,16 @@ function ToolBtn({ id, active, set, icon: Icon, label }) {
 
 // ─── PANEL CHAT ──────────────────────────────────────────────────────────────
 function PanelChat({ activeDoc, settings, currentPage }) {
-  const [messages, setMessages] = useState([{ role: 'assistant', content: `Locked onto **Page ${currentPage}**. Ask anything.` }]);
+  const [messages, setMessages] = useState([{ role: 'assistant', content: `Hello! I have analyzed the document. You can ask me questions about Page ${currentPage}, or the entire document.` }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [contextMode, setContextMode] = useState('page'); 
   const endRef = useRef(null);
 
-  useEffect(() => { setMessages([{ role: 'assistant', content: `Locked onto **Page ${currentPage}**. Ask anything.` }]); }, [currentPage]);
+  useEffect(() => { 
+    setMessages([{ role: 'assistant', content: `Locked onto **Page ${currentPage}**. Ask anything, or switch to "Full Document" mode.` }]); 
+  }, [currentPage]);
+  
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
   const handleChat = async () => {
@@ -1505,8 +1742,15 @@ function PanelChat({ activeDoc, settings, currentPage }) {
     const msg = input; setInput(""); setMessages(p => [...p, { role: 'user', content: msg }]); setLoading(true);
     try {
       const pdfData = await getPdfData(activeDoc.id);
-      const text = pdfData?.pagesText?.[currentPage] || "No text found.";
-      const res = await callAI(`CONTEXT FROM PAGE ${currentPage}:\n${text}\n\nQUESTION:\n${msg}`, false, settings.strictMode, settings.apiKey);
+      let text = "";
+      
+      if (contextMode === 'page') {
+        text = pdfData?.pagesText?.[currentPage] || "No text found.";
+      } else {
+        text = Object.entries(pdfData?.pagesText || {}).map(([p, t]) => `[Page ${p}] ${t}`).join('\n').substring(0, 80000); 
+      }
+      
+      const res = await callAI(`CONTEXT:\n${text}\n\nUSER QUESTION:\n${msg}`, false, false, settings.apiKey);
       setMessages(p => [...p, { role: 'assistant', content: res }]);
     } catch (e) { setMessages(p => [...p, { role: 'assistant', content: `⚠️ ${e.message}` }]); }
     finally { setLoading(false); }
@@ -1514,11 +1758,14 @@ function PanelChat({ activeDoc, settings, currentPage }) {
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 pb-[100px] md:pb-6 flex flex-col">
-      <div className="bg-[var(--accent-color)]/10 px-4 py-2.5 flex items-center gap-2 rounded-xl mb-4 border border-[var(--accent-color)]/20"><Target size={13} className="text-[var(--accent-color)]"/><span className="text-[9px] font-black text-[var(--accent-color)] uppercase tracking-widest">Page {currentPage}</span></div>
+      <div className="flex items-center gap-2 mb-4 bg-gray-50 dark:bg-zinc-900 p-1 rounded-xl border border-gray-200 dark:border-zinc-800 shrink-0">
+        <button onClick={() => setContextMode('page')} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-colors ${contextMode === 'page' ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800 dark:hover:text-white'}`}>Page {currentPage}</button>
+        <button onClick={() => setContextMode('document')} className={`flex-1 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg transition-colors ${contextMode === 'document' ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'text-gray-500 hover:text-gray-800 dark:hover:text-white'}`}>Full Document</button>
+      </div>
       <div className="flex-1 space-y-4 mb-4">
         {messages.map((m,i) => (
           <div key={i} className={`flex gap-3 ${m.role==='user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user' ? 'bg-[var(--accent-color)]' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>{m.role==='user' ? <List size={13} className="text-white"/> : <BrainCircuit size={13} className="text-[var(--accent-color)]"/>}</div>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user' ? 'bg-[var(--accent-color)]' : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700'}`}>{m.role==='user' ? <UserCircle2 size={13} className="text-white"/> : <BrainCircuit size={13} className="text-[var(--accent-color)]"/>}</div>
             <div className={`p-4 max-w-[85%] text-xs leading-relaxed ${m.role==='user' ? 'bg-[var(--accent-color)] text-white rounded-2xl rounded-tr-sm' : 'bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl rounded-tl-sm text-gray-600 dark:text-zinc-300 whitespace-pre-wrap'}`}>{m.content}</div>
           </div>
         ))}
@@ -1527,7 +1774,7 @@ function PanelChat({ activeDoc, settings, currentPage }) {
       </div>
       <div className="shrink-0">
         <div className="relative flex items-end bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-2xl focus-within:border-[var(--accent-color)] focus-within:ring-1 focus-within:ring-[var(--accent-color)]/50 transition-all p-1">
-          <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleChat();}}} placeholder={`Ask about page ${currentPage}...`} disabled={loading} className="w-full bg-transparent p-3 pr-12 text-xs text-gray-800 dark:text-white outline-none resize-none max-h-32 custom-scrollbar" style={{minHeight:'44px'}}/>
+          <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleChat();}}} placeholder={`Ask about ${contextMode==='page'?'page '+currentPage:'the document'}...`} disabled={loading} className="w-full bg-transparent p-3 pr-12 text-xs text-gray-800 dark:text-white outline-none resize-none max-h-32 custom-scrollbar" style={{minHeight:'44px'}}/>
           <button onClick={handleChat} disabled={loading||!input.trim()} className="absolute right-2 bottom-2 p-2.5 bg-[var(--accent-color)] disabled:bg-gray-200 dark:disabled:bg-zinc-800 rounded-xl text-white disabled:text-gray-400 transition-all shadow-sm"><Send size={13}/></button>
         </div>
       </div>
@@ -1601,7 +1848,6 @@ function InPanelExam({ exam, onBack }) {
 
   const q = exam.questions[currentQIndex];
   
-  // Conditionally format the lab section
   const hasLabs = q.labPanels && q.labPanels.length > 0;
   
   const labSection = hasLabs ? (
