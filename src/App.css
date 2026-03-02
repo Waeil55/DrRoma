@@ -13,3 +13,13 @@
   position: relative;
   z-index: 1001; 
 }
+.nav-buttons-container {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+}
+
