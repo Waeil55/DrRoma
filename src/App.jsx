@@ -1446,7 +1446,8 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
       )}
 
       {/* Core Viewer Area */}
-    <div ref={containerRef} className="flex-1 overflow-auto bg-gray-200 dark:bg-[#121214] block relative custom-scrollbar p-0 m-0">
+      {/* Core Viewer Area */}
+<div ref={containerRef} className="flex-1 min-h-0 overflow-auto bg-gray-200 dark:bg-[#121214] block relative custom-scrollbar p-0 m-0">
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500 dark:text-zinc-500 min-h-[50vh]"><Loader2 className="animate-spin text-[var(--accent-color)]" size={32}/><span className="text-xs font-black tracking-[0.2em] uppercase">Rendering Viewer...</span></div>
