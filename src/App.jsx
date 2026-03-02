@@ -1,3 +1,6 @@
+import './app.css';
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   BookOpen, Layers, CheckSquare, Settings,
@@ -859,7 +862,21 @@ export default function App() {
               <Sparkles size={24} />
             </button>
           )}
-        </main>
+        <main className="main-content-wrapper">
+  {/* Your reading pages go here */}
+
+  <div className="nav-buttons-container">
+    <button>Back</button>
+    <button>Next</button>
+  </div>
+
+  <input className="input-box" type="text" />
+</main>
+
+<footer className="footer">
+  {/* Footer content */}
+</footer>
+
 
         {/* CUSTOM SPLITTER - Added standard Touch Event Triggers */}
         {activeDocId && currentView === 'reader' && rightPanelOpen && (
