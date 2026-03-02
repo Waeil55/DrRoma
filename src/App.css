@@ -1,0 +1,15 @@
+.main-content-wrapper {
+  padding-bottom: 100px; /* Adjust to match your footer's height */
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.input-box {
+  position: relative;
+  z-index: 1001; 
+}
