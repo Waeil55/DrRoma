@@ -464,108 +464,135 @@ export default function App() {
   const filteredDocuments = searchQuery ? documents.filter(d => d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
 
   // SUPER TURBO BACKGROUND GENERATOR (1000x Faster Approach)
-  const startBackgroundGeneration = async (taskType, docId, startPage, endPage, params) => {
-    if (bgTask) { addToast("A generation is already running in background.", "info"); return; }
-    setBgTask({ title: `Super Turbo ${taskType} Generation`, msg: 'Executing Mass Parallel Neural Extraction...', done: 0, total: 100, isFinished: false, result: null });
+const startBackgroundGeneration = async (taskType, docId, startPage, endPage, params) => {
+  if (bgTask) {
+    addToast("A generation is already running in background.", "info");
+    return;
+  }
+
+  setBgTask({ 
+    title: `Super Turbo ${taskType.toUpperCase()} Generation`, 
+    msg: 'Initializing Ultra-Fast Parallel Threads...', 
+    done: 0, 
+    total: 100, 
+    isFinished: false, 
+    result: null 
+  });
+
+  try {
+    const pdfData = await getPdfData(docId);
+    const pagesText = pdfData?.pagesText || {};
+    let textContext = '';
     
-    try {
-      const pdfData = await getPdfData(docId);
-      const pagesText = pdfData?.pagesText || {};
-      let text = '';
-      for (let i = Number(startPage); i <= Number(endPage); i++) { 
-        if (pagesText[i]) text += `\n\n--- [PAGE ${i}] ---\n${pagesText[i]}\n\n`; 
+    // Combine text with clear page markers for the AI
+    for (let i = Number(startPage); i <= Number(endPage); i++) {
+      if (pagesText[i]) {
+        textContext += `\n--- [SOURCE: PAGE ${i}] ---\n${pagesText[i]}\n`;
       }
-      if (!text.trim() || text.length < 20) throw new Error('Not enough readable text found on these pages.');
+    }
+
+    if (!textContext.trim() || textContext.length < 50) {
+      throw new Error('Insufficient text found in selected range.');
+    }
+
+    // 1. Define the Turbo System Rules
+    const systemInstruction = `
+      STRICT RULES: 
+      1. Use ONLY the provided text. NO OUTSIDE KNOWLEDGE.
+      2. For EVERY item, you MUST provide an exact short quote from the text and the [Page X] marker where it was found.
+      3. Difficulty: ${params.difficultyLevel || 'Expert'}.
+    `;
+
+    // 2. Configure Batches for 1000x Speed
+    // Cases are heavy, so we process them 1-by-1 in parallel. 
+    // Exams/Cards are lighter, so we process them in small batches.
+    const count = params.count || 5;
+    const itemsPerBatch = taskType === 'cases' ? 1 : (taskType === 'flashcards' ? 10 : 5);
+    const numBatches = Math.ceil(count / itemsPerBatch);
+    
+    setBgTask(p => ({ ...p, total: numBatches, msg: `Igniting ${numBatches} Parallel Neural Threads...` }));
+
+    // 3. Define the Dynamic Task Logic
+    const tasks = Array.from({ length: numBatches }, (_, i) => {
+      const batchCount = (i === numBatches - 1 && count % itemsPerBatch !== 0) ? count % itemsPerBatch : itemsPerBatch;
       
-      const diffPrompt = `Difficulty Level: ${params.difficultyLevel || 'Expert'}. Make output incredibly advanced, deep, and highly detailed. YOU MUST STRICTLY CITE EXACT EVIDENCE AND THE EXACT PAGE NUMBER FROM THE TEXT FOR EVERY SINGLE ANSWER.`;
-      let resultData = null;
-
-      if (taskType === 'flashcards' || taskType === 'exam' || taskType === 'cases') {
-        // TURBO CHUNKING: Generate ultra-small chunks via massive parallel requests.
-        const CHUNK_SIZE = taskType === 'cases' ? 1 : (taskType === 'exam' ? 3 : 5); 
-        const count = params.count || 25;
-        const numChunks = Math.ceil(count / CHUNK_SIZE); 
-        setBgTask(p => ({ ...p, total: numChunks, done: 0, msg: `Igniting ${numChunks} parallel API threads...` }));
-        
-        const tasks = Array.from({ length: numChunks }, (_, i) => {
-          const countForChunk = (i === numChunks - 1 && count % CHUNK_SIZE !== 0) ? count % CHUNK_SIZE : CHUNK_SIZE;
-          const p = `${diffPrompt}\n\nSTRICT INSTRUCTION: Create exactly ${countForChunk} unique items representing the most high-yield concepts from this text ONLY.\n\nTEXT SOURCE:\n${text}`;
-          let formatPrompt = '';
-          
-          if (taskType === 'cases') {
-            formatPrompt = `\n\nGenerate EXACTLY ${countForChunk} highly realistic, complex USMLE-style patient case(s) based ONLY on the provided text topics.
-            
-            CRITICAL REQUIREMENTS:
-            1. LONG, highly comprehensive patient vignette (HPI, ROS, Physical Exam).
-            2. STRICT RULE: AT LEAST 12 ROWS of laboratory results are MANDATORY for every single case. Group them into panels (e.g. CBC, CMP, LFTs). Include "flag" ("H"/"L") for abnormals. If the exact labs aren't in the text, infer appropriate expected labs for the disease discussed in the text to reach 12 rows.
-            3. A high-quality multiple choice question based on the vignette.
-            4. Explicit text evidence and exact source page number proving the answer.
-
-            Format STRICTLY as JSON:
-            {
-              "cases": [
-                {
-                  "title": "Case Title",
-                  "vignette": "A 35-year-old female presents...",
-                  "diagnosis": "Diagnosis",
-                  "labPanels": [
-                    {
-                      "panelName": "COMPREHENSIVE METABOLIC & CBC (MUST HAVE 12+ ROWS)",
-                      "rows": [
-                        {"test": "WBC", "result": "15.2", "flag": "H", "range": "4.5-11.0", "units": "K/uL"},
-                        // ... [GENERATE AT LEAST 11 MORE ROWS HERE TO MEET THE 12+ REQUIREMENT] ...
-                      ]
-                    }
-                  ],
-                  "examQuestion": {
-                    "q": "What is the most likely contributing factor?",
-                    "options": ["A) Acute cholecystitis", "B) Opioid overdose", "C) Prescription opioid abuse", "D) Hepatitis C"],
-                    "correct": 0,
-                    "explanation": "Detailed explanation...",
-                    "evidence": "Exact short quote from the text proving this answer.",
-                    "sourcePage": integer_page_number
-                  }
-                }
-              ]
-            }`;
-          } else if (taskType === 'flashcards') {
-            formatPrompt = '\n\nFormat as JSON: { "items": [ {"q": "Question", "a": "Answer", "evidence": "Exact short quote from text proving this", "sourcePage": page_number_integer} ] }';
-          } else if (taskType === 'exam') {
-            formatPrompt = '\n\nFormat as JSON: { "title": "Generated Exam", "items": [ { "q": "Question", "options": ["A","B","C","D","E"], "correct": 0, "explanation": "Explanation", "evidence": "Exact short quote from text", "sourcePage": page_number_integer } ] }';
+      let specificPrompt = '';
+      if (taskType === 'cases') {
+        specificPrompt = `
+          Generate ${batchCount} complex USMLE-style cases from the provided text.
+          REQUIREMENTS:
+          1. LONG patient vignette covering HPI, Exam, and ROS.
+          2. MINIMUM 12 ROWS of laboratory results per case across different panels (CBC, BMP, LFTs, etc.).
+          3. Mandatory 'flag' ("H" or "L") for any result outside normal range.
+          4. Format STRICTLY as JSON:
+          {
+            "cases": [{
+              "title": "Clinical Case Title",
+              "vignette": "A 45-year-old male...",
+              "diagnosis": "Diagnosis Name",
+              "labPanels": [{
+                "panelName": "Comprehensive Metabolic Panel",
+                "rows": [{"test": "Glucose", "result": "126", "flag": "H", "range": "70-99", "units": "mg/dL"}]
+              }],
+              "examQuestion": {
+                "q": "What is the next best step?", 
+                "options": ["Option A", "Option B", "Option C", "Option D"], 
+                "correct": 0, 
+                "explanation": "Detailed explanation why A is correct...", 
+                "evidence": "Exact quote from text", 
+                "sourcePage": ${startPage}
+              }
+            }]
           }
-          
-          return () => callAI(p + formatPrompt, true, userSettings.strictMode, userSettings.apiKey, 8000);
-        });
-        
-        let allItems = [];
-        // MASSIVE CONCURRENCY: Set to 50 to fire all chunks practically at once
-        const results = await runParallel(tasks, 50, (done, total) => { setBgTask(p => ({ ...p, done, total, msg: `Turbo Threading: ${done}/${total} batches processed...` })); });
-        
-        for (const res of results) { 
-          if (res.status === 'fulfilled') { 
-            try { 
-              const parsed = parseJsonSafe(res.value); 
-              const items = parsed.items || parsed.questions || parsed.cases || []; 
-              allItems = [...allItems, ...items]; 
-            } catch (e) { console.warn('Chunk parse failed', e); } 
-          } 
-        }
-        if (allItems.length === 0) throw new Error('AI failed to extract valid items. Please check text or API key.');
-        
-        const baseTitle = taskType === 'cases' ? 'Patient Cases Block' : 'Generated Assessment';
-        resultData = { type: taskType, title: baseTitle, data: allItems.slice(0, count), pages: `${startPage}-${endPage}` };
+        `;
+      } else if (taskType === 'flashcards') {
+        specificPrompt = `Generate ${batchCount} expert-level medical flashcards. 
+        Format as JSON: {"items": [{"q": "...", "a": "...", "evidence": "...", "sourcePage": integer}]}`;
       } else {
-        setBgTask(p => ({ ...p, total: 1, done: 0, msg: `Running fast neural extraction...` }));
-        const p = `${diffPrompt}\nPerform the following task based ONLY on this medical text.\nTASK: ${taskType}\nRespond in Markdown.\n\nTEXT:\n${text}`;
-        const raw = await callAI(p, false, userSettings.strictMode, userSettings.apiKey, 8000);
-        const titles = { clinical: 'Clinical Summary', differential: 'Differential Diagnosis', treatment: 'Treatment Plan', labs: 'Lab Interpretation', eli5: 'Simplify (ELI5)', summary: 'Summary', mnemonics: 'Mnemonics', plan: 'Study Plan', mindmap: 'Mind Map', quizlet: 'Quizlet Export' };
-        resultData = { type: taskType, data: raw, pages: `${startPage}-${endPage}`, customTitle: titles[taskType] || taskType };
-        setBgTask(p => ({ ...p, done: 1 }));
+        specificPrompt = `Generate ${batchCount} high-yield medical exam questions. 
+        Format as JSON: {"items": [{"q": "...", "options": ["..."], "correct": 0, "explanation": "...", "evidence": "...", "sourcePage": integer}]}`;
       }
-      setBgTask(p => ({ ...p, isFinished: true, result: resultData, msg: 'Ultra-Fast Generation Complete! Click below to view.' }));
-      addToast('Super Turbo Generation Complete!', 'success');
-    } catch (e) { setBgTask(null); addToast(e.message || 'Generation failed', 'error'); }
-  };
+
+      const fullPrompt = `${systemInstruction}\n\nTEXT SOURCE:\n${textContext}\n\n${specificPrompt}`;
+      return () => callAI(fullPrompt, true, userSettings.strictMode, userSettings.apiKey, 8000);
+    });
+
+    // 4. Execution Layer (Massive Parallelism)
+    // We use a concurrency of 50 to send almost all requests at the exact same time.
+    let allResults = [];
+    const executionResults = await runParallel(tasks, 50, (done, total) => {
+      setBgTask(p => ({ ...p, done, msg: `Turbo Threading: Batch ${done}/${total} complete...` }));
+    });
+
+    // 5. Aggregation Layer
+    for (const res of executionResults) {
+      if (res.status === 'fulfilled') {
+        try {
+          const parsed = parseJsonSafe(res.value);
+          const dataPoints = parsed.cases || parsed.items || parsed.questions || [];
+          allResults = [...allResults, ...dataPoints];
+        } catch (e) { console.warn("Thread Parse Fail:", e); }
+      }
+    }
+
+    if (allResults.length === 0) throw new Error("AI failed to extract data. Check context or API key.");
+
+    const finalData = {
+      type: taskType,
+      title: taskType === 'cases' ? 'Patient Case Block' : 'Generated Assessment',
+      data: allResults.slice(0, count),
+      pages: `${startPage}-${endPage}`
+    };
+
+    setBgTask(p => ({ ...p, isFinished: true, result: finalData, msg: 'Ultra-Fast Extraction Complete!' }));
+    addToast('Turbo Generation Finished!', 'success');
+
+  } catch (error) {
+    console.error("Turbo Fail:", error);
+    setBgTask(null);
+    addToast(error.message, 'error');
+  }
+};
 
   const handleViewBgTask = () => {
     if (!bgTask?.result) return;
