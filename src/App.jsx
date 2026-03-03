@@ -799,7 +799,7 @@ function ExamsGlobalView({ exams, setExams, addToast, setCurrentPage, setRightPa
     <div className="flex-1 overflow-y-auto custom-scrollbar">
       <div className="w-full max-w-screen-xl mx-auto p-6 md:p-12 pb-32">
         <h1 className="title-font text-4xl font-black text-rose-500 mb-10 flex items-center gap-4"><GraduationCap size={40}/> Examination Center</h1>
-        {exams.length === 0 ? <p className="glass p-10 rounded-[2rem] text-center font-bold opacity-60">No exams generated yet. Go to Reader and open AI Studio to extract some.</p> : (
+        {exams.length === 0 ? <p className="glass p-10 rounded-[2rem] text-center font-bold opacity-60">No exams generated yet. Go to Reader -&gt; AI Studio to extract some.</p>: (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {exams.map(e => (
               <div key={e.id} className="glass rounded-[2rem] p-6 flex flex-col card-hover">
