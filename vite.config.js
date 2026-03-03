@@ -3,5 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/DrMariam/',
+  // Replace 'DrMariam' with your exact repository name if different
+  base: '/DrMariam/', 
 })
