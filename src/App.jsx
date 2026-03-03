@@ -360,27 +360,93 @@ export default function App() {
   }, [isResizing]);
 
   const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file || file.type !== 'application/pdf') return;
-    setIsUploading(true); setUploadProgress(10);
+    const files = Array.from(event.target.files);
+    if (!files || files.length === 0) return;
+    
+    setIsUploading(true);
+    setUploadProgress(5);
+
     try {
-      const arrayBuffer = await file.arrayBuffer(); setUploadProgress(30);
-      const pdfjsLib = await loadPdfJs(); setUploadProgress(50);
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      const totalPages = pdf.numPages; const pagesText = {};
-      for (let i = 1; i <= totalPages; i++) {
-        try { const page = await pdf.getPage(i); const textContent = await page.getTextContent(); pagesText[i] = textContent.items.map(s => s.str).join(' '); page.cleanup(); } catch (e) { pagesText[i] = ''; }
-        setUploadProgress(50 + Math.floor((i / totalPages) * 40));
+      const pdfjsLib = await loadPdfJs();
+      
+      const newDocs = [];
+      const newPages = {};
+      const newOpenDocIds = [];
+      let lastDocId = null;
+
+      for (let fIndex = 0; fIndex < files.length; fIndex++) {
+        const file = files[fIndex];
+        if (file.type !== 'application/pdf') continue;
+
+        // ZERO-RAM APPROACH: Create a temporary disk URL instead of reading bytes into RAM
+        const fileUrl = URL.createObjectURL(file);
+        
+        const loadingTask = pdfjsLib.getDocument(fileUrl);
+        const pdf = await loadingTask.promise;
+        const totalPages = pdf.numPages; 
+        const pagesText = {};
+        
+        for (let i = 1; i <= totalPages; i++) {
+          try { 
+            const page = await pdf.getPage(i); 
+            const textContent = await page.getTextContent(); 
+            pagesText[i] = textContent.items.map(s => s.str).join(' '); 
+            page.cleanup(); // Aggressive RAM cleanup per page
+          } catch (e) { 
+            pagesText[i] = ''; 
+          }
+          
+          // Yield to main thread every 5 pages so the browser never freezes
+          if (i % 5 === 0) await new Promise(resolve => setTimeout(resolve, 5));
+          
+          const fileProgress = (i / totalPages) * (100 / files.length);
+          const overallProgress = Math.round(((fIndex / files.length) * 100) + fileProgress);
+          setUploadProgress(overallProgress);
+        }
+        
+        // Destroy PDF objects and revoke the temporary URL to free memory
+        try { await pdf.destroy(); } catch (e) {}
+        try { await loadingTask.destroy(); } catch (e) {}
+        URL.revokeObjectURL(fileUrl);
+        
+        const id = Date.now().toString() + '-' + Math.random().toString(36).substring(2, 9);
+        
+        // SAVE AS BLOB: Storing the native `file` object is infinitely faster and safer than ArrayBuffers
+        await savePdfData(id, { fileBlob: file, pagesText });
+        
+        newDocs.push({ id, name: file.name, totalPages, progress: 1, addedAt: new Date().toISOString() });
+        newOpenDocIds.push(id);
+        newPages[id] = 1;
+        lastDocId = id;
+        
+        addToast(`"${file.name}" extracted safely!`, 'success');
       }
-      try { await loadingTask.destroy(); } catch (e) {}
-      const id = Date.now().toString();
-      const newDoc = { id, name: file.name, totalPages, progress: 1, addedAt: new Date().toISOString() };
-      await savePdfData(id, { buffer: arrayBuffer, pagesText });
-      setDocuments(prev => [...prev, newDoc]); setOpenDocs(prev => prev.includes(id) ? prev : [...prev, id]); setActiveDocId(id); setDocPages(prev => ({ ...prev, [id]: 1 })); setCurrentView('reader'); setRightPanelOpen(true);
-      addToast(`"${file.name}" uploaded successfully!`, 'success');
-    } catch (error) { console.error(error); addToast('Upload failed.', 'error'); } finally { setIsUploading(false); setUploadProgress(0); if (event.target) event.target.value = ''; }
+      
+      if (newDocs.length > 0) {
+        setDocuments(prev => [...prev, ...newDocs]);
+        setOpenDocs(prev => [...new Set([...prev, ...newOpenDocIds])]);
+        setDocPages(prev => ({ ...prev, ...newPages }));
+        if (lastDocId) setActiveDocId(lastDocId);
+        
+        setCurrentView('reader'); 
+        setRightPanelOpen(true);
+      }
+
+    } catch (error) { 
+      console.error("Upload Error:", error); 
+      addToast(`Upload failed: ${error.message}`, 'error'); 
+    } finally { 
+      setIsUploading(false); 
+      setUploadProgress(0); 
+      if (event.target) event.target.value = ''; 
+    }
   };
+
+
+  
+
+
+  
 
   const closeDoc = (id) => {
     setOpenDocs(prev => prev.filter(d => d !== id));
@@ -674,7 +740,10 @@ function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument,
           <div><h1 className="title-font text-5xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)]">Intelligence Nexus</h1><p className="text-lg md:text-xl text-[var(--text)] opacity-60 mt-4 font-medium">Premium medical AI workspace</p></div>
           <label className={`cursor-pointer btn-accent flex items-center gap-3 text-sm font-black uppercase tracking-widest shadow-2xl px-8 py-4 rounded-2xl ${isUploading ? 'opacity-50' : ''}`}>
             {isUploading ? <Loader2 className="animate-spin" size={24}/> : <FileUp size={24}/>}{isUploading ? 'IMPORTING...' : 'IMPORT PDF'}
-            <input type="file" accept="application/pdf" className="hidden" onChange={onUpload} disabled={isUploading}/>
+            <input type="file" accept="application/pdf" multiple className="hidden" onChange={onUpload} disabled={isUploading}/>
+
+
+
           </label>
         </div>
         {documents.length > 0 ? (
@@ -905,18 +974,51 @@ function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRi
   const [localPage, setLocalPage] = useState(currentPage);
   const canvasRef = useRef(null); const containerRef = useRef(null); const textLayerRef = useRef(null); const renderTaskRef = useRef(null);
 
-  useEffect(() => { setLocalPage(currentPage); }, [currentPage]);
-  useEffect(() => {
+
+useEffect(() => {
     let isMounted = true;
+    let objectUrl = null; // Keep track of the URL so we can destroy it when closing the tab
+
     const loadPdf = async () => {
       setIsLoading(true);
       try {
-        const buffer = await getPdfData(activeDoc.id);
-        if (buffer && isMounted) { const pdfjsLib = await loadPdfJs(); const loadedPdf = await pdfjsLib.getDocument({ data: buffer.buffer || buffer }).promise; if (isMounted) setPdf(loadedPdf); }
-      } catch (e) { console.error(e); } finally { if (isMounted) setIsLoading(false); }
+        const pdfData = await getPdfData(activeDoc.id);
+        if (pdfData && isMounted) { 
+          const pdfjsLib = await loadPdfJs(); 
+          
+          let loadingTask;
+          
+          if (pdfData.fileBlob) {
+            // NEW SUPER-TURBO METHOD: Read directly from the Blob using a URL
+            objectUrl = URL.createObjectURL(pdfData.fileBlob);
+            loadingTask = pdfjsLib.getDocument(objectUrl);
+          } else {
+            // BACKWARD COMPATIBILITY: Fallback for older documents already stored as ArrayBuffer
+            loadingTask = pdfjsLib.getDocument({ data: pdfData.buffer || pdfData });
+          }
+          
+          const loadedPdf = await loadingTask.promise; 
+          if (isMounted) setPdf(loadedPdf); 
+        }
+      } catch (e) { 
+        console.error("PDF Render Error:", e); 
+      } finally { 
+        if (isMounted) setIsLoading(false); 
+      }
     };
-    loadPdf(); return () => { isMounted = false; };
+    
+    loadPdf(); 
+    
+    // Cleanup function: When you close the document, destroy the object URL to clear RAM
+    return () => { 
+      isMounted = false; 
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, [activeDoc.id]);
+
+
 
   useEffect(() => {
     if (!pdf) return; let isMounted = true;
