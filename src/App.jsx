@@ -1,1740 +1,1815 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import {
-  BookOpen, Layers, CheckSquare, Settings, ChevronLeft, ChevronRight, MessageSquare,
-  CheckCircle2, Library, Trash2, Loader2, Send, GraduationCap, Save, X, BookA,
-  AlertCircle, FileUp, Target, Trash, Sparkles, Activity, Stethoscope, Lightbulb,
-  Baby, Play, Pill, Thermometer, Zap, Database, Search, Palette, Type,
-  Moon, Sun, UserCircle2, ZoomIn, ZoomOut, Maximize, PlusCircle,
-  CloudSun, MoonStar, FileSearch, MessageCircleQuestion, FastForward,
-  FlaskConical, Info, Clipboard, KeyRound, Globe, ChevronDown, ChevronUp
-} from 'lucide-react';
+import React,{useState,useEffect,useRef,useCallback,useMemo}from'react';
+import{BookOpen,Layers,CheckSquare,Settings,ChevronLeft,ChevronRight,MessageSquare,
+CheckCircle2,Trash2,Loader2,Send,GraduationCap,Save,X,BookA,AlertCircle,FileUp,
+Target,Trash,Sparkles,Activity,Stethoscope,Lightbulb,Baby,Pill,Thermometer,Zap,
+Database,Search,Palette,Type,Moon,Sun,UserCircle2,ZoomIn,ZoomOut,Maximize,
+PlusCircle,CloudSun,MoonStar,FileSearch,MessageCircleQuestion,FastForward,
+FlaskConical,Info,Clipboard,KeyRound,Globe,GripVertical,BookMarked,Layers3,
+Brain,ListChecks,FilePlus,AlignLeft,Hash}from'lucide-react';
 
-const MARIAM_IMG = "https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg";
+const MARIAM_IMG="https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg";
+const NAV_H=72; // mobile bottom nav height px
 
-// ─── INDEXED DB ───────────────────────────────────────────────────────────────
-const DB_NAME = 'MariamProDB_v26';
-const openDB = () => new Promise((resolve, reject) => {
-  const req = indexedDB.open(DB_NAME, 5);
-  req.onupgradeneeded = e => {
-    const db = e.target.result;
-    if (!db.objectStoreNames.contains('pdfs')) db.createObjectStore('pdfs');
-    if (!db.objectStoreNames.contains('appState')) db.createObjectStore('appState');
-  };
-  req.onsuccess = () => resolve(req.result);
-  req.onerror = () => reject(req.error);
+/* ═══════════════════════════════════════════════════════════════════════════
+   INDEXED DB
+═══════════════════════════════════════════════════════════════════════════ */
+const DB='MariamProDB_v30';
+const openDB=()=>new Promise((res,rej)=>{
+  const r=indexedDB.open(DB,6);
+  r.onupgradeneeded=e=>{const d=e.target.result;
+    ['pdfs','appState'].forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s);});};
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
 });
-const dbOp = async (store, mode, op) => {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, mode);
-    const s = tx.objectStore(store);
-    const r = op(s);
-    if (r && r.onsuccess !== undefined) { r.onsuccess = () => resolve(r.result); r.onerror = () => reject(r.error); }
-    else { tx.oncomplete = () => resolve(); tx.onerror = () => reject(tx.error); }
-  });
-};
-const savePdf = (id, d) => dbOp('pdfs', 'readwrite', s => { s.put(d, id); });
-const getPdf  = id => dbOp('pdfs', 'readonly', s => s.get(id));
-const delPdf  = id => dbOp('pdfs', 'readwrite', s => { s.delete(id); });
-const saveState = (k, v) => dbOp('appState', 'readwrite', s => { s.put(v, k); });
-const getState  = k => dbOp('appState', 'readonly', s => s.get(k));
+const dbOp=(store,mode,op)=>openDB().then(db=>new Promise((res,rej)=>{
+  const tx=db.transaction(store,mode),s=tx.objectStore(store),r=op(s);
+  if(r?.onsuccess!==undefined){r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}
+  else{tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}
+}));
+const savePdf=(id,d)=>dbOp('pdfs','readwrite',s=>{s.put(d,id);});
+const getPdf=id=>dbOp('pdfs','readonly',s=>s.get(id));
+const delPdf=id=>dbOp('pdfs','readwrite',s=>{s.delete(id);});
+const saveState=(k,v)=>dbOp('appState','readwrite',s=>{s.put(v,k);});
+const getState=k=>dbOp('appState','readonly',s=>s.get(k));
 
-const loadPdfJs = async () => {
-  if (window.pdfjsLib) return window.pdfjsLib;
-  return new Promise((resolve, reject) => {
-    const sc = document.createElement('script');
-    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
-    sc.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; resolve(window.pdfjsLib); };
-    sc.onerror = reject;
-    document.body.appendChild(sc);
+/* ═══════════════════════════════════════════════════════════════════════════
+   PDF.JS
+═══════════════════════════════════════════════════════════════════════════ */
+const loadPdfJs=async()=>{
+  if(window.pdfjsLib)return window.pdfjsLib;
+  return new Promise((res,rej)=>{
+    const sc=document.createElement('script');
+    sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
+    sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';res(window.pdfjsLib);};
+    sc.onerror=rej; document.body.appendChild(sc);
   });
 };
 
-// ─── UNIVERSAL AI ENGINE ──────────────────────────────────────────────────────
-// Supports: Anthropic (Claude), OpenAI, Google Gemini, and any OpenAI-compatible
-// endpoint (GLM, DeepSeek, Groq, Mistral, local Ollama, etc.)
-const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens = 4000) => {
-  const { provider = 'anthropic', apiKey = '', baseUrl = '', model = '' } = settings;
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIVERSAL AI ENGINE
+   Supports: Anthropic · OpenAI · Gemini · DeepSeek · GLM · Groq · Ollama · Any-Compatible
+═══════════════════════════════════════════════════════════════════════════ */
+const callAI=async(prompt,expectJson,strictMode,settings={},maxTokens=8000)=>{
+  const{provider='anthropic',apiKey='',baseUrl='',model=''}=settings;
+  const sys=strictMode
+    ?'STRICT MEDICAL AI: Use ONLY the provided document text. NEVER add outside knowledge. Cite every answer with [Page X].'
+    :'Expert medical AI. Use the provided document as primary source. Be precise, detailed, and accurate.';
+  const jsonSuffix=expectJson?'\n\nRETURN ONLY RAW JSON. No markdown. No explanation. No backticks.':'';
+  const finalPrompt=prompt+jsonSuffix;
 
-  const sysParts = strictMode
-    ? 'SUPER STRICT: You are an elite medical AI. Use ONLY the provided text. NO outside knowledge. Every answer MUST cite [Page X].'
-    : 'You are an elite medical AI. Vast clinical knowledge. Prioritize document context. Be smart, detailed, and helpful.';
-  const jsonSuffix = expectJson ? '\n\nCRITICAL: Respond ONLY with valid JSON. No markdown fences, no preamble.' : '';
-  const finalPrompt = prompt + jsonSuffix;
-
-  // ── Anthropic / Claude ─────────────────────────────────────────────────────
-  if (provider === 'anthropic') {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}) },
-      body: JSON.stringify({
-        model: model || 'claude-sonnet-4-20250514',
-        max_tokens: Math.min(maxTokens, 8000),
-        system: sysParts,
-        messages: [{ role: 'user', content: finalPrompt }]
-      })
-    });
-    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || res.statusText); }
-    const d = await res.json();
-    return d.content[0].text.trim();
+  if(provider==='anthropic'){
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json',...(apiKey?{'x-api-key':apiKey}:{})},
+      body:JSON.stringify({model:model||'claude-sonnet-4-20250514',max_tokens:Math.min(maxTokens,8192),
+        system:sys,messages:[{role:'user',content:finalPrompt}]})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||r.statusText);}
+    const d=await r.json();return d.content[0].text.trim();
   }
-
-  // ── Google Gemini ──────────────────────────────────────────────────────────
-  if (provider === 'gemini') {
-    if (!apiKey) throw new Error('Gemini API key is required. Add it in Settings.');
-    const mdl = model || 'gemini-2.0-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${mdl}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: sysParts }] },
-        contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
-        generationConfig: { maxOutputTokens: Math.min(maxTokens, 8192), temperature: strictMode ? 0 : 0.7 }
-      })
-    });
-    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || res.statusText); }
-    const d = await res.json();
-    return d.candidates[0].content.parts[0].text.trim();
+  if(provider==='gemini'){
+    if(!apiKey)throw new Error('Gemini API key required — add it in Settings.');
+    const mdl=model||'gemini-2.0-flash';
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${mdl}:generateContent?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system_instruction:{parts:[{text:sys}]},
+        contents:[{role:'user',parts:[{text:finalPrompt}]}],
+        generationConfig:{maxOutputTokens:Math.min(maxTokens,8192),temperature:strictMode?0:0.4}})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||r.statusText);}
+    const d=await r.json();return d.candidates[0].content.parts[0].text.trim();
   }
-
-  // ── OpenAI + any compatible (GLM, DeepSeek, Groq, Ollama …) ───────────────
-  if (!apiKey) throw new Error('API key is required. Add it in Settings.');
-  const base = (baseUrl || 'https://api.openai.com').replace(/\/$/, '');
-  const res = await fetch(`${base}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: model || 'gpt-4o-mini',
-      messages: [{ role: 'system', content: sysParts }, { role: 'user', content: finalPrompt }],
-      max_tokens: Math.min(maxTokens, 8000),
-      temperature: strictMode ? 0 : 0.7,
-      ...(expectJson && provider === 'openai' ? { response_format: { type: 'json_object' } } : {})
-    })
-  });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.error?.message || res.statusText); }
-  const d = await res.json();
-  return d.choices[0].message.content.trim();
+  if(!apiKey)throw new Error('API key required — add it in Settings.');
+  const base=(baseUrl||'https://api.openai.com').replace(/\/$/,'');
+  const r=await fetch(`${base}/v1/chat/completions`,{method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+    body:JSON.stringify({model:model||'gpt-4o-mini',
+      messages:[{role:'system',content:sys},{role:'user',content:finalPrompt}],
+      max_tokens:Math.min(maxTokens,8192),temperature:strictMode?0:0.4,
+      ...(expectJson&&provider==='openai'?{response_format:{type:'json_object'}}:{})})});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||r.statusText);}
+  const d=await r.json();return d.choices[0].message.content.trim();
 };
 
-const parseJsonSafe = text => {
-  let c = text.replace(/```json/gi,'').replace(/```/g,'').trim();
-  const f = c.indexOf('{'), l = c.lastIndexOf('}');
-  if (f !== -1 && l !== -1) c = c.substring(f, l + 1);
+const parseJson=txt=>{
+  let c=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
+  const f=c.indexOf('{'),l=c.lastIndexOf('}');
+  if(f!==-1&&l!==-1)c=c.substring(f,l+1);
   return JSON.parse(c);
 };
 
-const runParallel = async (tasks, concurrency = 2, onProgress) => {
-  const results = [];
-  for (let i = 0; i < tasks.length; i += concurrency) {
-    const batch = tasks.slice(i, i + concurrency);
-    const br = await Promise.allSettled(batch.map(fn => fn()));
+/* Ultra-fast parallel runner — max concurrency, zero artificial delay */
+const runParallel=async(tasks,concurrency=10,onProgress)=>{
+  const results=[];
+  for(let i=0;i<tasks.length;i+=concurrency){
+    const batch=tasks.slice(i,i+concurrency);
+    const br=await Promise.allSettled(batch.map(fn=>fn()));
     results.push(...br);
-    if (onProgress) onProgress(Math.min(i + concurrency, tasks.length), tasks.length);
-    if (i + concurrency < tasks.length) await new Promise(r => setTimeout(r, 400));
+    if(onProgress)onProgress(Math.min(i+concurrency,tasks.length),tasks.length);
   }
   return results;
 };
 
-// ─── TOAST ────────────────────────────────────────────────────────────────────
-function useToast() {
-  const [toasts, setToasts] = useState([]);
-  const addToast = useCallback((msg, type = 'success', dur = 3500) => {
-    const id = Date.now();
-    setToasts(p => [...p, { id, msg, type }]);
-    setTimeout(() => setToasts(p => p.filter(t => t.id !== id)), dur);
-  }, []);
-  return { toasts, addToast };
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════════════ */
+function useToast(){
+  const[toasts,setToasts]=useState([]);
+  const add=useCallback((msg,type='success',dur=3500)=>{
+    const id=Date.now();
+    setToasts(p=>[...p,{id,msg,type}]);
+    setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),dur);
+  },[]);
+  return{toasts,addToast:add};
 }
-function ToastContainer({ toasts }) {
-  return (
-    <div className="fixed top-24 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
-      {toasts.map(t => (
-        <div key={t.id} className={`px-5 py-4 rounded-2xl text-sm font-bold shadow-2xl glass border flex items-center gap-3 animate-slide-in pointer-events-auto
-          ${t.type==='success'?'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/30':
-            t.type==='error'?'bg-red-500/20 text-red-700 dark:text-red-300 border-red-400/30':'bg-[var(--card)] text-[var(--text)] border-[var(--border)]'}`}>
-          {t.type==='success'?<CheckCircle2 size={18}/>:t.type==='error'?<AlertCircle size={18}/>:<Info size={18}/>} {t.msg}
+function ToastContainer({toasts}){
+  return(
+    <div className="fixed top-20 right-3 z-[9999] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-24px)]">
+      {toasts.map(t=>(
+        <div key={t.id} className={`px-4 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2.5 animate-slide-in pointer-events-auto
+          ${t.type==='success'?'bg-emerald-500 text-white':t.type==='error'?'bg-red-500 text-white':'bg-[var(--card)] border border-[var(--border)] text-[var(--text)]'}`}>
+          {t.type==='success'?<CheckCircle2 size={15}/>:t.type==='error'?<AlertCircle size={15}/>:<Info size={15}/>}
+          <span className="truncate">{t.msg}</span>
         </div>
       ))}
     </div>
   );
 }
 
-// ─── PROGRESS OVERLAY ─────────────────────────────────────────────────────────
-function ProgressOverlay({ task, onCancel, onView }) {
-  if (!task) return null;
-  return (
-    <div className="fixed bottom-28 right-4 md:right-8 z-[9998] glass bg-[var(--card)] rounded-3xl p-5 shadow-2xl border-2 border-[var(--accent)] flex flex-col gap-3 w-[calc(100%-32px)] md:w-[340px] animate-slide-in">
-      <div className="flex justify-between items-center">
-        <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)] flex items-center gap-2">
-          {task.isFinished ? <CheckCircle2 size={16}/> : <FastForward size={16} className="animate-pulse"/>}
-          {task.title || 'AI Engine'}
-        </span>
-        <button onClick={onCancel} className="opacity-50 hover:opacity-100 hover:text-red-500 p-1 rounded-lg"><X size={15}/></button>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOUCH + MOUSE DRAG HOOK
+═══════════════════════════════════════════════════════════════════════════ */
+function useDrag(onDrag,deps=[]){
+  const dragging=useRef(false);
+  const start=useCallback(e=>{
+    e.preventDefault();
+    dragging.current=true;
+    document.body.style.userSelect='none';
+    document.body.style.webkitUserSelect='none';
+    const move=ev=>{
+      if(!dragging.current)return;
+      const x=ev.touches?.[0]?.clientX??ev.clientX;
+      const y=ev.touches?.[0]?.clientY??ev.clientY;
+      if(x!==undefined)onDrag(x,y);
+    };
+    const up=()=>{
+      dragging.current=false;
+      document.body.style.userSelect='';
+      document.body.style.webkitUserSelect='';
+      document.removeEventListener('mousemove',move);
+      document.removeEventListener('mouseup',up);
+      document.removeEventListener('touchmove',move);
+      document.removeEventListener('touchend',up);
+    };
+    document.addEventListener('mousemove',move,{passive:false});
+    document.addEventListener('mouseup',up);
+    document.addEventListener('touchmove',move,{passive:false});
+    document.addEventListener('touchend',up);
+  },[onDrag,...deps]);
+  return start;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ALWAYS-OPEN TUTOR CHAT (persistent, never hidden)
+═══════════════════════════════════════════════════════════════════════════ */
+function TutorChat({context,settings,contextLabel=''}){
+  const[msgs,setMsgs]=useState([]);
+  const[input,setInput]=useState('');
+  const[loading,setLoading]=useState(false);
+  const endRef=useRef(null);
+  const prevCtx=useRef(null);
+
+  useEffect(()=>{
+    const key=JSON.stringify(context);
+    if(prevCtx.current!==key){
+      prevCtx.current=key;
+      if(context)setMsgs([{role:'assistant',content:`Ready! Ask me anything about ${contextLabel||'this content'}.`}]);
+    }
+  },[context,contextLabel]);
+
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,loading]);
+
+  const send=async()=>{
+    if(!input.trim()||loading)return;
+    const msg=input;setInput('');
+    const newMsgs=[...msgs,{role:'user',content:msg}];
+    setMsgs(newMsgs);setLoading(true);
+    try{
+      const hist=newMsgs.slice(-6).map(m=>`${m.role==='user'?'STUDENT':'TUTOR'}: ${m.content}`).join('\n');
+      const res=await callAI(
+        `You are an expert medical tutor. The student is studying this content:\n${JSON.stringify(context,null,2)}\n\nConversation:\n${hist}\n\nStudent asked: ${msg}\n\nAnswer concisely but completely. Use clinical reasoning.`,
+        false,false,settings,3000);
+      setMsgs(p=>[...p,{role:'assistant',content:res}]);
+    }catch(e){setMsgs(p=>[...p,{role:'assistant',content:`⚠️ ${e.message}`}]);}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div className="flex flex-col h-full bg-[var(--bg)]">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--card)] shrink-0">
+        <img src={MARIAM_IMG} className="w-7 h-7 rounded-lg object-cover" alt="AI"/>
+        <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
+        {loading&&<Loader2 size={12} className="animate-spin text-[var(--accent)] ml-auto"/>}
       </div>
-      <p className="text-xs font-bold opacity-80 leading-snug">{task.msg}</p>
-      {!task.isFinished && (
-        <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2.5 overflow-hidden">
-          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-500"
-               style={{ width: `${task.total ? (task.done / task.total) * 100 : 15}%` }}/>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 min-h-0">
+        {msgs.length===0&&(
+          <div className="flex flex-col items-center justify-center h-full opacity-40 text-center">
+            <Brain size={32} className="mb-2"/>
+            <p className="text-[10px] font-bold">Tutor ready</p>
+          </div>
+        )}
+        {msgs.map((m,i)=>(
+          <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden'}`}>
+              {m.role==='user'?<UserCircle2 size={13} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
+            </div>
+            <div className={`px-3 py-2 text-[11px] leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
+              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'bg-[var(--card)] border border-[var(--border)] rounded-tl-sm'}`}>
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {loading&&<div className="flex gap-2"><div className="w-6 h-6 rounded-lg overflow-hidden shrink-0"><img src={MARIAM_IMG} className="w-full h-full object-cover opacity-50" alt="AI"/></div><div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl rounded-tl-sm px-4 py-2 flex gap-1">{[0,1,2].map(i=><span key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}</div></div>}
+        <div ref={endRef}/>
+      </div>
+      <div className="shrink-0 p-2 border-t border-[var(--border)] bg-[var(--card)]">
+        <div className="flex gap-2 items-end">
+          <textarea value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+            placeholder="Ask tutor…" disabled={loading} rows={1}
+            className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-[11px] outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
+          <button onClick={send} disabled={loading||!input.trim()}
+            className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0">
+            <Send size={14}/>
+          </button>
         </div>
-      )}
-      {task.isFinished && (
-        <button onClick={onView} className="w-full py-3 mt-1 bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 rounded-xl text-[10px] font-black uppercase tracking-widest border border-[var(--accent)]/20">
-          View Results
-        </button>
-      )}
+      </div>
     </div>
   );
 }
 
-// ─── LAB TABLE ────────────────────────────────────────────────────────────────
-function LabResultRow({ test, result, range, units, flag }) {
-  const isL = flag==='L', isH = flag==='H';
-  return (
-    <tr className="border-b border-gray-100 dark:border-zinc-800/60 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30">
-      <td className="py-3 px-4 text-xs font-bold text-gray-700 dark:text-zinc-300">{test}</td>
-      <td className="py-3 px-4 text-xs text-center">
-        <span className={`font-black inline-flex items-center gap-1 ${isL?'text-blue-600':isH?'text-red-600':'text-gray-900 dark:text-white'}`}>
-          {result}
-          {flag && <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${isL?'bg-blue-100 text-blue-700':'bg-red-100 text-red-700'}`}>{flag}</span>}
-        </span>
-      </td>
-      <td className="py-3 px-4 text-xs text-center text-gray-500 font-mono">{range}</td>
-      <td className="py-3 px-4 text-[10px] text-center text-gray-400 font-mono uppercase">{units}</td>
-    </tr>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SPLIT PANE (vertical divider, touch+mouse drag)
+═══════════════════════════════════════════════════════════════════════════ */
+function SplitPane({left,right,defaultSplit=60,minLeft=30,maxLeft=85,direction='vertical'}){
+  const[split,setSplit]=useState(defaultSplit);
+  const containerRef=useRef(null);
+
+  const handleDrag=useCallback((x,y)=>{
+    const el=containerRef.current;
+    if(!el)return;
+    const rect=el.getBoundingClientRect();
+    if(direction==='vertical'){
+      const pct=Math.max(minLeft,Math.min(maxLeft,((x-rect.left)/rect.width)*100));
+      setSplit(pct);
+    }else{
+      const pct=Math.max(minLeft,Math.min(maxLeft,((y-rect.top)/rect.height)*100));
+      setSplit(pct);
+    }
+  },[direction,minLeft,maxLeft]);
+
+  const startDrag=useDrag(handleDrag,[handleDrag]);
+
+  if(direction==='vertical')return(
+    <div ref={containerRef} className="flex flex-row w-full h-full overflow-hidden">
+      <div style={{width:`${split}%`}} className="flex flex-col h-full overflow-hidden min-w-0">{left}</div>
+      <div onMouseDown={startDrag} onTouchStart={startDrag}
+        className="w-2 shrink-0 cursor-col-resize flex items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/30 transition-colors group touch-none select-none z-10">
+        <GripVertical size={12} className="text-[var(--text)] opacity-40 group-hover:opacity-100"/>
+      </div>
+      <div style={{width:`${100-split}%`}} className="flex flex-col h-full overflow-hidden min-w-0">{right}</div>
+    </div>
+  );
+  return(
+    <div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden">
+      <div style={{height:`${split}%`}} className="w-full overflow-hidden min-h-0">{left}</div>
+      <div onMouseDown={startDrag} onTouchStart={startDrag}
+        className="h-2 shrink-0 cursor-row-resize flex items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/30 transition-colors group touch-none select-none">
+        <div className="w-16 h-1 bg-[var(--text)] opacity-20 rounded-full group-hover:opacity-60"/>
+      </div>
+      <div style={{height:`${100-split}%`}} className="w-full overflow-hidden min-h-0">{right}</div>
+    </div>
   );
 }
-function LabTable({ rows }) {
-  if (!rows?.length) return null;
-  return (
-    <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800 bg-white dark:bg-[#121214] shadow-sm mb-5">
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAB TABLE
+═══════════════════════════════════════════════════════════════════════════ */
+function LabTable({rows}){
+  if(!rows?.length)return null;
+  return(
+    <div className="rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--card)] mb-4 text-[11px]">
       <table className="w-full border-collapse">
-        <thead><tr className="bg-gray-50 dark:bg-zinc-900/80 border-b border-gray-200 dark:border-zinc-800">
+        <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[var(--border)]">
           {['Test','Result','Range','Units'].map(h=>(
-            <th key={h} className="py-2 px-4 text-[9px] font-black uppercase tracking-widest text-gray-400">{h}</th>
+            <th key={h} className="py-1.5 px-3 text-[9px] font-black uppercase tracking-wider text-left opacity-50">{h}</th>
           ))}
         </tr></thead>
-        <tbody>{rows.map((r,i)=><LabResultRow key={i} {...r}/>)}</tbody>
+        <tbody>
+          {rows.map((r,i)=>(
+            <tr key={i} className="border-b border-[var(--border)]/50 last:border-0">
+              <td className="py-2 px-3 font-semibold">{r.test}</td>
+              <td className="py-2 px-3 text-center">
+                <span className={`font-black inline-flex items-center gap-1 ${r.flag==='L'?'text-blue-500':r.flag==='H'?'text-red-500':''}`}>
+                  {r.result}
+                  {r.flag&&<span className={`text-[8px] font-black px-1 py-0.5 rounded ${r.flag==='L'?'bg-blue-100 dark:bg-blue-900/40 text-blue-600':'bg-red-100 dark:bg-red-900/40 text-red-600'}`}>{r.flag}</span>}
+                </span>
+              </td>
+              <td className="py-2 px-3 text-center opacity-50 font-mono">{r.range}</td>
+              <td className="py-2 px-3 text-center opacity-40 font-mono text-[9px] uppercase">{r.units}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
 }
 
-// ─── MINI TUTOR CHAT ──────────────────────────────────────────────────────────
-function MiniTutorChat({ contextObj, settings, onClose }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const endRef = useRef(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
-
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-    const newMsgs = [...messages, { role: 'user', content: input }];
-    setMessages(newMsgs); setInput(''); setLoading(true);
-    try {
-      const res = await callAI(
-        `You are an elite medical tutor. CONTEXT:\n${JSON.stringify(contextObj,null,2)}\n\nSTUDENT: ${input}\n\nAnswer brilliantly and concisely.`,
-        false, false, settings, 2000
-      );
-      setMessages([...newMsgs, { role: 'assistant', content: res }]);
-    } catch (e) {
-      setMessages([...newMsgs, { role: 'assistant', content: `⚠️ ${e.message}` }]);
-    } finally { setLoading(false); }
-  };
-
-  return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#0f111a]">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800 shrink-0">
-        <span className="text-xs font-black uppercase tracking-widest text-[var(--accent-color)] flex items-center gap-2">
-          <img src={MARIAM_IMG} className="w-8 h-8 rounded-lg object-cover" alt="Tutor"/> AI Tutor
-        </span>
-        <button onClick={onClose} className="hover:text-red-500 p-2 glass rounded-lg"><X size={16}/></button>
-      </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
-        {messages.length === 0 && (
-          <div className="text-center opacity-50 mt-8">
-            <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 grayscale" alt="Tutor"/>
-            <p className="text-xs font-bold">Ask me anything about this question.</p>
-          </div>
-        )}
-        {messages.map((m,i) => (
-          <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
-            <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent-color)] text-white':'bg-gray-100 dark:bg-zinc-800'}`}>
-              {m.role==='user'?<UserCircle2 size={14}/>:<img src={MARIAM_IMG} className="w-full h-full rounded-xl object-cover" alt="AI"/>}
-            </div>
-            <div className={`p-3 text-xs leading-relaxed max-w-[86%] ${m.role==='user'?'bg-[var(--accent-color)] text-white rounded-2xl rounded-tr-sm':'bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl rounded-tl-sm whitespace-pre-wrap'}`}>{m.content}</div>
-          </div>
-        ))}
-        {loading && <Loader2 size={16} className="animate-spin text-[var(--accent-color)] mx-auto"/>}
-        <div ref={endRef}/>
-      </div>
-      <div className="p-3 shrink-0 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
-        <div className="relative">
-          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSend()}
-            placeholder="Ask your tutor…" disabled={loading}
-            className="w-full bg-white dark:bg-black border border-gray-300 dark:border-zinc-700 rounded-xl py-3 pl-4 pr-11 text-xs outline-none focus:border-[var(--accent-color)]"/>
-          <button onClick={handleSend} disabled={loading||!input.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--accent-color)] text-white p-2 rounded-lg disabled:opacity-40">
-            <Send size={13}/>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-const DEFAULT_SETTINGS = {
-  provider: 'anthropic', apiKey: '', baseUrl: '', model: '',
-  strictMode: true, theme: 'pure-white', fontSize: 'medium', accentColor: 'indigo'
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROVIDER PRESETS
+═══════════════════════════════════════════════════════════════════════════ */
+const PROVIDERS={
+  anthropic:{label:'Claude (Anthropic)',note:'Works built-in — no API key needed in Claude artifacts.',needsKey:false,defaultModel:'claude-sonnet-4-20250514',baseUrl:''},
+  openai:   {label:'OpenAI (GPT)',       note:'Requires an OpenAI API key.',                          needsKey:true, defaultModel:'gpt-4o-mini',              baseUrl:'https://api.openai.com'},
+  gemini:   {label:'Google Gemini',      note:'Requires a Google AI Studio API key.',                 needsKey:true, defaultModel:'gemini-2.0-flash',          baseUrl:''},
+  deepseek: {label:'DeepSeek',           note:'Requires a DeepSeek API key.',                        needsKey:true, defaultModel:'deepseek-chat',             baseUrl:'https://api.deepseek.com'},
+  glm:      {label:'GLM / Zhipu AI',     note:'Requires a Zhipu API key.',                           needsKey:true, defaultModel:'glm-4-flash',               baseUrl:'https://open.bigmodel.cn/api/paas'},
+  groq:     {label:'Groq (Ultra-fast)',  note:'Requires a Groq API key. Extremely fast.',             needsKey:true, defaultModel:'llama-3.3-70b-versatile',   baseUrl:'https://api.groq.com/openai'},
+  ollama:   {label:'Ollama (Local)',     note:'Local inference — no API key needed.',                 needsKey:false,defaultModel:'llama3',                    baseUrl:'http://localhost:11434/v1'},
+  custom:   {label:'Custom API',         note:'Any OpenAI-compatible endpoint.',                      needsKey:true, defaultModel:'',                          baseUrl:''},
 };
+const DEFAULT_SETTINGS={provider:'anthropic',apiKey:'',baseUrl:'',model:'',strictMode:true,theme:'pure-white',fontSize:'medium',accentColor:'indigo'};
 
-export default function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [documents, setDocuments]   = useState([]);
-  const [openDocs,  setOpenDocs]    = useState([]);
-  const [activeDocId, setActiveDocId] = useState(null);
-  const [docPages,  setDocPages]    = useState({});
-  const [flashcards, setFlashcards] = useState([]);
-  const [exams,  setExams]  = useState([]);
-  const [cases,  setCases]  = useState([]);
-  const [notes,  setNotes]  = useState([]);
-  const [chatSessions, setChatSessions] = useState([]);
-  const [userSettings, setUserSettings] = useState(DEFAULT_SETTINGS);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [currentView, setCurrentView] = useState('library');
-  const [rightPanelTab, setRightPanelTab] = useState('generate');
-  const [rightPanelOpen, setRightPanelOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [aiWidth, setAiWidth] = useState(440);
-  const [isResizing, setIsResizing] = useState(false);
-  const [bgTask, setBgTask] = useState(null);
-  const { toasts, addToast } = useToast();
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP
+═══════════════════════════════════════════════════════════════════════════ */
+export default function App(){
+  const[loaded,setLoaded]=useState(false);
+  const[docs,setDocs]=useState([]);
+  const[openDocs,setOpenDocs]=useState([]);
+  const[activeId,setActiveId]=useState(null);
+  const[docPages,setDocPages]=useState({});
+  const[flashcards,setFlashcards]=useState([]);
+  const[exams,setExams]=useState([]);
+  const[cases,setCases]=useState([]);
+  const[notes,setNotes]=useState([]);
+  const[chatSessions,setChatSessions]=useState([]);
+  const[settings,setSettings]=useState(DEFAULT_SETTINGS);
+  const[uploading,setUploading]=useState(false);
+  const[uploadPct,setUploadPct]=useState(0);
+  const[view,setView]=useState('library');
+  const[rpTab,setRpTab]=useState('generate');
+  const[rpOpen,setRpOpen]=useState(false);
+  const[rpW,setRpW]=useState(420);
+  const[bgTask,setBgTask]=useState(null);
+  const{toasts,addToast}=useToast();
 
-  // viewport
-  useEffect(() => {
-    let m = document.querySelector('meta[name="viewport"]');
-    if (!m) { m = document.createElement('meta'); m.name = 'viewport'; document.head.appendChild(m); }
-    m.content = 'width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover';
-  }, []);
+  // viewport meta
+  useEffect(()=>{
+    let m=document.querySelector('meta[name="viewport"]');
+    if(!m){m=document.createElement('meta');m.name='viewport';document.head.appendChild(m);}
+    m.content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
+  },[]);
 
-  // load
-  useEffect(() => {
-    (async () => {
-      try {
-        const [d,fc,ex,ca,no,ch,st,od,dp] = await Promise.all([
-          getState('docs'),getState('flashcards'),getState('exams'),getState('cases'),
-          getState('notes'),getState('chats'),getState('settings'),getState('openDocs'),getState('docPages')
-        ]);
-        if(d)  setDocuments(d);
-        if(fc) setFlashcards(fc);
-        if(ex) setExams(ex);
-        if(ca) setCases(ca);
-        if(no) setNotes(no);
-        if(ch) setChatSessions(ch);
-        if(st) setUserSettings(p=>({...DEFAULT_SETTINGS,...p,...st}));
-        if(od) setOpenDocs(od);
-        if(dp) setDocPages(dp);
-      } catch(e){console.warn(e);} finally { setIsLoaded(true); }
-    })();
-  }, []);
+  // load persisted state
+  useEffect(()=>{(async()=>{
+    try{
+      const[d,fc,ex,ca,no,ch,st,od,dp]=await Promise.all([
+        getState('docs'),getState('flashcards'),getState('exams'),getState('cases'),
+        getState('notes'),getState('chats'),getState('settings'),getState('openDocs'),getState('docPages')]);
+      if(d)setDocs(d);if(fc)setFlashcards(fc);if(ex)setExams(ex);if(ca)setCases(ca);
+      if(no)setNotes(no);if(ch)setChatSessions(ch);if(od)setOpenDocs(od);if(dp)setDocPages(dp);
+      if(st)setSettings(p=>({...DEFAULT_SETTINGS,...p,...st}));
+    }catch(e){console.warn(e);}finally{setLoaded(true);}
+  })();},[]);
 
   // persist
-  useEffect(() => {
-    if (!isLoaded) return;
-    const t = setTimeout(async () => {
-      try {
-        const slim = documents.map(d=>{const c={...d};delete c.pagesText;return c;});
-        await Promise.all([
-          saveState('docs',slim),saveState('flashcards',flashcards),saveState('exams',exams),
+  useEffect(()=>{
+    if(!loaded)return;
+    const t=setTimeout(async()=>{
+      try{
+        const slim=docs.map(d=>{const c={...d};delete c.pagesText;return c;});
+        await Promise.all([saveState('docs',slim),saveState('flashcards',flashcards),saveState('exams',exams),
           saveState('cases',cases),saveState('notes',notes),saveState('chats',chatSessions),
-          saveState('settings',userSettings),saveState('openDocs',openDocs),saveState('docPages',docPages)
-        ]);
-      } catch(e){console.warn(e);}
-    }, 1000);
-    return () => clearTimeout(t);
-  }, [documents,flashcards,exams,cases,notes,chatSessions,userSettings,openDocs,docPages,isLoaded]);
+          saveState('settings',settings),saveState('openDocs',openDocs),saveState('docPages',docPages)]);
+      }catch(e){console.warn(e);}
+    },800);
+    return()=>clearTimeout(t);
+  },[docs,flashcards,exams,cases,notes,chatSessions,settings,openDocs,docPages,loaded]);
 
-  // theme / font / accent
-  const fontSizeMap = {small:'14px',medium:'16px',large:'18px',xl:'20px',xxl:'22px'};
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove('light','dark','pure-white','oled');
-    let th = userSettings.theme;
-    if (th==='system') th = window.matchMedia?.('(prefers-color-scheme:dark)').matches ? 'dark' : 'pure-white';
+  // theme
+  useEffect(()=>{
+    const root=document.documentElement;
+    root.classList.remove('pure-white','light','dark','oled');
+    let th=settings.theme;
+    if(th==='system')th=window.matchMedia?.('(prefers-color-scheme:dark)').matches?'dark':'pure-white';
     root.classList.add(th);
     root.style.setProperty('color-scheme',(th==='dark'||th==='oled')?'dark':'light');
-    root.style.fontSize = fontSizeMap[userSettings.fontSize]||'16px';
-    const clrs = {
+    root.style.fontSize={small:'14px',medium:'16px',large:'18px',xl:'20px'}[settings.fontSize]||'16px';
+    const clrs={
       indigo:{hex:'#6366f1',rgb:'99,102,241',soft:'#4f46e5'},
       purple:{hex:'#a855f7',rgb:'168,85,247',soft:'#9333ea'},
       blue:  {hex:'#3b82f6',rgb:'59,130,246',soft:'#2563eb'},
       emerald:{hex:'#10b981',rgb:'16,185,129',soft:'#059669'},
-      rose:  {hex:'#f43f5e',rgb:'244,63,94',soft:'#e11d48'}
+      rose:  {hex:'#f43f5e',rgb:'244,63,94',soft:'#e11d48'},
     };
-    const c = clrs[userSettings.accentColor]||clrs.indigo;
+    const c=clrs[settings.accentColor]||clrs.indigo;
     root.style.setProperty('--accent',c.hex);
     root.style.setProperty('--accent-rgb',c.rgb);
     root.style.setProperty('--accent-soft',c.soft);
-    root.style.setProperty('--accent-color',c.hex);
-  }, [userSettings.theme,userSettings.fontSize,userSettings.accentColor]);
+  },[settings.theme,settings.fontSize,settings.accentColor]);
 
-  // panel resize
-  useEffect(() => {
-    const move = e => {
-      if (!isResizing) return;
-      const x = e.touches?.[0]?.clientX ?? e.clientX;
-      if (x) setAiWidth(Math.max(300,Math.min(window.innerWidth-x,window.innerWidth-260)));
-    };
-    const up = () => { if(isResizing) setIsResizing(false); };
-    if (isResizing) {
-      document.addEventListener('mousemove',move); document.addEventListener('mouseup',up);
-      document.addEventListener('touchmove',move,{passive:false}); document.addEventListener('touchend',up);
-      document.body.style.userSelect='none';
-    } else { document.body.style.userSelect=''; }
-    return () => {
-      document.removeEventListener('mousemove',move); document.removeEventListener('mouseup',up);
-      document.removeEventListener('touchmove',move); document.removeEventListener('touchend',up);
-      document.body.style.userSelect='';
-    };
-  },[isResizing]);
+  // right-panel resize
+  const handleRpDrag=useCallback((x)=>{
+    const w=Math.max(320,Math.min(window.innerWidth-300,window.innerWidth-x));
+    setRpW(w);
+  },[]);
+  const startRpDrag=useDrag(handleRpDrag,[handleRpDrag]);
 
-  // ── UPLOAD ─────────────────────────────────────────────────────────────────
-  const handleFileUpload = async (event) => {
-    const files = Array.from(event.target.files || []);
-    if (!files.length) return;
-    if (event.target) event.target.value = '';   // reset immediately so re-upload works
-    setIsUploading(true); setUploadProgress(5);
-    try {
-      const pdfjs = await loadPdfJs();
-      const newDocs=[], newOpenIds=[], newPageMap={};
-      let lastId = null;
-      for (let fi=0; fi<files.length; fi++) {
-        const file = files[fi];
-        if (file.type !== 'application/pdf') { addToast(`"${file.name}" is not a PDF — skipped.`,'info'); continue; }
+  // upload
+  const handleUpload=async(e)=>{
+    const files=Array.from(e.target.files||[]);
+    if(!files.length)return;
+    if(e.target)e.target.value='';
+    setUploading(true);setUploadPct(2);
+    try{
+      const pdfjs=await loadPdfJs();
+      const newDocs=[],newIds=[],newPg={};
+      let lastId=null;
+      for(let fi=0;fi<files.length;fi++){
+        const file=files[fi];
+        if(file.type!=='application/pdf'){addToast(`"${file.name}" is not a PDF — skipped`,'info');continue;}
         let ab;
-        try { ab = await file.arrayBuffer(); } catch(e){ addToast(`Cannot read "${file.name}".`,'error'); continue; }
+        try{ab=await file.arrayBuffer();}catch{addToast(`Cannot read "${file.name}"`,'error');continue;}
         let pdf;
-        try { pdf = await pdfjs.getDocument({data:ab.slice(0)}).promise; }
-        catch(e){ addToast(`Cannot parse "${file.name}" as PDF.`,'error'); continue; }
-        const tot = pdf.numPages, pagesText = {};
-        for (let i=1; i<=tot; i++) {
-          try { const pg=await pdf.getPage(i); const tc=await pg.getTextContent(); pagesText[i]=tc.items.map(s=>s.str).join(' '); pg.cleanup(); }
-          catch(e){ pagesText[i]=''; }
-          if(i%10===0) await new Promise(r=>setTimeout(r,5));
-          setUploadProgress(Math.round((fi/files.length*100)+((i/tot)*(100/files.length))));
+        try{pdf=await pdfjs.getDocument({data:ab.slice(0)}).promise;}catch{addToast(`Cannot parse "${file.name}"`,'error');continue;}
+        const tot=pdf.numPages,pagesText={};
+        for(let i=1;i<=tot;i++){
+          try{const pg=await pdf.getPage(i);const tc=await pg.getTextContent();pagesText[i]=tc.items.map(s=>s.str).join(' ');pg.cleanup();}
+          catch{pagesText[i]='';}
+          if(i%8===0)await new Promise(r=>setTimeout(r,0));
+          setUploadPct(Math.round((fi/files.length*100)+((i/tot)*(90/files.length))));
         }
-        try { await pdf.destroy(); } catch(e){}
-        const id = `${Date.now()}-${Math.random().toString(36).substr(2,6)}`;
+        try{await pdf.destroy();}catch{}
+        const id=`${Date.now()}-${Math.random().toString(36).substr(2,6)}`;
         await savePdf(id,{buffer:ab,pagesText});
         newDocs.push({id,name:file.name,totalPages:tot,progress:1,addedAt:new Date().toISOString()});
-        newOpenIds.push(id); newPageMap[id]=1; lastId=id;
+        newIds.push(id);newPg[id]=1;lastId=id;
         addToast(`"${file.name}" imported!`,'success');
       }
-      if (newDocs.length) {
-        setDocuments(p=>[...p,...newDocs]);
-        setOpenDocs(p=>[...new Set([...p,...newOpenIds])]);
-        setDocPages(p=>({...p,...newPageMap}));
-        if (lastId) setTimeout(()=>{ setActiveDocId(lastId); setCurrentView('reader'); setRightPanelOpen(true); },60);
+      if(newDocs.length){
+        setDocs(p=>[...p,...newDocs]);
+        setOpenDocs(p=>[...new Set([...p,...newIds])]);
+        setDocPages(p=>({...p,...newPg}));
+        if(lastId)setTimeout(()=>{setActiveId(lastId);setView('reader');setRpOpen(true);},60);
       }
-    } catch(e){ addToast(`Upload failed: ${e.message}`,'error'); }
-    finally { setIsUploading(false); setUploadProgress(0); }
+    }catch(e){addToast(`Upload failed: ${e.message}`,'error');}
+    finally{setUploading(false);setUploadPct(0);}
   };
 
-  const closeDoc = useCallback((id)=>{
+  const closeDoc=useCallback(id=>{
     setOpenDocs(p=>p.filter(d=>d!==id));
-    setActiveDocId(prev=>{
-      if (prev!==id) return prev;
-      const next = openDocs.filter(d=>d!==id)[0]||null;
-      if (!next) setCurrentView('library');
+    setActiveId(prev=>{
+      if(prev!==id)return prev;
+      const next=openDocs.filter(d=>d!==id)[0]||null;
+      if(!next)setView('library');
       return next;
     });
   },[openDocs]);
 
-  const deleteDocument = async (id,e) => {
-    if(e) e.stopPropagation();
-    try { await delPdf(id); } catch(e){}
-    setDocuments(p=>p.filter(d=>d.id!==id));
+  const deleteDoc=async(id,ev)=>{
+    if(ev)ev.stopPropagation();
+    try{await delPdf(id);}catch{}
+    setDocs(p=>p.filter(d=>d.id!==id));
     setFlashcards(p=>p.filter(f=>f.docId!==id));
-    setExams(p=>p.filter(ex=>ex.docId!==id));
+    setExams(p=>p.filter(e=>e.docId!==id));
     setCases(p=>p.filter(c=>c.docId!==id));
     setNotes(p=>p.filter(n=>n.docId!==id));
-    closeDoc(id); addToast('Document deleted','info');
+    closeDoc(id);addToast('Document deleted','info');
   };
 
-  const activeDoc = useMemo(()=>documents.find(d=>d.id===activeDocId)||null,[documents,activeDocId]);
-  const filteredDocs = searchQuery ? documents.filter(d=>d.name.toLowerCase().includes(searchQuery.toLowerCase())) : documents;
+  const activeDoc=useMemo(()=>docs.find(d=>d.id===activeId)||null,[docs,activeId]);
+  const setPage=useCallback(updater=>setDocPages(p=>({...p,[activeId]:typeof updater==='function'?updater(p[activeId]||1):updater})),[activeId]);
 
-  // ── BACKGROUND GENERATION ──────────────────────────────────────────────────
-  const startBgGen = async (taskType, docId, startPage, endPage, params) => {
-    if (bgTask) { addToast('A generation is already running.','info'); return; }
-    setBgTask({title:`AI ${taskType.toUpperCase()}`,msg:'Initializing…',done:0,total:1,isFinished:false,result:null});
-    try {
-      const pdfData = await getPdf(docId);
-      const pagesText = pdfData?.pagesText||{};
+  // background generation
+  const startGen=async(taskType,docId,startPage,endPage,params)=>{
+    if(bgTask){addToast('A generation is already running','info');return;}
+    setBgTask({title:`AI ${taskType.toUpperCase()}`,msg:'Initializing…',done:0,total:1,isFinished:false});
+    try{
+      const pdfData=await getPdf(docId);
+      const pagesText=pdfData?.pagesText||{};
       let textContext='';
-      for (let i=Number(startPage);i<=Number(endPage);i++) {
-        if(pagesText[i]) textContext+=`\n--- [SOURCE: PAGE ${i}] ---\n${pagesText[i]}\n`;
+      for(let i=Number(startPage);i<=Number(endPage);i++){
+        if(pagesText[i])textContext+=`\n[PAGE ${i}]\n${pagesText[i]}\n`;
       }
-      if (!textContext.trim()||textContext.length<50) throw new Error('Insufficient text in selected page range.');
-      const sysInstr=`STRICT:\n1. Use ONLY provided text.\n2. Every item must cite the exact page.\n3. Difficulty: ${params.difficultyLevel||'Expert'}.`;
-      const count=params.count||5;
-      const perBatch = taskType==='cases'?1:taskType==='flashcards'?7:4;
-      const numBatches = Math.ceil(count/perBatch);
-      setBgTask(p=>({...p,total:numBatches,msg:`Preparing ${numBatches} AI request(s)…`}));
+      if(!textContext.trim()||textContext.length<30)throw new Error('No text found in selected range.');
+      const count=params.count||10;
+      const diff=params.difficultyLevel||'Expert';
+      // Ultra-fast batch sizes: 30 flashcards/call, 15 exam Q/call, 5 cases/call
+      const batchSize=taskType==='cases'?5:taskType==='flashcards'?30:15;
+      const numBatches=Math.ceil(count/batchSize);
+      setBgTask(p=>({...p,total:numBatches,msg:`Launching ${numBatches} parallel AI requests…`}));
 
-      const tasks = Array.from({length:numBatches},(_,i)=>{
-        const bc=(i===numBatches-1&&count%perBatch!==0)?count%perBatch:perBatch;
-        let sp='';
-        if (taskType==='cases') {
-          sp=`Generate ${bc} complex USMLE-style clinical case(s) from the text.\nRequirements:\n- Long patient vignette (HPI, Exam, ROS)\n- Minimum 12 lab rows across panels (CBC, BMP, LFTs, etc.)\n- flag "H" or "L" for any abnormal result\nFormat as JSON:\n{"cases":[{"title":"…","vignette":"…","diagnosis":"…","labPanels":[{"panelName":"…","rows":[{"test":"…","result":"…","flag":"H","range":"…","units":"…"}]}],"examQuestion":{"q":"…","options":["A","B","C","D"],"correct":0,"explanation":"…","evidence":"…","sourcePage":${startPage}}}]}`;
-        } else if (taskType==='flashcards') {
-          sp=`Generate ${bc} expert medical flashcards.\nJSON: {"items":[{"q":"…","a":"…","evidence":"…","sourcePage":0}]}`;
-        } else if (taskType==='exam') {
-          sp=`Generate ${bc} high-yield exam questions.\nJSON: {"items":[{"q":"…","options":["A","B","C","D"],"correct":0,"explanation":"…","evidence":"…","sourcePage":0}]}`;
-        } else {
-          sp=`Task: ${taskType}. Respond in Markdown.`;
-        }
-        return ()=>callAI(`${sysInstr}\n\nTEXT:\n${textContext}\n\n${sp}`,
-          ['cases','flashcards','exam'].includes(taskType), userSettings.strictMode, userSettings, 6000);
+      const sysInstr=`STRICT: Only use the provided document text. Cite every item with the exact page. Difficulty: ${diff}.`;
+      const makePrompt=(bc)=>{
+        if(taskType==='cases')return`${sysInstr}\nGenerate ${bc} USMLE clinical cases from the text.\nJSON: {"cases":[{"title":"…","vignette":"…","diagnosis":"…","labPanels":[{"panelName":"…","rows":[{"test":"…","result":"…","flag":"H|L|","range":"…","units":"…"}]}],"examQuestion":{"q":"…","options":["A","B","C","D"],"correct":0,"explanation":"…","evidence":"…","sourcePage":1}}]}`;
+        if(taskType==='flashcards')return`${sysInstr}\nGenerate ${bc} expert medical flashcards from the text.\nJSON: {"items":[{"q":"…","a":"…","evidence":"…","sourcePage":1}]}`;
+        if(taskType==='exam')return`${sysInstr}\nGenerate ${bc} high-yield exam questions from the text.\nJSON: {"items":[{"q":"…","options":["A","B","C","D"],"correct":0,"explanation":"…","evidence":"…","sourcePage":1}]}`;
+        return`${sysInstr}\nTask: ${taskType}. Text:\n${textContext}\n\nRespond in Markdown.`;
+      };
+      const isJson=['cases','flashcards','exam'].includes(taskType);
+      const tasks=Array.from({length:numBatches},(_,i)=>{
+        const bc=i===numBatches-1&&count%batchSize!==0?count%batchSize:batchSize;
+        return()=>callAI(`${makePrompt(bc)}\n\nDOCUMENT TEXT:\n${textContext}`,isJson,settings.strictMode,settings,8000);
       });
 
       let all=[];
-      const exResults = await runParallel(tasks,2,(done,total)=>{
-        setBgTask(p=>({...p,done,msg:`Batch ${done}/${total} complete…`}));
+      const exRes=await runParallel(tasks,10,(done,total)=>{
+        setBgTask(p=>({...p,done,msg:`${done}/${total} batches complete…`}));
       });
-      if (['cases','flashcards','exam'].includes(taskType)) {
-        for(const r of exResults) {
-          if(r.status==='fulfilled') {
-            try { const p=parseJsonSafe(r.value); all=[...all,...(p.cases||p.items||p.questions||[])]; }
-            catch(e){ console.warn('Parse fail:',e.message); }
+      if(isJson){
+        for(const r of exRes){
+          if(r.status==='fulfilled'){
+            try{const p=parseJson(r.value);all=[...all,...(p.cases||p.items||p.questions||[])];}
+            catch(e){console.warn('Parse:',e.message);}
           }
         }
-        if (!all.length) throw new Error('AI returned no data. Try fewer pages or lower count.');
-        setBgTask(p=>({...p,isFinished:true,result:{type:taskType,title:'Generated Content',data:all.slice(0,count),pages:`${startPage}-${endPage}`},msg:`Done! ${all.length} item(s) generated.`}));
-      } else {
-        const raw=exResults[0]?.value||'No content generated.';
-        const titles={clinical:'Clinical Summary',differential:'Differential Dx',treatment:'Treatment Plan',labs:'Lab Interpretation',eli5:'ELI5 Simplification',summary:'Summary',mnemonics:'Mnemonics'};
-        setBgTask(p=>({...p,isFinished:true,result:{type:taskType,data:raw,pages:`${startPage}-${endPage}`,customTitle:titles[taskType]||taskType},msg:'Complete!'}));
+        if(!all.length)throw new Error('AI returned no parseable data.');
+        setBgTask(p=>({...p,isFinished:true,result:{type:taskType,data:all.slice(0,count),pages:`${startPage}-${endPage}`},msg:`Done! ${Math.min(all.length,count)} items.`}));
+      }else{
+        const raw=exRes[0]?.value||'No content generated.';
+        const titles={clinical:'Clinical Summary',differential:'Differential Dx',treatment:'Treatment Plan',labs:'Lab Interpretation',eli5:'Simplified',summary:'Summary',mnemonics:'Mnemonics'};
+        setBgTask(p=>({...p,isFinished:true,result:{type:taskType,data:raw,pages:`${startPage}-${endPage}`,title:titles[taskType]||taskType},msg:'Complete!'}));
       }
       addToast('Generation complete!','success');
-    } catch(e) {
-      console.error(e); setBgTask(null); addToast(e.message,'error');
-    }
+    }catch(e){console.error(e);setBgTask(null);addToast(e.message,'error');}
   };
 
-  const handleViewBgTask = ()=>{ if(!bgTask?.result) return; setCurrentView('reader'); setRightPanelOpen(true); setRightPanelTab('generate'); };
-
-  if (!isLoaded) return (
-    <div className="h-[100dvh] w-screen flex flex-col items-center justify-center bg-[var(--bg)] gap-5">
-      <style>{`:root{--bg:#ffffff;--text:#0f172a;--card:#f8fafc;--border:#e2e8f0;--accent:#6366f1;--accent-soft:#4f46e5;--accent-color:#6366f1;}`}</style>
-      <Loader2 className="animate-spin text-[var(--accent)]" size={56}/>
-      <p className="font-black text-[var(--text)] uppercase tracking-[0.3em] text-xs opacity-40">Loading MARIAM…</p>
+  if(!loaded)return(
+    <div className="h-[100dvh] w-screen flex flex-col items-center justify-center bg-white gap-4">
+      <style>{`:root{--bg:#fff;--text:#0f172a;--card:#f8fafc;--border:#e2e8f0;--accent:#6366f1;--accent-soft:#4f46e5;}`}</style>
+      <Loader2 className="animate-spin text-indigo-500" size={44}/>
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Loading MARIAM PRO…</p>
     </div>
   );
 
-  const setPage = (updater) => setDocPages(p=>({...p,[activeDocId]:typeof updater==='function'?updater(p[activeDocId]||1):updater}));
+  const showReader=view==='reader'&&!!activeId&&!!activeDoc;
 
-  return (
+  return(
     <div className="h-[100dvh] w-screen flex flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)]">
       <style>{`
         .pure-white{--bg:#ffffff;--text:#0f172a;--card:#f8fafc;--border:#e2e8f0;}
-        .light{--bg:#f5f7ff;--text:#1e293b;--card:#ffffff;--border:#e2e8f0;}
-        .dark{--bg:#0f111a;--text:#e2e8f0;--card:#161a27;--border:#27273c;}
-        .oled{--bg:#000000;--text:#f1f5f9;--card:#0a0a0a;--border:#1e1e1e;}
-        body{margin:0;padding:0;background:var(--bg);overflow:hidden;font-family:'Inter',system-ui;}
-        .title-font{font-family:'Space Grotesk',sans-serif;}
-        .glass{background:var(--card);border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,.03);}
-        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-soft));color:white;border:none;}
-        .btn-accent:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(var(--accent-rgb),.3);}
-        .card-hover{transition:.3s ease;}.card-hover:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(0,0,0,.08);border-color:rgba(var(--accent-rgb),.4);}
-        .custom-scrollbar::-webkit-scrollbar{width:5px;height:5px;}.custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(128,128,128,.2);border-radius:10px;}
-        .pdf-text-layer{position:absolute;inset:0;overflow:hidden;opacity:1;line-height:1;}
-        .pdf-text-layer span{position:absolute;color:transparent;transform-origin:0% 0%;white-space:pre;cursor:text;}
-        canvas{width:100%!important;height:auto!important;display:block;}
-        @keyframes slide-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-        .animate-slide-in{animation:slide-in .25s ease-out forwards;}
-        /* bottom-nav sits above everything on mobile */
-        .bottom-nav{background:var(--card);border:1px solid var(--border);box-shadow:0 -5px 30px rgba(0,0,0,.12);border-radius:2rem;}
+        .light{--bg:#f0f4ff;--text:#1e293b;--card:#ffffff;--border:#e2e8f0;}
+        .dark{--bg:#0d0f1a;--text:#e2e8f0;--card:#141827;--border:#252840;}
+        .oled{--bg:#000;--text:#f1f5f9;--card:#0a0a0a;--border:#1a1a1a;}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        body{margin:0;padding:0;overflow:hidden;}
+        .custom-scrollbar::-webkit-scrollbar{width:4px;height:4px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(128,128,128,.2);border-radius:4px;}
+        .glass{background:var(--card);border:1px solid var(--border);}
+        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-soft));color:#fff;border:none;cursor:pointer;}
+        .btn-accent:hover{opacity:.9;}
+        .btn-accent:active{opacity:.8;transform:scale(.98);}
+        .card-hover{transition:.25s ease;cursor:pointer;}
+        .card-hover:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(var(--accent-rgb),.12);}
+        @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+        .animate-slide-in{animation:slide-in .2s ease-out forwards;}
+        .bottom-nav-safe{padding-bottom:max(8px,env(safe-area-inset-bottom));}
+        .scroll-content{padding-bottom:calc(${NAV_H}px + env(safe-area-inset-bottom) + 24px);}
+        @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
+        canvas{display:block;max-width:100%;height:auto!important;}
       `}</style>
-
       <ToastContainer toasts={toasts}/>
-      <ProgressOverlay task={bgTask} onCancel={()=>setBgTask(null)} onView={handleViewBgTask}/>
 
       {/* ── HEADER ── */}
-      <div className="h-16 md:h-20 glass flex items-center justify-between px-4 md:px-8 z-40 shrink-0 rounded-none border-t-0 border-l-0 border-r-0">
-        <div className="flex items-center gap-2 md:gap-3">
-          <img src={MARIAM_IMG} className="w-8 h-8 md:w-10 md:h-10 rounded-xl object-cover border border-[var(--border)]" alt="Logo"/>
-          <span className="title-font text-2xl md:text-3xl font-black tracking-tighter text-[var(--accent)]">MARIAM</span>
-          <span className="text-[10px] font-black bg-[var(--accent)] text-white px-2.5 py-0.5 rounded-full">PRO</span>
+      <header className="h-14 lg:h-16 glass flex items-center justify-between px-4 lg:px-6 shrink-0 z-40 border-t-0 border-x-0">
+        <div className="flex items-center gap-2.5">
+          <img src={MARIAM_IMG} className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl object-cover border border-[var(--border)]" alt=""/>
+          <span className="text-2xl lg:text-3xl font-black tracking-tight text-[var(--accent)]" style={{fontFamily:'system-ui'}}>MARIAM</span>
+          <span className="text-[9px] font-black bg-[var(--accent)] text-white px-2 py-0.5 rounded-full">PRO</span>
         </div>
-        <div className="hidden md:block flex-1 max-w-xl px-8">
-          <div className="relative">
-            <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="Search documents…"
-              className="w-full bg-black/5 dark:bg-white/5 border border-transparent focus:border-[var(--accent)]/50 rounded-full py-2.5 pl-11 pr-5 text-sm outline-none text-[var(--text)]"/>
-            <Search className="absolute left-4 top-2.5 opacity-40" size={18}/>
+        <div className="hidden md:flex flex-1 max-w-sm mx-6">
+          <div className="relative w-full">
+            <input placeholder="Search documents…" className="w-full bg-black/5 dark:bg-white/5 rounded-full py-2 pl-9 pr-4 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
+            <Search className="absolute left-3 top-2.5 opacity-30" size={16}/>
           </div>
         </div>
-        <div className="flex items-center gap-2 md:gap-4">
-          <button onClick={()=>setCurrentView('settings')} className="w-9 h-9 flex items-center justify-center rounded-xl glass hover:bg-black/5 dark:hover:bg-white/10 opacity-70 hover:opacity-100"><Settings size={18}/></button>
-          <div onClick={()=>{ setRightPanelOpen(!rightPanelOpen); if(currentView!=='reader'&&activeDocId) setCurrentView('reader'); }}
-               className="hidden md:flex items-center gap-2 bg-[var(--accent)]/10 px-4 py-2 rounded-full cursor-pointer hover:bg-[var(--accent)]/20 border border-[var(--accent)]/20 text-[var(--accent)]">
-            <Sparkles size={16}/><span className="font-bold text-xs uppercase tracking-widest">AI Studio</span>
-          </div>
+        <div className="flex items-center gap-2">
+          {activeDoc&&(
+            <button onClick={()=>{setRpOpen(o=>!o);if(view!=='reader')setView('reader');}}
+              className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all
+                ${rpOpen?'bg-[var(--accent)] text-white':'glass text-[var(--accent)] border border-[var(--accent)]/30'}`}>
+              <Sparkles size={14}/> AI Studio
+            </button>
+          )}
+          <button onClick={()=>setView('settings')} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100">
+            <Settings size={17}/>
+          </button>
         </div>
-      </div>
+      </header>
 
       {/* ── BODY ── */}
-      <div className="flex flex-1 min-h-0 overflow-hidden relative">
-        {isUploading && (
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-[var(--border)] z-50 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] transition-all duration-300" style={{width:`${uploadProgress}%`}}/>
-          </div>
-        )}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* DESKTOP SIDEBAR */}
+        <nav className="hidden lg:flex w-[78px] flex-col items-center py-6 gap-1 glass shrink-0 border-t-0 border-b-0 border-l-0 z-30">
+          {[
+            {icon:BookOpen,label:'Library',v:'library'},
+            {icon:BookMarked,label:'Reader',v:'reader',dis:!activeId},
+            {icon:Layers,label:'Cards',v:'flashcards'},
+            {icon:CheckSquare,label:'Exams',v:'exams'},
+            {icon:Activity,label:'Cases',v:'cases'},
+            {icon:MessageSquare,label:'Chat',v:'chat'},
+          ].map(({icon:Icon,label,v,dis})=>(
+            <button key={v} onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
+              disabled={dis} title={label}
+              className={`flex flex-col items-center gap-1 w-full py-2.5 rounded-2xl mx-1 transition-all text-[8px] font-black uppercase tracking-widest
+                ${dis?'opacity-20 cursor-not-allowed':''}
+                ${view===v?'text-[var(--accent)]':''}`}>
+              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all
+                ${view===v?'bg-[var(--accent)] text-white shadow-lg':'text-[var(--text)] opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                <Icon size={19} strokeWidth={view===v?2.5:2}/>
+              </div>
+              <span className={view===v?'text-[var(--accent)]':'opacity-50'}>{label}</span>
+            </button>
+          ))}
+        </nav>
 
-        {/* SIDEBAR desktop */}
-        <div className="hidden lg:flex w-[90px] flex-col items-center py-8 glass shrink-0 rounded-none border-t-0 border-b-0 border-l-0 z-30">
-          <div onClick={()=>setCurrentView('library')} className="w-14 h-14 rounded-3xl overflow-hidden border border-[var(--border)] cursor-pointer mb-8 hover:scale-105 transition-transform shadow-md">
-            <img src={MARIAM_IMG} className="w-full h-full object-cover" alt="Mariam"/>
-          </div>
-          <div className="flex flex-col gap-5 w-full px-2">
-            {[
-              {icon:Library,label:'Library',view:'library'},
-              {icon:BookOpen,label:'Reader',view:'reader',disabled:!activeDocId},
-              {icon:Layers,label:'Cards',view:'flashcards'},
-              {icon:GraduationCap,label:'Exams',view:'exams'},
-              {icon:Activity,label:'Cases',view:'cases'},
-              {icon:MessageSquare,label:'Chat',view:'chat'},
-            ].map(({icon:Icon,label,view,disabled})=>(
-              <button key={view} onClick={()=>{ if(!disabled) { if(view==='reader'&&activeDocId) setCurrentView('reader'); else if(view!=='reader') setCurrentView(view); }}}
-                disabled={disabled}
-                className={`flex flex-col items-center gap-1.5 text-[9px] font-black uppercase tracking-widest py-2.5 rounded-2xl transition-all ${disabled?'opacity-25 cursor-not-allowed':''}`}>
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${currentView===view?'bg-[var(--accent)] text-white shadow-lg scale-110':'text-[var(--text)] opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10'}`}>
-                  <Icon size={20} strokeWidth={currentView===view?2.5:2}/>
-                </div>
-                <span className={currentView===view?'text-[var(--accent)]':'text-[var(--text)] opacity-60'}>{label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* MAIN CONTENT */}
+        <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+          {/* UPLOAD PROGRESS BAR */}
+          {uploading&&(
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--border)] z-50">
+              <div className="h-full bg-[var(--accent)] transition-all duration-200" style={{width:`${uploadPct}%`}}/>
+            </div>
+          )}
 
-        {/* MAIN VIEWS */}
-        <main className="flex-1 flex flex-col relative min-w-0 min-h-0 overflow-hidden">
-          {/* Library */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='library'?'flex':'hidden'}`}>
-            <LibraryView documents={filteredDocs} onUpload={handleFileUpload} isUploading={isUploading}
-              onOpen={id=>{ setOpenDocs(p=>p.includes(id)?p:[...p,id]); setActiveDocId(id); setCurrentView('reader'); }}
-              deleteDocument={deleteDocument} flashcards={flashcards} exams={exams} cases={cases}/>
-          </div>
-          {/* Flashcards */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='flashcards'?'flex':'hidden'}`}>
-            <FlashcardsGlobalView flashcards={flashcards} setFlashcards={setFlashcards} addToast={addToast}
-              setCurrentPage={p=>setDocPages(prev=>({...prev,[activeDocId]:p}))} setRightPanelOpen={setRightPanelOpen}
-              setCurrentView={setCurrentView} settings={userSettings}/>
-          </div>
-          {/* Exams */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='exams'?'flex':'hidden'}`}>
-            <ExamsGlobalView exams={exams} setExams={setExams} addToast={addToast}
-              setCurrentPage={p=>setDocPages(prev=>({...prev,[activeDocId]:p}))} setRightPanelOpen={setRightPanelOpen}
-              setCurrentView={setCurrentView} settings={userSettings}/>
-          </div>
-          {/* Cases */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='cases'?'flex':'hidden'}`}>
-            <CasesGlobalView cases={cases} setCases={setCases} addToast={addToast}
-              setCurrentPage={p=>setDocPages(prev=>({...prev,[activeDocId]:p}))} setRightPanelOpen={setRightPanelOpen}
-              setCurrentView={setCurrentView} settings={userSettings}/>
-          </div>
-          {/* Chat */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='chat'?'flex':'hidden'}`}>
-            <ChatGlobalView settings={userSettings} chatSessions={chatSessions} setChatSessions={setChatSessions} addToast={addToast}/>
-          </div>
-          {/* Settings */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='settings'?'flex':'hidden'}`}>
-            <PanelSettings settings={userSettings} setSettings={setUserSettings}/>
-          </div>
-          {/* Reader */}
-          <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${currentView==='reader'&&activeDocId&&activeDoc?'flex':'hidden'}`}>
-            {activeDocId && activeDoc && (
-              <PdfWorkspace activeDoc={activeDoc} setDocuments={setDocuments}
-                closeDoc={()=>setCurrentView('library')}
-                rightPanelOpen={rightPanelOpen} setRightPanelOpen={setRightPanelOpen}
-                currentPage={docPages[activeDocId]||1} setCurrentPage={setPage}
-                openDocs={openDocs} setActiveDocId={setActiveDocId}
-                closeTab={id=>setOpenDocs(p=>p.filter(d=>d!==id))}
-                documents={documents} isResizing={isResizing}/>
+          {/* VIEWS — all mounted, toggled via display */}
+          <ViewWrapper active={view==='library'}>
+            <LibraryView docs={docs} uploading={uploading} onUpload={handleUpload}
+              onOpen={id=>{setOpenDocs(p=>p.includes(id)?p:[...p,id]);setActiveId(id);setView('reader');}}
+              onDelete={deleteDoc} flashcards={flashcards} exams={exams} cases={cases}/>
+          </ViewWrapper>
+          <ViewWrapper active={view==='flashcards'}>
+            <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast}/>
+          </ViewWrapper>
+          <ViewWrapper active={view==='exams'}>
+            <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast}/>
+          </ViewWrapper>
+          <ViewWrapper active={view==='cases'}>
+            <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast}/>
+          </ViewWrapper>
+          <ViewWrapper active={view==='chat'}>
+            <ChatView settings={settings} sessions={chatSessions} setSessions={setChatSessions}/>
+          </ViewWrapper>
+          <ViewWrapper active={view==='settings'}>
+            <SettingsView settings={settings} setSettings={setSettings}/>
+          </ViewWrapper>
+          <ViewWrapper active={showReader}>
+            {activeDoc&&(
+              <PdfWorkspace activeDoc={activeDoc} setDocs={setDocs}
+                currentPage={docPages[activeId]||1} setCurrentPage={setPage}
+                openDocs={openDocs} closeTab={id=>setOpenDocs(p=>p.filter(d=>d!==id))}
+                setActiveId={setActiveId} docs={docs}
+                onBack={()=>setView('library')}/>
             )}
-          </div>
+          </ViewWrapper>
         </main>
 
-        {/* DRAG RESIZER */}
-        {activeDocId && activeDoc && currentView==='reader' && rightPanelOpen && (
-          <div className="hidden md:flex w-2.5 cursor-col-resize hover:bg-[var(--accent)]/50 items-center justify-center shrink-0 z-[120] touch-none transition-colors"
-            style={{backgroundColor:isResizing?'rgba(var(--accent-rgb),.5)':''}}
-            onMouseDown={e=>{e.preventDefault();setIsResizing(true);}}
-            onTouchStart={()=>setIsResizing(true)}>
-            <div className="w-1 h-16 bg-[var(--text)] opacity-20 rounded-full pointer-events-none"/>
-          </div>
-        )}
-
         {/* AI STUDIO PANEL */}
-        <aside style={{width:window.innerWidth>768?`${aiWidth}px`:'100%',
-          display:(activeDocId&&activeDoc&&currentView==='reader'&&rightPanelOpen)?'flex':'none'}}
-          className="glass shrink-0 flex-col z-[100] absolute inset-0 md:relative animate-slide-in rounded-none border-t-0 border-b-0 border-r-0">
-          <div className="h-16 md:h-20 flex items-center justify-between px-5 bg-[var(--accent)] text-white shrink-0">
-            <span className="font-black title-font text-xl flex items-center gap-3"><Sparkles size={22}/> AI Studio</span>
-            <button onClick={()=>setRightPanelOpen(false)} className="p-2 rounded-xl hover:bg-white/20"><X size={22}/></button>
-          </div>
-          <div className="flex gap-1.5 p-2.5 bg-black/5 dark:bg-white/5 shrink-0 border-b border-[var(--border)]">
-            {[['generate','Extract',Zap],['chat','Chat',MessageSquare],['review','Vault',Database]].map(([id,label,Icon])=>(
-              <button key={id} onClick={()=>setRightPanelTab(id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
-                  ${rightPanelTab===id?'bg-[var(--card)] text-[var(--accent)] border border-[var(--border)]':'text-[var(--text)] opacity-50 hover:opacity-100 border border-transparent'}`}>
-                <Icon size={14}/><span className="hidden sm:inline">{label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="flex-1 flex flex-col min-h-0" style={{pointerEvents:isResizing?'none':'auto'}}>
-            {activeDoc && (<>
-              <div className={`flex-1 flex flex-col min-h-0 ${rightPanelTab==='generate'?'flex':'hidden'}`}>
-                <PanelGenerate activeDoc={activeDoc} bgTask={bgTask} onStartGenerate={startBgGen}
-                  onClearTask={()=>setBgTask(null)} setFlashcards={setFlashcards} setExams={setExams}
-                  setCases={setCases} setNotes={setNotes} switchToReview={()=>setRightPanelTab('review')}
-                  currentPage={docPages[activeDocId]||1} addToast={addToast} settings={userSettings}/>
+        {showReader&&rpOpen&&(
+          <>
+            {/* drag handle */}
+            <div onMouseDown={startRpDrag} onTouchStart={startRpDrag}
+              className="hidden lg:flex w-2 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/30 shrink-0 z-[120] touch-none transition-colors group">
+              <GripVertical size={12} className="text-[var(--text)] opacity-20 group-hover:opacity-60"/>
+            </div>
+            <aside style={{width:window.innerWidth>=1024?`${rpW}px`:'100%'}}
+              className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in">
+              {/* panel header */}
+              <div className="h-14 lg:h-16 bg-[var(--accent)] text-white flex items-center justify-between px-4 shrink-0">
+                <span className="font-black flex items-center gap-2 text-base"><Sparkles size={18}/> AI Studio</span>
+                <button onClick={()=>setRpOpen(false)} className="w-8 h-8 hover:bg-white/20 rounded-xl flex items-center justify-center"><X size={18}/></button>
               </div>
-              <div className={`flex-1 flex flex-col min-h-0 ${rightPanelTab==='chat'?'flex':'hidden'}`}>
-                <PanelChat activeDoc={activeDoc} settings={userSettings} currentPage={docPages[activeDocId]||1}/>
+              {/* tabs */}
+              <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
+                {[['generate','Extract',Zap],['chat','Chat',MessageSquare],['vault','Vault',Database]].map(([id,lbl,Icon])=>(
+                  <button key={id} onClick={()=>setRpTab(id)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[10px] font-black uppercase tracking-widest transition-colors border-b-2
+                      ${rpTab===id?'border-[var(--accent)] text-[var(--accent)]':'border-transparent text-[var(--text)] opacity-50 hover:opacity-80'}`}>
+                    <Icon size={13}/>{lbl}
+                  </button>
+                ))}
               </div>
-              <div className={`flex-1 flex flex-col min-h-0 ${rightPanelTab==='review'?'flex':'hidden'}`}>
-                <PanelReview activeDocId={activeDocId} flashcards={flashcards} setFlashcards={setFlashcards}
-                  exams={exams} setExams={setExams} cases={cases} setCases={setCases}
-                  notes={notes} setNotes={setNotes} addToast={addToast}
-                  setCurrentPage={p=>setDocPages(prev=>({...prev,[activeDocId]:p}))}
-                  setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={userSettings}/>
+              {/* panel content */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {activeDoc&&rpTab==='generate'&&(
+                  <GeneratePanel activeDoc={activeDoc} bgTask={bgTask} onStart={startGen}
+                    onClear={()=>setBgTask(null)} setFlashcards={setFlashcards} setExams={setExams}
+                    setCases={setCases} setNotes={setNotes} onVault={()=>setRpTab('vault')}
+                    currentPage={docPages[activeId]||1} addToast={addToast} settings={settings}/>
+                )}
+                {activeDoc&&rpTab==='chat'&&(
+                  <ChatPanel activeDoc={activeDoc} settings={settings} currentPage={docPages[activeId]||1}/>
+                )}
+                {activeDoc&&rpTab==='vault'&&(
+                  <VaultPanel activeDocId={activeId} flashcards={flashcards} setFlashcards={setFlashcards}
+                    exams={exams} setExams={setExams} cases={cases} setCases={setCases}
+                    notes={notes} setNotes={setNotes} addToast={addToast}
+                    setCurrentPage={setPage} setView={setView} settings={settings}/>
+                )}
               </div>
-            </>)}
-          </div>
-        </aside>
+            </aside>
+          </>
+        )}
       </div>
 
       {/* ── MOBILE BOTTOM NAV ── */}
-      <div className="lg:hidden fixed bottom-3 left-2 right-2 p-2 bottom-nav flex justify-around items-center z-[1000]"
-           style={{paddingBottom:`calc(8px + env(safe-area-inset-bottom))`}}>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[500] bg-[var(--card)] border-t border-[var(--border)] flex items-center bottom-nav-safe"
+        style={{paddingBottom:`max(12px, env(safe-area-inset-bottom))`}}>
         {[
-          {icon:Library,label:'Library',view:'library'},
-          {icon:BookOpen,label:'Reader',view:'reader',disabled:!activeDocId},
-          {icon:Layers,label:'Cards',view:'flashcards'},
-          {icon:Activity,label:'Cases',view:'cases'},
-          {icon:GraduationCap,label:'Exams',view:'exams'},
-          {icon:MessageSquare,label:'Chat',view:'chat'},
-        ].map(({icon:Icon,label,view,disabled})=>(
-          <button key={view} disabled={disabled}
-            onClick={()=>{ if(!disabled){ if(view==='reader'&&activeDocId) setCurrentView('reader'); else if(view!=='reader') setCurrentView(view); }}}
-            className={`flex flex-col items-center gap-1 p-2 rounded-2xl min-w-[52px] transition-all
-              ${currentView===view?'text-[var(--accent)] bg-[var(--accent)]/10':'text-[var(--text)] opacity-55'}
-              ${disabled?'opacity-25':''}`}>
-            <Icon size={20} strokeWidth={currentView===view?2.5:2}/>
-            <span className="text-[9px] font-bold">{label}</span>
+          {icon:BookOpen,label:'Library',v:'library'},
+          {icon:BookMarked,label:'Reader',v:'reader',dis:!activeId},
+          {icon:Layers,label:'Cards',v:'flashcards'},
+          {icon:Activity,label:'Cases',v:'cases'},
+          {icon:GraduationCap,label:'Exams',v:'exams'},
+          {icon:MessageSquare,label:'Chat',v:'chat'},
+        ].map(({icon:Icon,label,v,dis})=>(
+          <button key={v} disabled={dis}
+            onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
+            className={`flex-1 flex flex-col items-center gap-1 pt-2 pb-1 transition-all ${dis?'opacity-20':''}`}>
+            <Icon size={19} strokeWidth={view===v?2.5:2}
+              className={view===v?'text-[var(--accent)]':'text-[var(--text)] opacity-55'}/>
+            <span className={`text-[8px] font-bold ${view===v?'text-[var(--accent)]':'opacity-50'}`}>{label}</span>
           </button>
         ))}
-      </div>
+      </nav>
     </div>
   );
 }
 
-// ─── SHARED SMALL COMPONENTS ──────────────────────────────────────────────────
-function EmptyState({ icon:Icon, text }) {
-  return (
-    <div className="flex flex-col items-center justify-center text-center py-20 px-6 glass rounded-[3rem] border-dashed border-2 border-[var(--border)] m-2">
-      <Icon size={48} className="opacity-25 mb-5"/><p className="text-sm opacity-55 font-bold max-w-[220px] leading-relaxed">{text}</p>
-    </div>
-  );
-}
-function ToolBtn({ id, active, set, icon:Icon, label }) {
-  return (
-    <button onClick={()=>set(id)} className={`py-3.5 flex flex-col items-center justify-center gap-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all
-      ${active===id?'bg-[var(--accent)] text-white shadow-lg scale-105 border-transparent':'glass opacity-55 hover:opacity-100 border border-[var(--border)]'}`}>
-      <Icon size={18}/>{label}
-    </button>
-  );
+function ViewWrapper({active,children}){
+  return <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${active?'':'hidden'}`}>{children}</div>;
 }
 
-// ─── LIBRARY VIEW ─────────────────────────────────────────────────────────────
-function LibraryView({ documents, onUpload, onOpen, isUploading, deleteDocument, flashcards, exams, cases }) {
-  return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-screen-2xl mx-auto p-6 md:p-12 pb-[120px] lg:pb-32">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-12">
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIBRARY VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,cases}){
+  const[search,setSearch]=useState('');
+  const filtered=search?docs.filter(d=>d.name.toLowerCase().includes(search.toLowerCase())):docs;
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="p-4 lg:p-8 max-w-screen-2xl mx-auto">
+        {/* header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 lg:mb-10">
           <div>
-            <h1 className="title-font text-5xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)]">Intelligence Nexus</h1>
-            <p className="text-base md:text-lg opacity-50 mt-3 font-medium">Premium medical AI · Universal API</p>
+            <h1 className="text-3xl lg:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)]">Intelligence Nexus</h1>
+            <p className="text-xs lg:text-sm opacity-40 mt-1 font-medium">{docs.length} document{docs.length!==1?'s':''} · Universal AI</p>
           </div>
-          <label className={`cursor-pointer btn-accent flex items-center gap-3 text-sm font-black uppercase tracking-widest shadow-2xl px-7 py-4 rounded-2xl ${isUploading?'opacity-50 pointer-events-none':''}`}>
-            {isUploading?<Loader2 className="animate-spin" size={22}/>:<FileUp size={22}/>}
-            {isUploading?'IMPORTING…':'IMPORT PDF'}
-            <input type="file" accept="application/pdf" multiple className="hidden" onChange={onUpload} disabled={isUploading}/>
-          </label>
+          <div className="flex gap-2 items-center">
+            <div className="relative flex-1 sm:flex-none">
+              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search…"
+                className="w-full sm:w-48 bg-black/5 dark:bg-white/5 rounded-xl py-2.5 pl-8 pr-3 text-sm outline-none border border-[var(--border)] focus:border-[var(--accent)]/50 text-[var(--text)]"/>
+              <Search className="absolute left-2.5 top-3 opacity-30" size={14}/>
+            </div>
+            <label className={`btn-accent flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap cursor-pointer ${uploading?'opacity-50 pointer-events-none':''}`}>
+              {uploading?<Loader2 size={16} className="animate-spin"/>:<FileUp size={16}/>}
+              {uploading?'Importing…':'Import PDF'}
+              <input type="file" accept="application/pdf" multiple className="hidden" onChange={onUpload} disabled={uploading}/>
+            </label>
+          </div>
         </div>
-        {documents.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {documents.map(doc => {
-              const nCards = flashcards.filter(f=>f.docId===doc.id).reduce((s,set)=>s+(set.cards?.length||0),0);
-              const nExams = exams.filter(e=>e.docId===doc.id).length;
-              const nCases = cases.filter(c=>c.docId===doc.id).length;
-              return (
-                <div key={doc.id} onClick={()=>onOpen(doc.id)} className="card-hover glass rounded-[2rem] overflow-hidden cursor-pointer flex flex-col relative group">
-                  <button onClick={e=>deleteDocument(doc.id,e)} className="absolute top-3 right-3 z-20 w-10 h-10 bg-black/50 hover:bg-red-500 backdrop-blur-md rounded-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={17}/></button>
-                  <div className="h-40 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] flex items-center justify-center">
-                    <BookOpen size={56} className="text-white opacity-35 group-hover:scale-110 transition-transform duration-500"/>
+        {filtered.length===0?(
+          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 lg:p-20 text-center flex flex-col items-center gap-4">
+            <FileUp size={48} className="opacity-20"/>
+            <h2 className="text-xl lg:text-2xl font-black opacity-60">{search?'No results found':'No Documents Yet'}</h2>
+            <p className="text-sm opacity-40 max-w-xs">{search?'Try a different search term':'Import a PDF to get started.'}</p>
+          </div>
+        ):(
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
+            {filtered.map(doc=>{
+              const nCards=flashcards.filter(f=>f.docId===doc.id).reduce((s,set)=>s+(set.cards?.length||0),0);
+              const nExams=exams.filter(e=>e.docId===doc.id).length;
+              const nCases=cases.filter(c=>c.docId===doc.id).length;
+              return(
+                <div key={doc.id} onClick={()=>onOpen(doc.id)} className="card-hover glass rounded-2xl overflow-hidden flex flex-col relative group">
+                  <button onClick={ev=>onDelete(doc.id,ev)}
+                    className="absolute top-2 right-2 z-10 w-7 h-7 bg-black/60 hover:bg-red-500 rounded-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                    <Trash2 size={13}/>
+                  </button>
+                  <div className="h-28 lg:h-32 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] flex items-center justify-center">
+                    <BookOpen size={40} className="text-white opacity-30 group-hover:scale-110 transition-transform duration-300"/>
                   </div>
-                  <div className="p-5 flex-1 flex flex-col">
-                    <h3 className="font-bold text-sm md:text-base leading-snug line-clamp-2 mb-4 flex-1">{doc.name}</h3>
-                    <div className="flex gap-1.5 flex-wrap text-[10px] font-bold">
-                      <span className="px-2.5 py-1 bg-black/5 dark:bg-white/5 rounded-lg">{nCards} Cards</span>
-                      <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg">{nExams} Exams</span>
-                      <span className="px-2.5 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg">{nCases} Cases</span>
+                  <div className="p-3 flex-1 flex flex-col gap-2">
+                    <h3 className="font-bold text-[11px] lg:text-xs leading-snug line-clamp-2 flex-1">{doc.name}</h3>
+                    <div className="flex gap-1 flex-wrap">
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 bg-black/5 dark:bg-white/5 rounded-md">{nCards} Cards</span>
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">{nExams} Exams</span>
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 bg-blue-500/10 text-blue-500 rounded-md">{nCases} Cases</span>
                     </div>
                   </div>
                 </div>
               );
             })}
           </div>
-        ) : (
-          <div className="glass border-dashed border-2 rounded-[3rem] p-20 text-center flex flex-col items-center">
-            <FileUp size={56} className="opacity-30 mb-5"/>
-            <h2 className="title-font text-3xl font-black mb-3">No Documents Yet</h2>
-            <p className="opacity-50 max-w-xs leading-relaxed text-sm">Import a PDF to start extracting knowledge with AI.</p>
-          </div>
         )}
       </div>
     </div>
   );
 }
 
-// ─── SETTINGS VIEW ────────────────────────────────────────────────────────────
-const PROVIDER_PRESETS = {
-  anthropic: { label:'Claude (Anthropic)', note:'Works built-in — no key required in Claude artifacts.', needsKey:false, defaultModel:'claude-sonnet-4-20250514', baseUrl:'https://api.anthropic.com' },
-  openai:    { label:'OpenAI (GPT)',        note:'Requires an OpenAI API key.',                          needsKey:true,  defaultModel:'gpt-4o-mini',              baseUrl:'https://api.openai.com' },
-  gemini:    { label:'Google Gemini',       note:'Requires a Google AI Studio API key.',                 needsKey:true,  defaultModel:'gemini-2.0-flash',          baseUrl:'' },
-  deepseek:  { label:'DeepSeek',            note:'Requires a DeepSeek API key. Very cost-effective.',    needsKey:true,  defaultModel:'deepseek-chat',             baseUrl:'https://api.deepseek.com' },
-  glm:       { label:'GLM / Zhipu AI',      note:'Requires a Zhipu API key.',                           needsKey:true,  defaultModel:'glm-4-flash',               baseUrl:'https://open.bigmodel.cn/api/paas' },
-  groq:      { label:'Groq (Ultra-fast)',   note:'Requires a Groq API key. Extremely fast inference.',   needsKey:true,  defaultModel:'llama-3.3-70b-versatile',   baseUrl:'https://api.groq.com/openai' },
-  ollama:    { label:'Ollama (Local)',       note:'Runs models locally. No key needed.',                 needsKey:false, defaultModel:'llama3',                    baseUrl:'http://localhost:11434/v1' },
-  compatible:{ label:'Custom / Compatible', note:'Any OpenAI-compatible API. Set your own Base URL.',   needsKey:true,  defaultModel:'',                          baseUrl:'' },
-};
-
-function PanelSettings({ settings, setSettings }) {
-  const preset = PROVIDER_PRESETS[settings.provider] || PROVIDER_PRESETS.anthropic;
-  const themes  = [{id:'pure-white',label:'Pure White',icon:Sun},{id:'light',label:'Soft Light',icon:CloudSun},{id:'dark',label:'Deep Dark',icon:Moon},{id:'oled',label:'OLED Black',icon:MoonStar}];
-  const accents = [{id:'indigo',hex:'#6366f1'},{id:'purple',hex:'#a855f7'},{id:'blue',hex:'#3b82f6'},{id:'emerald',hex:'#10b981'},{id:'rose',hex:'#f43f5e'}];
-  const fontSizes=[{id:'small',px:12},{id:'medium',px:14},{id:'large',px:16},{id:'xl',px:18},{id:'xxl',px:20}];
-
-  const handleProviderChange = (p) => {
-    const pr = PROVIDER_PRESETS[p];
-    setSettings(s=>({...s, provider:p, baseUrl:pr.baseUrl, model:pr.defaultModel}));
-  };
-
-  return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-3xl mx-auto p-6 md:p-12 space-y-7 pb-[120px] lg:pb-32">
-        <h1 className="title-font text-4xl font-black flex items-center gap-4"><Settings size={36} className="opacity-40"/> Settings</h1>
-
-        {/* AI Provider */}
-        <div className="glass rounded-[2rem] p-7 card-hover">
-          <h3 className="font-black mb-5 flex items-center gap-3 text-base"><Globe className="text-[var(--accent)]" size={20}/> AI Provider</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
-            {Object.entries(PROVIDER_PRESETS).map(([id,{label}])=>(
-              <button key={id} onClick={()=>handleProviderChange(id)}
-                className={`py-3 px-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border
-                  ${settings.provider===id?'bg-[var(--accent)] text-white border-transparent shadow-lg scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
-                {label.split(' ')[0]}<br/><span className="opacity-70 normal-case font-bold text-[9px]">{label.split(' ').slice(1).join(' ')}</span>
-              </button>
-            ))}
-          </div>
-          <div className={`flex items-start gap-3 px-4 py-3 rounded-xl mb-5 border ${preset.needsKey?'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800':'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800'}`}>
-            {preset.needsKey?<AlertCircle size={16} className="text-amber-500 mt-0.5 shrink-0"/>:<CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0"/>}
-            <p className={`text-xs font-bold ${preset.needsKey?'text-amber-700 dark:text-amber-300':'text-emerald-700 dark:text-emerald-300'}`}>{preset.note}</p>
-          </div>
-
-          {preset.needsKey && (
-            <div className="mb-4">
-              <label className="text-[10px] font-black uppercase tracking-widest opacity-55 mb-2 block flex items-center gap-2"><KeyRound size={12}/> API Key</label>
-              <input type="password" placeholder="Paste your API key here…" value={settings.apiKey||''}
-                onChange={e=>setSettings(s=>({...s,apiKey:e.target.value}))}
-                className="w-full bg-black/5 dark:bg-white/5 rounded-2xl p-4 font-mono text-sm focus:border-[var(--accent)] outline-none border border-[var(--border)] text-[var(--text)]"/>
-            </div>
-          )}
-
-          {(settings.provider==='compatible'||settings.provider==='ollama') && (
-            <div className="mb-4">
-              <label className="text-[10px] font-black uppercase tracking-widest opacity-55 mb-2 block">Base URL</label>
-              <input type="text" placeholder="https://your-api-endpoint.com" value={settings.baseUrl||''}
-                onChange={e=>setSettings(s=>({...s,baseUrl:e.target.value}))}
-                className="w-full bg-black/5 dark:bg-white/5 rounded-2xl p-4 font-mono text-sm focus:border-[var(--accent)] outline-none border border-[var(--border)] text-[var(--text)]"/>
-            </div>
-          )}
-
-          <div>
-            <label className="text-[10px] font-black uppercase tracking-widest opacity-55 mb-2 block">Model Name</label>
-            <input type="text" placeholder={preset.defaultModel||'e.g. gpt-4o'} value={settings.model||''}
-              onChange={e=>setSettings(s=>({...s,model:e.target.value}))}
-              className="w-full bg-black/5 dark:bg-white/5 rounded-2xl p-4 font-mono text-sm focus:border-[var(--accent)] outline-none border border-[var(--border)] text-[var(--text)]"/>
-            <p className="text-[10px] opacity-40 mt-2 font-medium">Leave blank to use default: <code>{preset.defaultModel}</code></p>
-          </div>
-        </div>
-
-        {/* Theme */}
-        <div className="glass rounded-[2rem] p-7 card-hover">
-          <h3 className="font-black mb-5 flex items-center gap-3 text-base"><Palette className="text-[var(--accent)]" size={20}/> Theme</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            {themes.map(t=>(
-              <button key={t.id} onClick={()=>setSettings({...settings,theme:t.id})}
-                className={`py-5 px-2 rounded-2xl font-black text-xs uppercase tracking-widest flex flex-col items-center gap-3 border transition-all
-                  ${settings.theme===t.id?'bg-[var(--accent)] text-white border-transparent shadow-xl scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
-                <t.icon size={24}/>{t.label}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-3 flex-wrap">
-            {accents.map(a=>(
-              <button key={a.id} onClick={()=>setSettings({...settings,accentColor:a.id})}
-                className={`w-10 h-10 rounded-xl transition-all ${settings.accentColor===a.id?'scale-125 ring-2 ring-offset-2 ring-current shadow-xl':''}`}
-                style={{backgroundColor:a.hex}}/>
-            ))}
-          </div>
-        </div>
-
-        {/* Font */}
-        <div className="glass rounded-[2rem] p-7 card-hover">
-          <h3 className="font-black mb-5 flex items-center gap-3 text-base"><Type className="text-emerald-500" size={20}/> Font Size</h3>
-          <div className="flex gap-2 p-2 bg-black/5 dark:bg-white/5 rounded-2xl border border-[var(--border)]">
-            {fontSizes.map(f=>(
-              <button key={f.id} onClick={()=>setSettings({...settings,fontSize:f.id})}
-                className={`flex-1 py-3.5 rounded-xl font-black transition-all ${settings.fontSize===f.id?'glass text-emerald-500 shadow-md':'opacity-50 hover:opacity-100'}`}
-                style={{fontSize:`${f.px}px`}}>Aa</button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── PDF WORKSPACE ────────────────────────────────────────────────────────────
-// FIX: pb-24 lg:pb-0 pushes content above the mobile bottom nav (which is ~72px tall + 12px margin)
-// FIX: PDF bottom controls get z-[1001] so they sit above the mobile nav overlay
-function PdfWorkspace({ activeDoc, setDocuments, closeDoc, rightPanelOpen, setRightPanelOpen, currentPage, setCurrentPage, openDocs, setActiveDocId, closeTab, isResizing, documents }) {
-  const [pdf,     setPdf]     = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [dims,    setDims]    = useState({w:0,h:0});
-  const [scale,   setScale]   = useState(1.2);
-  const [localPage, setLocalPage] = useState(currentPage);
-  const canvasRef   = useRef(null);
-  const containerRef = useRef(null);
-  const textRef     = useRef(null);
-  const renderRef   = useRef(null);
-  const pdfRef      = useRef(null);
-
-  useEffect(()=>{ setLocalPage(currentPage); },[currentPage]);
+/* ═══════════════════════════════════════════════════════════════════════════
+   PDF WORKSPACE
+═══════════════════════════════════════════════════════════════════════════ */
+function PdfWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,closeTab,setActiveId,docs,onBack}){
+  const[pdf,setPdf]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[dims,setDims]=useState({w:0,h:0});
+  const[scale,setScale]=useState(1);
+  const canvasRef=useRef(null);
+  const containerRef=useRef(null);
+  const textRef=useRef(null);
+  const renderRef=useRef(null);
+  const pdfRef=useRef(null);
 
   useEffect(()=>{
-    if (!activeDoc?.id) return;
-    let mounted=true; setLoading(true); setPdf(null);
-    if (pdfRef.current) { try{pdfRef.current.destroy();}catch(e){} pdfRef.current=null; }
+    if(!activeDoc?.id)return;
+    let mounted=true;setLoading(true);setPdf(null);
+    if(pdfRef.current){try{pdfRef.current.destroy();}catch{}pdfRef.current=null;}
     (async()=>{
-      try {
-        const data = await getPdf(activeDoc.id);
-        if (!data||!mounted) return;
-        const pdfjs = await loadPdfJs();
-        const buf = data.buffer||data;
-        const loaded = await pdfjs.getDocument({data:buf.slice(0)}).promise;
-        if (mounted) { pdfRef.current=loaded; setPdf(loaded); }
-        else { try{loaded.destroy();}catch(e){} }
-      } catch(e){console.error(e);}
-      finally { if(mounted) setLoading(false); }
+      try{
+        const data=await getPdf(activeDoc.id);
+        if(!data||!mounted)return;
+        const pdfjs=await loadPdfJs();
+        const loaded=await pdfjs.getDocument({data:(data.buffer||data).slice(0)}).promise;
+        if(mounted){pdfRef.current=loaded;setPdf(loaded);}else{try{loaded.destroy();}catch{}}
+      }catch(e){console.error(e);}
+      finally{if(mounted)setLoading(false);}
     })();
-    return ()=>{ mounted=false; };
+    return()=>{mounted=false;};
   },[activeDoc?.id]);
 
   useEffect(()=>{
-    if (!pdf) return;
+    if(!pdf)return;
     let mounted=true;
     (async()=>{
-      try {
-        const page = await pdf.getPage(localPage);
-        const cont = containerRef.current; if(!cont||!mounted) return;
-        const tmp = page.getViewport({scale:1});
-        const base = cont.clientWidth/tmp.width;
-        const final = Math.min(Math.max(base*scale,.5),5);
-        const vp = page.getViewport({scale:final});
-        if(mounted) setDims({w:vp.width,h:vp.height});
+      try{
+        const page=await pdf.getPage(currentPage);
+        const cont=containerRef.current;if(!cont||!mounted)return;
+        const tmp=page.getViewport({scale:1});
+        const base=cont.clientWidth/tmp.width;
+        const final=Math.min(Math.max(base*scale,.5),5);
+        const vp=page.getViewport({scale:final});
+        if(mounted)setDims({w:vp.width,h:vp.height});
         const canvas=canvasRef.current;
-        if (canvas) {
+        if(canvas){
           const pr=window.devicePixelRatio||1;
-          canvas.width=Math.floor(vp.width*pr); canvas.height=Math.floor(vp.height*pr);
-          if(renderRef.current) renderRef.current.cancel();
+          canvas.width=Math.floor(vp.width*pr);canvas.height=Math.floor(vp.height*pr);
+          canvas.style.width=`${vp.width}px`;canvas.style.height=`${vp.height}px`;
+          if(renderRef.current)renderRef.current.cancel();
           renderRef.current=page.render({canvasContext:canvas.getContext('2d'),viewport:vp,transform:[pr,0,0,pr,0,0]});
           await renderRef.current.promise;
         }
         const tl=textRef.current;
-        if(tl&&mounted){ tl.innerHTML=''; tl.style.setProperty('--scale-factor',vp.scale); const tc=await page.getTextContent(); window.pdfjsLib.renderTextLayer({textContentSource:tc,container:tl,viewport:vp,textDivs:[]}); }
-      } catch(e){ if(e.name!=='RenderingCancelledException') console.warn(e.message); }
+        if(tl&&mounted){tl.innerHTML='';tl.style.setProperty('--scale-factor',vp.scale);
+          const tc=await page.getTextContent();
+          window.pdfjsLib?.renderTextLayer({textContentSource:tc,container:tl,viewport:vp,textDivs:[]});}
+      }catch(e){if(e?.name!=='RenderingCancelledException')console.warn(e?.message);}
     })();
-    return ()=>{ mounted=false; if(renderRef.current) renderRef.current.cancel(); };
-  },[localPage,pdf,rightPanelOpen,scale,isResizing]);
+    return()=>{mounted=false;if(renderRef.current)renderRef.current.cancel();};
+  },[currentPage,pdf,scale]);
 
-  const nav = useCallback((dir)=>{
-    if(!activeDoc) return;
-    const next=Math.max(1,Math.min(activeDoc.totalPages,localPage+dir));
-    if(next!==localPage){ setLocalPage(next); setCurrentPage(next); setDocuments(p=>p.map(d=>d.id===activeDoc.id?{...d,progress:next}:d)); containerRef.current?.scrollTo({top:0,behavior:'smooth'}); }
-  },[localPage,activeDoc,setCurrentPage,setDocuments]);
+  const nav=useCallback(dir=>{
+    if(!activeDoc)return;
+    const next=Math.max(1,Math.min(activeDoc.totalPages,currentPage+dir));
+    if(next!==currentPage){setCurrentPage(next);setDocs(p=>p.map(d=>d.id===activeDoc.id?{...d,progress:next}:d));containerRef.current?.scrollTo({top:0,behavior:'smooth'});}
+  },[currentPage,activeDoc,setCurrentPage,setDocs]);
 
   useEffect(()=>{
-    const kd=e=>{ if(['INPUT','TEXTAREA'].includes(e.target.tagName)) return; if(e.key==='ArrowLeft') nav(-1); if(e.key==='ArrowRight') nav(1); };
-    document.addEventListener('keydown',kd); return()=>document.removeEventListener('keydown',kd);
+    const kd=e=>{if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;if(e.key==='ArrowLeft')nav(-1);if(e.key==='ArrowRight')nav(1);};
+    document.addEventListener('keydown',kd);return()=>document.removeEventListener('keydown',kd);
   },[nav]);
 
-  if (!activeDoc) return null;
+  if(!activeDoc)return null;
 
-  return (
-    // pb-24 lg:pb-0 → on mobile, shifts content up so bottom nav doesn't cover PDF controls
-    <div className="flex-1 flex flex-col h-full bg-black/5 dark:bg-black/20 relative min-h-0 pb-24 lg:pb-0">
-
-      {/* top bar */}
-      <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-5 glass shrink-0 z-10 border-b border-[var(--border)] rounded-none">
-        <div className="flex items-center gap-2 md:gap-4">
-          <button onClick={closeDoc} className="w-8 h-8 glass rounded-full flex items-center justify-center hover:bg-black/10"><ChevronLeft size={18}/></button>
-          <span className="font-bold text-xs md:text-sm truncate max-w-[130px] md:max-w-sm">{activeDoc.name}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-0.5 glass p-1 rounded-full">
-            <button onClick={()=>setScale(s=>Math.max(s-.25,.5))} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/10 opacity-60 hover:opacity-100"><ZoomOut size={14}/></button>
-            <button onClick={()=>setScale(1.2)} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/10 opacity-60 hover:opacity-100"><Maximize size={14}/></button>
-            <button onClick={()=>setScale(s=>Math.min(s+.25,4))} className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/10 opacity-60 hover:opacity-100"><ZoomIn size={14}/></button>
-          </div>
-          <button onClick={()=>setRightPanelOpen(!rightPanelOpen)}
-            className={`px-3 py-1.5 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all
-              ${rightPanelOpen?'bg-[var(--accent)] text-white':'glass text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
-            {rightPanelOpen?'Close AI':'AI Studio'}
-          </button>
+  return(
+    <div className="flex-1 flex flex-col h-full min-h-0">
+      {/* PDF top bar */}
+      <div className="h-12 glass flex items-center gap-2 px-3 shrink-0 border-t-0 border-x-0">
+        <button onClick={onBack} className="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 shrink-0">
+          <ChevronLeft size={16}/>
+        </button>
+        <span className="font-bold text-xs truncate flex-1 min-w-0">{activeDoc.name}</span>
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={()=>setScale(s=>Math.max(s-.2,.5))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomOut size={13}/></button>
+          <button onClick={()=>setScale(1)} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><Maximize size={13}/></button>
+          <button onClick={()=>setScale(s=>Math.min(s+.2,4))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomIn size={13}/></button>
         </div>
       </div>
 
-      {/* tabs */}
-      {openDocs.length>1 && (
-        <div className="flex gap-1.5 px-3 py-2 glass border-b border-[var(--border)] overflow-x-auto custom-scrollbar shrink-0 z-10 rounded-none">
+      {/* doc tabs */}
+      {openDocs.length>1&&(
+        <div className="flex gap-1.5 px-3 py-1.5 border-b border-[var(--border)] overflow-x-auto custom-scrollbar shrink-0 bg-[var(--card)]">
           {openDocs.map(id=>{
-            const doc=documents.find(d=>d.id===id); if(!doc) return null;
-            return (
-              <div key={id} onClick={()=>setActiveDocId(id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg cursor-pointer font-bold text-[10px] uppercase tracking-widest transition-colors shrink-0
-                  ${id===activeDoc.id?'bg-[var(--accent)] text-white':'glass hover:bg-black/10 border border-[var(--border)]'}`}>
-                <span className="truncate max-w-[90px]">{doc.name}</span>
-                <button onClick={e=>{e.stopPropagation();closeTab(id);}} className="p-0.5 rounded hover:bg-black/20"><X size={11}/></button>
+            const doc=docs.find(d=>d.id===id);if(!doc)return null;
+            return(
+              <div key={id} onClick={()=>setActiveId(id)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg cursor-pointer text-[10px] font-bold shrink-0 transition-colors
+                  ${id===activeDoc.id?'bg-[var(--accent)] text-white':'glass hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                <span className="truncate max-w-[80px]">{doc.name}</span>
+                <button onClick={e=>{e.stopPropagation();closeTab(id);}} className="opacity-60 hover:opacity-100 ml-0.5"><X size={10}/></button>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* scrollable pdf area */}
-      <div ref={containerRef} className="flex-1 overflow-auto custom-scrollbar relative min-h-0">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-[var(--accent)]">
-            <Loader2 className="animate-spin" size={32}/><span className="text-xs font-black tracking-widest uppercase opacity-60">Rendering…</span>
+      {/* PDF scroll area */}
+      <div ref={containerRef} className="flex-1 overflow-auto custom-scrollbar bg-zinc-200 dark:bg-zinc-900 min-h-0">
+        {loading?(
+          <div className="flex items-center justify-center h-full gap-3 text-[var(--accent)]">
+            <Loader2 size={28} className="animate-spin"/><span className="text-xs font-bold opacity-50">Rendering…</span>
           </div>
-        ) : pdf ? (
-          <div className="relative shadow-2xl bg-white shrink-0 mx-auto" style={{width:dims.w?`${dims.w}px`:'100%',height:dims.h?`${dims.h}px`:'auto'}}>
-            <canvas ref={canvasRef} className="block"/>
-            <div ref={textRef} className="pdf-text-layer"/>
+        ):pdf?(
+          <div className="p-2 pb-20 lg:pb-4 flex justify-center">
+            <div className="relative bg-white shadow-2xl" style={{width:dims.w?`${dims.w}px`:'100%',height:dims.h?`${dims.h}px`:'auto'}}>
+              <canvas ref={canvasRef}/>
+              <div ref={textRef} style={{position:'absolute',inset:0,overflow:'hidden',opacity:1,lineHeight:1,userSelect:'text'}}/>
+            </div>
           </div>
-        ) : (
-          <div className="m-auto text-red-500 text-sm flex items-center gap-2 bg-red-500/10 p-5 rounded-2xl border border-red-500/20 font-bold w-fit mt-10">
-            <AlertCircle size={16}/> Failed to load PDF.
+        ):(
+          <div className="flex items-center justify-center h-full">
+            <div className="text-red-500 text-xs flex items-center gap-2 bg-red-50 dark:bg-red-900/20 px-4 py-3 rounded-xl border border-red-200 dark:border-red-800">
+              <AlertCircle size={14}/> Failed to load PDF
+            </div>
           </div>
         )}
       </div>
 
-      {/* ── PAGE CONTROLS (z-[1001] so they appear above mobile nav overlay) ── */}
-      <div className="h-16 glass flex items-center justify-center gap-4 shrink-0 z-[1001] border-t border-[var(--border)] rounded-none
-                      absolute bottom-0 left-0 right-0 lg:relative lg:bottom-auto">
-        <button onClick={()=>nav(-1)} disabled={localPage<=1}
-          className="w-11 h-11 glass rounded-2xl flex items-center justify-center hover:bg-black/10 disabled:opacity-30 transition-colors shadow-sm active:scale-95">
-          <ChevronLeft size={20}/>
+      {/* PAGE CONTROLS — always visible, above mobile nav */}
+      <div className="h-14 glass flex items-center justify-center gap-3 shrink-0 border-t border-[var(--border)] border-x-0 border-b-0
+                      fixed bottom-[72px] left-0 right-0 z-[200] lg:relative lg:bottom-auto lg:z-auto"
+        style={{bottom:`calc(${NAV_H}px + env(safe-area-inset-bottom))`}}>
+        <button onClick={()=>nav(-1)} disabled={currentPage<=1}
+          className="w-10 h-10 glass rounded-xl flex items-center justify-center disabled:opacity-30 active:scale-95">
+          <ChevronLeft size={18}/>
         </button>
-        <div className="px-5 py-2.5 glass rounded-2xl font-mono font-bold text-sm border border-[var(--border)] shadow-sm">
-          PG <span className="text-[var(--accent)]">{localPage}</span> / {activeDoc.totalPages}
+        <div className="px-4 py-2 glass rounded-xl font-mono text-sm font-bold border border-[var(--border)] min-w-[90px] text-center">
+          <span className="text-[var(--accent)]">{currentPage}</span> / {activeDoc.totalPages}
         </div>
-        <button onClick={()=>nav(1)} disabled={localPage>=activeDoc.totalPages}
-          className="w-11 h-11 btn-accent rounded-2xl flex items-center justify-center shadow-lg disabled:opacity-50 active:scale-95">
-          <ChevronRight size={20}/>
+        <button onClick={()=>nav(1)} disabled={currentPage>=activeDoc.totalPages}
+          className="w-10 h-10 btn-accent rounded-xl flex items-center justify-center disabled:opacity-40 active:scale-95 shadow-md">
+          <ChevronRight size={18}/>
         </button>
       </div>
+      {/* spacer so content isn't hidden behind fixed page controls on mobile */}
+      <div className="h-14 lg:hidden shrink-0"/>
     </div>
   );
 }
 
-// ─── PANEL GENERATE ───────────────────────────────────────────────────────────
-// FIX: all hooks declared BEFORE any conditional return (React rules of hooks)
-function PanelGenerate({ activeDoc, bgTask, onStartGenerate, onClearTask, setFlashcards, setExams, setCases, setNotes, switchToReview, currentPage, addToast, settings }) {
-  const [startPage, setStartPage] = useState(1);
-  const [endPage,   setEndPage]   = useState(1);
-  const [type,      setType]      = useState('cases');
-  const [count,     setCount]     = useState(5);
-  const [difficulty,setDifficulty]= useState(2);
-  const levels = ['Hard','Expert','Insane'];
+/* ═══════════════════════════════════════════════════════════════════════════
+   GENERATE PANEL
+═══════════════════════════════════════════════════════════════════════════ */
+function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,setCases,setNotes,onVault,currentPage,addToast,settings}){
+  const[startPage,setStartPage]=useState(currentPage);
+  const[endPage,setEndPage]=useState(currentPage);
+  const[entireFile,setEntireFile]=useState(false);
+  const[type,setType]=useState('exam');
+  const[count,setCount]=useState(20);
+  const[difficulty,setDifficulty]=useState(2);
+  const levels=['Hard','Expert','Insane'];
 
-  // ← hooks MUST come before the early return
-  useEffect(()=>{
-    if (!bgTask && activeDoc) { setStartPage(currentPage); setEndPage(currentPage); }
-  },[currentPage, bgTask, activeDoc]);
+  useEffect(()=>{if(!bgTask){setStartPage(currentPage);if(!entireFile)setEndPage(currentPage);}},[currentPage,bgTask]);
+  useEffect(()=>{if(entireFile&&activeDoc){setStartPage(1);setEndPage(activeDoc.totalPages);}},[entireFile,activeDoc]);
 
-  if (!activeDoc) return <div className="flex-1 flex items-center justify-center opacity-40 text-sm font-bold">No document open.</div>;
+  if(!activeDoc)return<div className="flex-1 flex items-center justify-center text-sm opacity-40 font-bold">No document open.</div>;
 
-  const go = () => onStartGenerate(type, activeDoc.id, startPage, endPage, {count, difficultyLevel:levels[difficulty-1]});
+  const go=()=>onStart(type,activeDoc.id,startPage,endPage,{count,difficultyLevel:levels[difficulty-1]});
 
-  const save = () => {
-    if (!bgTask?.result) return;
-    const g = bgTask.result;
-    if (g.type==='flashcards') {
-      const cards = g.data.map(c=>({id:Date.now()+Math.random(),q:c.q,a:c.a,evidence:c.evidence,sourcePage:c.sourcePage,level:0,nextReview:Date.now(),repetitions:0,ef:2.5,interval:1,lastReview:Date.now()}));
-      setFlashcards(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:`Flashcards (Pgs ${g.pages})`,cards,createdAt:new Date().toISOString()}]);
+  const save=()=>{
+    if(!bgTask?.result)return;
+    const g=bgTask.result;
+    if(g.type==='flashcards'){
+      const cards=g.data.map(c=>({id:Date.now()+Math.random(),q:c.q,a:c.a,evidence:c.evidence,sourcePage:c.sourcePage,repetitions:0,ef:2.5,interval:1,nextReview:Date.now(),lastReview:Date.now()}));
+      setFlashcards(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:`Cards — Pgs ${g.pages}`,cards,createdAt:new Date().toISOString()}]);
       addToast(`${cards.length} flashcards saved!`,'success');
-    } else if (g.type==='cases') {
-      setCases(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:'Patient Case Block',questions:g.data,createdAt:new Date().toISOString()}]);
+    }else if(g.type==='cases'){
+      setCases(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:'Patient Cases',questions:g.data,createdAt:new Date().toISOString()}]);
       addToast(`${g.data.length} cases saved!`,'success');
-    } else if (g.type==='exam') {
-      setExams(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:`Exam (Pgs ${g.pages})`,questions:g.data,createdAt:new Date().toISOString()}]);
+    }else if(g.type==='exam'){
+      setExams(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,sourcePages:g.pages,title:`Exam — Pgs ${g.pages}`,questions:g.data,createdAt:new Date().toISOString()}]);
       addToast(`${g.data.length} questions saved!`,'success');
-    } else {
-      setNotes(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,title:`${g.customTitle||'Note'} · Pgs ${g.pages}`,content:g.data,createdAt:new Date().toISOString()}]);
+    }else{
+      setNotes(p=>[...p,{id:Date.now().toString(),docId:activeDoc.id,title:`${g.title||'Note'} · Pgs ${g.pages}`,content:g.data,createdAt:new Date().toISOString()}]);
       addToast('Note saved!','success');
     }
-    onClearTask(); switchToReview();
+    onClear();onVault();
   };
 
-  if (bgTask?.isFinished) return (
+  /* ── RESULTS VIEW ── */
+  if(bgTask?.isFinished)return(
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="glass border-b border-[var(--border)] p-4 flex justify-between items-center shrink-0">
-        <span className="text-xs font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2"><CheckCircle2 size={18}/> {bgTask.result?.data?.length||1} items ready</span>
+      <div className="flex items-center justify-between px-4 py-3 bg-emerald-500/10 border-b border-emerald-500/20 shrink-0">
+        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+          <CheckCircle2 size={15}/> {bgTask.result?.data?.length||1} items ready
+        </span>
         <div className="flex gap-2">
-          <button onClick={onClearTask} className="px-4 py-2 glass opacity-60 hover:opacity-100 rounded-xl text-[10px] font-black uppercase">Discard</button>
-          <button onClick={save} className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase flex items-center gap-2 shadow-md"><Save size={14}/> Save</button>
-        </div>
-      </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 pb-[110px] lg:pb-5 space-y-5">
-        {bgTask.result?.type==='flashcards' && bgTask.result.data.map((item,i)=>(
-          <div key={i} className="glass p-5 rounded-[2rem]">
-            <p className="font-bold mb-4 text-sm"><span className="opacity-40 mr-2 text-xs">Q</span>{item.q}</p>
-            <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/20 p-4 rounded-xl mb-3"><p className="text-sm text-[var(--accent)]"><span className="opacity-40 mr-2 text-xs">A</span>{item.a}</p></div>
-            {item.evidence&&<p className="text-xs opacity-50 italic bg-black/5 p-3 rounded-xl">"{item.evidence}" — Pg {item.sourcePage||'?'}</p>}
-          </div>
-        ))}
-        {(bgTask.result?.type==='exam'||bgTask.result?.type==='cases') && bgTask.result.data.map((item,i)=>(
-          <div key={i} className="glass p-5 rounded-[2rem]">
-            {item.vignette&&<p className="text-xs opacity-75 mb-3 bg-black/5 p-3 rounded-xl leading-relaxed">{item.vignette}</p>}
-            <p className="font-bold text-sm mb-4">{i+1}. {item.q||item.examQuestion?.q}</p>
-            <div className="space-y-2 mb-4">
-              {(item.options||item.examQuestion?.options||[]).map((o,oi)=>{
-                const ci=item.correct!==undefined?item.correct:item.examQuestion?.correct;
-                return <div key={oi} className={`text-xs p-3 rounded-xl border ${oi===ci?'border-emerald-500 bg-emerald-500/10 text-emerald-600 font-bold':'border-[var(--border)] bg-black/5'}`}><span className="font-mono opacity-40 mr-2">{String.fromCharCode(65+oi)}.</span>{o}</div>;
-              })}
-            </div>
-            <div className="p-4 bg-[var(--accent)]/10 rounded-xl border border-[var(--accent)]/20"><p className="text-xs leading-relaxed">{item.explanation||item.examQuestion?.explanation}</p></div>
-          </div>
-        ))}
-        {!['flashcards','exam','cases'].includes(bgTask.result?.type) && (
-          <div className="glass p-6 rounded-[2rem] text-sm whitespace-pre-wrap leading-loose">{bgTask.result?.data}</div>
-        )}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-5 pb-[110px] lg:pb-5">
-      <div className="glass rounded-[2rem] p-5 mb-5">
-        <h2 className="font-black mb-4 flex items-center gap-2 text-sm"><Target size={18} className="text-[var(--accent)]"/> Select Pages</h2>
-        <div className="flex items-center gap-3 mb-6">
-          {[['From',startPage,setStartPage],['To',endPage,setEndPage]].map(([l,v,s])=>(
-            <div key={l} className="flex-1">
-              <label className="text-[9px] font-black uppercase tracking-widest opacity-50 mb-1.5 block">{l} Page</label>
-              <input type="number" min={1} max={activeDoc.totalPages} value={v} onChange={e=>s(Number(e.target.value))}
-                className="w-full bg-white dark:bg-black rounded-xl px-3 py-2.5 text-center font-mono font-bold outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)] text-sm"/>
-            </div>
-          ))}
-        </div>
-
-        <h2 className="font-black mb-3 flex items-center gap-2 text-sm"><Zap size={18} className="text-amber-500"/> Tool</h2>
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          <ToolBtn id="flashcards" active={type} set={setType} icon={Layers}      label="Cards"/>
-          <ToolBtn id="exam"       active={type} set={setType} icon={CheckSquare}  label="Exam"/>
-          <ToolBtn id="summary"    active={type} set={setType} icon={BookA}        label="Summary"/>
-          <ToolBtn id="cases"      active={type} set={setType} icon={Activity}     label="Cases"/>
-          <ToolBtn id="clinical"   active={type} set={setType} icon={Stethoscope}  label="Clinical"/>
-          <ToolBtn id="treatment"  active={type} set={setType} icon={Pill}         label="Treat"/>
-          <ToolBtn id="labs"       active={type} set={setType} icon={Thermometer}  label="Labs"/>
-          <ToolBtn id="mnemonics"  active={type} set={setType} icon={Lightbulb}    label="Memory"/>
-          <ToolBtn id="eli5"       active={type} set={setType} icon={Baby}         label="ELI5"/>
-        </div>
-
-        {['flashcards','exam','cases'].includes(type) && (
-          <div className="mb-5 bg-black/5 dark:bg-white/5 p-4 rounded-2xl border border-[var(--border)]">
-            <label className="text-[9px] font-black uppercase tracking-widest opacity-50 mb-4 flex justify-between"><span>Quantity</span><span className="text-[var(--accent)]">{count} items</span></label>
-            <input type="range" min="1" max="25" value={count} onChange={e=>setCount(+e.target.value)} className="w-full accent-[var(--accent)]"/>
-            <p className="text-[9px] opacity-35 mt-1.5">Keep ≤8 for faster results</p>
-          </div>
-        )}
-
-        <div className="mb-5 bg-black/5 dark:bg-white/5 p-4 rounded-2xl border border-[var(--border)]">
-          <label className="text-[9px] font-black uppercase tracking-widest opacity-50 mb-4 flex justify-between"><span>Difficulty</span><span className="text-[var(--accent)]">{levels[difficulty-1]}</span></label>
-          <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(+e.target.value)} className="w-full accent-[var(--accent)]"/>
-        </div>
-
-        <button onClick={go} disabled={!!bgTask}
-          className="w-full py-4 btn-accent rounded-2xl text-sm font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-3 hover:-translate-y-1 active:scale-95 transition-all shadow-xl">
-          {bgTask?<Loader2 size={20} className="animate-spin"/>:<Zap size={20} fill="currentColor"/>}
-          {bgTask?'Running AI…':'Execute Extraction'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── PANEL CHAT ───────────────────────────────────────────────────────────────
-// FIX: all hooks BEFORE conditional return
-function PanelChat({ activeDoc, settings, currentPage }) {
-  const [messages, setMessages] = useState([{role:'assistant',content:'Ready. Ask anything about this document.'}]);
-  const [input,    setInput]    = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [mode,     setMode]     = useState('page');
-  const endRef = useRef(null);
-
-  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:'smooth'}); },[messages,loading]);
-
-  // Only update the context hint message when page changes, not on initial mount causing duplicates
-  const prevPageRef = useRef(currentPage);
-  useEffect(()=>{
-    if (prevPageRef.current !== currentPage) {
-      prevPageRef.current = currentPage;
-      if (activeDoc) setMessages(p=>[...p,{role:'assistant',content:`*(Now focused on Page ${currentPage})*`}]);
-    }
-  },[currentPage, activeDoc]);
-
-  if (!activeDoc) return <div className="flex-1 flex items-center justify-center opacity-40 text-sm font-bold">No document open.</div>;
-
-  const handleChat = async () => {
-    if (!input.trim()||loading) return;
-    const msg=input; setInput(''); setMessages(p=>[...p,{role:'user',content:msg}]); setLoading(true);
-    try {
-      const pdfData = await getPdf(activeDoc.id);
-      const text = mode==='page'
-        ? (pdfData?.pagesText?.[currentPage]||'No text on this page.')
-        : Object.entries(pdfData?.pagesText||{}).map(([p,t])=>`[Page ${p}]\n${t}`).join('\n\n').substring(0,60000);
-      const hist = messages.filter(m=>!m.content.startsWith('*(')).slice(-6).map(m=>`${m.role==='user'?'USER':'ASSISTANT'}: ${m.content}`).join('\n');
-      const res = await callAI(`DOCUMENT:\n${text}\n\nHISTORY:\n${hist}\n\nQUESTION:\n${msg}`, false, false, settings, 3000);
-      setMessages(p=>[...p,{role:'assistant',content:res}]);
-    } catch(e) { setMessages(p=>[...p,{role:'assistant',content:`⚠️ ${e.message}`}]); }
-    finally { setLoading(false); }
-  };
-
-  return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <div className="shrink-0 p-3 pb-2 border-b border-[var(--border)]">
-        <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1.5 rounded-xl">
-          <button onClick={()=>setMode('page')}
-            className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors ${mode==='page'?'bg-[var(--accent)] text-white shadow-md':'opacity-55 hover:opacity-100'}`}>
-            Page {currentPage}
-          </button>
-          <button onClick={()=>setMode('document')}
-            className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-lg transition-colors ${mode==='document'?'bg-[var(--accent)] text-white shadow-md':'opacity-55 hover:opacity-100'}`}>
-            Full Doc
+          <button onClick={onClear} className="px-3 py-1.5 glass rounded-xl text-[10px] font-black uppercase opacity-60 hover:opacity-100">Discard</button>
+          <button onClick={save} className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase flex items-center gap-1.5 shadow-md">
+            <Save size={12}/> Save
           </button>
         </div>
       </div>
-
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 min-h-0">
-        {messages.map((m,i)=>(
-          <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''}`}>
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)] text-white':'glass overflow-hidden'}`}>
-              {m.role==='user'?<UserCircle2 size={17}/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
-            </div>
-            <div className={`p-4 text-xs leading-relaxed max-w-[84%] ${m.role==='user'?'bg-[var(--accent)] text-white rounded-2xl rounded-tr-sm':'glass rounded-2xl rounded-tl-sm whitespace-pre-wrap'}`}>{m.content}</div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+        {bgTask.result?.type==='flashcards'&&bgTask.result.data.map((item,i)=>(
+          <div key={i} className="glass p-4 rounded-2xl">
+            <p className="font-bold text-xs mb-3 leading-relaxed"><span className="opacity-30 mr-1.5 font-mono text-[9px]">Q{i+1}</span>{item.q}</p>
+            <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/20 p-3 rounded-xl text-xs text-[var(--accent)]">{item.a}</div>
+            {item.evidence&&<p className="mt-2 text-[10px] opacity-40 italic">"{item.evidence}" — Pg {item.sourcePage}</p>}
           </div>
         ))}
-        {loading && <div className="flex gap-3"><div className="w-9 h-9 rounded-xl glass overflow-hidden"><img src={MARIAM_IMG} className="w-full h-full object-cover opacity-50" alt="AI"/></div><div className="p-4 glass rounded-2xl flex gap-1.5 items-center">{[0,1,2].map(i=><span key={i} className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay:`${i*.15}s`}}/>)}</div></div>}
-        <div ref={endRef}/>
-      </div>
-
-      <div className="shrink-0 p-3 pb-[110px] lg:pb-3 border-t border-[var(--border)] bg-[var(--bg)] relative">
-        <div className="relative flex items-end bg-black/5 dark:bg-white/5 rounded-2xl border border-[var(--border)] p-2">
-          <textarea value={input} onChange={e=>setInput(e.target.value)}
-            onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleChat();} }}
-            placeholder={`Ask about ${mode==='page'?`page ${currentPage}`:'the document'}…`} disabled={loading}
-            className="w-full bg-transparent p-3 pr-12 text-xs outline-none resize-none max-h-28 custom-scrollbar text-[var(--text)]"
-            style={{minHeight:'48px'}}/>
-          <button onClick={handleChat} disabled={loading||!input.trim()}
-            className="absolute right-3 bottom-3 p-3 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white shadow-lg hover:scale-105 active:scale-95">
-            <Send size={16}/>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── PANEL REVIEW ─────────────────────────────────────────────────────────────
-function PanelReview({ activeDocId, flashcards, setFlashcards, exams, setExams, cases, setCases, notes, setNotes, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [item, setItem] = useState(null);
-  const [tab,  setTab]  = useState('cases');
-  const dCards = flashcards.filter(f=>f.docId===activeDocId);
-  const dExams = exams.filter(e=>e.docId===activeDocId);
-  const dCases = cases.filter(c=>c.docId===activeDocId);
-  const dNotes = notes.filter(n=>n.docId===activeDocId);
-
-  if (item?.type==='exam'||item?.type==='case') return <div className="flex-1 flex flex-col min-h-0"><InPanelExam exam={item.data} onBack={()=>setItem(null)} onScoreUpdate={(id,sc)=>{ if(item.type==='case') setCases(p=>p.map(c=>c.id===id?{...c,lastScore:sc}:c)); else setExams(p=>p.map(e=>e.id===id?{...e,lastScore:sc}:e)); }} addToast={addToast} setCurrentPage={setCurrentPage} setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={settings}/></div>;
-  if (item?.type==='note') return <div className="flex-1 flex flex-col min-h-0"><InPanelNote note={item.data} onBack={()=>setItem(null)}/></div>;
-  if (item?.type==='flashcards') return <div className="flex-1 flex flex-col min-h-0"><InPanelFlashcards title={item.data.title} initialCards={item.data.cards} onBack={()=>setItem(null)} setFlashcards={setFlashcards} addToast={addToast} setCurrentPage={setCurrentPage} setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={settings}/></div>;
-
-  const TABS = [['cases','Cases',dCases.length],['exams','Exams',dExams.length],['flashcards','Cards',dCards.length],['notes','Notes',dNotes.length]];
-
-  return (
-    <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-      <div className="flex gap-1.5 p-3 glass border-b border-[var(--border)] shrink-0 rounded-none">
-        {TABS.map(([id,label,cnt])=>(
-          <button key={id} onClick={()=>setTab(id)} className={`flex-1 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all flex flex-col items-center gap-0.5
-            ${tab===id?'bg-[var(--card)] text-[var(--accent)] shadow border border-[var(--border)]':'opacity-50 hover:opacity-100 border border-transparent'}`}>
-            {label}<span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black ${tab===id?'bg-[var(--accent)] text-white':'bg-black/10 dark:bg-white/10'}`}>{cnt}</span>
-          </button>
-        ))}
-      </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pb-[110px] lg:pb-4 space-y-3 min-h-0">
-
-        {tab==='cases' && (dCases.length===0?<EmptyState icon={Activity} text="No cases for this document."/>:dCases.map(c=>(
-          <div key={c.id} className="glass rounded-2xl p-5 card-hover border border-[var(--border)]">
-            <div className="flex justify-between items-start mb-4">
-              <div><p className="font-bold text-sm mb-2 leading-snug">{c.title}</p><div className="flex gap-2 flex-wrap"><span className="text-[9px] font-black text-blue-500 bg-blue-500/10 px-2 py-1 rounded-lg">{c.questions.length} Cases</span>{c.lastScore!==undefined&&<span className={`text-[9px] font-black px-2 py-1 rounded-lg ${c.lastScore>=70?'text-emerald-500 bg-emerald-500/10':'text-red-500 bg-red-500/10'}`}>{c.lastScore}%</span>}</div></div>
-              <button onClick={()=>setCases(cases.filter(x=>x.id!==c.id))} className="p-2 opacity-40 hover:text-red-500 rounded-xl glass"><Trash size={15}/></button>
-            </div>
-            <button onClick={()=>setItem({type:'case',data:c})} className="w-full py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"><Play size={14} fill="currentColor"/> Solve</button>
-          </div>
-        )))}
-
-        {tab==='exams' && (dExams.length===0?<EmptyState icon={GraduationCap} text="No exams for this document."/>:dExams.map(e=>(
-          <div key={e.id} className="glass rounded-2xl p-5 card-hover border border-[var(--border)]">
-            <div className="flex justify-between items-start mb-4">
-              <div><p className="font-bold text-sm mb-2 leading-snug">{e.title}</p><div className="flex gap-2 flex-wrap"><span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg">{e.questions.length} Qs</span>{e.lastScore!==undefined&&<span className={`text-[9px] font-black px-2 py-1 rounded-lg ${e.lastScore>=70?'text-emerald-500 bg-emerald-500/10':'text-red-500 bg-red-500/10'}`}>{e.lastScore}%</span>}</div></div>
-              <button onClick={()=>setExams(exams.filter(x=>x.id!==e.id))} className="p-2 opacity-40 hover:text-red-500 rounded-xl glass"><Trash size={15}/></button>
-            </div>
-            <button onClick={()=>setItem({type:'exam',data:e})} className="w-full py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"><Play size={14} fill="currentColor"/> Take Exam</button>
-          </div>
-        )))}
-
-        {tab==='flashcards' && (dCards.length===0?<EmptyState icon={Layers} text="No flashcards for this document."/>:dCards.map(set=>{
-          const due=(set.cards||[]).filter(c=>c.nextReview<=Date.now()).length;
-          return (
-            <div key={set.id} className="glass rounded-2xl p-5 card-hover border border-[var(--border)]">
-              <div className="flex justify-between items-start mb-4">
-                <div><p className="font-bold text-sm mb-2 leading-snug">{set.title}</p><div className="flex gap-2 flex-wrap"><span className="text-[9px] font-black text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-1 rounded-lg">{set.cards?.length||0} Cards</span>{due>0&&<span className="text-[9px] font-black text-red-500 bg-red-500/10 px-2 py-1 rounded-lg animate-pulse">{due} due</span>}</div></div>
-                <button onClick={()=>setFlashcards(flashcards.filter(f=>f.id!==set.id))} className="p-2 opacity-40 hover:text-red-500 rounded-xl glass"><Trash size={15}/></button>
+        {(bgTask.result?.type==='exam'||bgTask.result?.type==='cases')&&bgTask.result.data.map((item,i)=>{
+          const q=item.examQuestion||item;
+          return(
+            <div key={i} className="glass p-4 rounded-2xl">
+              {item.vignette&&<p className="text-[10px] opacity-60 mb-3 bg-black/5 p-3 rounded-xl leading-relaxed line-clamp-3">{item.vignette}</p>}
+              <p className="font-bold text-xs mb-3 leading-relaxed">{i+1}. {q.q}</p>
+              <div className="space-y-1.5 mb-3">
+                {(q.options||[]).map((o,oi)=>(
+                  <div key={oi} className={`text-[10px] px-3 py-2 rounded-xl border ${oi===q.correct?'border-emerald-500 bg-emerald-500/10 text-emerald-600 font-bold':'border-[var(--border)] bg-black/5'}`}>
+                    <span className="font-mono opacity-40 mr-1.5">{String.fromCharCode(65+oi)}.</span>{o}
+                  </div>
+                ))}
               </div>
-              <button onClick={()=>setItem({type:'flashcards',data:set})} className="w-full py-3 bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 text-[var(--accent)] rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"><Play size={14} fill="currentColor"/> Study</button>
+              <div className="bg-[var(--accent)]/10 p-3 rounded-xl text-[10px] leading-relaxed">{q.explanation}</div>
             </div>
           );
-        }))}
-
-        {tab==='notes' && (dNotes.length===0?<EmptyState icon={BookA} text="No notes for this document."/>:dNotes.map(n=>(
-          <div key={n.id} onClick={()=>setItem({type:'note',data:n})} className="glass p-5 rounded-2xl relative group card-hover cursor-pointer border border-[var(--border)] hover:border-[var(--accent)]/50">
-            <p className="font-bold text-sm mb-3 pr-10 leading-snug">{n.title}</p>
-            <p className="text-xs opacity-50 line-clamp-3 bg-black/5 dark:bg-white/5 p-3 rounded-xl">{n.content}</p>
-            <button onClick={e=>{e.stopPropagation();setNotes(notes.filter(x=>x.id!==n.id));}} className="absolute top-5 right-5 p-2 opacity-0 group-hover:opacity-100 hover:text-red-500 rounded-xl glass"><Trash size={15}/></button>
-          </div>
-        )))}
-      </div>
-    </div>
-  );
-}
-
-// ─── GLOBAL VIEWS ─────────────────────────────────────────────────────────────
-function FlashcardsGlobalView({ flashcards, setFlashcards, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [studying, setStudying] = useState(null);
-  if (studying) return <div className="flex-1 flex flex-col min-h-0"><InPanelFlashcards title={studying.title} initialCards={studying.cards} onBack={()=>setStudying(null)} setFlashcards={setFlashcards} addToast={addToast} setCurrentPage={setCurrentPage} setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={settings}/></div>;
-  return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-screen-xl mx-auto p-6 md:p-12 pb-[120px] lg:pb-32">
-        <h1 className="title-font text-4xl font-black text-emerald-500 mb-10 flex items-center gap-4"><Layers size={36}/> Card Vault</h1>
-        {flashcards.length===0?<EmptyState icon={Layers} text="No flashcards yet. Open a PDF → AI Studio → Extract Cards."/>:(
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {flashcards.map(set=>(
-              <div key={set.id} className="glass rounded-[2rem] p-6 flex flex-col card-hover">
-                <h3 className="font-bold mb-4 line-clamp-2">{set.title}</h3>
-                <span className="px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-xl text-[10px] font-bold w-fit mb-6">{set.cards?.length||0} Cards</span>
-                <div className="mt-auto flex gap-3"><button onClick={()=>setStudying(set)} className="flex-1 py-4 btn-accent rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg">Study</button><button onClick={()=>setFlashcards(flashcards.filter(f=>f.id!==set.id))} className="p-4 glass hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors"><Trash2 size={18}/></button></div>
-              </div>
-            ))}
-          </div>
+        })}
+        {!['flashcards','exam','cases'].includes(bgTask.result?.type)&&(
+          <div className="glass p-4 rounded-2xl text-xs whitespace-pre-wrap leading-relaxed">{bgTask.result?.data}</div>
         )}
       </div>
     </div>
   );
-}
 
-function ExamsGlobalView({ exams, setExams, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [sel, setSel] = useState(null);
-  if (sel) return <div className="flex-1 flex flex-col min-h-0"><InPanelExam exam={sel} onBack={()=>setSel(null)} onScoreUpdate={(id,sc)=>setExams(p=>p.map(e=>e.id===id?{...e,lastScore:sc}:e))} addToast={addToast} setCurrentPage={setCurrentPage} setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={settings}/></div>;
-  return (
+  /* ── CONFIG VIEW ── */
+  return(
     <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-screen-xl mx-auto p-6 md:p-12 pb-[120px] lg:pb-32">
-        <h1 className="title-font text-4xl font-black text-rose-500 mb-10 flex items-center gap-4"><GraduationCap size={36}/> Exams</h1>
-        {exams.length===0?<EmptyState icon={GraduationCap} text="No exams yet."/>:(
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {exams.map(e=>(
-              <div key={e.id} className="glass rounded-[2rem] p-6 flex flex-col card-hover">
-                <h3 className="font-bold mb-4 line-clamp-2">{e.title}</h3>
-                <div className="flex gap-2 mb-6 flex-wrap text-[10px] font-bold"><span className="px-3 py-1 bg-rose-500/10 text-rose-600 rounded-xl">{e.questions.length} Qs</span>{e.lastScore!==undefined&&<span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-xl">{e.lastScore}%</span>}</div>
-                <div className="mt-auto flex gap-3"><button onClick={()=>setSel(e)} className="flex-1 py-4 bg-gradient-to-r from-rose-400 to-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg">Take Exam</button><button onClick={()=>setExams(exams.filter(ex=>ex.id!==e.id))} className="p-4 glass hover:text-red-500 hover:bg-red-500/10 rounded-2xl"><Trash2 size={18}/></button></div>
+      <div className="p-4 space-y-4">
+        {/* Page range */}
+        <div className="glass rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><Hash size={13}/> Page Range</h3>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <div onClick={()=>setEntireFile(o=>!o)}
+                className={`w-10 h-5 rounded-full transition-colors relative ${entireFile?'bg-[var(--accent)]':'bg-gray-300 dark:bg-zinc-600'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${entireFile?'translate-x-5':'translate-x-0.5'}`}/>
+              </div>
+              <span className="text-[10px] font-bold opacity-60">Entire File</span>
+            </label>
+          </div>
+          <div className={`flex gap-3 ${entireFile?'opacity-40 pointer-events-none':''}`}>
+            {[['From',startPage,setStartPage],['To',endPage,setEndPage]].map(([l,v,s])=>(
+              <div key={l} className="flex-1">
+                <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
+                <input type="number" min={1} max={activeDoc.totalPages} value={v} onChange={e=>s(Number(e.target.value))}
+                  className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
               </div>
             ))}
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function CasesGlobalView({ cases, setCases, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [sel, setSel] = useState(null);
-  if (sel) return <div className="flex-1 flex flex-col min-h-0"><InPanelExam exam={sel} onBack={()=>setSel(null)} onScoreUpdate={(id,sc)=>setCases(p=>p.map(c=>c.id===id?{...c,lastScore:sc}:c))} addToast={addToast} setCurrentPage={setCurrentPage} setRightPanelOpen={setRightPanelOpen} setCurrentView={setCurrentView} settings={settings}/></div>;
-  return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-screen-xl mx-auto p-6 md:p-12 pb-[120px] lg:pb-32">
-        <h1 className="title-font text-4xl font-black text-blue-500 mb-10 flex items-center gap-4"><Activity size={36}/> Patient Cases</h1>
-        {cases.length===0?<EmptyState icon={Activity} text="No cases yet."/>:(
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {cases.map(c=>(
-              <div key={c.id} className="glass rounded-[2rem] p-6 flex flex-col card-hover">
-                <h3 className="font-bold mb-4 line-clamp-2">{c.title}</h3>
-                <div className="flex gap-2 mb-6 flex-wrap text-[10px] font-bold"><span className="px-3 py-1 bg-blue-500/10 text-blue-600 rounded-xl">{c.questions?.length||0} Cases</span>{c.lastScore!==undefined&&<span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 rounded-xl">{c.lastScore}%</span>}</div>
-                <div className="mt-auto flex gap-3"><button onClick={()=>setSel(c)} className="flex-1 py-4 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg">Solve Cases</button><button onClick={()=>setCases(cases.filter(x=>x.id!==c.id))} className="p-4 glass hover:text-red-500 hover:bg-red-500/10 rounded-2xl"><Trash2 size={18}/></button></div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ChatGlobalView({ settings, chatSessions, setChatSessions, addToast }) {
-  const [sid, setSid] = useState(null);
-  const [input, setInput] = useState(''); const [loading, setLoading] = useState(false);
-  const endRef = useRef(null);
-  const active = chatSessions.find(s=>s.id===sid)||null;
-  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:'smooth'}); },[active?.messages,loading]);
-
-  const send = async () => {
-    if (!input.trim()||loading) return;
-    const id=sid||Date.now().toString(), msg=input; setInput('');
-    let msgs = !sid?[]:(chatSessions.find(s=>s.id===id)?.messages||[]);
-    msgs=[...msgs,{role:'user',content:msg}];
-    const title=!sid?msg.substring(0,40)+'…':chatSessions.find(s=>s.id===id)?.title;
-    setChatSessions(p=>p.find(s=>s.id===id)?p.map(s=>s.id===id?{...s,messages:msgs}:s):[{id,title,messages:msgs,createdAt:new Date().toISOString()},...p]);
-    if(!sid) setSid(id); setLoading(true);
-    try { const r=await callAI(msg,false,false,settings,4000); setChatSessions(p=>p.map(s=>s.id===id?{...s,messages:[...s.messages,{role:'assistant',content:r}]}:s)); }
-    catch(e){ setChatSessions(p=>p.map(s=>s.id===id?{...s,messages:[...s.messages,{role:'assistant',content:`⚠️ ${e.message}`}]}:s)); }
-    finally { setLoading(false); }
-  };
-
-  return (
-    <div className="flex-1 flex w-full h-full min-h-0">
-      <div className="hidden md:flex w-64 flex-col glass shrink-0 rounded-none border-y-0 border-l-0">
-        <div className="p-3 border-b border-[var(--border)]"><button onClick={()=>setSid(null)} className="w-full flex items-center justify-center gap-2 bg-[var(--accent)] text-white py-3 rounded-xl font-bold text-sm"><PlusCircle size={16}/> New Chat</button></div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-          {chatSessions.length===0&&<div className="text-center p-4 text-[9px] font-bold opacity-40 uppercase tracking-widest mt-4">No History</div>}
-          {chatSessions.map(s=>(
-            <div key={s.id} className="relative group mb-1">
-              <button onClick={()=>setSid(s.id)} className={`w-full text-left p-3 rounded-xl text-xs transition-colors ${sid===s.id?'bg-[var(--accent)]/10 text-[var(--accent)] font-bold':'opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}><div className="truncate pr-6">{s.title}</div></button>
-              <button onClick={()=>setChatSessions(p=>p.filter(x=>x.id!==s.id))} className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:text-red-500 opacity-0 group-hover:opacity-100 rounded-lg"><Trash size={12}/></button>
-            </div>
-          ))}
+          {entireFile&&<p className="text-[10px] text-[var(--accent)] font-bold mt-2 text-center">All {activeDoc.totalPages} pages selected</p>}
         </div>
-      </div>
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 flex flex-col">
-          {!active?(
-            <div className="flex-1 flex flex-col items-center justify-center text-center opacity-60">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--accent)]/10 flex items-center justify-center mb-5"><Sparkles size={32} className="text-[var(--accent)]"/></div>
-              <h2 className="text-xl font-black mb-2">Medical AI Chat</h2>
-              <p className="max-w-xs text-sm">Ask any clinical or general medical question.</p>
+
+        {/* Tool selector */}
+        <div className="glass rounded-2xl p-4">
+          <h3 className="text-xs font-black uppercase tracking-widest opacity-60 mb-3 flex items-center gap-2"><Zap size={13}/> Tool</h3>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              ['flashcards','Cards',Layers],['exam','Exam',CheckSquare],['summary','Summary',AlignLeft],
+              ['cases','Cases',Activity],['clinical','Clinical',Stethoscope],['treatment','Treat',Pill],
+              ['labs','Labs',Thermometer],['mnemonics','Memory',Lightbulb],['eli5','ELI5',Baby],
+            ].map(([id,lbl,Icon])=>(
+              <button key={id} onClick={()=>setType(id)}
+                className={`py-3 flex flex-col items-center gap-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border
+                  ${type===id?'bg-[var(--accent)] text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
+                <Icon size={16}/>{lbl}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Count */}
+        {['flashcards','exam','cases'].includes(type)&&(
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><ListChecks size={13}/> Quantity</h3>
+              <span className="text-sm font-black text-[var(--accent)]">{count}</span>
             </div>
-          ):(
-            <div className="max-w-3xl mx-auto w-full space-y-5 pb-4">
-              {active.messages.map((m,i)=>(
-                <div key={i} className={`flex gap-4 ${m.role==='user'?'flex-row-reverse':''}`}>
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'glass overflow-hidden border border-[var(--border)]'}`}>
-                    {m.role==='user'?<UserCircle2 size={18} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
-                  </div>
-                  <div className={`p-4 text-sm leading-relaxed max-w-[85%] ${m.role==='user'?'bg-[var(--accent)] text-white rounded-2xl rounded-tr-sm':'glass rounded-2xl rounded-tl-sm w-full whitespace-pre-wrap'}`}>{m.content}</div>
-                </div>
+            <input type="range" min="1" max="1000" value={count} onChange={e=>setCount(+e.target.value)}
+              className="w-full accent-[var(--accent)] mb-2"/>
+            <div className="flex gap-1.5 flex-wrap">
+              {[5,10,20,50,100,250,500,1000].map(n=>(
+                <button key={n} onClick={()=>setCount(n)}
+                  className={`px-2 py-1 rounded-lg text-[9px] font-black transition-colors ${count===n?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>
+                  {n}
+                </button>
               ))}
-              {loading&&<div className="flex gap-4"><div className="w-10 h-10 rounded-2xl glass overflow-hidden"><img src={MARIAM_IMG} className="w-full h-full object-cover opacity-40" alt="AI"/></div><div className="p-4 glass rounded-2xl flex gap-1.5 items-center">{[0,1,2].map(i=><span key={i} className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay:`${i*.15}s`}}/>)}</div></div>}
-              <div ref={endRef}/>
             </div>
-          )}
-        </div>
-        <div className="shrink-0 p-4 pb-[110px] lg:pb-4 border-t border-[var(--border)]">
-          <div className="max-w-3xl mx-auto glass rounded-2xl p-2 relative">
-            <textarea value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
-              placeholder="Ask anything…" disabled={loading}
-              className="w-full bg-transparent p-3 pr-14 text-sm outline-none resize-none max-h-36 custom-scrollbar text-[var(--text)]"
-              style={{minHeight:'56px'}}/>
-            <button onClick={send} disabled={loading||!input.trim()} className="absolute right-3 bottom-3 p-3 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white"><Send size={17}/></button>
+            {count>50&&<p className="text-[9px] text-amber-500 font-bold mt-2 flex items-center gap-1"><AlertCircle size={10}/>Large batches run in parallel — expect 30-120s for {count}+ items</p>}
           </div>
+        )}
+
+        {/* Difficulty */}
+        <div className="glass rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-black uppercase tracking-widest opacity-60">Difficulty</h3>
+            <span className="text-xs font-black text-[var(--accent)]">{levels[difficulty-1]}</span>
+          </div>
+          <input type="range" min="1" max="3" value={difficulty} onChange={e=>setDifficulty(+e.target.value)}
+            className="w-full accent-[var(--accent)]"/>
+        </div>
+
+        {/* GO button */}
+        <button onClick={go} disabled={!!bgTask}
+          className="w-full py-4 btn-accent rounded-2xl text-sm font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl">
+          {bgTask?<Loader2 size={18} className="animate-spin"/>:<Zap size={18} fill="currentColor"/>}
+          {bgTask?`${bgTask.msg}`:'Generate Now'}
+        </button>
+
+        {/* progress */}
+        {bgTask&&!bgTask.isFinished&&(
+          <div className="glass rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-black opacity-60">{bgTask.msg}</span>
+              <span className="text-[10px] font-black text-[var(--accent)]">{bgTask.done||0}/{bgTask.total||1}</span>
+            </div>
+            <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2 overflow-hidden">
+              <div className="bg-[var(--accent)] h-full rounded-full transition-all duration-300"
+                style={{width:`${bgTask.total?((bgTask.done||0)/bgTask.total)*100:10}%`}}/>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHAT PANEL (AI Studio side panel)
+═══════════════════════════════════════════════════════════════════════════ */
+function ChatPanel({activeDoc,settings,currentPage}){
+  const[msgs,setMsgs]=useState([{role:'assistant',content:'Ready. Ask me anything about this document.'}]);
+  const[input,setInput]=useState('');
+  const[loading,setLoading]=useState(false);
+  const[mode,setMode]=useState('page');
+  const endRef=useRef(null);
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,loading]);
+
+  const send=async()=>{
+    if(!input.trim()||loading)return;
+    const msg=input;setInput('');setMsgs(p=>[...p,{role:'user',content:msg}]);setLoading(true);
+    try{
+      const pdfData=await getPdf(activeDoc.id);
+      const text=mode==='page'
+        ?(pdfData?.pagesText?.[currentPage]||'No text on this page.')
+        :Object.entries(pdfData?.pagesText||{}).map(([p,t])=>`[Page ${p}]\n${t}`).join('\n\n').substring(0,80000);
+      const hist=msgs.slice(-6).map(m=>`${m.role==='user'?'USER':'AI'}: ${m.content}`).join('\n');
+      const res=await callAI(`DOCUMENT:\n${text}\n\nHISTORY:\n${hist}\n\nQUESTION: ${msg}`,false,false,settings,4000);
+      setMsgs(p=>[...p,{role:'assistant',content:res}]);
+    }catch(e){setMsgs(p=>[...p,{role:'assistant',content:`⚠️ ${e.message}`}]);}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div className="flex-1 flex flex-col min-h-0 h-full">
+      <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
+        {['page','document'].map(m=>(
+          <button key={m} onClick={()=>setMode(m)}
+            className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors border-b-2
+              ${mode===m?'border-[var(--accent)] text-[var(--accent)]':'border-transparent opacity-50 hover:opacity-80'}`}>
+            {m==='page'?`Page ${currentPage}`:'Full Doc'}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 min-h-0">
+        {msgs.map((m,i)=>(
+          <div key={i} className={`flex gap-2.5 ${m.role==='user'?'flex-row-reverse':''}`}>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden glass'}`}>
+              {m.role==='user'?<UserCircle2 size={16} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
+            </div>
+            <div className={`px-3.5 py-2.5 text-xs leading-relaxed max-w-[84%] whitespace-pre-wrap rounded-2xl
+              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass rounded-tl-sm'}`}>{m.content}</div>
+          </div>
+        ))}
+        {loading&&<div className="flex gap-2.5"><div className="w-8 h-8 rounded-xl overflow-hidden glass shrink-0"><img src={MARIAM_IMG} className="w-full h-full object-cover opacity-50" alt="AI"/></div><div className="glass px-4 py-3 rounded-2xl rounded-tl-sm flex gap-1">{[0,1,2].map(i=><span key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*.15}s`}}/>)}</div></div>}
+        <div ref={endRef}/>
+      </div>
+      <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]">
+        <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)]">
+          <textarea value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+            placeholder={`Ask about ${mode==='page'?`page ${currentPage}`:'the document'}…`} disabled={loading}
+            className="flex-1 bg-transparent p-2 text-xs outline-none resize-none max-h-24 custom-scrollbar text-[var(--text)] min-h-[36px]"/>
+          <button onClick={send} disabled={loading||!input.trim()}
+            className="w-8 h-8 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0"><Send size={14}/></button>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── IN-PANEL EXAM ────────────────────────────────────────────────────────────
-function InPanelExam({ exam, onBack, onScoreUpdate, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [qi,  setQi]  = useState(0);
-  const [sel, setSel] = useState(null);
-  const [fb,  setFb]  = useState(false);
-  const [score, setScore] = useState(0);
-  const [done, setDone]   = useState(false);
-  const [tutor, setTutor] = useState(false);
-  const [tw,   setTw]    = useState(340);
-  const [rz,   setRz]    = useState(false);
+/* ═══════════════════════════════════════════════════════════════════════════
+   VAULT PANEL
+═══════════════════════════════════════════════════════════════════════════ */
+function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,setCases,notes,setNotes,addToast,setCurrentPage,setView,settings}){
+  const[tab,setTab]=useState('exams');
+  const[active,setActive]=useState(null);
+  const dCards=flashcards.filter(f=>f.docId===activeDocId);
+  const dExams=exams.filter(e=>e.docId===activeDocId);
+  const dCases=cases.filter(c=>c.docId===activeDocId);
+  const dNotes=notes.filter(n=>n.docId===activeDocId);
 
-  const qObj = exam.questions[qi];
-  const q    = qObj?.examQuestion ? qObj.examQuestion : qObj;
-  const pct  = Math.round((qi/exam.questions.length)*100);
+  if(active?.type==='exam'||active?.type==='case')return(
+    <ExamPlayer exam={active.data} onBack={()=>setActive(null)}
+      onScore={(id,sc)=>{if(active.type==='case')setCases(p=>p.map(c=>c.id===id?{...c,lastScore:sc}:c));else setExams(p=>p.map(e=>e.id===id?{...e,lastScore:sc}:e));}}
+      settings={settings} addToast={addToast}/>
+  );
+  if(active?.type==='flashcards')return(
+    <FlashPlayer set={active.data} onBack={()=>setActive(null)} setFlashcards={setFlashcards} settings={settings} addToast={addToast}/>
+  );
+  if(active?.type==='note')return(
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex items-center justify-between px-4 py-3 bg-blue-500/10 border-b border-blue-500/20 shrink-0">
+        <button onClick={()=>setActive(null)} className="flex items-center gap-1.5 text-blue-600 text-xs font-black"><ChevronLeft size={14}/> Back</button>
+        <button onClick={()=>navigator.clipboard?.writeText(active.data.content)} className="w-8 h-8 glass rounded-xl flex items-center justify-center text-blue-600"><Clipboard size={14}/></button>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
+        <h2 className="font-black text-lg mb-4 leading-snug">{active.data.title}</h2>
+        <div className="text-xs leading-loose whitespace-pre-wrap glass p-4 rounded-2xl">{active.data.content}</div>
+      </div>
+    </div>
+  );
 
-  useEffect(()=>{
-    const mv=e=>{ if(!rz) return; const x=e.touches?.[0]?.clientX??e.clientX; if(x) setTw(Math.max(260,Math.min(window.innerWidth-x,window.innerWidth-100))); };
-    const up=()=>{ if(rz) setRz(false); };
-    if(rz){ document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up); document.body.style.userSelect='none'; }
-    else { document.body.style.userSelect=''; }
-    return()=>{ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.body.style.userSelect=''; };
-  },[rz]);
+  const TABS=[['exams','Exams',dExams.length,'rose'],['cases','Cases',dCases.length,'blue'],['flashcards','Cards',dCards.length,'indigo'],['notes','Notes',dNotes.length,'amber']];
 
-  const pick=(i)=>{ if(fb) return; setSel(i); setFb(true); if(i===q.correct) setScore(s=>s+1); };
+  return(
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex border-b border-[var(--border)] shrink-0 bg-[var(--card)]">
+        {TABS.map(([id,lbl,cnt])=>(
+          <button key={id} onClick={()=>setTab(id)}
+            className={`flex-1 flex flex-col items-center py-2 text-[9px] font-black uppercase tracking-widest transition-colors border-b-2
+              ${tab===id?'border-[var(--accent)] text-[var(--accent)]':'border-transparent opacity-50 hover:opacity-80'}`}>
+            {lbl}<span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black mt-0.5 ${tab===id?'bg-[var(--accent)] text-white':'bg-black/10 dark:bg-white/10'}`}>{cnt}</span>
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2.5">
+        {tab==='exams'&&(dExams.length===0
+          ?<Empty icon={GraduationCap} text="No exams yet"/>
+          :dExams.map(e=>(
+            <ItemCard key={e.id} title={e.title} badge={`${e.questions.length} Qs`} score={e.lastScore}
+              color="rose" onPlay={()=>setActive({type:'exam',data:e})} onDelete={()=>setExams(exams.filter(x=>x.id!==e.id))}/>
+          )))}
+        {tab==='cases'&&(dCases.length===0
+          ?<Empty icon={Activity} text="No cases yet"/>
+          :dCases.map(c=>(
+            <ItemCard key={c.id} title={c.title} badge={`${c.questions?.length||0} Cases`} score={c.lastScore}
+              color="blue" onPlay={()=>setActive({type:'case',data:c})} onDelete={()=>setCases(cases.filter(x=>x.id!==c.id))}/>
+          )))}
+        {tab==='flashcards'&&(dCards.length===0
+          ?<Empty icon={Layers} text="No cards yet"/>
+          :dCards.map(set=>(
+            <ItemCard key={set.id} title={set.title} badge={`${set.cards?.length||0} Cards`}
+              color="indigo" onPlay={()=>setActive({type:'flashcards',data:set})} onDelete={()=>setFlashcards(flashcards.filter(f=>f.id!==set.id))}/>
+          )))}
+        {tab==='notes'&&(dNotes.length===0
+          ?<Empty icon={AlignLeft} text="No notes yet"/>
+          :dNotes.map(n=>(
+            <div key={n.id} onClick={()=>setActive({type:'note',data:n})}
+              className="glass rounded-2xl p-4 card-hover relative group border border-[var(--border)]">
+              <p className="font-bold text-xs mb-2 pr-8 leading-snug">{n.title}</p>
+              <p className="text-[10px] opacity-40 line-clamp-2">{n.content}</p>
+              <button onClick={ev=>{ev.stopPropagation();setNotes(notes.filter(x=>x.id!==n.id));}}
+                className="absolute top-3 right-3 w-7 h-7 glass rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 hover:text-red-500">
+                <Trash size={12}/>
+              </button>
+            </div>
+          )))}
+      </div>
+    </div>
+  );
+}
+
+function ItemCard({title,badge,score,color,onPlay,onDelete}){
+  const colors={rose:'text-rose-500 bg-rose-500/10',blue:'text-blue-500 bg-blue-500/10',indigo:'text-[var(--accent)] bg-[var(--accent)]/10',amber:'text-amber-500 bg-amber-500/10'};
+  return(
+    <div className="glass rounded-2xl p-4 border border-[var(--border)] card-hover group">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <p className="font-bold text-xs leading-snug flex-1 min-w-0">{title}</p>
+        <button onClick={e=>{e.stopPropagation();onDelete();}} className="w-6 h-6 glass rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 hover:text-red-500 shrink-0"><Trash size={11}/></button>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg ${colors[color]||colors.indigo}`}>{badge}</span>
+        {score!==undefined&&<span className={`text-[9px] font-black px-2 py-0.5 rounded-lg ${score>=70?'bg-emerald-500/10 text-emerald-500':'bg-red-500/10 text-red-500'}`}>{score}%</span>}
+      </div>
+      <button onClick={onPlay} className="mt-3 w-full py-2.5 btn-accent rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 shadow-sm">
+        <Play size={12} fill="currentColor"/> Start
+      </button>
+    </div>
+  );
+}
+function Empty({icon:Icon,text}){return<div className="flex flex-col items-center gap-2 py-12 opacity-30"><Icon size={32}/><p className="text-xs font-bold">{text}</p></div>;}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EXAM PLAYER  — always-open tutor split pane
+═══════════════════════════════════════════════════════════════════════════ */
+function ExamPlayer({exam,onBack,onScore,settings,addToast}){
+  const[qi,setQi]=useState(0);
+  const[sel,setSel]=useState(null);
+  const[fb,setFb]=useState(false);
+  const[score,setScore]=useState(0);
+  const[done,setDone]=useState(false);
+  const[tutorW,setTutorW]=useState(38);// % of width
+
+  const handleTutorDrag=useCallback((x)=>{
+    const pct=Math.max(25,Math.min(65,((window.innerWidth-x)/window.innerWidth)*100));
+    setTutorW(pct);
+  },[]);
+  const startTutorDrag=useDrag(handleTutorDrag,[handleTutorDrag]);
+
+  const qObj=exam.questions[qi];
+  const q=qObj?.examQuestion?qObj.examQuestion:qObj;
+  const pct=Math.round((qi/Math.max(exam.questions.length,1))*100);
+
+  const pick=i=>{if(fb)return;setSel(i);setFb(true);if(i===q?.correct)setScore(s=>s+1);};
   const next=()=>{
-    setSel(null); setFb(false); setTutor(false);
-    if(qi<exam.questions.length-1){ setQi(qi+1); }
-    else { const fs=Math.round((score+(sel===q.correct?0:0))/exam.questions.length*100); setDone(true); onScoreUpdate?.(exam.id,Math.round(score/exam.questions.length*100)); }
+    setSel(null);setFb(false);
+    if(qi<exam.questions.length-1)setQi(qi+1);
+    else{setDone(true);onScore?.(exam.id,Math.round(score/exam.questions.length*100));}
   };
-  const jump=(pg)=>{ if(pg&&setCurrentView){ setCurrentView('reader'); setCurrentPage(+pg); setRightPanelOpen(false); setTimeout(()=>setRightPanelOpen(true),500); } };
 
-  if (done) {
+  if(done){
     const fs=Math.round((score/exam.questions.length)*100);
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
-        <div className={`w-40 h-40 rounded-full flex items-center justify-center mb-8 glass shadow-2xl ${fs>=70?'bg-emerald-500/20 border border-emerald-500/30':'bg-red-500/20 border border-red-500/30'}`}>
-          <span className={`text-5xl font-black title-font ${fs>=70?'text-emerald-500':'text-red-500'}`}>{fs}%</span>
+    return(
+      <div className="flex-1 flex flex-col items-center justify-center gap-5 p-8 text-center overflow-y-auto">
+        <div className={`w-28 h-28 rounded-full flex items-center justify-center glass shadow-xl ${fs>=70?'bg-emerald-500/20 border border-emerald-500/30':'bg-red-500/20 border border-red-500/30'}`}>
+          <span className={`text-4xl font-black ${fs>=70?'text-emerald-500':'text-red-500'}`}>{fs}%</span>
         </div>
-        <h2 className="title-font text-3xl font-black mb-3">Complete!</h2>
-        <p className="text-lg opacity-55 mb-2">{score}/{exam.questions.length} correct</p>
-        <p className={`font-bold mb-10 ${fs>=70?'text-emerald-500':'text-red-500'}`}>{fs>=90?'Outstanding!':fs>=70?'Well done!':'Keep studying!'}</p>
-        <div className="flex gap-3">
-          <button onClick={onBack} className="px-7 py-3.5 glass opacity-70 hover:opacity-100 rounded-full font-black text-xs uppercase tracking-widest">Back</button>
-          <button onClick={()=>{setQi(0);setScore(0);setSel(null);setFb(false);setDone(false);}} className="px-7 py-3.5 btn-accent rounded-full font-black text-xs uppercase tracking-widest">Retry</button>
+        <h2 className="text-2xl font-black">Complete!</h2>
+        <p className="opacity-50 text-sm">{score}/{exam.questions.length} correct</p>
+        <p className={`font-bold ${fs>=70?'text-emerald-500':'text-red-500'}`}>{fs>=90?'Outstanding!':fs>=70?'Well done!':'Keep studying!'}</p>
+        <div className="flex gap-3 mt-2">
+          <button onClick={onBack} className="px-6 py-3 glass rounded-full text-xs font-black uppercase opacity-70 hover:opacity-100">Back</button>
+          <button onClick={()=>{setQi(0);setScore(0);setSel(null);setFb(false);setDone(false);}} className="px-6 py-3 btn-accent rounded-full text-xs font-black uppercase shadow-lg">Retry</button>
         </div>
       </div>
     );
   }
-  if (!q) return null;
+  if(!q)return null;
 
-  return (
-    <div className="flex-1 flex flex-col h-full bg-gray-50 dark:bg-[#0a0a0c]">
-      <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-xs font-black uppercase tracking-widest opacity-60 hover:opacity-100 flex items-center gap-1.5"><ChevronLeft size={15}/> Exit</button>
+  const examContent=(
+    <div className="flex flex-col h-full bg-[var(--bg)]">
+      {/* exam header */}
+      <div className="flex items-center justify-between px-4 py-2.5 glass border-b border-[var(--border)] shrink-0">
+        <button onClick={onBack} className="flex items-center gap-1 text-[10px] font-black uppercase opacity-60 hover:opacity-100"><ChevronLeft size={13}/> Exit</button>
         <div className="flex items-center gap-3">
-          <div className="hidden md:block w-28 bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5"><div className="bg-[var(--accent-color)] h-full rounded-full" style={{width:`${pct}%`}}/></div>
-          <span className="text-[10px] font-black bg-gray-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg">{qi+1}/{exam.questions.length}</span>
+          <div className="w-24 h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden hidden sm:block">
+            <div className="h-full bg-[var(--accent)] rounded-full transition-all" style={{width:`${pct}%`}}/>
+          </div>
+          <span className="text-[10px] font-black glass px-2 py-1 rounded-lg">{qi+1}/{exam.questions.length}</span>
         </div>
       </div>
-
-      <div className="flex-1 overflow-hidden flex relative">
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-8 pb-[120px] lg:pb-8">
-          {qObj?.vignette && (
-            <div className="mb-6">
-              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 block mb-2">Patient Vignette</span>
-              <div className="text-sm text-gray-800 dark:text-zinc-200 leading-relaxed bg-white dark:bg-[#121214] p-5 rounded-2xl border border-gray-200 dark:border-zinc-800 whitespace-pre-wrap">{qObj.vignette}</div>
-            </div>
-          )}
-          {qObj?.labPanels?.length>0 && (
-            <div className="mb-6 lg:hidden">
-              <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-3 flex items-center gap-2"><FlaskConical size={16}/> Lab Results</h3>
-              {qObj.labPanels.map((lp,pi)=>(
-                <div key={pi} className="mb-2"><h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">{lp.panelName}</h4><LabTable rows={lp.rows}/></div>
-              ))}
-            </div>
-          )}
-
-          <h2 className="text-base md:text-lg font-bold mb-5 leading-relaxed text-gray-900 dark:text-white">{q.q}</h2>
-
-          <div className="space-y-2.5 mb-6">
-            {(q.options||[]).map((opt,i)=>{
-              const isSel=sel===i, isCorr=i===q.correct;
-              const cls = isSel?(isCorr?'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200':'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'):(fb&&isCorr?'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200':'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300');
-              return (
-                <button key={i} onClick={()=>pick(i)} disabled={fb} className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex items-center gap-3 text-sm ${cls}`}>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${(isSel||(fb&&isCorr))?(isCorr?'border-emerald-500':'border-red-500'):'border-gray-300 dark:border-zinc-600'}`}>
-                    {(isSel||(fb&&isCorr))&&<div className={`w-2.5 h-2.5 rounded-full ${isCorr?'bg-emerald-500':'bg-red-500'}`}/>}
-                  </div>
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-
-          {fb && (
-            <div className="animate-slide-in">
-              <div className="p-5 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/20 rounded-2xl mb-4">
-                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--accent-color)] block mb-2">Explanation</span>
-                <p className="text-sm leading-relaxed">{q.explanation}</p>
-                {q.evidence&&(
-                  <div className="mt-4 pt-4 border-t border-[var(--accent-color)]/20">
-                    <p className="text-xs italic opacity-60 border-l-4 border-gray-300 pl-2.5 mb-3">"{q.evidence}"</p>
-                    {q.sourcePage&&<button onClick={()=>jump(q.sourcePage)} className="px-3 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg text-[9px] font-black uppercase flex items-center gap-1.5 hover:scale-105 transition-transform"><FileSearch size={12}/> Pg {q.sourcePage}</button>}
-                  </div>
-                )}
-              </div>
-              {!tutor&&<button onClick={()=>setTutor(true)} className="mb-6 w-full py-3.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-200 dark:border-blue-800/50"><MessageCircleQuestion size={16}/> Ask AI Tutor</button>}
-            </div>
-          )}
-
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-zinc-800">
-            <button onClick={()=>{if(qi>0){setQi(qi-1);setSel(null);setFb(false);setTutor(false);}}} disabled={qi===0} className="px-4 py-2.5 text-gray-500 bg-gray-100 dark:bg-zinc-800 rounded-xl disabled:opacity-30 text-[10px] font-bold uppercase flex items-center gap-1.5"><ChevronLeft size={14}/> Prev</button>
-            <button onClick={next} disabled={!fb} className="px-6 py-3 bg-[var(--accent-color)] text-white disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 rounded-xl text-[10px] font-black shadow-lg uppercase flex items-center gap-2 transition-all hover:-translate-y-0.5 disabled:hover:translate-y-0">
-              {qi<exam.questions.length-1?'Next':'Finish'}<ChevronRight size={15}/>
-            </button>
-          </div>
-        </div>
-
-        {/* Lab panel (desktop) */}
-        {qObj?.labPanels?.length>0&&!tutor&&(
-          <div className="hidden lg:block w-[45%] border-l border-gray-200 dark:border-zinc-800 overflow-y-auto custom-scrollbar p-6">
-            <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 flex items-center gap-2"><FlaskConical size={16}/> Lab Results</h3>
-            {qObj.labPanels.map((lp,pi)=>(<div key={pi} className="mb-3"><h4 className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">{lp.panelName}</h4><LabTable rows={lp.rows}/></div>))}
+      {/* question content */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+        {qObj?.vignette&&(
+          <div className="mb-4 p-4 bg-[var(--card)] border border-[var(--border)] rounded-2xl text-xs leading-relaxed whitespace-pre-wrap">
+            <span className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-2">Patient Vignette</span>
+            {qObj.vignette}
           </div>
         )}
-
-        {tutor&&(<><div className="hidden md:flex w-2.5 cursor-col-resize hover:bg-[var(--accent)]/40 items-center justify-center shrink-0 z-[120]" onMouseDown={e=>{e.preventDefault();setRz(true);}}><div className="w-1 h-10 bg-gray-400 rounded-full pointer-events-none"/></div>
-        <aside style={{width:window.innerWidth<768?'100%':tw}} className="absolute md:relative right-0 top-0 bottom-0 z-[110] shadow-2xl border-l border-gray-200 dark:border-zinc-800"><MiniTutorChat contextObj={qObj} settings={settings} onClose={()=>setTutor(false)}/></aside></>)}
+        {qObj?.labPanels?.length>0&&(
+          <div className="mb-4">
+            <span className="text-[9px] font-black uppercase tracking-widest text-blue-500 flex items-center gap-1 mb-2"><FlaskConical size={11}/> Labs</span>
+            {qObj.labPanels.map((lp,pi)=><div key={pi}><p className="text-[9px] font-black opacity-40 mb-1">{lp.panelName}</p><LabTable rows={lp.rows}/></div>)}
+          </div>
+        )}
+        <h3 className="font-bold text-sm lg:text-base leading-relaxed mb-4">{q.q}</h3>
+        <div className="space-y-2 mb-5">
+          {(q.options||[]).map((opt,i)=>{
+            const isSel=sel===i,isCorr=i===q.correct;
+            return(
+              <button key={i} onClick={()=>pick(i)} disabled={fb}
+                className={`w-full text-left px-4 py-3 rounded-2xl border-2 transition-all text-xs leading-relaxed flex items-center gap-3
+                  ${isSel?(isCorr?'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 font-bold':'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 font-bold')
+                    :(fb&&isCorr?'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 font-bold':'border-[var(--border)] bg-[var(--card)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5')}`}>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
+                  ${(isSel||(fb&&isCorr))?(isCorr?'border-emerald-500':'border-red-500'):'border-[var(--border)]'}`}>
+                  {(isSel||(fb&&isCorr))&&<div className={`w-2.5 h-2.5 rounded-full ${isCorr?'bg-emerald-500':'bg-red-500'}`}/>}
+                </div>
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+        {fb&&(
+          <div className="animate-slide-in">
+            <div className="p-4 bg-[var(--accent)]/8 border border-[var(--accent)]/20 rounded-2xl mb-4">
+              <span className="text-[9px] font-black uppercase tracking-widest text-[var(--accent)] block mb-2">Explanation</span>
+              <p className="text-xs leading-relaxed">{q.explanation}</p>
+              {q.evidence&&<p className="mt-3 text-[10px] italic opacity-50 border-l-2 border-[var(--border)] pl-3">"{q.evidence}" — Pg {q.sourcePage}</p>}
+            </div>
+          </div>
+        )}
+        <div className="flex justify-between items-center pt-4 border-t border-[var(--border)]">
+          <button onClick={()=>{if(qi>0){setQi(qi-1);setSel(null);setFb(false);}}} disabled={qi===0}
+            className="px-4 py-2 glass rounded-xl text-[10px] font-black uppercase disabled:opacity-30 flex items-center gap-1">
+            <ChevronLeft size={13}/> Prev
+          </button>
+          <button onClick={next} disabled={!fb}
+            className="px-5 py-2.5 btn-accent rounded-xl text-[10px] font-black uppercase shadow-md disabled:opacity-40 flex items-center gap-1">
+            {qi<exam.questions.length-1?'Next':'Finish'} <ChevronRight size={13}/>
+          </button>
+        </div>
+        <div className="h-4"/>
       </div>
+    </div>
+  );
+
+  const tutorContent=<TutorChat context={qObj} settings={settings} contextLabel={`question ${qi+1}`}/>;
+
+  return(
+    <div className="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
+      <SplitPane left={examContent} right={tutorContent} defaultSplit={100-tutorW} minLeft={40} maxLeft={80}/>
     </div>
   );
 }
 
-// ─── IN-PANEL FLASHCARDS ──────────────────────────────────────────────────────
-function InPanelFlashcards({ title, initialCards, onBack, setFlashcards, addToast, setCurrentPage, setRightPanelOpen, setCurrentView, settings }) {
-  const [cards, setCards] = useState(initialCards||[]);
-  const [ci, setCi] = useState(0);
-  const [flip, setFlip] = useState(false);
-  const [stats, setStats] = useState({again:0,hard:0,good:0,easy:0});
-  const [tutor, setTutor] = useState(false);
-  const [tw, setTw] = useState(340); const [rz, setRz] = useState(false);
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLASH PLAYER  — always-open tutor split pane
+═══════════════════════════════════════════════════════════════════════════ */
+function FlashPlayer({set,onBack,setFlashcards,settings,addToast}){
+  const[cards,setCards]=useState(set.cards||[]);
+  const[ci,setCi]=useState(0);
+  const[flip,setFlip]=useState(false);
+  const[stats,setStats]=useState({again:0,hard:0,good:0,easy:0});
 
-  useEffect(()=>{
-    const mv=e=>{ if(!rz) return; const x=e.touches?.[0]?.clientX??e.clientX; if(x) setTw(Math.max(260,Math.min(window.innerWidth-x,window.innerWidth-100))); };
-    const up=()=>{if(rz) setRz(false);};
-    if(rz){ document.addEventListener('mousemove',mv); document.addEventListener('mouseup',up); document.body.style.userSelect='none'; }
-    else { document.body.style.userSelect=''; }
-    return()=>{ document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.body.style.userSelect=''; };
-  },[rz]);
+  const card=cards[ci];
+  const pct=Math.round((ci/Math.max(set.cards?.length||1,1))*100);
 
-  if (!cards?.length) return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center overflow-y-auto">
-      <div className="w-36 h-36 rounded-full glass bg-emerald-500/20 flex items-center justify-center mb-7 border border-emerald-500/30"><CheckCircle2 size={68} className="text-emerald-500"/></div>
-      <h2 className="title-font text-3xl font-black mb-3">Mastery Complete!</h2>
-      <div className="grid grid-cols-4 gap-3 my-8 w-full max-w-md">{Object.entries(stats).map(([k,v])=>(<div key={k} className="glass rounded-2xl p-4 text-center"><p className="text-2xl font-black title-font">{v}</p><p className="text-[9px] font-bold uppercase tracking-widest opacity-50 mt-1">{k}</p></div>))}</div>
-      <button onClick={onBack} className="px-10 py-4 btn-accent rounded-full font-black text-xs uppercase tracking-widest shadow-xl">Back</button>
-    </div>
-  );
-
-  const card = cards[ci];
-  const rate=(q)=>{
-    const rk=q===0?'again':q===3?'hard':q===4?'good':'easy'; setStats(p=>({...p,[rk]:p[rk]+1}));
+  const rate=q=>{
+    const rk=q===0?'again':q===3?'hard':q===4?'good':'easy';setStats(p=>({...p,[rk]:p[rk]+1}));
     let nr=card.repetitions||0,ne=card.ef||2.5,ni=card.interval||1;
     if(q<3){nr=0;ni=1;}else{ne=Math.max(1.3,ne+(0.1-(5-q)*(0.08+(5-q)*0.02)));nr++;ni=nr===1?1:nr===2?6:Math.round(ni*ne);}
     const nc={...card,repetitions:nr,ef:ne,interval:ni,lastReview:Date.now(),nextReview:Date.now()+ni*86400000};
     setCards(p=>p.map(c=>c.id===nc.id?nc:c));
-    setFlashcards(gs=>gs.map(set=>({...set,cards:set.cards?set.cards.map(c=>c.id===nc.id?nc:c):set.cards})));
-    setFlip(false); setTutor(false);
-    if(ci<cards.length-1) setCi(ci+1); else setCards([]);
+    setFlashcards(gs=>gs.map(s=>({...s,cards:s.cards?s.cards.map(c=>c.id===nc.id?nc:c):s.cards})));
+    setFlip(false);
+    if(ci<cards.length-1)setCi(ci+1);else setCards([]);
   };
-  const jump=(pg)=>{ if(pg&&setCurrentView){setCurrentView('reader');setCurrentPage(+pg);setRightPanelOpen(false);setTimeout(()=>setRightPanelOpen(true),500);} };
-  const pct=Math.round((ci/(initialCards?.length||1))*100);
 
-  return (
-    <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#0a0a0c]">
-      <div className="bg-[var(--accent-color)]/10 border-b border-[var(--accent-color)]/20 px-4 py-3 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-[var(--accent-color)] text-xs font-black uppercase tracking-widest flex items-center gap-1.5"><ChevronLeft size={15}/> Exit</button>
+  if(!cards.length)return(
+    <div className="flex-1 flex flex-col items-center justify-center gap-5 p-8 text-center">
+      <div className="w-24 h-24 rounded-full glass bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+        <CheckCircle2 size={48} className="text-emerald-500"/>
+      </div>
+      <h2 className="text-2xl font-black">Complete!</h2>
+      <div className="grid grid-cols-4 gap-2 w-full max-w-xs">
+        {Object.entries(stats).map(([k,v])=>(
+          <div key={k} className="glass rounded-xl p-3 text-center"><p className="text-xl font-black">{v}</p><p className="text-[8px] opacity-40 font-bold uppercase">{k}</p></div>
+        ))}
+      </div>
+      <button onClick={onBack} className="px-8 py-3 btn-accent rounded-full text-xs font-black uppercase shadow-lg">Back</button>
+    </div>
+  );
+
+  if(!card)return null;
+
+  const cardContent=(
+    <div className="flex flex-col h-full bg-[var(--bg)]">
+      {/* header */}
+      <div className="flex items-center justify-between px-4 py-2.5 glass border-b border-[var(--border)] shrink-0">
+        <button onClick={onBack} className="flex items-center gap-1 text-[10px] font-black uppercase opacity-60 hover:opacity-100"><ChevronLeft size={13}/> Exit</button>
         <div className="flex items-center gap-3">
-          <div className="hidden md:block w-36 bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5"><div className="bg-[var(--accent-color)] h-full rounded-full" style={{width:`${pct}%`}}/></div>
-          <span className="text-[10px] font-black bg-[var(--accent-color)]/10 text-[var(--accent-color)] px-3 py-1.5 rounded-lg">{ci+1}/{initialCards?.length||cards.length}</span>
+          <div className="w-24 h-1.5 bg-black/10 dark:bg-white/10 rounded-full hidden sm:block"><div className="h-full bg-[var(--accent)] rounded-full" style={{width:`${pct}%`}}/></div>
+          <span className="text-[10px] font-black glass px-2 py-1 rounded-lg">{ci+1}/{set.cards?.length||cards.length}</span>
         </div>
       </div>
-
-      <div className="flex-1 overflow-hidden flex relative">
-        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center justify-start pt-10 p-5 pb-[120px] lg:pb-8">
-          {/* Card */}
-          <div onClick={()=>!flip&&setFlip(true)} className={`w-full max-w-2xl cursor-pointer mb-7 shrink-0 ${flip?'min-h-[420px]':'h-72'}`} style={{perspective:'1000px'}}>
-            <div className={`relative w-full h-full transition-transform duration-600 ${flip?'[transform:rotateX(180deg)]':''}`} style={{transformStyle:'preserve-3d'}}>
-              {/* front */}
-              <div className="absolute inset-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center shadow-xl" style={{backfaceVisibility:'hidden'}}>
-                <span className="absolute top-5 left-5 text-[9px] font-black uppercase tracking-widest text-gray-400 bg-gray-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg">Question</span>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white leading-relaxed">{card.q}</h2>
-                <div className="absolute bottom-5 text-[9px] font-black uppercase tracking-widest text-[var(--accent-color)] animate-pulse bg-[var(--accent-color)]/10 px-4 py-1.5 rounded-full">Tap to reveal</div>
-              </div>
-              {/* back */}
-              <div onClick={e=>e.stopPropagation()} className="absolute inset-0 bg-white dark:bg-zinc-900 border-2 border-[var(--accent-color)]/50 rounded-[2.5rem] p-7 flex flex-col shadow-2xl overflow-y-auto custom-scrollbar" style={{backfaceVisibility:'hidden',transform:'rotateX(180deg)'}}>
-                <span className="text-[9px] font-black uppercase tracking-widest text-[var(--accent-color)] bg-[var(--accent-color)]/10 px-2.5 py-1 rounded-lg self-start mb-4">Answer</span>
-                <p className="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-relaxed mb-5">{card.a}</p>
-                {card.evidence&&(
-                  <div className="mt-2 pt-4 border-t border-gray-200 dark:border-zinc-800 mb-4">
-                    <p className="text-xs italic text-gray-500 border-l-4 border-gray-300 pl-2.5 mb-3">"{card.evidence}"</p>
-                    {card.sourcePage&&<button onClick={()=>jump(card.sourcePage)} className="px-3 py-1.5 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg text-[9px] font-black uppercase flex items-center gap-1.5 hover:scale-105 transition-transform w-fit"><FileSearch size={12}/> Pg {card.sourcePage}</button>}
-                  </div>
-                )}
-                {!tutor&&<button onClick={()=>setTutor(true)} className="mt-auto w-full py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border border-blue-200 dark:border-blue-800/50"><MessageCircleQuestion size={14}/> Ask AI Tutor</button>}
-              </div>
+      {/* card area */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div onClick={()=>!flip&&setFlip(true)}
+          className={`w-full max-w-xl cursor-pointer mb-5 rounded-3xl border-2 bg-[var(--card)] overflow-hidden shadow-lg transition-all
+            ${flip?'border-[var(--accent)]/50':'border-[var(--border)] hover:border-[var(--accent)]/30'}`}
+          style={{minHeight:'180px'}}>
+          {!flip?(
+            <div className="h-full flex flex-col items-center justify-center p-6 text-center gap-3">
+              <span className="text-[8px] font-black uppercase tracking-widest opacity-30 bg-black/5 dark:bg-white/5 px-2 py-1 rounded-lg">Question</span>
+              <p className="font-bold text-sm lg:text-base leading-relaxed">{card.q}</p>
+              <span className="text-[8px] text-[var(--accent)] font-black animate-pulse">TAP TO REVEAL</span>
             </div>
-          </div>
+          ):(
+            <div className="h-full flex flex-col p-5 gap-3" onClick={e=>e.stopPropagation()}>
+              <span className="text-[8px] font-black uppercase tracking-widest text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-1 rounded-lg self-start">Answer</span>
+              <p className="font-bold text-sm leading-relaxed flex-1">{card.a}</p>
+              {card.evidence&&<p className="text-[10px] italic opacity-40 border-l-2 border-[var(--border)] pl-2">"{card.evidence}" — Pg {card.sourcePage}</p>}
+            </div>
+          )}
+        </div>
+        {/* SR buttons */}
+        <div className={`w-full max-w-xl grid grid-cols-4 gap-2 transition-all ${flip?'opacity-100':'opacity-0 pointer-events-none'}`}>
+          {[['Again',0,'red'],[`Hard`,3,'amber'],['Good',4,'emerald'],['Easy',5,'blue']].map(([l,q,c])=>(
+            <button key={l} onClick={()=>rate(q)}
+              className={`py-3 rounded-2xl text-[10px] font-black uppercase border-2 transition-all hover:-translate-y-0.5 active:scale-95
+                text-${c}-600 bg-${c}-50 dark:bg-${c}-900/20 border-${c}-200 dark:border-${c}-800/50 hover:bg-${c}-500 hover:text-white hover:border-${c}-500`}>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
-          {/* SR buttons */}
-          <div className={`w-full max-w-2xl grid grid-cols-2 md:grid-cols-4 gap-3 transition-all ${flip?'opacity-100':'opacity-0 pointer-events-none'}`}>
-            {[{l:'Again',q:0,c:'text-red-600 bg-red-50 hover:bg-red-500 hover:text-white border-red-200'},{l:'Hard',q:3,c:'text-amber-600 bg-amber-50 hover:bg-amber-500 hover:text-white border-amber-200'},{l:'Good',q:4,c:'text-emerald-600 bg-emerald-50 hover:bg-emerald-500 hover:text-white border-emerald-200'},{l:'Easy',q:5,c:'text-blue-600 bg-blue-50 hover:bg-blue-500 hover:text-white border-blue-200'}].map(({l,q,c})=>(
-              <button key={l} onClick={()=>rate(q)} className={`py-4 rounded-2xl text-xs font-black uppercase tracking-widest border-2 transition-all hover:-translate-y-1 shadow-sm ${c}`}>{l}</button>
+  const tutorContent=<TutorChat context={card} settings={settings} contextLabel={`"${card.q?.substring(0,40)}…"`}/>;
+
+  return(
+    <div className="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
+      <SplitPane left={cardContent} right={tutorContent} defaultSplit={62} minLeft={40} maxLeft={80}/>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL VIEWS (Flashcards, Exams, Cases, Chat)
+═══════════════════════════════════════════════════════════════════════════ */
+function FlashcardsView({flashcards,setFlashcards,settings,addToast}){
+  const[sel,setSel]=useState(null);
+  if(sel)return<div className="flex-1 flex flex-col min-h-0 overflow-hidden"><FlashPlayer set={sel} onBack={()=>setSel(null)} setFlashcards={setFlashcards} settings={settings} addToast={addToast}/></div>;
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="p-4 lg:p-8 max-w-screen-xl mx-auto">
+        <h1 className="text-3xl font-black text-[var(--accent)] mb-8 flex items-center gap-3"><Layers size={30}/> Card Vault</h1>
+        {flashcards.length===0?<Empty icon={Layers} text="No flashcards. Open a PDF → AI Studio → Generate Cards"/>:(
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {flashcards.map(s=>(
+              <div key={s.id} className="glass rounded-2xl p-5 card-hover flex flex-col gap-4">
+                <h3 className="font-bold text-sm leading-snug line-clamp-2 flex-1">{s.title}</h3>
+                <span className="text-[9px] font-black bg-[var(--accent)]/10 text-[var(--accent)] px-2 py-1 rounded-lg w-fit">{s.cards?.length||0} Cards</span>
+                <div className="flex gap-2 mt-auto">
+                  <button onClick={()=>setSel(s)} className="flex-1 py-3 btn-accent rounded-xl text-xs font-black uppercase shadow-md">Study</button>
+                  <button onClick={()=>setFlashcards(flashcards.filter(f=>f.id!==s.id))} className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:text-red-500 hover:bg-red-500/10"><Trash2 size={16}/></button>
+                </div>
+              </div>
             ))}
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExamsView({exams,setExams,settings,addToast}){
+  const[sel,setSel]=useState(null);
+  if(sel)return<div className="flex-1 flex flex-col min-h-0 overflow-hidden"><ExamPlayer exam={sel} onBack={()=>setSel(null)} onScore={(id,sc)=>setExams(p=>p.map(e=>e.id===id?{...e,lastScore:sc}:e))} settings={settings} addToast={addToast}/></div>;
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="p-4 lg:p-8 max-w-screen-xl mx-auto">
+        <h1 className="text-3xl font-black text-rose-500 mb-8 flex items-center gap-3"><GraduationCap size={30}/> Exams</h1>
+        {exams.length===0?<Empty icon={GraduationCap} text="No exams yet"/>:(
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {exams.map(e=>(
+              <div key={e.id} className="glass rounded-2xl p-5 card-hover flex flex-col gap-4">
+                <h3 className="font-bold text-sm leading-snug line-clamp-2 flex-1">{e.title}</h3>
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-[9px] font-black bg-rose-500/10 text-rose-500 px-2 py-1 rounded-lg">{e.questions.length} Qs</span>
+                  {e.lastScore!==undefined&&<span className={`text-[9px] font-black px-2 py-1 rounded-lg ${e.lastScore>=70?'bg-emerald-500/10 text-emerald-500':'bg-red-500/10 text-red-500'}`}>{e.lastScore}%</span>}
+                </div>
+                <div className="flex gap-2 mt-auto">
+                  <button onClick={()=>setSel(e)} className="flex-1 py-3 bg-gradient-to-r from-rose-400 to-rose-600 text-white rounded-xl text-xs font-black uppercase shadow-md">Take Exam</button>
+                  <button onClick={()=>setExams(exams.filter(x=>x.id!==e.id))} className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:text-red-500 hover:bg-red-500/10"><Trash2 size={16}/></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CasesView({cases,setCases,settings,addToast}){
+  const[sel,setSel]=useState(null);
+  if(sel)return<div className="flex-1 flex flex-col min-h-0 overflow-hidden"><ExamPlayer exam={sel} onBack={()=>setSel(null)} onScore={(id,sc)=>setCases(p=>p.map(c=>c.id===id?{...c,lastScore:sc}:c))} settings={settings} addToast={addToast}/></div>;
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="p-4 lg:p-8 max-w-screen-xl mx-auto">
+        <h1 className="text-3xl font-black text-blue-500 mb-8 flex items-center gap-3"><Activity size={30}/> Patient Cases</h1>
+        {cases.length===0?<Empty icon={Activity} text="No cases yet"/>:(
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cases.map(c=>(
+              <div key={c.id} className="glass rounded-2xl p-5 card-hover flex flex-col gap-4">
+                <h3 className="font-bold text-sm leading-snug line-clamp-2 flex-1">{c.title}</h3>
+                <div className="flex gap-2 flex-wrap">
+                  <span className="text-[9px] font-black bg-blue-500/10 text-blue-500 px-2 py-1 rounded-lg">{c.questions?.length||0} Cases</span>
+                  {c.lastScore!==undefined&&<span className={`text-[9px] font-black px-2 py-1 rounded-lg ${c.lastScore>=70?'bg-emerald-500/10 text-emerald-500':'bg-red-500/10 text-red-500'}`}>{c.lastScore}%</span>}
+                </div>
+                <div className="flex gap-2 mt-auto">
+                  <button onClick={()=>setSel(c)} className="flex-1 py-3 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-xl text-xs font-black uppercase shadow-md">Solve</button>
+                  <button onClick={()=>setCases(cases.filter(x=>x.id!==c.id))} className="w-11 h-11 glass rounded-xl flex items-center justify-center hover:text-red-500 hover:bg-red-500/10"><Trash2 size={16}/></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ChatView({settings,sessions,setSessions}){
+  const[sid,setSid]=useState(null);
+  const[input,setInput]=useState('');
+  const[loading,setLoading]=useState(false);
+  const endRef=useRef(null);
+  const active=sessions.find(s=>s.id===sid)||null;
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[active?.messages,loading]);
+
+  const send=async()=>{
+    if(!input.trim()||loading)return;
+    const id=sid||Date.now().toString(),msg=input;setInput('');
+    const prevMsgs=!sid?[]:(sessions.find(s=>s.id===id)?.messages||[]);
+    const msgs=[...prevMsgs,{role:'user',content:msg}];
+    const title=!sid?msg.substring(0,40)+'…':sessions.find(s=>s.id===id)?.title;
+    setSessions(p=>p.find(s=>s.id===id)?p.map(s=>s.id===id?{...s,messages:msgs}:s):[{id,title,messages:msgs,createdAt:new Date().toISOString()},...p]);
+    if(!sid)setSid(id);setLoading(true);
+    try{const r=await callAI(msg,false,false,settings,4000);setSessions(p=>p.map(s=>s.id===id?{...s,messages:[...s.messages,{role:'assistant',content:r}]}:s));}
+    catch(e){setSessions(p=>p.map(s=>s.id===id?{...s,messages:[...s.messages,{role:'assistant',content:`⚠️ ${e.message}`}]}:s));}
+    finally{setLoading(false);}
+  };
+
+  return(
+    <div className="flex-1 flex min-h-0 h-full">
+      {/* sidebar */}
+      <div className="hidden md:flex w-60 flex-col glass border-t-0 border-b-0 border-l-0 shrink-0">
+        <div className="p-3 border-b border-[var(--border)]">
+          <button onClick={()=>setSid(null)} className="w-full flex items-center justify-center gap-2 bg-[var(--accent)] text-white py-2.5 rounded-xl text-xs font-black uppercase">
+            <PlusCircle size={14}/> New Chat
+          </button>
         </div>
-
-        {tutor&&(<>
-          <div className="hidden md:flex w-2.5 cursor-col-resize hover:bg-[var(--accent)]/40 items-center justify-center shrink-0 z-[120]" onMouseDown={e=>{e.preventDefault();setRz(true);}}><div className="w-1 h-10 bg-gray-400 rounded-full pointer-events-none"/></div>
-          <aside style={{width:window.innerWidth<768?'100%':tw}} className="absolute md:relative right-0 top-0 bottom-0 z-[110] shadow-2xl border-l border-gray-200 dark:border-zinc-800"><MiniTutorChat contextObj={card} settings={settings} onClose={()=>setTutor(false)}/></aside>
-        </>)}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+          {sessions.length===0&&<p className="text-center text-[9px] opacity-30 font-bold uppercase p-4">No History</p>}
+          {sessions.map(s=>(
+            <div key={s.id} className="relative group mb-0.5">
+              <button onClick={()=>setSid(s.id)} className={`w-full text-left px-3 py-2.5 rounded-xl text-[11px] transition-colors ${sid===s.id?'bg-[var(--accent)]/10 text-[var(--accent)] font-bold':'opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                <div className="truncate pr-5">{s.title}</div>
+              </button>
+              <button onClick={()=>setSessions(p=>p.filter(x=>x.id!==s.id))} className="absolute right-2 top-2.5 p-1 hover:text-red-500 opacity-0 group-hover:opacity-100 rounded-lg"><Trash size={11}/></button>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* main */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 scroll-content">
+          {!active?(
+            <div className="flex flex-col items-center justify-center h-full gap-4 opacity-40">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--accent)]/10 flex items-center justify-center"><Sparkles size={28} className="text-[var(--accent)]"/></div>
+              <h2 className="text-lg font-black">Medical AI Chat</h2>
+              <p className="text-sm text-center max-w-xs">Ask any clinical or medical question.</p>
+            </div>
+          ):(
+            <div className="max-w-3xl mx-auto space-y-4 pb-4">
+              {active.messages.map((m,i)=>(
+                <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden glass'}`}>
+                    {m.role==='user'?<UserCircle2 size={17} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
+                  </div>
+                  <div className={`px-4 py-3 text-sm leading-relaxed max-w-[84%] whitespace-pre-wrap rounded-2xl
+                    ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass rounded-tl-sm'}`}>{m.content}</div>
+                </div>
+              ))}
+              {loading&&<div className="flex gap-3"><div className="w-9 h-9 rounded-xl overflow-hidden glass"><img src={MARIAM_IMG} className="w-full h-full object-cover opacity-40" alt="AI"/></div><div className="glass px-4 py-3 rounded-2xl flex gap-1.5">{[0,1,2].map(i=><span key={i} className="w-2 h-2 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*.15}s`}}/>)}</div></div>}
+              <div ref={endRef}/>
+            </div>
+          )}
+        </div>
+        <div className="shrink-0 p-4 border-t border-[var(--border)] bg-[var(--card)]"
+          style={{paddingBottom:`calc(16px + ${NAV_H}px + env(safe-area-inset-bottom))`,paddingBottom:'calc(16px + 72px + env(safe-area-inset-bottom))'}}>
+          <div className="max-w-3xl mx-auto flex gap-2 items-end glass rounded-2xl p-2">
+            <textarea value={input} onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+              placeholder="Ask anything…" disabled={loading}
+              className="flex-1 bg-transparent p-2 text-sm outline-none resize-none max-h-28 custom-scrollbar text-[var(--text)] min-h-[40px]"/>
+            <button onClick={send} disabled={loading||!input.trim()} className="w-10 h-10 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0"><Send size={16}/></button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function InPanelNote({ note, onBack }) {
-  return (
-    <div className="flex-1 flex flex-col min-h-0">
-      <div className="glass bg-blue-500/10 border-b border-blue-500/20 px-5 py-4 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="text-blue-600 text-xs font-black uppercase tracking-widest flex items-center gap-2"><ChevronLeft size={15}/> Back</button>
-        <button onClick={()=>navigator.clipboard?.writeText(note.content)} className="text-blue-600 p-2 glass rounded-xl"><Clipboard size={18}/></button>
-      </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 pb-[100px] md:pb-10 max-w-4xl mx-auto w-full">
-        <h2 className="title-font text-3xl font-black mb-8">{note.title}</h2>
-        <div className="text-sm leading-loose whitespace-pre-wrap glass p-8 rounded-[2rem] border border-[var(--border)]">{note.content}</div>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SETTINGS VIEW
+═══════════════════════════════════════════════════════════════════════════ */
+function SettingsView({settings,setSettings}){
+  const pr=PROVIDERS[settings.provider]||PROVIDERS.anthropic;
+  const themes=[{id:'pure-white',label:'White',icon:Sun},{id:'light',label:'Soft',icon:CloudSun},{id:'dark',label:'Dark',icon:Moon},{id:'oled',label:'OLED',icon:MoonStar}];
+  const accents=[{id:'indigo',hex:'#6366f1'},{id:'purple',hex:'#a855f7'},{id:'blue',hex:'#3b82f6'},{id:'emerald',hex:'#10b981'},{id:'rose',hex:'#f43f5e'}];
+  const sizes=[{id:'small',label:'S',px:12},{id:'medium',label:'M',px:14},{id:'large',label:'L',px:16},{id:'xl',label:'XL',px:18}];
+  const changeProvider=p=>{const pr=PROVIDERS[p];setSettings(s=>({...s,provider:p,baseUrl:pr.baseUrl,model:pr.defaultModel}));};
+
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="max-w-2xl mx-auto p-4 lg:p-8 space-y-4">
+        <h1 className="text-3xl font-black flex items-center gap-3 mb-6"><Settings size={28} className="opacity-40"/> Settings</h1>
+
+        {/* AI Provider */}
+        <section className="glass rounded-2xl p-5">
+          <h2 className="font-black text-sm mb-4 flex items-center gap-2 opacity-70"><Globe size={16}/> AI Provider</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            {Object.entries(PROVIDERS).map(([id,{label}])=>(
+              <button key={id} onClick={()=>changeProvider(id)}
+                className={`py-2.5 px-2 rounded-xl text-[10px] font-black leading-tight transition-all border
+                  ${settings.provider===id?'bg-[var(--accent)] text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
+                {label.split(' ')[0]}<br/><span className="opacity-70 font-normal normal-case text-[9px]">{label.split(' ').slice(1).join(' ')}</span>
+              </button>
+            ))}
+          </div>
+          <div className={`flex items-start gap-2 p-3 rounded-xl mb-4 text-xs font-medium ${pr.needsKey?'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300':'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'}`}>
+            {pr.needsKey?<AlertCircle size={14} className="shrink-0 mt-0.5"/>:<CheckCircle2 size={14} className="shrink-0 mt-0.5"/>}
+            {pr.note}
+          </div>
+          {pr.needsKey&&(
+            <div className="mb-3">
+              <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5 flex items-center gap-1"><KeyRound size={10}/>API Key</label>
+              <input type="password" placeholder="Paste your API key…" value={settings.apiKey||''}
+                onChange={e=>setSettings(s=>({...s,apiKey:e.target.value}))}
+                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+            </div>
+          )}
+          {(settings.provider==='custom'||settings.provider==='ollama')&&(
+            <div className="mb-3">
+              <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5">Base URL</label>
+              <input type="text" placeholder="https://your-api.com" value={settings.baseUrl||''}
+                onChange={e=>setSettings(s=>({...s,baseUrl:e.target.value}))}
+                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+            </div>
+          )}
+          <div>
+            <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5">Model (optional)</label>
+            <input type="text" placeholder={pr.defaultModel||'e.g. gpt-4o'} value={settings.model||''}
+              onChange={e=>setSettings(s=>({...s,model:e.target.value}))}
+              className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+            <p className="text-[9px] opacity-30 mt-1">Default: <code>{pr.defaultModel}</code></p>
+          </div>
+        </section>
+
+        {/* Theme */}
+        <section className="glass rounded-2xl p-5">
+          <h2 className="font-black text-sm mb-4 flex items-center gap-2 opacity-70"><Palette size={16}/> Appearance</h2>
+          <div className="grid grid-cols-4 gap-2 mb-5">
+            {themes.map(t=>(
+              <button key={t.id} onClick={()=>setSettings({...settings,theme:t.id})}
+                className={`py-4 flex flex-col items-center gap-2 rounded-xl text-[10px] font-black uppercase border transition-all
+                  ${settings.theme===t.id?'bg-[var(--accent)] text-white border-transparent shadow-lg':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
+                <t.icon size={18}/>{t.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-3 items-center mb-5">
+            <span className="text-[9px] font-black opacity-40 uppercase tracking-widest shrink-0">Accent</span>
+            <div className="flex gap-2">
+              {accents.map(a=>(
+                <button key={a.id} onClick={()=>setSettings({...settings,accentColor:a.id})}
+                  className={`w-8 h-8 rounded-xl transition-all ${settings.accentColor===a.id?'scale-125 ring-2 ring-offset-2 ring-current shadow-lg':''}`}
+                  style={{backgroundColor:a.hex}}/>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="text-[9px] font-black opacity-40 uppercase tracking-widest block mb-2">Font Size</span>
+            <div className="flex gap-2 glass rounded-xl p-1.5">
+              {sizes.map(s=>(
+                <button key={s.id} onClick={()=>setSettings({...settings,fontSize:s.id})}
+                  className={`flex-1 py-2 rounded-lg font-black transition-all ${settings.fontSize===s.id?'bg-[var(--accent)] text-white shadow-md':'opacity-50 hover:opacity-100'}`}
+                  style={{fontSize:`${s.px}px`}}>{s.label}</button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Generation */}
+        <section className="glass rounded-2xl p-5">
+          <h2 className="font-black text-sm mb-4 flex items-center gap-2 opacity-70"><Brain size={16}/> Generation</h2>
+          <label className="flex items-center justify-between cursor-pointer">
+            <span className="text-xs font-bold opacity-60">Strict Mode (use only PDF text)</span>
+            <div onClick={()=>setSettings(s=>({...s,strictMode:!s.strictMode}))}
+              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${settings.strictMode?'bg-[var(--accent)]':'bg-gray-300 dark:bg-zinc-600'}`}>
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${settings.strictMode?'translate-x-5':'translate-x-1'}`}/>
+            </div>
+          </label>
+        </section>
       </div>
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MISSING ICON IMPORT FIX
+═══════════════════════════════════════════════════════════════════════════ */
+const Play=({size=16,...p})=><svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" {...p}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
