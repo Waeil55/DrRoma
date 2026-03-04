@@ -745,7 +745,7 @@ function DashboardView({docs,flashcards,exams,cases,notes,chatSessions,setView,s
   const bgTaskList=Object.values(window.__MARIAM_BG__?.tasks||{});
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
       <div className="w-full p-6 lg:p-8 xl:p-10 space-y-6">
         {/* Welcome */}
         <div className="flex items-center justify-between">
@@ -1130,7 +1130,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
           <button onClick={onClose} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100"><X size={16}/></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-5 space-y-4 max-h-[70vh]">
           {/* Source tabs */}
           <div className="flex gap-1 p-1 glass rounded-2xl">
             {[['library','From Library',BookOpen],['upload','Upload File',FileUp]].map(([id,lbl,TIcon])=>(
@@ -1532,7 +1532,7 @@ function TimelineView({events=[]}){
 function LabTable({rows}){
   if(!rows?.length)return null;
   return(
-    <div className="rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--card)] mb-4 text-[11px]">
+    <div className="rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--card)] mb-4 text-xs">
       <table className="w-full border-collapse">
         <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[var(--border)]">
           {['Test','Result','Range','Units'].map(h=>(
@@ -1643,14 +1643,14 @@ function TutorChat({context,settings,contextLabel=''}){
         <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
         {loading&&<div className="ml-auto flex gap-1">{[0,1,2].map(i=><div key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}</div>}
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3 min-h-0">
         {msgs.length===0&&<div className="flex flex-col items-center justify-center h-full opacity-40 text-center"><Brain size={32} className="mb-2"/><p className="text-xs font-bold">Ask me anything</p></div>}
         {msgs.map((m,i)=>(
           <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden'}`}>
               {m.role==='user'?<UserCircle2 size={16} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
             </div>
-            <div className={`px-3 py-2 text-[11px] leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
+            <div className={`px-3 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
               ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'bg-[var(--card)] border border-[var(--border)] rounded-tl-sm'}`}>
               {m.content||<span className="opacity-40">thinking…</span>}
             </div>
@@ -1663,7 +1663,7 @@ function TutorChat({context,settings,contextLabel=''}){
           <textarea value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
             placeholder="Ask tutor…" disabled={loading} rows={1}
-            className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-[11px] outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
+            className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
           <button onClick={toggleVoice}
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white animate-pulse':'glass text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
             {listening?<MicOff size={18}/>:<Mic size={18}/>}
@@ -1732,7 +1732,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
   },[onUpload]);
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content"
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content"
       onDragOver={e=>{e.preventDefault();setDragging(true);}}
       onDragLeave={()=>setDragging(false)}
       onDrop={handleDrop}>
@@ -1828,7 +1828,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
                     :<FileCover category={cat} name={doc.name}/>
                   }
                   <div className="p-3 flex-1 flex flex-col gap-2">
-                    <h3 className="font-bold text-[11px] lg:text-xs leading-snug line-clamp-2 flex-1">{doc.name}</h3>
+                    <h3 className="font-bold text-xs lg:text-xs leading-snug line-clamp-2 flex-1">{doc.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-xs opacity-40 font-mono">{doc.totalPages} {cat==='image'?'view':'pages'}</span>
                       <span className="text-xs font-black uppercase text-[var(--accent)] opacity-60">{(FILE_ICONS[cat]||FILE_ICONS.unknown).label}</span>
@@ -2108,7 +2108,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
 
   /* ── RESULTS VIEW ── */
   if(bgTask?.isFinished)return(
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex-1 min-h-0 flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 bg-emerald-500/10 border-b border-emerald-500/20 shrink-0">
         <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
           <CheckCircle2 size={15}/>{Array.isArray(bgTask.result?.data)?`${bgTask.result.data.length} items ready`:'Done!'}
@@ -2120,7 +2120,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
         {/* Flashcard preview */}
         {bgTask.result?.type==='flashcards'&&bgTask.result.data.slice(0,5).map((item,i)=>(
           <div key={i} className="glass p-4 rounded-2xl">
@@ -2137,7 +2137,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
               <p className="font-bold text-xs mb-3"><span className="opacity-30 mr-1.5 text-xs">Q{i+1}</span>{item.vignette||q.q}</p>
               <div className="space-y-1.5">
                 {(q.options||[]).map((opt,oi)=>(
-                  <div key={oi} className={`px-3 py-2 rounded-xl text-[11px] font-medium border ${oi===q.correct?'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold':'glass border-transparent'}`}>
+                  <div key={oi} className={`px-3 py-2 rounded-xl text-xs font-medium border ${oi===q.correct?'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold':'glass border-transparent'}`}>
                     <span className="font-black opacity-50 mr-2">{String.fromCharCode(65+oi)}.</span>{opt}
                   </div>
                 ))}
@@ -2153,7 +2153,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
         {bgTask.result?.type==='concepts'&&bgTask.result.data.slice(0,5).map((c,i)=>(
           <div key={i} className="glass p-4 rounded-2xl">
             <p className="font-black text-xs mb-1 text-[var(--accent)]">{c.concept||c.term}</p>
-            <p className="text-[11px] leading-relaxed opacity-80">{c.definition||c.explanation}</p>
+            <p className="text-xs leading-relaxed opacity-80">{c.definition||c.explanation}</p>
             {c.example&&<p className="text-xs mt-2 opacity-50 italic">Ex: {c.example}</p>}
           </div>
         ))}
@@ -2170,7 +2170,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
 
   /* ── CONFIG VIEW ── */
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4 h-full">
       {/* Page range */}
       <div className="glass rounded-2xl p-4">
         <h3 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4 flex items-center gap-2"><BookOpen size={16}/> Page Range</h3>
@@ -2341,7 +2341,7 @@ function ChatPanel({activeDoc,settings,currentPage}){
           </button>
         ))}
       </div>
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3 min-h-0">
         {msgs.map((m,i)=>(
           <div key={i} className={`flex gap-2.5 ${m.role==='user'?'flex-row-reverse':''}`}>
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden glass'}`}>
@@ -2400,12 +2400,12 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
   );
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
       <Section id="fc" title="Flashcards" count={docFc.reduce((s,f)=>s+(f.cards?.length||0),0)} colorClass="text-[var(--accent)]">
         {docFc.map(set=>(
           <div key={set.id} className="flex items-center justify-between p-3 glass rounded-xl">
             <div>
-              <p className="text-[11px] font-bold">{set.title}</p>
+              <p className="text-sm font-bold">{set.title}</p>
               <p className="text-xs opacity-40">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
             </div>
             <div className="flex gap-1.5">
@@ -2420,7 +2420,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
       <Section id="ex" title="Exams" count={docEx.reduce((s,e)=>s+(e.questions?.length||0),0)} colorClass="text-emerald-500">
         {docEx.map(ex=>(
           <div key={ex.id} className="flex items-center justify-between p-3 glass rounded-xl">
-            <div><p className="text-[11px] font-bold">{ex.title}</p><p className="text-xs opacity-40">{ex.questions?.length} Qs</p></div>
+            <div><p className="text-xs font-bold">{ex.title}</p><p className="text-xs opacity-40">{ex.questions?.length} Qs</p></div>
             <div className="flex gap-1.5">
               <button onClick={()=>setView('exams')} className="text-xs font-black px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg">Take</button>
               <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
@@ -2433,7 +2433,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
       <Section id="ca" title="Cases" count={docCa.reduce((s,c)=>s+(c.questions?.length||0),0)} colorClass="text-blue-500">
         {docCa.map(c=>(
           <div key={c.id} className="flex items-center justify-between p-3 glass rounded-xl">
-            <div><p className="text-[11px] font-bold">{c.title}</p><p className="text-xs opacity-40">{c.questions?.length} cases</p></div>
+            <div><p className="text-xs font-bold">{c.title}</p><p className="text-xs opacity-40">{c.questions?.length} cases</p></div>
             <div className="flex gap-1.5">
               <button onClick={()=>setView('cases')} className="text-xs font-black px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">Start</button>
               <button onClick={()=>setCases(p=>p.filter(x=>x.id!==c.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
@@ -2447,7 +2447,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
         {docNo.map(n=>(
           <div key={n.id} className="p-3 glass rounded-xl">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-[11px] font-bold">{n.title}</p>
+              <p className="text-xs font-bold">{n.title}</p>
               <button onClick={()=>setNotes(p=>p.filter(x=>x.id!==n.id))} className="text-xs px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-lg font-black">Del</button>
             </div>
             <p className="text-xs opacity-60 line-clamp-3 leading-relaxed">{n.content}</p>
@@ -2522,7 +2522,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
     const card=selSet.cards[idx];
     const progress=((idx+1)/selSet.cards.length)*100;
     return(
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
         <div className="w-full p-6 lg:p-8">
           <div className="flex items-center justify-between mb-4">
             <button onClick={()=>{setSelSet(null);setIdx(0);setFlipped(false);}}
@@ -2567,7 +2567,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
   }
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
       {showModal&&<QuickGenerateModal type="flashcards" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards} setExams={setExams} setCases={setCases}/>}
@@ -2695,7 +2695,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
     const q=selEx.questions[qi];
     const progress=((qi+1)/selEx.questions.length)*100;
     return(
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
         <div className="w-full p-6 lg:p-8">
           <div className="flex items-center justify-between mb-4">
             <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
@@ -2745,7 +2745,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
   // Review mode — all questions at once
   if(reviewMode&&selEx){
     return(
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
         <div className="w-full p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={()=>setReviewMode(false)} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Back</button>
@@ -2800,7 +2800,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
   }
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
       {showModal&&<QuickGenerateModal type="exam" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams} setCases={setCases||((fn)=>{})}/>}
@@ -2901,7 +2901,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
   if(selSet){
     const cas=selSet.questions[ci];const q=cas.examQuestion||cas;
     return(
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
         <div className="w-full p-6 lg:p-8 space-y-4">
           <div className="flex items-center justify-between">
             <button onClick={()=>{setSelSet(null);setCi(0);setStage('vignette');}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
@@ -2957,7 +2957,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
   }
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
       {showModal&&<QuickGenerateModal type="cases" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams||((fn)=>{})} setCases={setCases}/>}
@@ -3113,7 +3113,7 @@ function ChatView({settings,sessions,setSessions}){
       onClick={()=>loadSession(s)}>
       <MessageSquare size={16} className={`shrink-0 mt-0.5 ${selSess===s.id?'text-[var(--accent)]':'opacity-40'}`}/>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] font-bold truncate">{s.title}</p>
+        <p className="text-sm font-bold truncate">{s.title}</p>
         <p className="text-xs opacity-40 mt-0.5">{s.msgCount||0} msgs · {new Date(s.updatedAt).toLocaleDateString()}</p>
       </div>
       <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0"
@@ -3161,7 +3161,7 @@ function ChatView({settings,sessions,setSessions}){
               className="w-full bg-black/5 dark:bg-white/5 rounded-xl pl-7 pr-3 py-2 text-xs outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar px-2 pb-4 space-y-0.5">
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-2 pb-4 space-y-0.5">
           {pinned.length>0&&(
             <>
               <p className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1.5 flex items-center gap-1"><Pin size={9}/>Pinned</p>
@@ -3192,7 +3192,7 @@ function ChatView({settings,sessions,setSessions}){
             <History size={18}/>
           </button>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-black truncate">{selSess?sessions.find(s=>s.id===selSess)?.title||'Untitled Chat':'New Chat'}</p>
+            <p className="text-xs font-black truncate">{selSess?sessions.find(s=>s.id===selSess)?.title||'Untitled Chat':'New Chat'}</p>
           </div>
           {msgs.length>0&&(
             <button onClick={()=>{
@@ -3209,7 +3209,7 @@ function ChatView({settings,sessions,setSessions}){
 
         {/* Welcome / starters */}
         {msgs.length===0&&(
-          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-5">
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 gap-5 overflow-y-auto">
             <div className="relative">
               <img src={MARIAM_IMG} className="w-20 h-20 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
@@ -3233,7 +3233,7 @@ function ChatView({settings,sessions,setSessions}){
 
         {/* Messages */}
         {msgs.length>0&&(
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 min-h-0" style={{paddingBottom:`calc(80px + ${NAV_H}px + env(safe-area-inset-bottom))`}}>
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4" style={{}}>
             {msgs.map((m,i)=>(
               <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''} group`}>
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[var(--border)]'}`}>
@@ -3265,7 +3265,7 @@ function ChatView({settings,sessions,setSessions}){
 
         {/* Input area */}
         <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]"
-          style={{paddingBottom:`calc(12px + ${NAV_H}px + env(safe-area-inset-bottom))`}}>
+          style={{}}>
           <div className="w-full flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)] focus-within:border-[var(--accent)]/50 transition-colors">
             <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
               onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
@@ -3295,11 +3295,11 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
   const pr=PROVIDERS[settings.provider]||PROVIDERS.anthropic;
   const themes=[{id:'pure-white',label:'White',icon:Sun},{id:'light',label:'Soft',icon:CloudSun},{id:'dark',label:'Dark',icon:Moon},{id:'oled',label:'OLED',icon:MoonStar}];
   const accents=[{id:'indigo',hex:'#6366f1'},{id:'purple',hex:'#a855f7'},{id:'blue',hex:'#3b82f6'},{id:'emerald',hex:'#10b981'},{id:'rose',hex:'#f43f5e'}];
-  const sizes=[{id:'small',label:'S',px:12},{id:'medium',label:'M',px:14},{id:'large',label:'L',px:16},{id:'xl',label:'XL',px:18}];
+  const sizes=[{id:'small',label:'S',px:15},{id:'medium',label:'M',px:18},{id:'large',label:'L',px:20},{id:'xl',label:'XL',px:22}];
   const changeProvider=p=>{const pr=PROVIDERS[p];setSettings(s=>({...s,provider:p,baseUrl:pr.baseUrl,model:pr.defaultModel}));};
 
   return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
       <div className="w-full p-6 lg:p-8 space-y-6">
         <h1 className="text-3xl font-black flex items-center gap-3 mb-6"><Settings size={28} className="opacity-40"/> Settings</h1>
 
@@ -3775,7 +3775,7 @@ export default function App(){
         <div className="flex items-center gap-3">
           <img src={MARIAM_IMG} className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl object-cover border border-[var(--border)]" alt=""/>
           <span className="text-2xl lg:text-3xl font-black tracking-tight text-[var(--accent)]" style={{fontFamily:'system-ui'}}>MARIAM</span>
-          <span className="text-[11px] font-black bg-[var(--accent)] text-white px-2.5 py-1 rounded-full hidden sm:inline">{APP_VER}</span>
+          <span className="text-xs font-black bg-[var(--accent)] text-white px-2.5 py-1 rounded-full hidden sm:inline">{APP_VER}</span>
           {Object.values(window.__MARIAM_BG__?.tasks||{}).filter(t=>t.status==='running').length>0&&(
             <span className="text-xs font-black bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
               <Loader2 size={9} className="animate-spin"/>{Object.values(window.__MARIAM_BG__.tasks).filter(t=>t.status==='running').length} running
@@ -3874,7 +3874,7 @@ export default function App(){
               <GripVertical size={16} className="text-[var(--text)] opacity-20 group-hover:opacity-60"/>
             </div>
             <aside style={{width:window.innerWidth>=1024?`${rpW}px`:'100%'}}
-              className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in">
+              className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in h-full">
               <div className="h-14 lg:h-16 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-between px-4 shrink-0">
                 <span className="font-black flex items-center gap-2 text-base"><Sparkles size={18}/> AI Studio</span>
                 <button onClick={()=>setRpOpen(false)} className="w-8 h-8 hover:bg-white/20 rounded-xl flex items-center justify-center"><X size={18}/></button>
