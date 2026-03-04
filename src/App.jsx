@@ -1376,6 +1376,12 @@ const setupPWA=()=>{
     if(!m){m=document.createElement('meta');m.name=name;document.head.appendChild(m);}
     m.content=content;
   });
+  // Ensure viewport-fit=cover so env(safe-area-inset-*) works on iPhone notch/island
+  let vp=document.querySelector('meta[name="viewport"]');
+  if(!vp){vp=document.createElement('meta');vp.name='viewport';document.head.appendChild(vp);}
+  if(!vp.content.includes('viewport-fit')){
+    vp.content=(vp.content||'width=device-width, initial-scale=1')+', viewport-fit=cover';
+  }
 
   // Apple touch icon
   let apl=document.querySelector('link[rel="apple-touch-icon"]');
@@ -4534,7 +4540,8 @@ export default function App(){
         }
 
         /* ══ MISC ══ */
-        .scroll-content { padding-bottom:calc(90px + env(safe-area-inset-bottom) + 8px); -webkit-overflow-scrolling:touch; }
+        /* Mobile: pad bottom so content clears the pill nav (pill nav ~70px + safe area) */
+        .scroll-content { padding-bottom:calc(76px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -4589,7 +4596,8 @@ export default function App(){
   ];
 
   return(
-    <div className={`h-[100dvh] w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme||'pure-white'} accent-${settings.accentColor||'indigo'}`}>
+    <div className={`h-[100dvh] w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme||'pure-white'} accent-${settings.accentColor||'indigo'}`}
+      style={{paddingTop:'env(safe-area-inset-top)'}}>
       <style>{`
         /* ── LIGHT THEMES ── */
         .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(245,247,255,.88);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
@@ -4654,7 +4662,7 @@ export default function App(){
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(90px + env(safe-area-inset-bottom) + 16px);-webkit-overflow-scrolling:touch;}
+        .scroll-content{padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
         /* ── PILL NAV ITEM ACTIVE ── */
@@ -4897,7 +4905,9 @@ export default function App(){
 
       {/* MOBILE BOTTOM NAV — only rendered when mobile */}
       {isMobile&&(
-      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:9999,display:'flex',justifyContent:'center',alignItems:'center',padding:`10px 12px max(18px, env(safe-area-inset-bottom)) 12px`,pointerEvents:'none'}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:9999,display:'flex',justifyContent:'center',alignItems:'flex-end',paddingLeft:12,paddingRight:12,paddingBottom:'calc(10px + env(safe-area-inset-bottom))',paddingTop:6,pointerEvents:'none',
+        background:'linear-gradient(to top, rgba(var(--bg-rgb,245,247,255),0.7) 0%, transparent 100%)',
+      }}>
         <nav style={{
           pointerEvents:'all',
           display:'flex',
