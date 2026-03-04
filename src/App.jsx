@@ -4512,9 +4512,11 @@ export default function App(){
           border: 1px solid var(--border2,var(--border));
           border-radius: 999px;
           box-shadow: 0 8px 40px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.08);
-          padding: 5px 10px;
-          display:flex; align-items:center; gap:4px;
-          width: min(520px,calc(100vw - 24px));
+          padding: 4px 6px;
+          display:flex; flex-direction:row !important; align-items:center; gap:2px;
+          flex-wrap: nowrap !important;
+          width: min(520px,calc(100vw - 16px));
+          overflow: hidden;
           backdrop-filter: saturate(180%) blur(24px);
           -webkit-backdrop-filter: saturate(180%) blur(24px);
         }
@@ -4919,13 +4921,13 @@ export default function App(){
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
               onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
-              className={`relative flex-1 flex flex-col items-center gap-0.5 py-2 rounded-3xl transition-all ${dis?'opacity-20':''}`}
-              style={view===v?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.15),rgba(var(--acc-rgb,99,102,241),.06))'}:{}}>
-              {view===v&&<div style={{position:'absolute',top:-1,left:'50%',transform:'translateX(-50%)',height:2,width:24,borderRadius:999,background:'var(--accent)'}}/>}
-              <div style={{width:34,height:34,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',color:view===v?'var(--accent)':'var(--text2)',opacity:dis?0.3:view===v?1:.55}}>
-                <Icon size={17} strokeWidth={view===v?2.5:1.8}/>
+              className={`relative flex-1 flex flex-col items-center gap-0 py-1.5 rounded-3xl transition-all ${dis?'opacity-20':''}`}
+              style={{minWidth:0,flexShrink:1,...(view===v?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.15),rgba(var(--acc-rgb,99,102,241),.06))'}:{})}}>
+              {view===v&&<div style={{position:'absolute',top:-1,left:'50%',transform:'translateX(-50%)',height:2,width:18,borderRadius:999,background:'var(--accent)'}}/>}
+              <div style={{width:28,height:28,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',color:view===v?'var(--accent)':'var(--text2)',opacity:dis?0.3:view===v?1:.55}}>
+                <Icon size={15} strokeWidth={view===v?2.5:1.8}/>
               </div>
-              <span style={{fontSize:9,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.55}}>{label}</span>
+              <span style={{fontSize:8,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.04em',color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.55,whiteSpace:'nowrap'}}>{label}</span>
             </button>
           ))}
         </nav>
@@ -4936,4 +4938,3 @@ export default function App(){
 
 // Play icon polyfill
 const Play=({size=16,...p})=><svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" {...p}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
-
