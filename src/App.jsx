@@ -35,7 +35,7 @@ Filter,SortAsc,Grid,List,Smartphone,Monitor,Code,
 Printer,FileDown,FolderOpen,Pin,Copy,ExternalLink,
 Bell,Archive,BarChart,BookCopy,CalendarDays,FlameKindling,
 Trophy,Percent,PenLine,Scissors,Bookmark,History,Plus,
-MoreVertical,CheckCheck,CircleDot,Flame,
+MoreVertical,CheckCheck,CircleDot,Flame,Heart,Leaf,
 }from'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -674,7 +674,7 @@ function GlobalSearch({docs,flashcards,exams,cases,notes,onNavigate,onClose}){
       onClick={onClose}>
       <div className="w-full max-w-2xl glass rounded-3xl shadow-2xl overflow-hidden animate-slide-up border border-[var(--accent)]/30"
         onClick={e=>e.stopPropagation()}>
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)]">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[color:var(--border2,var(--border))]">
           <Search size={20} className="text-[var(--accent)] shrink-0"/>
           <input ref={inputRef} value={q} onChange={e=>setQ(e.target.value)}
             placeholder="Search everything — documents, cards, questions, cases, notes…"
@@ -691,7 +691,7 @@ function GlobalSearch({docs,flashcards,exams,cases,notes,onNavigate,onClose}){
               </div>
             ):results.map((r,i)=>(
               <button key={i} onClick={()=>{r.action();onClose();}}
-                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-[var(--accent)]/5 transition-colors text-left border-b border-[var(--border)]/50 last:border-0">
+                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-[var(--accent)]/5 transition-colors text-left border-b border-[color:var(--border2,var(--border))]/50 last:border-0">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{background:r.color+'20'}}>
                   <r.icon size={16} style={{color:r.color}}/>
                 </div>
@@ -746,52 +746,71 @@ function DashboardView({docs,flashcards,exams,cases,notes,chatSessions,setView,s
 
   return(
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
-      <div className="w-full p-6 lg:p-8 xl:p-10 space-y-6">
-        {/* Welcome */}
-        <div className="flex items-center justify-between">
+      <div className="max-w-6xl mx-auto p-5 lg:p-8 space-y-6">
+
+        {/* ── HERO ── */}
+        <div className="flex items-start justify-between gap-4 animate-slide-in">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-black">Dashboard</h1>
-            <p className="text-base opacity-50 mt-1 font-medium">{new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</p>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="badge text-xs">
+                {new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
+              </span>
+              {streak>=3&&<span className="badge" style={{color:'#f59e0b',borderColor:'rgba(245,158,11,.3)',background:'rgba(245,158,11,.1)'}}>🔥 {streak} day streak</span>}
+            </div>
+            <h1 className="text-3xl lg:text-4xl font-black leading-tight" style={{fontFamily:'Plus Jakarta Sans,system-ui',color:'var(--text)'}}>
+              {new Date().getHours()<12?'Good morning ☀️':new Date().getHours()<17?'Good afternoon 🌤':'Good evening 🌙'} 👋
+            </h1>
+            <p className="text-base mt-1 font-medium" style={{color:'var(--text2)'}}>
+              {docs.length===0?'Upload a document to get started':'Your AI-powered study command center'}
+            </p>
           </div>
-          <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-[var(--accent)]/20" alt="MARIAM"/>
+          <div className="relative shrink-0 hidden sm:block">
+            <img src={MARIAM_IMG} alt="" className="w-16 h-16 rounded-2xl object-cover"
+              style={{boxShadow:'0 0 0 3px rgba(var(--acc-rgb,99,102,241),.25),0 8px 24px rgba(0,0,0,.3)'}}/>
+          </div>
         </div>
 
-        {/* Stat grid */}
-        <div className="grid grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
-          {STAT_CARDS.map(({label,value,icon:Icon,color,sub,urgent})=>(
-            <div key={label} className={`glass rounded-2xl p-5 lg:p-6 border transition-all cursor-default ${urgent?'border-[color:var(--ac)] shadow-lg':'border-[var(--border)]'}`}
-              style={urgent?{'--ac':color+'60'}:{}}>
+        {/* ── STAT CARDS ── */}
+        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+          {STAT_CARDS.map(({label,value,icon:Icon,color,sub,urgent},i)=>(
+            <div key={label}
+              className={`card-lined rounded-2xl p-4 cursor-default animate-slide-up stagger-${Math.min(i+1,6)}`}
+              style={urgent?{borderTopColor:color+'99'}:{}}>
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:color+'20'}}>
-                  <Icon size={20} style={{color}}/>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:color+'18'}}>
+                  <Icon size={17} style={{color}}/>
                 </div>
-                {urgent&&<div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{background:color}}/>}
+                {urgent&&<div className="w-2 h-2 rounded-full animate-pulse" style={{background:color}}/>}
               </div>
-              <p className="text-4xl font-black leading-none mt-2" style={{color}}>{value}</p>
-              <p className="text-sm font-black uppercase tracking-widest opacity-50 mt-2 leading-tight">{label}</p>
-              <p className="text-sm opacity-40 mt-1">{sub}</p>
+              <p className="text-3xl lg:text-4xl font-black leading-none" style={{color,fontFamily:'Plus Jakarta Sans,system-ui'}}>{value}</p>
+              <p className="text-xs font-black uppercase tracking-widest mt-1.5" style={{color:'var(--text3)',fontSize:10}}>{label}</p>
+              <p className="text-xs mt-0.5 font-medium" style={{color:'var(--text3)'}}>{sub}</p>
             </div>
           ))}
         </div>
 
-        {/* Active background tasks */}
+        {/* ── BG TASKS ── */}
         {bgTaskList.filter(t=>t.status==='running'||t.status==='done').length>0&&(
-          <div className="glass rounded-2xl p-5 border border-[var(--accent)]/20">
-            <h2 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4 flex items-center gap-2"><Zap size={18} className="text-[var(--accent)]"/>Active Generation Tasks</h2>
-            <div className="space-y-3">
+          <div className="card-lined rounded-2xl p-5 animate-fade-in" style={{borderTopColor:'rgba(var(--acc-rgb,99,102,241),.4)'}}>
+            <h2 className="text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2" style={{color:'var(--text3)'}}>
+              <Zap size={13} style={{color:'var(--accent)'}}/> Active Generation
+            </h2>
+            <div className="space-y-2.5">
               {bgTaskList.map((t,i)=>(
-                <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border ${t.status==='done'?'border-emerald-500/30 bg-emerald-500/5':'border-[var(--border)]'}`}>
-                  {t.status==='running'?<Loader2 size={16} className="text-[var(--accent)] animate-spin shrink-0"/>:<CheckCircle2 size={16} className="text-emerald-500 shrink-0"/>}
+                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl border transition-all"
+                  style={t.status==='done'?{borderColor:'rgba(16,185,129,.3)',background:'rgba(16,185,129,.05)'}:{borderColor:'var(--border2,var(--border))',background:'var(--surface2,var(--card))'}}>
+                  {t.status==='running'?<Loader2 size={14} className="animate-spin shrink-0" style={{color:'var(--accent)'}}/>:<CheckCircle2 size={14} className="shrink-0" style={{color:'#10b981'}}/>}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate capitalize">{t.type} · {t.docName?.slice(0,30)}</p>
+                    <p className="text-sm font-bold truncate capitalize">{t.type} · {t.docName?.slice(0,28)}</p>
                     {t.status==='running'&&t.total>1&&(
-                      <div className="mt-1.5 w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-[var(--accent)] rounded-full transition-all" style={{width:`${((t.done||0)/t.total)*100}%`}}/>
+                      <div className="mt-1.5 h-1 rounded-full overflow-hidden" style={{background:'var(--border2,var(--border))'}}>
+                        <div className="h-full rounded-full transition-all duration-500" style={{width:`${((t.done||0)/t.total)*100}%`,background:'linear-gradient(90deg,var(--accent),var(--accent2,var(--accent)))'}}/>
                       </div>
                     )}
-                    {t.status==='done'&&<p className="text-xs opacity-40 mt-0.5">{t.result?.count} items ready</p>}
+                    {t.status==='done'&&<p className="text-xs mt-0.5" style={{color:'var(--text3)'}}>{t.result?.count} items ready</p>}
                   </div>
-                  <span className={`text-xs font-black px-3 py-1.5 rounded-lg ${t.status==='done'?'bg-emerald-500/20 text-emerald-600':'bg-[var(--accent)]/10 text-[var(--accent)]'}`}>
+                  <span className="text-xs font-black px-2.5 py-1 rounded-lg"
+                    style={t.status==='done'?{background:'rgba(16,185,129,.15)',color:'#10b981'}:{background:'rgba(var(--acc-rgb,99,102,241),.12)',color:'var(--accent)'}}>
                     {t.status==='done'?'Done':'Running'}
                   </span>
                 </div>
@@ -800,82 +819,110 @@ function DashboardView({docs,flashcards,exams,cases,notes,chatSessions,setView,s
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Documents */}
-          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><History size={18}/>Recent Documents</h2>
-              <button onClick={()=>setView('library')} className="text-sm font-black text-[var(--accent)] hover:underline">See all →</button>
+        {/* ── MAIN GRID ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+
+          {/* Recent Docs */}
+          <div className="card-lined rounded-2xl p-5 lg:col-span-3 animate-slide-up stagger-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-black uppercase tracking-widest flex items-center gap-2" style={{color:'var(--text3)'}}>
+                <History size={13} style={{color:'var(--accent)'}}/> Recent Documents
+              </h2>
+              <button onClick={()=>setView('library')} className="text-xs font-bold transition-all" style={{color:'var(--accent)',opacity:.7}}>View all →</button>
             </div>
             {recentDocs.length===0?(
-              <div className="text-center py-10 opacity-30">
-                <FileText size={40} className="mx-auto mb-3"/><p className="text-sm font-bold">No documents yet</p>
+              <div className="flex flex-col items-center py-10 gap-3">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{background:'rgba(var(--acc-rgb,99,102,241),.08)',border:'1px solid rgba(var(--acc-rgb,99,102,241),.15)'}}>
+                  <FileText size={22} style={{color:'var(--accent)',opacity:.5}}/>
+                </div>
+                <p className="text-sm font-bold" style={{color:'var(--text3)'}}>No documents yet</p>
+                <button onClick={()=>setView('library')} className="btn-accent px-4 py-2 rounded-xl text-sm font-black">Upload Document</button>
               </div>
-            ):recentDocs.map(doc=>(
+            ):recentDocs.map((doc,i)=>(
               <button key={doc.id} onClick={()=>{setActiveId(doc.id);setView('reader');}}
-                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--accent)]/5 transition-all mb-1.5">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${FILE_ICONS[doc.fileCategory||'unknown']?.from||'from-slate-500'} ${FILE_ICONS[doc.fileCategory||'unknown']?.to||'to-slate-700'} flex items-center justify-center shrink-0`}>
-                  <FileText size={18} className="text-white opacity-80"/>
+                className="w-full flex items-center gap-3.5 p-3 rounded-xl transition-all group hover:bg-[rgba(var(--acc-rgb,99,102,241),0.05)] mb-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white text-sm font-black"
+                  style={{background:`linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))`}}>
+                  {doc.name.slice(0,2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1 text-left">
-                  <p className="text-base font-bold truncate">{doc.name}</p>
-                  <p className="text-sm opacity-40 mt-0.5">{doc.totalPages} pages · {new Date(doc.addedAt||0).toLocaleDateString()}</p>
+                  <p className="text-sm font-semibold truncate" style={{color:'var(--text)'}}>{doc.name}</p>
+                  <p className="text-xs mt-0.5" style={{color:'var(--text3)'}}>{doc.totalPages} pages · {new Date(doc.addedAt||0).toLocaleDateString()}</p>
                 </div>
-                <ChevronRight size={16} className="opacity-30 shrink-0"/>
+                <ChevronRight size={14} className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{color:'var(--accent)'}}/>
               </button>
             ))}
           </div>
 
-          {/* Study Progress */}
-          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
-            <h2 className="text-base font-black uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2"><BarChart size={18}/>Study Progress</h2>
-            <div className="space-y-4">
+          {/* Right col */}
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            {/* Study Stats */}
+            <div className="card-lined rounded-2xl p-5 animate-slide-up stagger-3">
+              <h2 className="text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2" style={{color:'var(--text3)'}}>
+                <BarChart size={13} style={{color:'var(--accent)'}}/> Study Progress
+              </h2>
               {[
-                {label:'Avg Exam Score',value:`${avgScore}%`,max:100,cur:avgScore,color:'#3b82f6'},
-                {label:'Cards Studied',value:ANALYTICS.totalCards,max:Math.max(ANALYTICS.totalCards,totalCards)||1,cur:ANALYTICS.totalCards,color:'#8b5cf6'},
-                {label:'Due Cards',value:dueCards,max:Math.max(dueCards,totalCards)||1,cur:dueCards,color:dueCards>0?'#ef4444':'#10b981'},
-              ].map(({label,value,max,cur,color})=>(
-                <div key={label}>
-                  <div className="flex justify-between mb-1.5">
-                    <span className="text-base font-bold opacity-60">{label}</span>
-                    <span className="text-base font-black" style={{color}}>{value}</span>
+                {label:'Avg Score',val:`${avgScore}%`,pct:avgScore,color:'#818cf8'},
+                {label:'Cards Studied',val:ANALYTICS.totalCards,pct:Math.min(100,Math.round((ANALYTICS.totalCards/Math.max(1,totalCards))*100)),color:'#a78bfa'},
+                {label:'Due Cards',val:dueCards,pct:Math.min(100,Math.round((dueCards/Math.max(1,totalCards))*100)),color:dueCards>0?'#f43f5e':'#10b981'},
+              ].map(({label,val,pct,color})=>(
+                <div key={label} className="mb-3">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-xs font-medium" style={{color:'var(--text2)'}}>{label}</span>
+                    <span className="text-xs font-black" style={{color}}>{val}</span>
                   </div>
-                  <div className="w-full h-3 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{width:`${Math.min(100,max?(cur/max)*100:0)}%`,background:color}}/>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{background:'var(--border2,var(--border))'}}>
+                    <div className="h-full rounded-full transition-all duration-1000" style={{width:`${pct}%`,background:color}}/>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Quick Actions */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              {[
-                ['Study Cards',Layers,'flashcards','#8b5cf6'],
-                ['Take Exam',CheckSquare,'exams','#3b82f6'],
-                ['Practice Cases',Activity,'cases','#06b6d4'],
-                ['AI Chat',MessageSquare,'chat','#f59e0b'],
-              ].map(([lbl,Icon,v,col])=>(
-                <button key={v} onClick={()=>setView(v)}
-                  className="flex items-center gap-3 p-4 glass rounded-xl hover:border-[color:var(--hc)] transition-all text-base font-black"
-                  style={{'--hc':col+'60'}}>
-                  <Icon size={16} style={{color:col}}/>{lbl}
-                </button>
-              ))}
+            <div className="card-lined rounded-2xl p-5 animate-slide-up stagger-4">
+              <h2 className="text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2" style={{color:'var(--text3)'}}>
+                <Zap size={13} style={{color:'var(--accent)'}}/> Quick Actions
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  {lbl:'Study Cards',Icon:Layers,v:'flashcards',col:'#a78bfa'},
+                  {lbl:'Take Exam',Icon:CheckSquare,v:'exams',col:'#818cf8'},
+                  {lbl:'Cases',Icon:Activity,v:'cases',col:'#22d3ee'},
+                  {lbl:'AI Chat',Icon:MessageSquare,v:'chat',col:'#34d399'},
+                ].map(({lbl,Icon,v,col})=>(
+                  <button key={v} onClick={()=>setView(v)}
+                    className="flex flex-col items-start gap-2 p-3.5 rounded-xl card-hover transition-all"
+                    style={{background:'var(--surface2,var(--card))',border:'1px solid var(--border2,var(--border))'}}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:col+'18'}}>
+                      <Icon size={16} style={{color:col}}/>
+                    </div>
+                    <span className="text-xs font-black" style={{color:'var(--text)'}}>{lbl}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Recent exam scores chart */}
+        {/* Recent Scores Chart */}
         {recentScores.length>0&&(
-          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
-            <h2 className="text-sm font-black uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2"><TrendingUp size={18}/>Recent Exam Scores</h2>
-            <div className="flex items-end gap-3 h-28">
-              {recentScores.map((s,i)=>(
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                  <span className="text-xs font-black" style={{color:s.pct>=80?'#10b981':s.pct>=60?'#f59e0b':'#ef4444'}}>{s.pct}%</span>
-                  <div className="w-full rounded-t-lg transition-all" style={{height:`${Math.max(8,s.pct*0.88)}px`,background:s.pct>=80?'#10b981':s.pct>=60?'#f59e0b':'#ef4444',opacity:0.8}}/>
-                </div>
-              ))}
+          <div className="card-lined rounded-2xl p-5 animate-slide-up stagger-5">
+            <h2 className="text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2" style={{color:'var(--text3)'}}>
+              <TrendingUp size={13} style={{color:'var(--accent)'}}/> Exam Score History
+            </h2>
+            <div className="flex items-end gap-2" style={{height:80}}>
+              {recentScores.map((s,i)=>{
+                const col=s.pct>=80?'#10b981':s.pct>=60?'#f59e0b':'#f43f5e';
+                return(
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                    <span className="text-xs font-black" style={{color:col,fontSize:10}}>{s.pct}%</span>
+                    <div className="w-full rounded-t-lg relative overflow-hidden"
+                      style={{height:`${Math.max(4,s.pct*.7)}px`,background:`${col}22`,border:`1px solid ${col}44`}}>
+                      <div className="absolute inset-x-0 bottom-0" style={{height:'60%',background:`${col}88`}}/>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -1117,7 +1164,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
       style={{background:'rgba(0,0,0,0.6)',backdropFilter:'blur(8px)'}}>
       <div className="w-full sm:max-w-lg glass rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[92dvh] overflow-hidden shadow-2xl animate-slide-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[var(--border)] shrink-0">
+        <div className="flex items-center justify-between p-5 border-b border-[color:var(--border2,var(--border))] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{background:tc.color+'22'}}>
               <Icon size={20} style={{color:tc.color}}/>
@@ -1154,7 +1201,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
               ):docs.map(doc=>(
                 <button key={doc.id} onClick={()=>setSelDocId(doc.id)}
                   className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all border
-                    ${selDocId===doc.id?'bg-[var(--accent)]/10 border-[var(--accent)]/40':'glass border-transparent hover:border-[var(--border)]'}`}>
+                    ${selDocId===doc.id?'bg-[var(--accent)]/10 border-[var(--accent)]/40':'glass border-transparent hover:border-[color:var(--border2,var(--border))]'}`}>
                   <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${FILE_ICONS[doc.fileCategory||'unknown']?.from||'from-slate-500'} ${FILE_ICONS[doc.fileCategory||'unknown']?.to||'to-slate-700'} flex items-center justify-center shrink-0`}>
                     <FileText size={18} className="text-white opacity-80"/>
                   </div>
@@ -1176,7 +1223,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
                   onDragOver={e=>e.preventDefault()}
                   onDrop={e=>{e.preventDefault();handleFileUpload(e.dataTransfer.files);}}
                   onClick={()=>inputRef.current?.click()}
-                  className="border-2 border-dashed border-[var(--border)] rounded-2xl p-8 text-center cursor-pointer hover:border-[var(--accent)]/50 transition-colors">
+                  className="border-2 border-dashed border-[color:var(--border2,var(--border))] rounded-2xl p-8 text-center cursor-pointer hover:border-[var(--accent)]/50 transition-colors">
                   {uploading?(
                     <div className="space-y-3">
                       <Loader2 size={28} className="mx-auto text-[var(--accent)] animate-spin"/>
@@ -1215,11 +1262,11 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
               </div>
               <div className="flex gap-3 items-center">
                 <button onClick={()=>setEntireFile(true)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[var(--border)] opacity-60'}`}>
+                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[color:var(--border2,var(--border))] opacity-60'}`}>
                   Entire File
                 </button>
                 <button onClick={()=>setEntireFile(false)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${!entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[var(--border)] opacity-60'}`}>
+                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${!entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[color:var(--border2,var(--border))] opacity-60'}`}>
                   Page Range
                 </button>
               </div>
@@ -1230,7 +1277,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
                       <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
                       <input type="number" min={1} max={activeDoc.totalPages} value={v}
                         onChange={e=>s(Math.max(1,Math.min(activeDoc.totalPages,Number(e.target.value))))}
-                        className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+                        className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"/>
                     </div>
                   ))}
                 </div>
@@ -1263,7 +1310,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
               {levels.map((l,i)=>(
                 <button key={l} onClick={()=>setDifficulty(i+1)}
                   className={`py-2.5 rounded-xl text-xs font-black border transition-all
-                    ${difficulty===i+1?'text-white border-transparent shadow-md':'glass border-[var(--border)] opacity-60 hover:opacity-100'}`}
+                    ${difficulty===i+1?'text-white border-transparent shadow-md':'glass border-[color:var(--border2,var(--border))] opacity-60 hover:opacity-100'}`}
                   style={difficulty===i+1?{background:['#10b981','#f59e0b','#ef4444'][i]}:{}}>
                   {['🟢','🟡','🔴'][i]} {l}
                 </button>
@@ -1273,7 +1320,7 @@ function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-[var(--border)] shrink-0">
+        <div className="p-5 border-t border-[color:var(--border2,var(--border))] shrink-0">
           <button onClick={handleGo} disabled={!activeDoc}
             className="w-full py-4 btn-accent rounded-2xl text-sm font-black uppercase tracking-widest disabled:opacity-40 flex items-center justify-center gap-3 shadow-xl">
             <Zap size={18} fill="currentColor"/>
@@ -1373,7 +1420,7 @@ function ToastContainer({toasts}){
     <div className="fixed top-20 right-3 z-[9999] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-24px)]">
       {toasts.map(t=>(
         <div key={t.id} className={`px-4 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2.5 animate-slide-in pointer-events-auto
-          ${t.type==='success'?'bg-emerald-500 text-white':t.type==='error'?'bg-red-500 text-white':t.type==='warn'?'bg-amber-500 text-white':'bg-[var(--card)] border border-[var(--border)] text-[var(--text)]'}`}>
+          ${t.type==='success'?'bg-emerald-500 text-white':t.type==='error'?'bg-red-500 text-white':t.type==='warn'?'bg-amber-500 text-white':'bg-[var(--surface,var(--card))] border border-[color:var(--border2,var(--border))] text-[var(--text)]'}`}>
           {t.type==='success'?<CheckCircle2 size={15}/>:t.type==='error'?<AlertCircle size={18}/>:<Info size={18}/>}
           <span className="truncate max-w-[280px]">{t.msg}</span>
         </div>
@@ -1532,16 +1579,16 @@ function TimelineView({events=[]}){
 function LabTable({rows}){
   if(!rows?.length)return null;
   return(
-    <div className="rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--card)] mb-4 text-xs">
+    <div className="rounded-xl overflow-hidden border border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))] mb-4 text-xs">
       <table className="w-full border-collapse">
-        <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[var(--border)]">
+        <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[color:var(--border2,var(--border))]">
           {['Test','Result','Range','Units'].map(h=>(
             <th key={h} className="py-1.5 px-3 text-xs font-black uppercase tracking-wider text-left opacity-50">{h}</th>
           ))}
         </tr></thead>
         <tbody>
           {rows.map((r,i)=>(
-            <tr key={i} className="border-b border-[var(--border)]/50 last:border-0">
+            <tr key={i} className="border-b border-[color:var(--border2,var(--border))]/50 last:border-0">
               <td className="py-2 px-3 font-semibold">{r.test}</td>
               <td className="py-2 px-3 text-center">
                 <span className={`font-black inline-flex items-center gap-1 ${r.flag==='L'?'text-blue-500':r.flag==='H'?'text-red-500':''}`}>
@@ -1638,12 +1685,12 @@ function TutorChat({context,settings,contextLabel=''}){
 
   return(
     <div className="flex flex-col h-full bg-[var(--bg)]">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--card)] shrink-0">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))] shrink-0">
         <img src={MARIAM_IMG} className="w-7 h-7 rounded-lg object-cover" alt="AI"/>
         <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
         {loading&&<div className="ml-auto flex gap-1">{[0,1,2].map(i=><div key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}</div>}
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         {msgs.length===0&&<div className="flex flex-col items-center justify-center h-full opacity-40 text-center"><Brain size={32} className="mb-2"/><p className="text-xs font-bold">Ask me anything</p></div>}
         {msgs.map((m,i)=>(
           <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
@@ -1651,19 +1698,19 @@ function TutorChat({context,settings,contextLabel=''}){
               {m.role==='user'?<UserCircle2 size={16} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
             </div>
             <div className={`px-3 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
-              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'bg-[var(--card)] border border-[var(--border)] rounded-tl-sm'}`}>
+              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'bg-[var(--surface,var(--card))] border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
               {m.content||<span className="opacity-40">thinking…</span>}
             </div>
           </div>
         ))}
         <div ref={endRef}/>
       </div>
-      <div className="shrink-0 p-2 border-t border-[var(--border)] bg-[var(--card)]">
+      <div className="shrink-0 p-2 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
         <div className="flex gap-2 items-end">
           <textarea value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
             placeholder="Ask tutor…" disabled={loading} rows={1}
-            className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
+            className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
           <button onClick={toggleVoice}
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white animate-pulse':'glass text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
             {listening?<MicOff size={18}/>:<Mic size={18}/>}
@@ -1771,17 +1818,17 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
           <h1 className="text-2xl lg:text-3xl font-black tracking-tight flex-none">Library</h1>
           <div className="flex-1 min-w-[160px] relative">
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search files…"
-              className="w-full bg-black/5 dark:bg-white/5 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none border border-[var(--border)] focus:border-[var(--accent)]/50 text-[var(--text)]"/>
+              className="w-full bg-black/5 dark:bg-white/5 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none border border-[color:var(--border2,var(--border))] focus:border-[var(--accent)]/50 text-[var(--text)]"/>
             <Search className="absolute left-2.5 top-3 opacity-30" size={14}/>
           </div>
           <div className="flex items-center gap-2">
             <select value={sortBy} onChange={e=>setSortBy(e.target.value)}
-              className="glass border border-[var(--border)] rounded-xl px-3 py-2.5 text-xs font-black outline-none text-[var(--text)] bg-[var(--card)] cursor-pointer">
+              className="glass border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2.5 text-xs font-black outline-none text-[var(--text)] bg-[var(--surface,var(--card))] cursor-pointer">
               <option value="date">Newest</option>
               <option value="name">Name</option>
               <option value="type">Type</option>
             </select>
-            <div className="flex glass rounded-xl overflow-hidden border border-[var(--border)]">
+            <div className="flex glass rounded-xl overflow-hidden border border-[color:var(--border2,var(--border))]">
               <button onClick={()=>setViewMode('grid')} className={`p-2.5 transition-colors ${viewMode==='grid'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><Grid size={18}/></button>
               <button onClick={()=>setViewMode('list')} className={`p-2.5 transition-colors ${viewMode==='list'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><List size={18}/></button>
             </div>
@@ -1796,7 +1843,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
 
         {/* Empty state */}
         {filtered.length===0&&(
-          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 lg:p-16 text-center flex flex-col items-center gap-4"
+          <div className="glass border-dashed border-2 border-[color:var(--border2,var(--border))] rounded-3xl p-12 lg:p-16 text-center flex flex-col items-center gap-4"
             onClick={()=>inputRef.current?.click()}>
             <div className="w-20 h-20 rounded-3xl bg-[var(--accent)]/10 flex items-center justify-center">
               <FileUp size={40} className="text-[var(--accent)] opacity-60"/>
@@ -1990,7 +2037,7 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
 
       {/* Tab bar */}
       {openDocs.length>1&&(
-        <div className="flex gap-1.5 px-3 py-1.5 border-b border-[var(--border)] overflow-x-auto custom-scrollbar shrink-0 bg-[var(--card)]">
+        <div className="flex gap-1.5 px-3 py-1.5 border-b border-[color:var(--border2,var(--border))] overflow-x-auto custom-scrollbar shrink-0 bg-[var(--surface,var(--card))]">
           {openDocs.map(id=>{
             const doc=docs.find(d=>d.id===id);if(!doc)return null;
             const dc=FILE_ICONS[doc.fileCategory||'pdf']||FILE_ICONS.pdf;
@@ -2026,7 +2073,7 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
           </div>
         ):(
           <div className="p-6 pb-20 lg:pb-6 w-full">
-            <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm border border-[var(--border)] min-h-[60vh]">
+            <div className="bg-[var(--surface,var(--card))] rounded-2xl p-6 shadow-sm border border-[color:var(--border2,var(--border))] min-h-[60vh]">
               <pre className="text-sm leading-relaxed whitespace-pre-wrap font-mono text-[var(--text)] opacity-90 break-words">{pageText||'(No content on this page)'}</pre>
             </div>
           </div>
@@ -2034,11 +2081,11 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
       </div>
 
       {/* Page nav */}
-      <div className="h-14 glass flex items-center justify-center gap-3 shrink-0 border-t border-[var(--border)] border-x-0 border-b-0
+      <div className="h-14 glass flex items-center justify-center gap-3 shrink-0 border-t border-[color:var(--border2,var(--border))] border-x-0 border-b-0
         fixed bottom-[72px] left-0 right-0 z-[200] lg:relative lg:bottom-auto lg:z-auto"
         style={{bottom:`calc(${NAV_H}px + env(safe-area-inset-bottom))`}}>
         <button onClick={()=>nav(-1)} disabled={currentPage<=1} className="w-10 h-10 glass rounded-xl flex items-center justify-center disabled:opacity-30 active:scale-95"><ChevronLeft size={18}/></button>
-        <div className="px-4 py-2 glass rounded-xl font-mono text-sm font-bold border border-[var(--border)] min-w-[90px] text-center">
+        <div className="px-4 py-2 glass rounded-xl font-mono text-sm font-bold border border-[color:var(--border2,var(--border))] min-w-[90px] text-center">
           <span className="text-[var(--accent)]">{currentPage}</span> / {activeDoc.totalPages}
         </div>
         <button onClick={()=>nav(1)} disabled={currentPage>=activeDoc.totalPages}
@@ -2120,7 +2167,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           </button>
         </div>
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
         {/* Flashcard preview */}
         {bgTask.result?.type==='flashcards'&&bgTask.result.data.slice(0,5).map((item,i)=>(
           <div key={i} className="glass p-4 rounded-2xl">
@@ -2187,7 +2234,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
               <div key={l} className="flex-1">
                 <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
                 <input type="number" min={1} max={activeDoc.totalPages} value={v} onChange={e=>s(Number(e.target.value))}
-                  className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+                  className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"/>
               </div>
             ))}
           </div>
@@ -2202,7 +2249,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           {TOOLS.map(([id,lbl,Icon,color])=>(
             <button key={id} onClick={()=>setType(id)}
               className={`py-2.5 flex flex-col items-center gap-1 rounded-xl text-xs font-black uppercase tracking-wider transition-all border
-                ${type===id?'text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}
+                ${type===id?'text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[color:var(--border2,var(--border))]'}`}
               style={type===id?{backgroundColor:color}:{}}>
               <Icon size={18}/>{lbl}
             </button>
@@ -2223,7 +2270,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
             ))}
           </div>
           <input value={targetLang} onChange={e=>setTargetLang(e.target.value)} placeholder="Or type any language…"
-            className="mt-3 w-full glass border border-[var(--border)] rounded-xl px-3 py-2 text-xs outline-none focus:border-[var(--accent)] text-[var(--text)]"/>
+            className="mt-3 w-full glass border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none focus:border-[var(--accent)] text-[var(--text)]"/>
         </div>
       )}
 
@@ -2273,7 +2320,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
             <span className="text-xs font-black text-[var(--accent)]">{bgTask.done||0}/{bgTask.total||1}</span>
           </div>
           <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-300 animate-pulse"
+            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full rounded-full transition-all duration-300 animate-pulse"
               style={{width:`${bgTask.total?((bgTask.done||0)/bgTask.total)*100:10}%`}}/>
           </div>
         </div>
@@ -2332,7 +2379,7 @@ function ChatPanel({activeDoc,settings,currentPage}){
 
   return(
     <div className="flex-1 flex flex-col min-h-0 h-full">
-      <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
+      <div className="flex shrink-0 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
         {['page','document'].map(m=>(
           <button key={m} onClick={()=>setMode(m)}
             className={`flex-1 py-2.5 text-xs font-black uppercase tracking-widest transition-colors border-b-2
@@ -2355,12 +2402,12 @@ function ChatPanel({activeDoc,settings,currentPage}){
         ))}
         <div ref={endRef}/>
       </div>
-      <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]">
+      <div className="shrink-0 p-3 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
         <div className="flex gap-2 items-end">
           <textarea value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
             placeholder="Ask about this document…" disabled={loading} rows={1}
-            className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
+            className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
           <button onClick={toggleVoice}
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${listening?'bg-red-500 text-white animate-pulse':'glass text-[var(--accent)]'}`}>
             {listening?<MicOff size={18}/>:<Mic size={18}/>}
@@ -2395,7 +2442,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
         </div>
         {expanded[id]?<ChevronUp size={18} className="opacity-40"/>:<ChevronDown size={18} className="opacity-40"/>}
       </button>
-      {expanded[id]&&<div className="border-t border-[var(--border)] p-3 space-y-2">{children}</div>}
+      {expanded[id]&&<div className="border-t border-[color:var(--border2,var(--border))] p-3 space-y-2">{children}</div>}
     </div>
   );
 
@@ -2460,7 +2507,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
         <Section id="mm" title="Mind Maps" count={docMm.length} colorClass="text-purple-500">
           {docMm.map((m,i)=>(
             <div key={m.id} className="glass rounded-xl overflow-hidden">
-              <p className="text-xs font-bold p-2 border-b border-[var(--border)] opacity-60">{m.data?.topic||`Map ${i+1}`} · Pgs {m.pages}</p>
+              <p className="text-xs font-bold p-2 border-b border-[color:var(--border2,var(--border))] opacity-60">{m.data?.topic||`Map ${i+1}`} · Pgs {m.pages}</p>
               <MindMap data={m.data}/>
             </div>
           ))}
@@ -2518,9 +2565,9 @@ function AiTutorPanel({settings,context,onClose,width,onDragStart,alwaysOpen=fal
   ];
 
   return(
-    <div className="flex flex-col h-full min-h-0 bg-[var(--card)] border-l border-[var(--border)]" style={{width:width||360}}>
+    <div className="flex flex-col h-full min-h-0 bg-[var(--surface,var(--card))] border-l border-[color:var(--border2,var(--border))]" style={{width:width||360}}>
       {/* Header - draggable */}
-      <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-between px-4 py-3 shrink-0 cursor-grab select-none"
+      <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-between px-4 py-3 shrink-0 cursor-grab select-none"
         onMouseDown={onDragStart} onTouchStart={onDragStart}>
         <div>
           <span className="font-black flex items-center gap-2 text-base"><GraduationCap size={20}/> AI Tutor</span>
@@ -2532,19 +2579,19 @@ function AiTutorPanel({settings,context,onClose,width,onDragStart,alwaysOpen=fal
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
         {msgs.map((m,i)=>(
           <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-black ${m.role==='user'?'bg-[var(--accent)] text-white':'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-white'}`}>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-black ${m.role==='user'?'bg-[var(--accent)] text-white':'bg-gradient-to-br from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white'}`}>
               {m.role==='user'?'You':'AI'}
             </div>
             <div className={`px-3 py-2.5 text-sm leading-relaxed rounded-2xl max-w-[85%] whitespace-pre-wrap
-              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass border border-[var(--border)] rounded-tl-sm'}`}>
+              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
               {m.content||<span className="opacity-30 animate-pulse">▊</span>}
             </div>
           </div>
         ))}
         {loading&&(
           <div className="flex gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-center text-xs font-black shrink-0">AI</div>
-            <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-[var(--border)]">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-center text-xs font-black shrink-0">AI</div>
+            <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-[color:var(--border2,var(--border))]">
               {[0,1,2].map(i=><div key={i} className="w-2 h-2 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
             </div>
           </div>
@@ -2552,17 +2599,17 @@ function AiTutorPanel({settings,context,onClose,width,onDragStart,alwaysOpen=fal
         <div ref={endRef}/>
       </div>
       {/* Quick prompts */}
-      <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[var(--border)]">
+      <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[color:var(--border2,var(--border))]">
         {QUICK.map(q=>(
           <button key={q} onClick={()=>send(q)}
-            className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[var(--border)] leading-tight text-left">
+            className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[color:var(--border2,var(--border))] leading-tight text-left">
             {q}
           </button>
         ))}
       </div>
       {/* Input */}
-      <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]">
-        <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)] focus-within:border-[var(--accent)]/50">
+      <div className="shrink-0 p-3 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
+        <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/50">
           <textarea value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
             placeholder="Ask your tutor anything…" disabled={loading} rows={1}
@@ -2590,7 +2637,7 @@ function WithAiTutor({settings,context,children}){
       {/* Toggle button */}
       {!open&&(
         <button onClick={()=>setOpen(true)}
-          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white rounded-xl font-black text-sm shadow-xl hover:opacity-90 transition-all">
+          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white rounded-xl font-black text-sm shadow-xl hover:opacity-90 transition-all">
           <GraduationCap size={16}/>AI Tutor
         </button>
       )}
@@ -2660,7 +2707,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
     return(
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
           <button onClick={()=>{setSelSet(null);setIdx(0);setFlipped(false);}}
             className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
           <div className="text-center">
@@ -2673,14 +2720,14 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
         </div>
         {/* Progress bar */}
         <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
-          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
+          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
         </div>
         {/* Two-panel row */}
         <div className="flex-1 min-h-0 flex overflow-hidden">
           {/* LEFT: card + controls */}
           <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-5" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
             {/* Flip card */}
-            <div className="glass rounded-3xl p-8 cursor-pointer min-h-[220px] flex flex-col justify-between select-none border border-[var(--border)] hover:border-[var(--accent)]/40 transition-all active:scale-[0.99]"
+            <div className="glass rounded-3xl p-8 cursor-pointer min-h-[220px] flex flex-col justify-between select-none border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 transition-all active:scale-[0.99]"
               onClick={()=>setFlipped(f=>!f)}>
               <div className="flex items-start justify-between mb-4">
                 <span className={`text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border ${flipped?'border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/8':'glass opacity-50'}`}>
@@ -2691,7 +2738,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
               <p className={`text-base font-semibold leading-relaxed flex-1 ${flipped?'text-[var(--accent)]':''}`}>
                 {flipped?card.a:card.q}
               </p>
-              {flipped&&card.evidence&&<p className="text-xs opacity-40 mt-4 italic border-t border-[var(--border)] pt-3">"{card.evidence}"</p>}
+              {flipped&&card.evidence&&<p className="text-xs opacity-40 mt-4 italic border-t border-[color:var(--border2,var(--border))] pt-3">"{card.evidence}"</p>}
               {!flipped&&<p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-1"><RefreshCw size={11}/>Tap to flip</p>}
             </div>
             {/* Rating buttons */}
@@ -2717,7 +2764,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
           </div>
           {/* RIGHT: AI Tutor always open */}
-          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0" style={{width:fcTutorW}}>
+          <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0" style={{width:fcTutorW}}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={fcTutorW} onDragStart={startFcTutorDrag} alwaysOpen={true}/>
           </div>
         </div>
@@ -2747,7 +2794,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
                 ['Cards',flashcards.reduce((s,f)=>s+(f.cards?.length||0),0),'#3b82f6'],
                 ['Due Today',flashcards.reduce((s,f)=>s+(f.cards?.filter(c=>!c.nextReview||c.nextReview<=Date.now()).length||0),0),'#f59e0b'],
               ].map(([l,n,col])=>(
-                <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+                <div key={l} className="glass rounded-2xl p-3 text-center border border-[color:var(--border2,var(--border))]">
                   <p className="text-xl font-black" style={{color:col}}>{n}</p>
                   <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
                 </div>
@@ -2755,7 +2802,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
             </div>
             {docs?.length>0&&(
               <select value={filterDocId} onChange={e=>setFilterDocId(e.target.value)}
-                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[color:var(--border2,var(--border))] outline-none text-[var(--text)]">
                 <option value="all">All Documents</option>
                 {[...new Set(flashcards.map(f=>f.docId))].map(id=>{const doc=docs?.find(d=>d.id===id);return doc?<option key={id} value={id}>{doc.name.slice(0,30)}</option>:null;})}
               </select>
@@ -2764,7 +2811,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
         )}
 
         {!flashcards.length?(
-          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
+          <div className="glass border-dashed border-2 border-[color:var(--border2,var(--border))] rounded-3xl p-12 text-center">
             <Layers size={48} className="mx-auto mb-4 opacity-20"/>
             <p className="text-lg font-black opacity-40">No flashcard sets yet</p>
             <p className="text-sm opacity-30 mt-1 mb-6">Generate cards from any document</p>
@@ -2773,7 +2820,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
             </button>
           </div>
         ):(filteredSets.map(set=>(
-          <div key={set.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+          <div key={set.id} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20 transition-all card-hover">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <h3 className="font-black text-sm truncate">{set.title}</h3>
@@ -2861,7 +2908,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
     return(
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
           <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
           <div className="text-center">
             <p className="text-sm font-black truncate max-w-xs">{selEx.title}</p>
@@ -2871,13 +2918,13 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
         </div>
         {/* Progress */}
         <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
-          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
+          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
         </div>
         {/* Two-panel row */}
         <div className="flex-1 min-h-0 flex overflow-hidden">
           {/* LEFT: question + options */}
           <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-6 space-y-4" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
-            <div className="glass rounded-2xl p-6 border border-[var(--border)]">
+            <div className="glass rounded-2xl p-6 border border-[color:var(--border2,var(--border))]">
               {q.sourcePage&&<p className="text-xs font-mono opacity-30 mb-3">Source: p.{q.sourcePage}</p>}
               <p className="text-base font-semibold leading-relaxed">{q.q}</p>
             </div>
@@ -2887,11 +2934,11 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
                   className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
                     ${submitted&&oi===q.correct?'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
                       submitted&&oi===selected&&oi!==q.correct?'bg-red-500/15 border-red-500 text-red-500':
-                      selected===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                      selected===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
                     ${submitted&&oi===q.correct?'bg-emerald-500 border-emerald-500 text-white':
                       submitted&&oi===selected&&oi!==q.correct?'bg-red-500 border-red-500 text-white':
-                      selected===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[var(--border)] opacity-50'}`}>
+                      selected===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[color:var(--border2,var(--border))] opacity-50'}`}>
                     {String.fromCharCode(65+oi)}
                   </span>
                   <span className="flex-1">{opt}</span>
@@ -2903,7 +2950,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
               <div className="glass p-5 rounded-2xl border-l-4 border-[var(--accent)] bg-[var(--accent)]/5">
                 <p className="text-xs font-black opacity-60 mb-2 uppercase tracking-widest">Explanation</p>
                 <p className="text-sm leading-relaxed">{q.explanation}</p>
-                {q.evidence&&<p className="text-xs opacity-40 italic mt-3 pt-3 border-t border-[var(--border)]">"{q.evidence}"</p>}
+                {q.evidence&&<p className="text-xs opacity-40 italic mt-3 pt-3 border-t border-[color:var(--border2,var(--border))]">"{q.evidence}"</p>}
               </div>
             )}
             <div className="pb-4">
@@ -2921,7 +2968,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
           </div>
           {/* RIGHT: AI Tutor always open */}
-          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0" style={{width:examTutorW}}>
+          <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0" style={{width:examTutorW}}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true}/>
           </div>
         </div>
@@ -2944,7 +2991,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
           </div>
           <div className="space-y-4">
             {selEx.questions.map((q,i)=>(
-              <div key={i} className="glass rounded-2xl p-5 border border-[var(--border)]">
+              <div key={i} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))]">
                 <p className="text-xs font-black text-[var(--accent)] mb-2">Q{i+1}</p>
                 <p className="text-sm font-bold mb-3">{q.q}</p>
                 <div className="space-y-1.5">
@@ -2969,7 +3016,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
     const grade=pct>=90?'A':pct>=80?'B':pct>=70?'C':pct>=60?'D':'F';
     return(
       <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full border border-[var(--border)]">
+        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full border border-[color:var(--border2,var(--border))]">
           <div className={`text-7xl font-black mb-1 ${pct>=80?'text-emerald-500':pct>=60?'text-amber-500':'text-red-500'}`}>{pct}%</div>
           <div className={`text-3xl font-black mb-4 ${pct>=80?'text-emerald-500':pct>=60?'text-amber-500':'text-red-500'}`}>Grade {grade}</div>
           <p className="text-sm font-black opacity-60 mb-1">{score} / {selEx.questions.length} correct</p>
@@ -2979,7 +3026,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={()=>{setReviewMode(true);}} className="glass px-6 py-3 rounded-2xl font-black border border-[var(--border)]">Review Answers</button>
+          <button onClick={()=>{setReviewMode(true);}} className="glass px-6 py-3 rounded-2xl font-black border border-[color:var(--border2,var(--border))]">Review Answers</button>
           <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl">Back to Exams</button>
         </div>
       </div>
@@ -3008,7 +3055,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
                 ['Avg Score',ANALYTICS.scores.length?`${Math.round(ANALYTICS.scores.reduce((s,r)=>s+r.pct,0)/ANALYTICS.scores.length)}%`:'—','#10b981'],
                 ['Attempts',ANALYTICS.scores.length,'#f59e0b'],
               ].map(([l,n,col])=>(
-                <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+                <div key={l} className="glass rounded-2xl p-3 text-center border border-[color:var(--border2,var(--border))]">
                   <p className="text-xl font-black" style={{color:col}}>{n}</p>
                   <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
                 </div>
@@ -3017,12 +3064,12 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
             {/* Filters */}
             <div className="flex gap-2 flex-wrap">
               <select value={filterDocId} onChange={e=>setFilterDocId(e.target.value)}
-                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[color:var(--border2,var(--border))] outline-none text-[var(--text)]">
                 <option value="all">All Documents</option>
                 {[...new Set(exams.map(e=>e.docId))].map(id=>{const doc=docs?.find(d=>d.id===id);return doc?<option key={id} value={id}>{doc.name.slice(0,30)}</option>:null;})}
               </select>
               <select value={sortMode} onChange={e=>setSortMode(e.target.value)}
-                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[color:var(--border2,var(--border))] outline-none text-[var(--text)]">
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
                 <option value="most">Most questions</option>
@@ -3032,7 +3079,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
         )}
 
         {!exams.length?(
-          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
+          <div className="glass border-dashed border-2 border-[color:var(--border2,var(--border))] rounded-3xl p-12 text-center">
             <CheckSquare size={48} className="mx-auto mb-4 opacity-20"/>
             <p className="text-lg font-black opacity-40">No exams yet</p>
             <p className="text-sm opacity-30 mt-1 mb-6">Generate exams from any document</p>
@@ -3041,7 +3088,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
             </button>
           </div>
         ):(filteredExams.map(ex=>(
-          <div key={ex.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+          <div key={ex.id} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20 transition-all card-hover">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <h3 className="font-black text-sm truncate">{ex.title}</h3>
@@ -3101,7 +3148,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
 
         {/* ── TOP BAR ── */}
-        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
           <button onClick={()=>{setSelSet(null);setCi(0);setSelOpt(null);setSubmitted(false);}}
             className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 hover:border-[var(--accent)]/40 transition-all">
             <ChevronLeft size={18}/>Exit
@@ -3129,7 +3176,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
           <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-5 space-y-4" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
 
             {/* Patient Vignette */}
-            <div className="glass rounded-2xl p-5 border border-[var(--border)]">
+            <div className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))]">
               <p className="text-xs font-black uppercase tracking-widest text-[var(--accent)] mb-3 flex items-center gap-2">
                 <Stethoscope size={13}/> Patient Vignette
               </p>
@@ -3137,7 +3184,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
             </div>
 
             {/* Question stem */}
-            <div className="glass rounded-2xl p-5 border border-[var(--border)]">
+            <div className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))]">
               <p className="text-sm font-black uppercase tracking-widest opacity-40 mb-3 flex items-center gap-2"><CheckSquare size={13}/>Question</p>
               <p className="text-base font-semibold leading-relaxed">{q.q}</p>
             </div>
@@ -3149,11 +3196,11 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
                   className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
                     ${submitted&&oi===q.correct?'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
                       submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500/15 border-red-500 text-red-500':
-                      selOpt===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                      selOpt===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
                     ${submitted&&oi===q.correct?'bg-emerald-500 border-emerald-500 text-white':
                       submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500 border-red-500 text-white':
-                      selOpt===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[var(--border)] opacity-50'}`}>
+                      selOpt===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[color:var(--border2,var(--border))] opacity-50'}`}>
                     {String.fromCharCode(65+oi)}
                   </span>
                   <span className="flex-1">{opt}</span>
@@ -3167,7 +3214,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
               <div className="glass p-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-500/5 space-y-2">
                 {cas.diagnosis&&<p className="text-sm font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={15}/>Diagnosis: {cas.diagnosis}</p>}
                 {q.explanation&&<p className="text-sm leading-relaxed">{q.explanation}</p>}
-                {q.evidence&&<p className="text-xs opacity-40 italic pt-3 border-t border-[var(--border)]">"{q.evidence}" — p.{q.sourcePage}</p>}
+                {q.evidence&&<p className="text-xs opacity-40 italic pt-3 border-t border-[color:var(--border2,var(--border))]">"{q.evidence}" — p.{q.sourcePage}</p>}
               </div>
             )}
 
@@ -3198,10 +3245,10 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
           </div>
 
           {/* ═══ MIDDLE: Lab Results (scrollable, draggable width) ═══ */}
-          <div className="hidden lg:flex flex-col border-l border-[var(--border)] bg-[var(--card)] overflow-hidden shrink-0"
+          <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))] overflow-hidden shrink-0"
             style={{width:labW}}>
             {/* Lab header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] shrink-0 cursor-grab select-none"
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0 cursor-grab select-none"
               onMouseDown={startLabDrag} onTouchStart={startLabDrag}>
               <Thermometer size={15} className="text-[var(--accent)] shrink-0"/>
               <span className="text-sm font-black uppercase tracking-widest text-[var(--accent)]">Laboratory Results</span>
@@ -3214,7 +3261,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
                   <p className="text-xs font-black uppercase tracking-widest opacity-50 mb-2 px-1">{panel.panelName}</p>
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-[var(--border)]">
+                      <tr className="border-b border-[color:var(--border2,var(--border))]">
                         {['TEST','RESULT','RANGE','UNITS'].map(h=>(
                           <th key={h} className="text-left py-1.5 px-2 text-xs font-black uppercase tracking-wider opacity-40">{h}</th>
                         ))}
@@ -3222,7 +3269,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
                     </thead>
                     <tbody>
                       {(panel.rows||[]).map((row,ri)=>(
-                        <tr key={ri} className="border-b border-[var(--border)]/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                        <tr key={ri} className="border-b border-[color:var(--border2,var(--border))]/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                           <td className="py-2 px-2 font-bold text-sm">{row.test}</td>
                           <td className="py-2 px-2 font-black text-sm">
                             <span className="flex items-center gap-1" style={{color:row.flag==='H'?'#ef4444':row.flag==='L'?'#3b82f6':undefined}}>
@@ -3253,7 +3300,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
           </div>
 
           {/* ═══ RIGHT: AI Tutor (always open, draggable width) ═══ */}
-          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0 overflow-hidden"
+          <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0 overflow-hidden"
             style={{width:tutorW}}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={tutorW} onDragStart={startTutorDrag} alwaysOpen={true}/>
           </div>
@@ -3261,10 +3308,10 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
         </div>
 
         {/* Mobile: lab results below (collapsed accordion) */}
-        <div className="lg:hidden border-t border-[var(--border)]">
+        <div className="lg:hidden border-t border-[color:var(--border2,var(--border))]">
           {cas.labPanels?.length>0&&(
             <details className="group">
-              <summary className="flex items-center gap-2 px-4 py-3 cursor-pointer bg-[var(--card)] text-sm font-black select-none">
+              <summary className="flex items-center gap-2 px-4 py-3 cursor-pointer bg-[var(--surface,var(--card))] text-sm font-black select-none">
                 <Thermometer size={15} className="text-[var(--accent)]"/>
                 <span className="text-[var(--accent)] uppercase tracking-widest text-xs">Lab Results</span>
                 <ChevronDown size={14} className="ml-auto opacity-40 group-open:rotate-180 transition-transform"/>
@@ -3274,9 +3321,9 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
                   <div key={pi} className="mb-4">
                     <p className="text-xs font-black uppercase tracking-widest opacity-50 mb-2">{panel.panelName}</p>
                     <table className="w-full text-xs">
-                      <thead><tr className="border-b border-[var(--border)]">{['TEST','RESULT','RANGE','UNITS'].map(h=><th key={h} className="text-left py-1 px-2 font-black uppercase opacity-40">{h}</th>)}</tr></thead>
+                      <thead><tr className="border-b border-[color:var(--border2,var(--border))]">{['TEST','RESULT','RANGE','UNITS'].map(h=><th key={h} className="text-left py-1 px-2 font-black uppercase opacity-40">{h}</th>)}</tr></thead>
                       <tbody>{(panel.rows||[]).map((row,ri)=>(
-                        <tr key={ri} className="border-b border-[var(--border)]/20">
+                        <tr key={ri} className="border-b border-[color:var(--border2,var(--border))]/20">
                           <td className="py-1.5 px-2 font-bold">{row.test}</td>
                           <td className="py-1.5 px-2 font-black" style={{color:row.flag==='H'?'#ef4444':row.flag==='L'?'#3b82f6':undefined}}>{row.result}{row.flag&&` ${row.flag}`}</td>
                           <td className="py-1.5 px-2 opacity-40 font-mono">{row.range}</td>
@@ -3314,7 +3361,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
               ['Total Cases',cases.reduce((s,c)=>s+(c.questions?.length||0),0),'#06b6d4'],
               ['Docs Used',[...new Set(cases.map(c=>c.docId))].filter(Boolean).length,'#10b981'],
             ].map(([l,n,col])=>(
-              <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+              <div key={l} className="glass rounded-2xl p-3 text-center border border-[color:var(--border2,var(--border))]">
                 <p className="text-xl font-black" style={{color:col}}>{n}</p>
                 <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
               </div>
@@ -3322,7 +3369,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
           </div>
         )}
         {!cases.length?(
-          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
+          <div className="glass border-dashed border-2 border-[color:var(--border2,var(--border))] rounded-3xl p-12 text-center">
             <Activity size={48} className="mx-auto mb-4 opacity-20"/>
             <p className="text-lg font-black opacity-40">No cases yet</p>
             <p className="text-sm opacity-30 mt-1 mb-6">Generate clinical cases from any medical document</p>
@@ -3331,7 +3378,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
             </button>
           </div>
         ):(cases.map(set=>(
-          <div key={set.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+          <div key={set.id} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20 transition-all card-hover">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <h3 className="font-black text-sm truncate">{set.title}</h3>
@@ -3525,7 +3572,7 @@ function ChatView({settings,sessions,setSessions}){
 
       {/* Context menu */}
       {contextMenu&&(
-        <div className="fixed z-[9999] glass rounded-xl shadow-2xl border border-[var(--border)] py-1 min-w-[180px]"
+        <div className="fixed z-[9999] glass rounded-xl shadow-2xl border border-[color:var(--border2,var(--border))] py-1 min-w-[180px]"
           style={{left:Math.min(contextMenu.x,window.innerWidth-200),top:Math.min(contextMenu.y,window.innerHeight-140)}}>
           <button onClick={()=>{setPinnedIds(p=>p.includes(contextMenu.id)?p.filter(x=>x!==contextMenu.id):[...p,contextMenu.id]);setContextMenu(null);}}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[var(--accent)]/10 transition-colors">
@@ -3535,7 +3582,7 @@ function ChatView({settings,sessions,setSessions}){
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[var(--accent)]/10 transition-colors">
             <Copy size={15}/>Copy transcript
           </button>
-          <div className="my-1 border-t border-[var(--border)]"/>
+          <div className="my-1 border-t border-[color:var(--border2,var(--border))]"/>
           <button onClick={()=>deleteSession(contextMenu.id)}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors">
             <Trash2 size={15}/>Delete chat
@@ -3549,12 +3596,12 @@ function ChatView({settings,sessions,setSessions}){
         <div className="lg:hidden fixed inset-0 bg-black/40 z-[40] backdrop-blur-sm"
           onClick={()=>setSidebarOpen(false)}/>
       )}
-      <div className={`flex flex-col bg-[var(--card)] border-r border-[var(--border)] transition-all duration-300 shrink-0 z-[41]
+      <div className={`flex flex-col bg-[var(--surface,var(--card))] border-r border-[color:var(--border2,var(--border))] transition-all duration-300 shrink-0 z-[41]
         ${sidebarOpen?'w-72':'w-0 overflow-hidden'}
         lg:relative absolute inset-y-0 left-0`}>
 
         {/* Sidebar header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0">
           <span className="text-base font-black">MARIAM Chat</span>
           <div className="flex items-center gap-1">
             <button onClick={newSession}
@@ -3579,7 +3626,7 @@ function ChatView({settings,sessions,setSessions}){
         </div>
 
         {/* Sidebar tabs: Chats | Projects */}
-        <div className="flex border-b border-[var(--border)] shrink-0 px-3 gap-1">
+        <div className="flex border-b border-[color:var(--border2,var(--border))] shrink-0 px-3 gap-1">
           {[['chats','Chats',MessageSquare],['projects','Projects',FolderOpen]].map(([id,lbl,Icon])=>(
             <button key={id} onClick={()=>setSidebarTab(id)}
               className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-black uppercase tracking-widest border-b-2 transition-colors -mb-px
@@ -3596,7 +3643,7 @@ function ChatView({settings,sessions,setSessions}){
               <div className="mb-2">
                 <p className="text-xs font-black uppercase tracking-widest opacity-30 px-4 py-1.5 flex items-center gap-1.5"><Pin size={10}/>Pinned</p>
                 {pinned.map(s=><SessionItem key={s.id} s={s}/>)}
-                <div className="mx-3 my-2 border-t border-[var(--border)]"/>
+                <div className="mx-3 my-2 border-t border-[color:var(--border2,var(--border))]"/>
               </div>
             )}
             {Object.entries(grouped).map(([grp,items])=>items.length>0&&(
@@ -3623,11 +3670,11 @@ function ChatView({settings,sessions,setSessions}){
               <Plus size={16}/>New Project
             </button>
             {showNewProject&&(
-              <div className="mx-3 mb-3 p-3 glass rounded-xl border border-[var(--border)] space-y-2">
+              <div className="mx-3 mb-3 p-3 glass rounded-xl border border-[color:var(--border2,var(--border))] space-y-2">
                 <input value={newProjectName} onChange={e=>setNewProjectName(e.target.value)}
                   onKeyDown={e=>e.key==='Enter'&&createProject()}
                   placeholder="Project name…" autoFocus
-                  className="w-full text-sm bg-transparent outline-none border-b border-[var(--border)] pb-1 text-[var(--text)]"/>
+                  className="w-full text-sm bg-transparent outline-none border-b border-[color:var(--border2,var(--border))] pb-1 text-[var(--text)]"/>
                 <div className="flex gap-2">
                   <button onClick={createProject} className="flex-1 py-1.5 btn-accent rounded-lg text-xs font-black">Create</button>
                   <button onClick={()=>setShowNewProject(false)} className="flex-1 py-1.5 glass rounded-lg text-xs font-black opacity-60">Cancel</button>
@@ -3659,7 +3706,7 @@ function ChatView({settings,sessions,setSessions}){
               </button>
             ))}
             {selProject&&(
-              <div className="border-t border-[var(--border)] mt-2 pt-2">
+              <div className="border-t border-[color:var(--border2,var(--border))] mt-2 pt-2">
                 <p className="text-xs font-black uppercase tracking-widest opacity-30 px-4 py-1.5">Chats in project</p>
                 {filteredSessions.map(s=><SessionItem key={s.id} s={s}/>)}
                 {filteredSessions.length===0&&<p className="text-xs opacity-30 text-center py-4">No chats in this project</p>}
@@ -3669,7 +3716,7 @@ function ChatView({settings,sessions,setSessions}){
         )}
 
         {/* Sidebar footer */}
-        <div className="shrink-0 p-3 border-t border-[var(--border)]">
+        <div className="shrink-0 p-3 border-t border-[color:var(--border2,var(--border))]">
           <div className="flex items-center gap-2 px-2 py-2 text-xs opacity-40">
             <Brain size={14}/>
             <span className="font-bold">{sessions.length} conversations · {sessions.reduce((a,s)=>a+(s.msgCount||0),0)} messages</span>
@@ -3681,7 +3728,7 @@ function ChatView({settings,sessions,setSessions}){
       <div className="flex-1 flex flex-col min-h-0 min-w-0 relative">
 
         {/* Top bar */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-sm shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]/80 backdrop-blur-sm shrink-0">
           <button onClick={()=>setSidebarOpen(o=>!o)}
             className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0 transition-all">
             <History size={18}/>
@@ -3717,7 +3764,7 @@ function ChatView({settings,sessions,setSessions}){
             <div className="flex flex-col items-center justify-center min-h-full p-6 gap-8">
               <div className="text-center space-y-3">
                 <div className="relative inline-block">
-                  <img src={MARIAM_IMG} className="w-24 h-24 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
+                  <img src={MARIAM_IMG} className="w-24 h-24 rounded-3xl object-cover shadow-2xl border-4 border-[color:var(--border2,var(--border))]" alt="MARIAM AI"/>
                   <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
                     <div className="w-2.5 h-2.5 bg-white rounded-full"/>
                   </div>
@@ -3728,7 +3775,7 @@ function ChatView({settings,sessions,setSessions}){
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-2xl">
                 {STARTERS.map(s=>(
                   <button key={s.text} onClick={()=>send(s.text)}
-                    className="glass rounded-2xl p-4 text-left hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-all border border-[var(--border)] group">
+                    className="glass rounded-2xl p-4 text-left hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-all border border-[color:var(--border2,var(--border))] group">
                     <div className="text-2xl mb-2">{s.icon}</div>
                     <p className="text-sm font-bold group-hover:text-[var(--accent)] transition-colors">{s.text}</p>
                   </button>
@@ -3746,7 +3793,7 @@ function ChatView({settings,sessions,setSessions}){
             <div className="max-w-3xl mx-auto py-6 px-4 space-y-6">
               {msgs.map((m,i)=>(
                 <div key={i} className={`flex gap-4 ${m.role==='user'?'flex-row-reverse':''} group`}>
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[var(--border)]'}`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[color:var(--border2,var(--border))]'}`}>
                     {m.role==='user'?<UserCircle2 size={20} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
                   </div>
                   <div className={`flex-1 max-w-[85%] flex flex-col gap-1.5 ${m.role==='user'?'items-end':''}`}>
@@ -3770,7 +3817,7 @@ function ChatView({settings,sessions,setSessions}){
               ))}
               {loading&&(
                 <div className="flex gap-4">
-                  <div className="w-9 h-9 rounded-xl overflow-hidden border border-[var(--border)] shrink-0 mt-1"><img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/></div>
+                  <div className="w-9 h-9 rounded-xl overflow-hidden border border-[color:var(--border2,var(--border))] shrink-0 mt-1"><img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/></div>
                   <div className="glass rounded-2xl rounded-tl-sm px-4 py-3.5 flex items-center gap-1.5">
                     {[0,1,2].map(i=><div key={i} className="w-2.5 h-2.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
                   </div>
@@ -3782,7 +3829,7 @@ function ChatView({settings,sessions,setSessions}){
         </div>
 
         {/* Input area — ChatGPT-style */}
-        <div className="shrink-0 px-4 py-4 border-t border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-sm">
+        <div className="shrink-0 px-4 py-4 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]/80 backdrop-blur-sm">
           <div className="max-w-3xl mx-auto">
             {/* Project badge if active */}
             {selProject&&(
@@ -3792,7 +3839,7 @@ function ChatView({settings,sessions,setSessions}){
                 <button onClick={()=>setSelProject(null)} className="opacity-40 hover:opacity-80 ml-1"><X size={12}/></button>
               </div>
             )}
-            <div className="glass rounded-2xl border border-[var(--border)] focus-within:border-[var(--accent)]/60 transition-colors shadow-lg">
+            <div className="glass rounded-2xl border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/60 transition-colors shadow-lg">
               <textarea ref={inputRef} value={input}
                 onChange={e=>{setInput(e.target.value);setInputRows(Math.min(8,e.target.value.split('\n').length));}}
                 onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
@@ -3801,16 +3848,16 @@ function ChatView({settings,sessions,setSessions}){
               <div className="flex items-center justify-between px-3 pb-3">
                 <div className="flex items-center gap-1">
                   <button onClick={toggleVoice}
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${listening?'bg-red-500 text-white animate-pulse':'opacity-40 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10'}`}
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${listening?'bg-red-500 text-white animate-pulse':'opacity-50 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10'}`}
                     title="Voice input">
                     {listening?<MicOff size={16}/>:<Mic size={16}/>}
                   </button>
                   {projects.length>0&&(
                     <div className="relative group">
-                      <button className="w-8 h-8 rounded-xl flex items-center justify-center opacity-40 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 transition-all" title="Assign to project">
+                      <button className="w-8 h-8 rounded-xl flex items-center justify-center opacity-50 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 transition-all" title="Assign to project">
                         <FolderOpen size={16}/>
                       </button>
-                      <div className="absolute bottom-10 left-0 hidden group-hover:flex flex-col glass rounded-xl border border-[var(--border)] shadow-xl min-w-[160px] py-1 z-50">
+                      <div className="absolute bottom-10 left-0 hidden group-hover:flex flex-col glass rounded-xl border border-[color:var(--border2,var(--border))] shadow-xl min-w-[160px] py-1 z-50">
                         {projects.map(p=>(
                           <button key={p.id} onClick={()=>setSelProject(p.id)}
                             className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-[var(--accent)]/10 transition-colors">
@@ -3841,8 +3888,27 @@ function ChatView({settings,sessions,setSessions}){
 ═══════════════════════════════════════════════════════════════════ */
 function SettingsView({settings,setSettings,installPrompt,onInstall}){
   const pr=PROVIDERS[settings.provider]||PROVIDERS.anthropic;
-  const themes=[{id:'pure-white',label:'White',icon:Sun},{id:'light',label:'Soft',icon:CloudSun},{id:'dark',label:'Dark',icon:Moon},{id:'oled',label:'OLED',icon:MoonStar}];
-  const accents=[{id:'indigo',hex:'#6366f1'},{id:'purple',hex:'#a855f7'},{id:'blue',hex:'#3b82f6'},{id:'emerald',hex:'#10b981'},{id:'rose',hex:'#f43f5e'}];
+  const themes=[
+    {id:'pure-white',label:'White',icon:Sun,desc:'Clean & bright'},
+    {id:'light',label:'Soft Blue',icon:CloudSun,desc:'Gentle blue tint'},
+    {id:'warm',label:'Warm',icon:Flame,desc:'Cozy amber tone'},
+    {id:'rose',label:'Rose',icon:Heart,desc:'Soft pink glow'},
+    {id:'forest',label:'Forest',icon:Leaf,desc:'Natural greens'},
+    {id:'dark',label:'Dark',icon:Moon,desc:'Easy on eyes'},
+    {id:'midnight',label:'Midnight',icon:MoonStar,desc:'Deep blue-black'},
+    {id:'slate',label:'Slate',icon:Layers,desc:'Modern grey'},
+    {id:'oled',label:'OLED',icon:Zap,desc:'Pure black'},
+  ];
+  const accents=[
+    {id:'indigo',hex:'#5046e5',label:'Indigo'},
+    {id:'purple',hex:'#9333ea',label:'Purple'},
+    {id:'blue',hex:'#2563eb',label:'Blue'},
+    {id:'emerald',hex:'#059669',label:'Emerald'},
+    {id:'rose',hex:'#e11d48',label:'Rose'},
+    {id:'amber',hex:'#d97706',label:'Amber'},
+    {id:'cyan',hex:'#0891b2',label:'Cyan'},
+    {id:'teal',hex:'#0d9488',label:'Teal'},
+  ];
   const sizes=[{id:'small',label:'S',px:15},{id:'medium',label:'M',px:18},{id:'large',label:'L',px:20},{id:'xl',label:'XL',px:22}];
   const changeProvider=p=>{const pr=PROVIDERS[p];setSettings(s=>({...s,provider:p,baseUrl:pr.baseUrl,model:pr.defaultModel}));};
 
@@ -3869,7 +3935,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
             {Object.entries(PROVIDERS).map(([id,{label}])=>(
               <button key={id} onClick={()=>changeProvider(id)}
                 className={`py-2.5 px-2 rounded-xl text-xs font-black leading-tight transition-all border
-                  ${settings.provider===id?'bg-[var(--accent)] text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
+                  ${settings.provider===id?'bg-[var(--accent)] text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[color:var(--border2,var(--border))]'}`}>
                 {label.split(' ')[0]}<br/><span className="opacity-70 font-normal normal-case text-xs">{label.split(' ').slice(1).join(' ')}</span>
               </button>
             ))}
@@ -3883,7 +3949,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
               <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5 flex items-center gap-1"><KeyRound size={10}/>API Key</label>
               <input type="password" placeholder="Paste your API key…" value={settings.apiKey||''}
                 onChange={e=>setSettings(s=>({...s,apiKey:e.target.value}))}
-                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"/>
             </div>
           )}
           {(settings.provider==='custom'||settings.provider==='ollama')&&(
@@ -3891,46 +3957,55 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
               <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5">Base URL</label>
               <input type="text" placeholder="https://your-api.com" value={settings.baseUrl||''}
                 onChange={e=>setSettings(s=>({...s,baseUrl:e.target.value}))}
-                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+                className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"/>
             </div>
           )}
           <div>
             <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5">Model (optional)</label>
             <input type="text" placeholder={pr.defaultModel||'e.g. gpt-4o'} value={settings.model||''}
               onChange={e=>setSettings(s=>({...s,model:e.target.value}))}
-              className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+              className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"/>
           </div>
         </section>
 
         {/* Theme */}
         <section className="glass rounded-2xl p-5">
           <h2 className="font-black text-sm mb-4 flex items-center gap-2 opacity-70"><Palette size={16}/> Appearance</h2>
-          <div className="grid grid-cols-4 gap-2 mb-5">
+          <div className="grid grid-cols-3 gap-2 mb-5">
             {themes.map(t=>(
               <button key={t.id} onClick={()=>setSettings({...settings,theme:t.id})}
-                className={`py-4 flex flex-col items-center gap-2 rounded-xl text-xs font-black uppercase border transition-all
-                  ${settings.theme===t.id?'bg-[var(--accent)] text-white border-transparent shadow-lg':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
-                <t.icon size={18}/>{t.label}
+                className={`py-3 px-2 flex flex-col items-center gap-1.5 rounded-xl text-xs font-black border transition-all`}
+                style={settings.theme===t.id?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.18),rgba(var(--acc-rgb,99,102,241),.08))',borderColor:'rgba(var(--acc-rgb,99,102,241),.4)',color:'var(--accent)',boxShadow:'0 4px 16px rgba(var(--acc-rgb,99,102,241),.18)'}:{background:'var(--surface2,var(--card))',borderColor:'var(--border)',opacity:.7}}>
+                <t.icon size={18}/><span>{t.label}</span>
+                {t.desc&&<span style={{fontSize:9,fontWeight:500,opacity:.6}}>{t.desc}</span>}
               </button>
             ))}
           </div>
-          <div className="flex gap-3 items-center mb-5">
-            <span className="text-xs font-black opacity-40 uppercase tracking-widest shrink-0">Accent</span>
-            <div className="flex gap-2">
+          <div className="mb-5">
+            <p className="text-xs font-black uppercase tracking-widest mb-3" style={{color:'var(--text3)',opacity:.7}}>Accent Color</p>
+            <div className="flex flex-wrap gap-2">
               {accents.map(a=>(
                 <button key={a.id} onClick={()=>setSettings({...settings,accentColor:a.id})}
-                  className={`w-8 h-8 rounded-xl transition-all ${settings.accentColor===a.id?'scale-125 ring-2 ring-offset-2 ring-current shadow-lg':''}`}
-                  style={{backgroundColor:a.hex}}/>
+                  title={a.label}
+                  className="flex flex-col items-center gap-1 transition-all"
+                  style={{}}>
+                  <div className="w-8 h-8 rounded-xl transition-all flex items-center justify-center"
+                    style={{background:a.hex,boxShadow:settings.accentColor===a.id?`0 0 0 3px rgba(255,255,255,.5), 0 0 0 5px ${a.hex}`:undefined,transform:settings.accentColor===a.id?'scale(1.2)':'scale(1)'}}>
+                    {settings.accentColor===a.id&&<CheckCircle2 size={14} className="text-white"/>}
+                  </div>
+                  <span style={{fontSize:9,fontWeight:700,color:'var(--text3)',opacity:.7}}>{a.label}</span>
+                </button>
               ))}
             </div>
           </div>
           <div>
-            <span className="text-xs font-black opacity-40 uppercase tracking-widest block mb-2">Font Size</span>
+            <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{color:'var(--text3)',opacity:.7}}>Font Size</span>
             <div className="flex gap-2 glass rounded-xl p-1.5">
-              {sizes.map(s=>(
-                <button key={s.id} onClick={()=>setSettings({...settings,fontSize:s.id})}
-                  className={`flex-1 py-2 rounded-lg font-black transition-all ${settings.fontSize===s.id?'bg-[var(--accent)] text-white shadow-md':'opacity-50 hover:opacity-100'}`}
-                  style={{fontSize:`${s.px}px`}}>{s.label}</button>
+              {sizes.map(sz=>(
+                <button key={sz.id} onClick={()=>setSettings({...settings,fontSize:sz.id})}
+                  className={`flex-1 py-2 rounded-lg font-black transition-all`}
+                  style={settings.fontSize===sz.id?{background:'var(--accent)',color:'#fff'}:{opacity:.6}}
+                  >{sz.label}</button>
               ))}
             </div>
           </div>
@@ -4078,7 +4153,7 @@ export default function App(){
     };
     const c=clrs[settings.accentColor]||clrs.indigo;
     root.style.setProperty('--accent',c.hex);
-    root.style.setProperty('--accent-rgb',c.rgb);
+    root.style.setProperty('--acc-rgb',c.rgb);
     root.style.setProperty('--accent-soft',c.soft);
   },[settings.theme,settings.fontSize,settings.accentColor]);
 
@@ -4245,7 +4320,258 @@ export default function App(){
 
   if(!loaded)return(
     <div className="h-[100dvh] w-screen flex flex-col items-center justify-center bg-white gap-4">
-      <style>{`:root{--bg:#fff;--text:#0f172a;--card:#f8fafc;--border:#e2e8f0;--accent:#6366f1;--accent-soft:#4f46e5;}`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+        /* ══ FONTS ══ */
+        *, *::before, *::after { box-sizing: border-box; }
+        * { -webkit-tap-highlight-color: transparent; font-family: 'DM Sans', system-ui, sans-serif; }
+        h1,h2,h3,h4,.brand,.font-black { font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important; }
+        .mono, code, pre { font-family: 'JetBrains Mono', monospace !important; }
+        body { margin:0; padding:0; overflow:hidden; }
+        input, textarea, select { font-size: 16px !important; }
+
+        /* ══ LIGHT THEMES ══ */
+        .pure-white {
+          --bg:#f6f8ff; --bg2:#edf1ff; --surface:#ffffff; --surface2:#f0f4ff; --surface3:#e5eaff;
+          --text:#060d28; --text2:#3e4f7a; --text3:#8494bc;
+          --border:rgba(50,80,220,.07); --border2:rgba(50,80,220,.14);
+          --accent:#4f46e5; --accent2:#7c3aed; --acc-rgb:79,70,229;
+          --nav-bg:rgba(246,248,255,.88); --sidebar-bg:linear-gradient(180deg,#eef2ff,#e5eaff);
+          --card:#fff; --glow:rgba(79,70,229,.12);
+        }
+        .light {
+          --bg:#eef2ff; --bg2:#e3eaff; --surface:#ffffff; --surface2:#eef2ff; --surface3:#e0e8ff;
+          --text:#040e2a; --text2:#2e3f6a; --text3:#6a7caa;
+          --border:rgba(40,70,220,.09); --border2:rgba(40,70,220,.17);
+          --accent:#4338ca; --accent2:#6d28d9; --acc-rgb:67,56,202;
+          --nav-bg:rgba(238,242,255,.92); --sidebar-bg:linear-gradient(180deg,#e3eaff,#d8e2ff);
+          --card:#fff; --glow:rgba(67,56,202,.12);
+        }
+        .warm {
+          --bg:#fffcf5; --bg2:#fff8ea; --surface:#ffffff; --surface2:#fffbf0; --surface3:#fff4d9;
+          --text:#1c0f04; --text2:#5c3d1a; --text3:#9e7540;
+          --border:rgba(180,110,20,.08); --border2:rgba(180,110,20,.15);
+          --accent:#d97706; --accent2:#ea580c; --acc-rgb:217,119,6;
+          --nav-bg:rgba(255,252,245,.92); --sidebar-bg:linear-gradient(180deg,#fff8ea,#ffefd4);
+          --card:#fff; --glow:rgba(217,119,6,.12);
+        }
+        .rose {
+          --bg:#fff5f7; --bg2:#ffe8ee; --surface:#ffffff; --surface2:#fff0f4; --surface3:#ffdde5;
+          --text:#1c040c; --text2:#5c1525; --text3:#a04560;
+          --border:rgba(220,30,80,.08); --border2:rgba(220,30,80,.15);
+          --accent:#e11d48; --accent2:#be185d; --acc-rgb:225,29,72;
+          --nav-bg:rgba(255,245,247,.92); --sidebar-bg:linear-gradient(180deg,#ffe8ee,#ffdde5);
+          --card:#fff; --glow:rgba(225,29,72,.12);
+        }
+        .forest {
+          --bg:#f2fbf6; --bg2:#e2f5ea; --surface:#ffffff; --surface2:#eef9f3; --surface3:#ddf3e6;
+          --text:#041a0c; --text2:#1a4a2a; --text3:#4a8060;
+          --border:rgba(20,130,55,.08); --border2:rgba(20,130,55,.15);
+          --accent:#059669; --accent2:#0d9488; --acc-rgb:5,150,105;
+          --nav-bg:rgba(242,251,246,.92); --sidebar-bg:linear-gradient(180deg,#e2f5ea,#cfeedd);
+          --card:#fff; --glow:rgba(5,150,105,.12);
+        }
+        /* ══ DARK THEMES ══ */
+        .dark {
+          --bg:#050a14; --bg2:#080e1e; --surface:#0d1628; --surface2:#121e34; --surface3:#172440;
+          --text:#cad8f8; --text2:#546082; --text3:#324060;
+          --border:rgba(100,140,255,.08); --border2:rgba(100,140,255,.15);
+          --accent:#818cf8; --accent2:#a78bfa; --acc-rgb:129,140,248;
+          --nav-bg:rgba(5,10,20,.94); --sidebar-bg:linear-gradient(180deg,#06091a,#050810);
+          --card:#0d1628; --glow:rgba(129,140,248,.14);
+        }
+        .midnight {
+          --bg:#09091a; --bg2:#0e0e24; --surface:#131326; --surface2:#191934; --surface3:#202046;
+          --text:#dddeff; --text2:#5a5a98; --text3:#3a3a70;
+          --border:rgba(130,130,255,.08); --border2:rgba(130,130,255,.15);
+          --accent:#6366f1; --accent2:#8b5cf6; --acc-rgb:99,102,241;
+          --nav-bg:rgba(9,9,26,.96); --sidebar-bg:linear-gradient(180deg,#0e0e24,#09091a);
+          --card:#131326; --glow:rgba(99,102,241,.14);
+        }
+        .slate {
+          --bg:#0d1117; --bg2:#131b24; --surface:#1a2330; --surface2:#202c3a; --surface3:#283444;
+          --text:#d4e4f8; --text2:#4e6080; --text3:#304050;
+          --border:rgba(80,130,190,.08); --border2:rgba(80,130,190,.15);
+          --accent:#38bdf8; --accent2:#818cf8; --acc-rgb:56,189,248;
+          --nav-bg:rgba(13,17,23,.96); --sidebar-bg:linear-gradient(180deg,#131b24,#0d1117);
+          --card:#1a2330; --glow:rgba(56,189,248,.14);
+        }
+        .oled {
+          --bg:#000000; --bg2:#040810; --surface:#070c18; --surface2:#0b1020; --surface3:#0f1528;
+          --text:#b8ccf0; --text2:#384870; --text3:#243050;
+          --border:rgba(70,110,220,.07); --border2:rgba(70,110,220,.12);
+          --accent:#818cf8; --accent2:#c084fc; --acc-rgb:129,140,248;
+          --nav-bg:rgba(0,0,0,.97); --sidebar-bg:linear-gradient(180deg,#040810,#000000);
+          --card:#070c18; --glow:rgba(129,140,248,.12);
+        }
+        /* ══ ACCENT OVERRIDES ══ */
+        .accent-indigo  {--accent:#4f46e5;--accent2:#7c3aed;--acc-rgb:79,70,229;}
+        .accent-purple  {--accent:#9333ea;--accent2:#7c3aed;--acc-rgb:147,51,234;}
+        .accent-blue    {--accent:#2563eb;--accent2:#0891b2;--acc-rgb:37,99,235;}
+        .accent-emerald {--accent:#059669;--accent2:#0d9488;--acc-rgb:5,150,105;}
+        .accent-rose    {--accent:#e11d48;--accent2:#be185d;--acc-rgb:225,29,72;}
+        .accent-amber   {--accent:#d97706;--accent2:#ea580c;--acc-rgb:217,119,6;}
+        .accent-cyan    {--accent:#0891b2;--accent2:#0e7490;--acc-rgb:8,145,178;}
+        .accent-teal    {--accent:#0d9488;--accent2:#059669;--acc-rgb:13,148,136;}
+
+        /* ══ SCROLLBAR ══ */
+        .custom-scrollbar { -webkit-overflow-scrolling: touch; }
+        .custom-scrollbar::-webkit-scrollbar { width: 2px; height: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(var(--acc-rgb,99,102,241),.2); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(var(--acc-rgb,99,102,241),.4); }
+
+        /* ══ SURFACES ══ */
+        .glass { background: var(--surface,var(--card)); border: 1px solid var(--border); }
+        .glass-2 { background: var(--surface2,var(--card)); border: 1px solid var(--border2,var(--border)); }
+        .card-lined {
+          background: var(--surface,var(--card));
+          border: 1px solid var(--border2,var(--border));
+          border-top: 1.5px solid rgba(var(--acc-rgb,99,102,241),.25);
+          box-shadow: 0 4px 20px rgba(0,0,0,.1), 0 1px 4px rgba(0,0,0,.06);
+        }
+        .card-glow {
+          background: linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.08),rgba(var(--acc-rgb,99,102,241),.02));
+          border: 1px solid rgba(var(--acc-rgb,99,102,241),.22);
+          box-shadow: 0 0 28px rgba(var(--acc-rgb,99,102,241),.08),inset 0 1px 0 rgba(var(--acc-rgb,99,102,241),.1);
+        }
+
+        /* ══ BUTTONS ══ */
+        .btn-accent {
+          background: linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));
+          color:#fff; border:none; cursor:pointer; font-weight:800; letter-spacing:.015em;
+          transition: all .18s cubic-bezier(.34,1.4,.64,1);
+          box-shadow: 0 4px 18px rgba(var(--acc-rgb,99,102,241),.32),inset 0 1px 0 rgba(255,255,255,.14);
+          position:relative; overflow:hidden;
+        }
+        .btn-accent::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.1),transparent); }
+        .btn-accent:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.44); }
+        .btn-accent:active { transform:scale(.97); }
+
+        /* ══ GRADIENT TEXT ══ */
+        .gradient-text {
+          background: linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));
+          -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+
+        /* ══ CARD HOVER ══ */
+        .card-hover { transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+        .card-hover:hover {
+          transform:translateY(-2px);
+          box-shadow:0 12px 36px rgba(var(--acc-rgb,99,102,241),.1),0 2px 8px rgba(0,0,0,.14);
+          border-color:rgba(var(--acc-rgb,99,102,241),.3) !important;
+        }
+
+        /* ══ ANIMATIONS ══ */
+        @keyframes slide-in  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+        @keyframes slide-up  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:none} }
+        @keyframes scale-in  { from{opacity:0;transform:scale(.93)} to{opacity:1;transform:scale(1)} }
+        @keyframes fade-in   { from{opacity:0} to{opacity:1} }
+        @keyframes spin      { to{transform:rotate(360deg)} }
+        @keyframes float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+        @keyframes glow-ring { 0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb,99,102,241),.35)} 50%{box-shadow:0 0 0 7px rgba(var(--acc-rgb,99,102,241),0)} }
+        @keyframes shimmer   { 0%{background-position:-400% 0} 100%{background-position:400% 0} }
+        @keyframes ticker    { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+        .animate-slide-in { animation:slide-in .25s cubic-bezier(.34,1.2,.64,1) both; }
+        .animate-slide-up { animation:slide-up .32s cubic-bezier(.34,1.2,.64,1) both; }
+        .animate-scale-in { animation:scale-in .24s cubic-bezier(.34,1.3,.64,1) both; }
+        .animate-fade-in  { animation:fade-in .2s ease both; }
+        .animate-spin     { animation:spin 1s linear infinite; }
+        .animate-pulse    { animation:glow-ring 2.5s ease infinite; }
+        .animate-bounce   { animation:float 1s ease-in-out infinite; }
+        .animate-float    { animation:float 3s ease-in-out infinite; }
+        .stagger-1{animation-delay:.06s} .stagger-2{animation-delay:.12s} .stagger-3{animation-delay:.18s}
+        .stagger-4{animation-delay:.24s} .stagger-5{animation-delay:.30s} .stagger-6{animation-delay:.36s}
+
+        /* ══ NAVIGATION ══ */
+        .sidebar-nav { background:var(--sidebar-bg,var(--surface2)); border-right:1px solid var(--border); }
+        .sidebar-nav button { transition:all .18s ease; }
+        .nav-item-active { position:relative; }
+        .nav-item-active::before {
+          content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+          width:3px; height:30px; border-radius:0 6px 6px 0;
+          background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));
+        }
+        .main-header {
+          background:var(--nav-bg);
+          backdrop-filter:saturate(200%) blur(20px); -webkit-backdrop-filter:saturate(200%) blur(20px);
+          border-bottom:1px solid var(--border);
+        }
+
+        /* ══ PILL NAV ══ */
+        .pill-nav-wrap {
+          position:fixed; bottom:0; left:0; right:0; z-index:500;
+          display:flex; justify-content:center;
+          padding-bottom:max(16px,env(safe-area-inset-bottom));
+          pointer-events:none;
+        }
+        .pill-nav {
+          pointer-events:all;
+          background: var(--surface,var(--card));
+          border: 1px solid var(--border2,var(--border));
+          border-radius: 999px;
+          box-shadow: 0 8px 40px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.08);
+          padding: 5px 10px;
+          display:flex; align-items:center; gap:4px;
+          width: min(520px,calc(100vw - 24px));
+          backdrop-filter: saturate(180%) blur(24px);
+          -webkit-backdrop-filter: saturate(180%) blur(24px);
+        }
+
+        /* ══ BG MESH ══ */
+        .bg-mesh {
+          background:
+            radial-gradient(ellipse 900px 700px at 0% -5%,rgba(var(--acc-rgb,99,102,241),.06) 0%,transparent 55%),
+            radial-gradient(ellipse 700px 900px at 105% 105%,rgba(167,139,250,.04) 0%,transparent 55%),
+            var(--bg);
+        }
+
+        /* ══ INPUTS ══ */
+        .glass-input {
+          background:var(--surface2,var(--card)); border:1px solid var(--border2,var(--border));
+          color:var(--text); transition:border-color .15s,box-shadow .15s;
+        }
+        .glass-input:focus {
+          outline:none; border-color:rgba(var(--acc-rgb,99,102,241),.5);
+          box-shadow:0 0 0 3px rgba(var(--acc-rgb,99,102,241),.1);
+        }
+
+        /* ══ SHIMMER SKELETON ══ */
+        .shimmer {
+          background: linear-gradient(90deg,var(--surface2) 25%,var(--surface3,var(--surface)) 50%,var(--surface2) 75%);
+          background-size:400% 100%; animation:shimmer 1.6s ease infinite;
+        }
+
+        /* ══ MISC ══ */
+        .scroll-content { padding-bottom:calc(90px + env(safe-area-inset-bottom) + 8px); -webkit-overflow-scrolling:touch; }
+        @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
+        .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
+        .prose-custom li { margin:3px 0; }
+        .prose-custom strong { font-weight:800; }
+        canvas { display:block; max-width:100%; height:auto !important; }
+        textarea { min-height:40px; }
+        input[type=range] { accent-color:var(--accent); }
+        html { scroll-behavior:smooth; }
+        @media(max-width:640px){ .hide-sm{display:none!important;} }
+        @media(min-width:1024px){ .lg-only{display:flex!important;} }
+
+        /* ══ DRAG HANDLE ══ */
+        .drag-h { cursor:col-resize; width:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent; transition:background .15s; }
+        .drag-h:hover { background:rgba(var(--acc-rgb,99,102,241),.12); }
+        .drag-h-row { cursor:row-resize; height:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent; transition:background .15s; }
+        .drag-h-row:hover { background:rgba(var(--acc-rgb,99,102,241),.12); }
+
+        /* ══ ANSWER OPTION ══ */
+        .answer-opt { transition:all .13s ease; cursor:pointer; border:1.5px solid var(--border2,var(--border)); background:var(--surface,var(--card)); border-radius:14px; }
+        .answer-opt:not(:disabled):hover { border-color:rgba(var(--acc-rgb,99,102,241),.4); background:rgba(var(--acc-rgb,99,102,241),.05); transform:translateX(3px); }
+        .answer-opt.selected  { border-color:var(--accent); background:rgba(var(--acc-rgb,99,102,241),.1); }
+        .answer-opt.correct   { border-color:#10b981; background:rgba(16,185,129,.1); }
+        .answer-opt.wrong     { border-color:#f43f5e; background:rgba(244,63,94,.08); }
+
+        /* ══ BADGE ══ */
+        .badge { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(var(--acc-rgb,99,102,241),.1); color:var(--accent); border:1px solid rgba(var(--acc-rgb,99,102,241),.2); }
+      `}</style>
       <div className="relative">
         <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover shadow-2xl" alt="MARIAM"/>
         <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center">
@@ -4269,34 +4595,112 @@ export default function App(){
     {icon:Activity,label:'Cases',v:'cases'},
     {icon:CheckSquare,label:'Exams',v:'exams'},
     {icon:MessageSquare,label:'Chat',v:'chat'},
+    {icon:Settings,label:'Settings',v:'settings'},
   ];
 
   return(
-    <div className="h-[100dvh] w-screen flex flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)]">
+    <div className={`h-[100dvh] w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme||'pure-white'} accent-${settings.accentColor||'indigo'}`}>
       <style>{`
-        .pure-white{--bg:#ffffff;--text:#0f172a;--card:#f8fafc;--border:#e2e8f0;}
-        .light{--bg:#f0f4ff;--text:#1e293b;--card:#ffffff;--border:#e2e8f0;}
-        .dark{--bg:#0d0f1a;--text:#e2e8f0;--card:#141827;--border:#252840;}
-        .oled{--bg:#000;--text:#f1f5f9;--card:#0a0a0a;--border:#1a1a1a;}
+        /* ── LIGHT THEMES ── */
+        .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(245,247,255,.88);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
+        .light{--bg:#eef2ff;--bg2:#e4eaff;--surface:#ffffff;--surface2:#eef2ff;--text:#050f2a;--text2:#334070;--text3:#6a7ba0;--border:rgba(40,70,220,.09);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(238,242,255,.92);--sidebar-bg:linear-gradient(180deg,#e4eaff 0%,#d8e2ff 100%);--card:#fff;--border-old:#e2e8f0;}
+        .warm{--bg:#fffbf5;--bg2:#fff5e8;--surface:#ffffff;--surface2:#fff8f0;--text:#1a0f05;--text2:#5c3d1e;--text3:#9e7555;--border:rgba(180,100,20,.08);--border2:rgba(180,100,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,.92);--sidebar-bg:linear-gradient(180deg,#fff5e8 0%,#ffefd6 100%);--card:#fff;--border-old:#fde8cc;}
+        .rose{--bg:#fff5f7;--bg2:#ffe8ed;--surface:#ffffff;--surface2:#fff0f4;--text:#1a0508;--text2:#5c1a28;--text3:#a05070;--border:rgba(200,30,80,.08);--border2:rgba(200,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,.92);--sidebar-bg:linear-gradient(180deg,#ffe8ed 0%,#ffd6e0 100%);--card:#fff;--border-old:#ffc0cb;}
+        .forest{--bg:#f0faf5;--bg2:#e0f5ea;--surface:#ffffff;--surface2:#eef9f3;--text:#031a0a;--text2:#1a4a28;--text3:#4a8060;--border:rgba(20,130,60,.08);--border2:rgba(20,130,60,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,250,245,.92);--sidebar-bg:linear-gradient(180deg,#e0f5ea 0%,#cff0dc 100%);--card:#fff;--border-old:#b7f5d0;}
+        /* ── DARK THEMES ── */
+        .dark{--bg:#04080f;--bg2:#070c18;--surface:#0c1220;--surface2:#101828;--text:#ccd8f8;--text2:#5c6e98;--text3:#384562;--border:rgba(100,130,255,.08);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(4,8,15,.94);--sidebar-bg:linear-gradient(180deg,#06090f 0%,#040810 100%);--card:#0c1220;--border-old:#252840;}
+        .oled{--bg:#000000;--bg2:#030610;--surface:#060c18;--surface2:#0a1020;--text:#c0d0f0;--text2:#404e70;--text3:#28344c;--border:rgba(80,120,255,.07);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,.97);--sidebar-bg:linear-gradient(180deg,#020408 0%,#000000 100%);--card:#060c18;--border-old:#1a1a1a;}
+        .midnight{--bg:#0a0a14;--bg2:#0e0e1e;--surface:#12122a;--surface2:#18183a;--text:#e0e0ff;--text2:#6060a0;--text3:#404080;--border:rgba(140,140,255,.08);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(10,10,20,.96);--sidebar-bg:linear-gradient(180deg,#0e0e1e 0%,#0a0a14 100%);--card:#12122a;--border-old:#1e1e40;}
+        .slate{--bg:#0f1117;--bg2:#161820;--surface:#1e2130;--surface2:#252840;--text:#dce8f8;--text2:#5a6a88;--text3:#384558;--border:rgba(100,130,180,.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,17,23,.96);--sidebar-bg:linear-gradient(180deg,#161820 0%,#0f1117 100%);--card:#1e2130;--border-old:#2a2d40;}
+        /* ── ACCENT OVERRIDES (when user picks accent color) ── */
+        .accent-indigo{--accent:#5046e5;--accent2:#7c3aed;--acc-rgb:80,70,229;}
+        .accent-purple{--accent:#9333ea;--accent2:#7c3aed;--acc-rgb:147,51,234;}
+        .accent-blue{--accent:#2563eb;--accent2:#0891b2;--acc-rgb:37,99,235;}
+        .accent-emerald{--accent:#059669;--accent2:#0d9488;--acc-rgb:5,150,105;}
+        .accent-rose{--accent:#e11d48;--accent2:#be185d;--acc-rgb:225,29,72;}
+        .accent-amber{--accent:#d97706;--accent2:#ea580c;--acc-rgb:217,119,6;}
+        .accent-cyan{--accent:#0891b2;--accent2:#0e7490;--acc-rgb:8,145,178;}
+        .accent-teal{--accent:#0d9488;--accent2:#059669;--acc-rgb:13,148,136;}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
         body{margin:0;padding:0;overflow:hidden;}
-        .custom-scrollbar::-webkit-scrollbar{width:4px;height:4px;} .custom-scrollbar{-webkit-overflow-scrolling:touch;overflow-scrolling:touch;}
-        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(128,128,128,.2);border-radius:4px;}
-        .glass{background:var(--card);border:1px solid var(--border);}
-        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-soft));color:#fff;border:none;cursor:pointer;}
-        .btn-accent:hover{opacity:.9;} .btn-accent:active{opacity:.8;transform:scale(.98);}
-        .card-hover{transition:.25s ease;}
-        .card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(var(--accent-rgb),.12);}
-        @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-        @keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-        @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 30%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 0%,transparent)}}
-        .animate-slide-in{animation:slide-in .2s ease-out forwards;}
-        .animate-slide-up{animation:slide-up .3s ease-out forwards;}
-        .bottom-nav-safe{padding-bottom:max(8px,env(safe-area-inset-bottom));}
-        .scroll-content{padding-bottom:calc(${NAV_H}px + env(safe-area-inset-bottom) + 24px);-webkit-overflow-scrolling:touch;}
+        input,textarea,select{font-size:16px!important;}
+        .custom-scrollbar{-webkit-overflow-scrolling:touch;}
+        .custom-scrollbar::-webkit-scrollbar{width:2px;height:2px;}
+        .custom-scrollbar::-webkit-scrollbar-track{background:transparent;}
+        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(var(--acc-rgb,99,102,241),.22);border-radius:4px;}
+        .glass{background:var(--surface,var(--card));border:1px solid var(--border);}
+        .glass-2{background:var(--surface2,var(--card));border:1px solid var(--border2,var(--border));}
+        .card-lined{background:var(--surface,var(--card));border:1px solid var(--border2,var(--border));border-top:1.5px solid rgba(var(--acc-rgb,99,102,241),.25);box-shadow:0 4px 20px rgba(0,0,0,.12);}
+        .card-glow{background:linear-gradient(145deg,rgba(var(--acc-rgb,99,102,241),.08),rgba(var(--acc-rgb,99,102,241),.02));border:1px solid rgba(var(--acc-rgb,99,102,241),.22);box-shadow:0 0 28px rgba(var(--acc-rgb,99,102,241),.07);}
+        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;border:none;cursor:pointer;font-weight:800;letter-spacing:.01em;transition:all .18s cubic-bezier(.34,1.4,.64,1);box-shadow:0 4px 18px rgba(var(--acc-rgb,99,102,241),.3),inset 0 1px 0 rgba(255,255,255,.13);position:relative;overflow:hidden;}
+        .btn-accent::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);}
+        .btn-accent:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.42);}
+        .btn-accent:active{transform:scale(.97);}
+        .gradient-text{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .card-hover{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
+        .card-hover:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(var(--acc-rgb,99,102,241),.1),0 2px 8px rgba(0,0,0,.15);border-color:rgba(var(--acc-rgb,99,102,241),.28)!important;}
+        @keyframes slide-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        @keyframes slide-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+        @keyframes scale-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+        @keyframes fade-in{from{opacity:0}to{opacity:1}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes glow-ring{0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb,99,102,241),.3)}50%{box-shadow:0 0 0 6px rgba(var(--acc-rgb,99,102,241),0)}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+        .animate-slide-in{animation:slide-in .24s cubic-bezier(.34,1.2,.64,1) both;}
+        .animate-slide-up{animation:slide-up .3s cubic-bezier(.34,1.2,.64,1) both;}
+        .animate-scale-in{animation:scale-in .22s cubic-bezier(.34,1.3,.64,1) both;}
+        .animate-fade-in{animation:fade-in .2s ease both;}
+        .animate-spin{animation:spin 1s linear infinite;}
+        .animate-pulse{animation:glow-ring 2s ease infinite;}
+        .animate-bounce{animation:float .9s ease-in-out infinite;}
+        .stagger-1{animation-delay:.06s}.stagger-2{animation-delay:.12s}.stagger-3{animation-delay:.18s}
+        .stagger-4{animation-delay:.24s}.stagger-5{animation-delay:.3s}.stagger-6{animation-delay:.36s}
+        .sidebar-nav{background:var(--sidebar-bg);border-right:1px solid var(--border);}
+        .nav-item-active{position:relative;}
+        .nav-item-active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));}
+        .mobile-nav{background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--border);}
+        .main-header{background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);}
+        .bg-mesh{background:radial-gradient(ellipse 800px 600px at 0% 0%,rgba(var(--acc-rgb,99,102,241),.06) 0%,transparent 60%),radial-gradient(ellipse 600px 800px at 100% 100%,rgba(167,139,250,.04) 0%,transparent 60%),var(--bg);}
+        .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
+        .prose-custom li{margin:3px 0;}
+        .prose-custom strong{font-weight:800;}
+        .scroll-content{padding-bottom:calc(90px + env(safe-area-inset-bottom) + 16px);-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
+
+        /* ── PILL NAV ITEM ACTIVE ── */
+        .pill-nav-active{position:relative;}
+        .pill-nav-active::before{display:none;}
+        /* ── SIDEBAR HOVER ── */
+        .sidebar-nav button:not(:disabled):hover .nav-icon{opacity:1!important;transform:scale(1.1);}
+        .sidebar-nav button{border-radius:12px;margin:0 8px;}
+        /* ── GLASS INPUTS ── */
+        .glass-input{background:var(--surface2,var(--card));border:1px solid var(--border2,var(--border));color:var(--text);transition:border-color .15s,box-shadow .15s;}
+        .glass-input:focus{outline:none;border-color:rgba(var(--acc-rgb,99,102,241),.5);box-shadow:0 0 0 3px rgba(var(--acc-rgb,99,102,241),.1);}
+        /* ── PILL BADGE ── */
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(var(--acc-rgb,99,102,241),.1);color:var(--accent);border:1px solid rgba(var(--acc-rgb,99,102,241),.2);}
+        /* ── DRAG HANDLE ── */
+        .drag-handle{cursor:col-resize;display:flex;align-items:center;justify-content:center;width:8px;background:transparent;transition:background .15s;flex-shrink:0;}
+        .drag-handle:hover{background:rgba(var(--acc-rgb,99,102,241),.15);}
+        /* ── SECTION HEADER ── */
+        .section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3,var(--text));opacity:.7;}
+        /* ── STAT CARD SHIMMER on load ── */
+        @keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
+        .shimmer{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3,var(--surface)) 50%,var(--surface2) 75%);background-size:400% 100%;animation:shimmer 1.5s ease infinite;}
+        /* ── RESPONSIVE FIXES ── */
+        @media(max-width:640px){
+          .hide-mobile{display:none!important;}
+          .glass{backdrop-filter:none;-webkit-backdrop-filter:none;}
+        }
+        @media(min-width:1024px){
+          .hide-desktop{display:none!important;}
+        }
+        /* ── CARD GRID RESPONSIVE ── */
+        .responsive-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+        @media(max-width:640px){.responsive-grid{grid-template-columns:1fr;}}
         canvas{display:block;max-width:100%;height:auto!important;}
         textarea{min-height:40px;}
+        input[type=range]{accent-color:var(--accent);}
+        html{scroll-behavior:smooth;}
       `}</style>
       <ToastContainer toasts={toasts}/>
       {showGlobalSearch&&<GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
@@ -4319,55 +4723,103 @@ export default function App(){
       )}
 
       {/* HEADER */}
-      <header className="h-16 lg:h-20 glass flex items-center justify-between px-4 lg:px-8 shrink-0 z-40 border-t-0 border-x-0">
-        <div className="flex items-center gap-3">
-          <img src={MARIAM_IMG} className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl object-cover border border-[var(--border)]" alt=""/>
-          <span className="text-2xl lg:text-3xl font-black tracking-tight text-[var(--accent)]" style={{fontFamily:'system-ui'}}>MARIAM</span>
-          <span className="text-xs font-black bg-[var(--accent)] text-white px-2.5 py-1 rounded-full hidden sm:inline">{APP_VER}</span>
-          {Object.values(window.__MARIAM_BG__?.tasks||{}).filter(t=>t.status==='running').length>0&&(
-            <span className="text-xs font-black bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-              <Loader2 size={9} className="animate-spin"/>{Object.values(window.__MARIAM_BG__.tasks).filter(t=>t.status==='running').length} running
-            </span>
-          )}
-        </div>
-        <div className="hidden md:flex flex-1 max-w-md mx-8">
-          <button onClick={()=>setShowGlobalSearch(true)} className="relative w-full">
-            <input readOnly placeholder="Search everything… (Ctrl+K)" className="w-full bg-black/5 dark:bg-white/5 rounded-full py-2.5 pl-10 pr-4 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)] cursor-pointer"/>
-            <Search className="absolute left-3.5 top-3 opacity-30" size={16}/>
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          {installPrompt&&(
-            <button onClick={onInstall} className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 hover:bg-[var(--accent)] hover:text-white transition-all">
-              <Download size={16}/> Install
+      <header className="main-header shrink-0 z-40" style={{height:64}}>
+        <div className="flex items-center justify-between h-full px-4 lg:px-6 gap-4">
+
+          {/* Logo */}
+          <div className="flex items-center gap-3 shrink-0">
+            <div className="relative">
+              <img src={MARIAM_IMG} className="w-10 h-10 rounded-2xl object-cover" alt=""
+                style={{boxShadow:'0 0 0 2px rgba(var(--acc-rgb,99,102,241),0.3),0 4px 12px rgba(0,0,0,0.25)'}}/>
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-[var(--bg)] bg-emerald-500 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-white"/>
+              </div>
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-xl font-black tracking-tight leading-none gradient-text">MARIAM</p>
+              <p className="text-xs opacity-30 font-bold tracking-widest uppercase leading-none mt-0.5">{APP_VER}</p>
+            </div>
+            {Object.values(window.__MARIAM_BG__?.tasks||{}).filter(t=>t.status==='running').length>0&&(
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black text-amber-400 border border-amber-500/30 bg-amber-500/10">
+                <Loader2 size={10} className="animate-spin"/>{Object.values(window.__MARIAM_BG__.tasks).filter(t=>t.status==='running').length} running
+              </div>
+            )}
+          </div>
+
+          {/* Search */}
+          <div className="flex-1 max-w-sm hidden md:flex">
+            <button onClick={()=>setShowGlobalSearch(true)} className="relative w-full group">
+              <div className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all cursor-pointer"
+                style={{background:'var(--surface2,var(--card))',border:'1px solid var(--border)'}}>
+                <Search size={15} className="opacity-30 shrink-0 group-hover:opacity-60 transition-opacity"/>
+                <span className="opacity-35 flex-1 text-left font-medium">Search everything…</span>
+                <kbd className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black opacity-25"
+                  style={{background:'var(--border)',border:'1px solid var(--border2)'}}>⌘K</kbd>
+              </div>
             </button>
-          )}
-          {activeDoc&&(
-            <button onClick={()=>{setRpOpen(o=>!o);if(view!=='reader')setView('reader');}}
-              className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all
-                ${rpOpen?'bg-[var(--accent)] text-white':'glass text-[var(--accent)] border border-[var(--accent)]/30'}`}>
-              <Sparkles size={18}/> AI Studio
+          </div>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={()=>setShowGlobalSearch(true)} className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+              style={{background:'var(--surface2,var(--card))',border:'1px solid var(--border)'}}>
+              <Search size={16} className="opacity-60"/>
             </button>
-          )}
-          <button onClick={()=>setView('settings')} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100"><Settings size={17}/></button>
+            {installPrompt&&(
+              <button onClick={onInstall} className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black transition-all"
+                style={{background:'rgba(var(--acc-rgb,99,102,241),0.1)',color:'var(--accent)',border:'1px solid rgba(var(--acc-rgb,99,102,241),0.2)'}}>
+                <Download size={14}/> Install App
+              </button>
+            )}
+            {activeDoc&&(
+              <button onClick={()=>{setRpOpen(o=>!o);if(view!=='reader')setView('reader');}}
+                className={`hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all`}
+                style={rpOpen?{
+                  background:'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))',
+                  color:'#fff',boxShadow:'0 4px 16px rgba(var(--acc-rgb,99,102,241),0.35)'
+                }:{
+                  background:'rgba(var(--acc-rgb,99,102,241),0.1)',
+                  color:'var(--accent)',
+                  border:'1px solid rgba(var(--acc-rgb,99,102,241),0.2)'
+                }}>
+                <Sparkles size={15}/> AI Studio
+              </button>
+            )}
+            <button onClick={()=>setView('settings')}
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all opacity-50 hover:opacity-100"
+              style={{background:'var(--surface2,var(--card))',border:'1px solid var(--border)'}}>
+              <Settings size={16}/>
+            </button>
+          </div>
         </div>
       </header>
 
       {/* BODY */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* DESKTOP SIDEBAR */}
-        <nav className="hidden lg:flex w-[110px] flex-col items-center py-6 gap-1 glass shrink-0 border-t-0 border-b-0 border-l-0 z-30">
+        <nav className="hidden lg:flex flex-col items-center shrink-0 z-30 py-4 gap-0.5"
+          style={{width:120,background:'var(--sidebar-bg,var(--surface2))',borderRight:'1px solid var(--border)'}}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
               disabled={dis} title={label}
-              className={`flex flex-col items-center gap-1.5 w-full py-3 rounded-2xl mx-1 transition-all text-xs font-black uppercase tracking-widest
-                ${dis?'opacity-20 cursor-not-allowed':''}
-                ${view===v?'text-[var(--accent)]':''}`}>
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all
-                ${view===v?'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/30':'text-[var(--text)] opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}>
-                <Icon size={26} strokeWidth={view===v?2.5:2}/>
+              className={`relative flex flex-col items-center gap-1.5 w-full py-3 transition-all ${dis?'opacity-20 cursor-not-allowed':''} ${view===v?'nav-item-active':''}`}
+              style={{borderRadius:0,paddingLeft:4,paddingRight:4}}>
+              <div className="flex items-center justify-center transition-all"
+                style={view===v?{
+                  background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.18),rgba(var(--acc-rgb,99,102,241),.08))',
+                  border:'1.5px solid rgba(var(--acc-rgb,99,102,241),.28)',
+                  color:'var(--accent)',
+                  boxShadow:'0 4px 16px rgba(var(--acc-rgb,99,102,241),.2)',
+                  borderRadius:16,width:56,height:56,
+                }:dis?{borderRadius:16,width:56,height:56,opacity:.3,color:'var(--text3,var(--text))'}:{
+                  borderRadius:16,width:56,height:56,
+                  color:'var(--text2,var(--text))',opacity:.6,
+                }}>
+                <Icon size={24} strokeWidth={view===v?2.5:1.8}/>
               </div>
-              <span className={view===v?'text-[var(--accent)]':'opacity-50'}>{label}</span>
+              <span style={{fontSize:10,color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.7,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em'}}>
+                {label}
+              </span>
             </button>
           ))}
         </nav>
@@ -4376,7 +4828,7 @@ export default function App(){
         <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
           {uploading&&(
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--border)] z-50">
-              <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] transition-all duration-300 animate-pulse" style={{width:`${uploadPct}%`}}/>
+              <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] transition-all duration-300 animate-pulse" style={{width:`${uploadPct}%`}}/>
             </div>
           )}
 
@@ -4423,11 +4875,11 @@ export default function App(){
             </div>
             <aside style={{width:window.innerWidth>=1024?`${rpW}px`:'100%'}}
               className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in h-full">
-              <div className="h-14 lg:h-16 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-between px-4 shrink-0">
+              <div className="h-14 lg:h-16 bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-between px-4 shrink-0">
                 <span className="font-black flex items-center gap-2 text-base"><Sparkles size={18}/> AI Studio</span>
                 <button onClick={()=>setRpOpen(false)} className="w-8 h-8 hover:bg-white/20 rounded-xl flex items-center justify-center"><X size={18}/></button>
               </div>
-              <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
+              <div className="flex shrink-0 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
                 {[['generate','Generate',Zap],['chat','Chat',MessageSquare],['vault','Vault',Database]].map(([id,lbl,Icon])=>(
                   <button key={id} onClick={()=>setRpTab(id)}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-black uppercase tracking-widest transition-colors border-b-2
@@ -4461,21 +4913,27 @@ export default function App(){
         )}
       </div>
 
-      {/* MOBILE BOTTOM NAV */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-[500] bg-[var(--card)] border-t border-[var(--border)] flex items-center"
-        style={{paddingBottom:`max(12px,env(safe-area-inset-bottom))`}}>
-        {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
-          <button key={v} disabled={dis}
-            onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
-            className={`flex-1 flex flex-col items-center gap-1 pt-2 pb-1 transition-all ${dis?'opacity-20':''}`}>
-            <Icon size={26} strokeWidth={view===v?2.5:2} className={view===v?'text-[var(--accent)]':'text-[var(--text)] opacity-55'}/>
-            <span className={`text-xs font-black uppercase tracking-wider ${view===v?'text-[var(--accent)]':'opacity-40'}`}>{label}</span>
-          </button>
-        ))}
-      </nav>
+                  {/* MOBILE BOTTOM NAV — Floating Pill */}
+      <div className="lg:hidden pill-nav-wrap">
+        <nav className="pill-nav">
+          {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
+            <button key={v} disabled={dis}
+              onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
+              className={`relative flex-1 flex flex-col items-center gap-0.5 py-2 rounded-3xl transition-all ${dis?'opacity-20':''}`}
+              style={view===v?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.15),rgba(var(--acc-rgb,99,102,241),.06))'}:{}}>
+              {view===v&&<div style={{position:'absolute',top:-1,left:'50%',transform:'translateX(-50%)',height:2,width:24,borderRadius:999,background:'var(--accent)'}}/>}
+              <div style={{width:34,height:34,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',color:view===v?'var(--accent)':'var(--text2)',opacity:dis?0.3:view===v?1:.55}}>
+                <Icon size={17} strokeWidth={view===v?2.5:1.8}/>
+              </div>
+              <span style={{fontSize:9,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em',color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.55}}>{label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }
 
 // Play icon polyfill
 const Play=({size=16,...p})=><svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" {...p}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
+
