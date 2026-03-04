@@ -1,4 +1,25 @@
 import React,{useState,useEffect,useRef,useCallback,useMemo}from'react';
+/*
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║  MARIAM PRO v7.0 ULTRA — Universal AI Document Intelligence     ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║  DEPENDENCY VERSIONS (pinned in CONFIG below):                  ║
+ * ║   • pdf.js        2.16.105  (Cloudflare CDN)                    ║
+ * ║   • mammoth       1.6.0     (Cloudflare CDN, loaded on demand)  ║
+ * ║   • xlsx          0.18.5    (Cloudflare CDN, loaded on demand)  ║
+ * ║   • lucide-react  (peer dep — managed by npm/package.json)      ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║  SECURITY POLICY:                                               ║
+ * ║   • All file data stays in the user's browser (IndexedDB).      ║
+ * ║   • No data is ever sent to any server except the chosen AI     ║
+ * ║     provider API (text prompts only — no raw files uploaded).   ║
+ * ║   • API keys are stored in IndexedDB only, never in cookies or  ║
+ * ║     localStorage, and are never transmitted except to the       ║
+ * ║     provider endpoint chosen by the user.                       ║
+ * ║   • Do NOT store HIPAA/GDPR regulated data without adding       ║
+ * ║     server-side encryption and access controls.                 ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ */
 /* mammoth and XLSX are loaded dynamically from CDN — no npm install needed */
 import{BookOpen,Layers,CheckSquare,Settings,ChevronLeft,ChevronRight,MessageSquare,
 CheckCircle2,Trash2,Loader2,Send,GraduationCap,Save,X,BookA,AlertCircle,FileUp,
@@ -11,68 +32,189 @@ Map,Clock,Download,Share2,Star,Mic,MicOff,Network,BarChart2,Camera,
 Languages,Wand2,Tag,TrendingUp,LayoutDashboard,Award,
 ChevronDown,ChevronUp,Eye,EyeOff,RefreshCw,
 Filter,SortAsc,Grid,List,Smartphone,Monitor,Code,
+Printer,FileDown,FolderOpen,Pin,Copy,ExternalLink,
+Bell,Archive,BarChart,BookCopy,CalendarDays,FlameKindling,
+Trophy,Percent,PenLine,Scissors,Bookmark,History,Plus,
+MoreVertical,CheckCheck,CircleDot,Flame,
 }from'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════
-   DYNAMIC CDN LOADERS — no npm install needed
+   DYNAMIC CDN LOADERS — no npm install needed.
+   Versions are pinned in CONFIG above so upgrades are one-line changes.
 ═══════════════════════════════════════════════════════════════════ */
-const loadScript=(src,globalName)=>new Promise((res,rej)=>{
-  if(window[globalName])return res(window[globalName]);
-  const s=document.createElement('script');
-  s.src=src;
-  s.onload=()=>res(window[globalName]);
-  s.onerror=()=>rej(new Error(`Failed to load ${globalName}`));
-  document.head.appendChild(s);
-});
+/**
+ * Injects a <script> tag and resolves with the global the library exposes.
+ * Safe to call multiple times — returns the cached global immediately if loaded.
+ */
+const loadScript=async(src,globalName)=>{
+  if(window[globalName])return window[globalName];
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src;
+    s.onload=()=>{
+      if(window[globalName])res(window[globalName]);
+      else rej(new Error(`Script loaded but global '${globalName}' not found at ${src}`));
+    };
+    s.onerror=()=>rej(new Error(`Network error loading ${globalName} from ${src}. Check your internet connection.`));
+    document.head.appendChild(s);
+  });
+};
 
-const loadMammoth=()=>loadScript(
-  'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
-  'mammoth'
-);
+const loadMammoth=()=>loadScript(CONFIG.MAMMOTH_CDN,'mammoth');
+const loadXLSX=()=>loadScript(CONFIG.XLSX_CDN,'XLSX');
+const loadJsPDF=()=>loadScript(CONFIG.JSPDF_CDN,'jspdf');
 
-const loadXLSX=()=>loadScript(
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'XLSX'
-);
-
-
-const MARIAM_IMG='https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg';
-const NAV_H=72;
-const APP_VER='v5.0 ULTRA';
-const CHUNK=3500;
 
 /* ═══════════════════════════════════════════════════════════════════
-   INDEXED DB
+   CONFIG — change values here, not scattered through the codebase.
+   In a production app these would come from import.meta.env / .env
 ═══════════════════════════════════════════════════════════════════ */
-const DB_NAME='MariamProDB_v50';
-const openDB=()=>new Promise((res,rej)=>{
-  const r=indexedDB.open(DB_NAME,8);
-  r.onupgradeneeded=e=>{const d=e.target.result;
-    ['files','appState'].forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s);});};
-  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+const CONFIG=Object.freeze({
+  MARIAM_IMG:'https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg',
+  NAV_H:72,           // px — mobile bottom nav height
+  APP_VER:'v7.0 ULTRA',
+  CHUNK:3500,         // chars per virtual page for non-PDF files
+  MAX_TOKENS:8000,    // default AI response ceiling
+  DB_NAME:'MariamProDB_v70',
+  DB_VERSION:9,
+  PDF_CDN:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105',
+  MAMMOTH_CDN:'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
+  XLSX_CDN:'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  JSPDF_CDN:'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  RETRY_ATTEMPTS:2,
+  PARALLEL_CONCURRENCY:50,
 });
-const dbOp=(store,mode,op)=>openDB().then(db=>new Promise((res,rej)=>{
-  const tx=db.transaction(store,mode),s=tx.objectStore(store),r=op(s);
-  if(r?.onsuccess!==undefined){r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}
-  else{tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}
-}));
-const saveFile=(id,d)=>dbOp('files','readwrite',s=>{s.put(d,id);});
-const getFile=id=>dbOp('files','readonly',s=>s.get(id));
-const delFile=id=>dbOp('files','readwrite',s=>{s.delete(id);});
-const saveState=(k,v)=>dbOp('appState','readwrite',s=>{s.put(v,k);});
-const getState=k=>dbOp('appState','readonly',s=>s.get(k));
+const{MARIAM_IMG,NAV_H,APP_VER,CHUNK}=CONFIG;
 
 /* ═══════════════════════════════════════════════════════════════════
-   PDF.JS LOADER
+   INDEXED DB — with proper migration strategy and async/await
+   Migration guide: bump CONFIG.DB_VERSION and add a case below.
 ═══════════════════════════════════════════════════════════════════ */
+
+/** Centralised error logger — swap console.error for Sentry.captureException etc. */
+const logError=(context,err)=>{
+  console.error(`[MariamPro][${context}]`,err?.message||err);
+};
+
+/**
+ * Opens (or upgrades) the IndexedDB database.
+ * onupgradeneeded handles ALL schema migrations in version order,
+ * so the DB is always consistent regardless of which version the
+ * user was previously on.
+ */
+const openDB=()=>new Promise((resolve,reject)=>{
+  if(!window.indexedDB){
+    return reject(new Error('IndexedDB is not supported in this browser.'));
+  }
+  const request=indexedDB.open(CONFIG.DB_NAME,CONFIG.DB_VERSION);
+
+  request.onupgradeneeded=event=>{
+    const db=event.target.result;
+    const oldVersion=event.oldVersion;
+    if(oldVersion<9){
+      if(!db.objectStoreNames.contains('files'))db.createObjectStore('files');
+      if(!db.objectStoreNames.contains('appState'))db.createObjectStore('appState');
+    }
+  };
+
+  request.onsuccess=()=>resolve(request.result);
+  request.onerror=()=>{
+    const msg=`Failed to open IndexedDB: ${request.error?.message||'unknown error'}`;
+    logError('openDB',msg);
+    reject(new Error(msg));
+  };
+  request.onblocked=()=>{
+    logError('openDB','Database upgrade blocked — close other tabs running this app.');
+  };
+});
+
+/**
+ * Generic database operation wrapper.
+ * Uses async/await internally; always rejects with a descriptive Error.
+ */
+const dbOp=async(store,mode,op)=>{
+  let db;
+  try{db=await openDB();}
+  catch(err){throw new Error(`DB open failed for store '${store}': ${err.message}`);}
+
+  return new Promise((resolve,reject)=>{
+    let tx,objectStore,request;
+    try{
+      tx=db.transaction(store,mode);
+      objectStore=tx.objectStore(store);
+      request=op(objectStore);
+    }catch(err){
+      const msg=`DB transaction setup failed (${store}/${mode}): ${err.message}`;
+      logError('dbOp',msg);
+      return reject(new Error(msg));
+    }
+
+    if(request?.onsuccess!==undefined){
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>{
+        const msg=`DB request failed (${store}): ${request.error?.message||'unknown'}`;
+        logError('dbOp',msg);
+        reject(new Error(msg));
+      };
+    }else{
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>{
+        const msg=`DB transaction failed (${store}): ${tx.error?.message||'unknown'}`;
+        logError('dbOp',msg);
+        reject(new Error(msg));
+      };
+    }
+  });
+};
+
+// Typed helpers — all return Promises; callers should await them
+const saveFile  =(id,data)=>dbOp('files','readwrite',s=>{s.put(data,id);});
+const getFile   =id       =>dbOp('files','readonly', s=>s.get(id));
+const delFile   =id       =>dbOp('files','readwrite',s=>{s.delete(id);});
+const saveState =(key,val)=>dbOp('appState','readwrite',s=>{s.put(val,key);});
+const getState  =key      =>dbOp('appState','readonly', s=>s.get(key));
+
+/* ═══════════════════════════════════════════════════════════════════
+   PDF.JS LOADER — with retry and descriptive error messages
+═══════════════════════════════════════════════════════════════════ */
+/**
+ * Loads PDF.js from CDN with up to RETRY_ATTEMPTS retries.
+ * Throws a user-friendly Error if all attempts fail.
+ */
 const loadPdfJs=async()=>{
   if(window.pdfjsLib)return window.pdfjsLib;
-  return new Promise((res,rej)=>{
-    const sc=document.createElement('script');
-    sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js';
-    sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';res(window.pdfjsLib);};
-    sc.onerror=rej;document.body.appendChild(sc);
-  });
+
+  const base=CONFIG.PDF_CDN;
+  let lastErr;
+  for(let attempt=1;attempt<=CONFIG.RETRY_ATTEMPTS+1;attempt++){
+    try{
+      await new Promise((resolve,reject)=>{
+        const sc=document.createElement('script');
+        sc.src=`${base}/pdf.min.js`;
+        sc.onload=()=>{
+          if(!window.pdfjsLib){
+            return reject(new Error('PDF.js script loaded but pdfjsLib global not found.'));
+          }
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc=`${base}/pdf.worker.min.js`;
+          resolve();
+        };
+        sc.onerror=()=>reject(new Error(`Network error loading PDF.js from ${sc.src}`));
+        document.body.appendChild(sc);
+      });
+      return window.pdfjsLib; // success
+    }catch(err){
+      lastErr=err;
+      logError(`loadPdfJs attempt ${attempt}`,err);
+      if(attempt<=CONFIG.RETRY_ATTEMPTS){
+        await new Promise(r=>setTimeout(r,1000*attempt)); // back-off
+        if(window.pdfjsLib)return window.pdfjsLib; // loaded by previous try
+      }
+    }
+  }
+  throw new Error(
+    `Could not load PDF renderer after ${CONFIG.RETRY_ATTEMPTS+1} attempts. `+
+    `Check your internet connection. (${lastErr?.message})`
+  );
 };
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -102,7 +244,17 @@ const FILE_ICONS={
 
 /* ═══════════════════════════════════════════════════════════════════
    UNIVERSAL FILE EXTRACTOR
+   Non-PDF files have no intrinsic page structure, so we split their
+   text into virtual pages of CONFIG.CHUNK characters each. This lets
+   every file type work with the same page-based AI & reader UI.
 ═══════════════════════════════════════════════════════════════════ */
+
+/**
+ * Splits a plain-text string into numbered virtual pages.
+ * Uses paragraph breaks as split points to avoid cutting mid-sentence,
+ * then falls back to hard character limits (CONFIG.CHUNK).
+ * @returns {{ pagesText: Record<number,string>, totalPages: number }}
+ */
 const chunkText=(text)=>{
   const pages={};let page=1,cur='';
   const parts=text.split(/\n\n+/);
@@ -116,6 +268,7 @@ const chunkText=(text)=>{
   return{pagesText:pages,totalPages:page};
 };
 
+/** Extracts text from a PDF file page-by-page using PDF.js. */
 const extractPdf=async(file,onProgress)=>{
   const ab=await file.arrayBuffer();
   const pdfjs=await loadPdfJs();
@@ -131,6 +284,7 @@ const extractPdf=async(file,onProgress)=>{
   return{buffer:ab,pagesText,totalPages:tot,fileCategory:'pdf'};
 };
 
+/** Extracts raw text from a .docx/.doc file using mammoth (loaded from CDN). */
 const extractWord=async(file)=>{
   const ab=await file.arrayBuffer();
   let text='';
@@ -143,6 +297,7 @@ const extractWord=async(file)=>{
   return{pagesText,totalPages,rawText:text,fileCategory:'word'};
 };
 
+/** Converts each sheet in an Excel workbook to CSV text, then chunks it. */
 const extractSpreadsheet=async(file)=>{
   const ab=await file.arrayBuffer();
   let text='';
@@ -160,12 +315,19 @@ const extractSpreadsheet=async(file)=>{
   return{pagesText,totalPages,rawText:text,fileCategory:'spreadsheet'};
 };
 
+/** Reads a CSV file as plain text and chunks it into virtual pages. */
 const extractCsv=async(file)=>{
   const text=await file.text();
   const{pagesText,totalPages}=chunkText(text);
   return{pagesText,totalPages,rawText:text,fileCategory:'csv'};
 };
 
+/**
+ * Reads an image file as base64.
+ * NOTE: base64 data is stored in IndexedDB only for display/AI-vision.
+ * No sensitive personal data should be uploaded; the app has no server-side
+ * storage — all data stays in the user's own browser.
+ */
 const extractImage=async(file)=>{
   return new Promise((res,rej)=>{
     const reader=new FileReader();
@@ -179,6 +341,7 @@ const extractImage=async(file)=>{
   });
 };
 
+/** Falls back to reading the file as UTF-8 text for code, markdown, logs, etc. */
 const extractText=async(file)=>{
   let text='';
   try{text=await file.text();}
@@ -187,6 +350,10 @@ const extractText=async(file)=>{
   return{pagesText,totalPages,rawText:text,fileCategory:'text'};
 };
 
+/**
+ * Universal entry point: detects the file type and routes to the correct extractor.
+ * Always returns { pagesText, totalPages, fileCategory, ...extras }.
+ */
 const extractUniversal=async(file,onProgress)=>{
   const cat=getFileCategory(file);
   switch(cat){
@@ -200,13 +367,19 @@ const extractUniversal=async(file,onProgress)=>{
 };
 
 /* ═══════════════════════════════════════════════════════════════════
-   AI ENGINE — multi-provider + vision + streaming
+   AI ENGINE
+   Supports: Anthropic (default, no key needed in Claude artifacts),
+   OpenAI, Google Gemini, DeepSeek, Groq, Ollama, and any
+   OpenAI-compatible endpoint. Provider is selected in Settings.
 ═══════════════════════════════════════════════════════════════════ */
+/**
+ * One-shot AI call. Returns the model's text response.
+ * @param {boolean} expectJson  — appends a strict "return only JSON" instruction
+ * @param {boolean} strictMode  — tells the model to cite only the document text
+ */
 const callAI=async(prompt,expectJson,strictMode,settings={},maxTokens=8000)=>{
   const{provider='anthropic',apiKey='',baseUrl='',model=''}=settings;
-  const sys=strictMode
-    ?'STRICT AI: Use ONLY the provided document text. NEVER add outside knowledge. Cite every answer with [Page X].'
-    :'Expert AI assistant. Use the provided document as primary source. Be precise, detailed, and insightful.';
+  const sys=`CRITICAL INSTRUCTION: You are an expert AI that generates EXCLUSIVELY from the provided PDF/document content below. You must NEVER use outside knowledge, general facts, or information not present in the document. Every question, answer, explanation, and vignette must be directly traceable to the document text. If a concept is not in the document, do not include it. Generate long, detailed, comprehensive content — questions should be multi-sentence with rich clinical/academic context. Explanations must be thorough (3-5 sentences minimum). ${strictMode?'STRICT MODE: Cite [Page X] for every single item.':'Always reference the source material explicitly.'}`;
   const jsonSuffix=expectJson?'\n\nRETURN ONLY RAW JSON. No markdown. No explanation. No backticks.':'';
   const finalPrompt=prompt+jsonSuffix;
 
@@ -285,23 +458,833 @@ const callAIStreaming=async(prompt,onChunk,settings={},maxTokens=4000)=>{
   return text;
 };
 
+/**
+ * Safely parses a JSON string that may be wrapped in markdown code fences.
+ * Throws a descriptive error if the content cannot be parsed.
+ */
 const parseJson=txt=>{
-  let c=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
-  const f=c.indexOf('{'),l=c.lastIndexOf('}');
-  if(f!==-1&&l!==-1)c=c.substring(f,l+1);
-  return JSON.parse(c);
+  // Strip markdown fences and leading/trailing whitespace
+  let cleaned=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
+  // Extract the outermost JSON object if there's preamble text
+  const start=cleaned.indexOf('{');
+  const end=cleaned.lastIndexOf('}');
+  if(start!==-1&&end!==-1&&end>start)cleaned=cleaned.substring(start,end+1);
+  try{
+    return JSON.parse(cleaned);
+  }catch(err){
+    throw new Error(`AI response was not valid JSON. Raw text (first 200 chars): ${cleaned.substring(0,200)}`);
+  }
 };
 
+/**
+ * Runs an array of async task-functions with bounded concurrency.
+ * Uses Promise.allSettled so a failed batch does not abort the rest.
+ * @param {Function[]} tasks - zero-arg functions returning Promises
+ * @param {number} concurrency - max simultaneous requests
+ * @param {Function} [onProgress] - called with (completed, total) after each batch
+ */
 const runParallel=async(tasks,concurrency=10,onProgress)=>{
   const results=[];
   for(let i=0;i<tasks.length;i+=concurrency){
     const batch=tasks.slice(i,i+concurrency);
-    const br=await Promise.allSettled(batch.map(fn=>fn()));
-    results.push(...br);
+    const batchResults=await Promise.allSettled(batch.map(fn=>fn()));
+    results.push(...batchResults);
     if(onProgress)onProgress(Math.min(i+concurrency,tasks.length),tasks.length);
   }
   return results;
 };
+
+/* ═══════════════════════════════════════════════════════════════════
+   PDF EXPORT ENGINE — generates printable PDFs via jsPDF
+═══════════════════════════════════════════════════════════════════ */
+const exportToPDF=async(type,data,title,addToast)=>{
+  try{
+    const lib=await loadJsPDF();
+    const jsPDF=lib.jspdf?.jsPDF||lib.jsPDF||window.jspdf?.jsPDF;
+    if(!jsPDF)throw new Error('jsPDF failed to load.');
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pageW=210,pageH=297,margin=15,colW=pageW-margin*2;
+    let y=margin;
+
+    const checkPage=(needed=12)=>{if(y+needed>pageH-margin){doc.addPage();y=margin;}};
+    const drawLine=()=>{doc.setDrawColor(200,200,200);doc.line(margin,y,pageW-margin,y);y+=4;};
+
+    // Header
+    doc.setFillColor(99,102,241);doc.rect(0,0,pageW,18,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+    doc.text('MARIAM PRO',margin,11);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');
+    doc.text(`${type.toUpperCase()} · ${title}`,margin+40,11);
+    doc.text(`Generated ${new Date().toLocaleDateString()}`,pageW-margin-35,11);
+    y=24;
+
+    doc.setTextColor(30,30,30);
+
+    if(type==='flashcards'){
+      data.forEach((card,i)=>{
+        checkPage(28);
+        doc.setFillColor(248,250,252);doc.roundedRect(margin,y,colW,24,2,2,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(99,102,241);
+        doc.text(`Q${i+1}`,margin+3,y+6);
+        doc.setTextColor(30,30,30);doc.setFont('helvetica','normal');doc.setFontSize(9);
+        const qLines=doc.splitTextToSize(card.q||'',colW-12);
+        doc.text(qLines,margin+10,y+6);
+        const qH=Math.min(qLines.length*4.5,14);
+        doc.setFillColor(238,240,255);doc.roundedRect(margin+2,y+qH+2,colW-4,10,1,1,'F');
+        doc.setTextColor(79,70,229);doc.setFontSize(8.5);
+        const aLines=doc.splitTextToSize(card.a||'',colW-10);
+        doc.text(aLines.slice(0,2),margin+5,y+qH+7);
+        y+=28;doc.setTextColor(30,30,30);
+      });
+    }else if(type==='exam'){
+      data.forEach((q,i)=>{
+        const opts=q.options||[];
+        const needed=22+opts.length*7+(q.explanation?12:0);
+        checkPage(needed);
+        doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(30,30,30);
+        const qLines=doc.splitTextToSize(`Q${i+1}. ${q.q||q.question||''}`,colW);
+        doc.text(qLines,margin,y);y+=qLines.length*5+3;
+        opts.forEach((opt,oi)=>{
+          const isCorrect=oi===q.correct;
+          if(isCorrect){doc.setFillColor(220,252,231);doc.roundedRect(margin,y-3.5,colW,6.5,1,1,'F');}
+          doc.setFont('helvetica',isCorrect?'bold':'normal');
+          doc.setFontSize(8.5);
+          doc.setTextColor(isCorrect?22:80,isCorrect?163:80,isCorrect?74:80);
+          doc.text(`${String.fromCharCode(65+oi)}. ${opt}`,margin+3,y);
+          if(isCorrect){doc.setTextColor(22,163,74);doc.text('✓',pageW-margin-5,y);}
+          y+=6.5;
+        });
+        if(q.explanation){
+          checkPage(12);
+          doc.setFillColor(254,252,232);doc.roundedRect(margin,y,colW,10,1,1,'F');
+          doc.setFont('helvetica','italic');doc.setFontSize(7.5);doc.setTextColor(120,100,20);
+          const expLines=doc.splitTextToSize(q.explanation,colW-6);
+          doc.text(expLines.slice(0,2),margin+3,y+4);y+=12;
+        }
+        drawLine();y+=2;
+        doc.setTextColor(30,30,30);
+      });
+    }else if(type==='cases'){
+      data.forEach((cas,i)=>{
+        checkPage(40);
+        const q=cas.examQuestion||cas;
+        doc.setFillColor(240,249,255);doc.roundedRect(margin,y,colW,8,2,2,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(14,116,144);
+        doc.text(`Case ${i+1}: ${cas.title||'Clinical Case'}`,margin+3,y+5.5);y+=11;
+        doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(30,30,30);
+        const vigLines=doc.splitTextToSize(cas.vignette||'',colW);
+        doc.text(vigLines.slice(0,6),margin,y);y+=Math.min(vigLines.length,6)*4.5+5;
+        if(cas.diagnosis){
+          doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(16,185,129);
+          doc.text(`Dx: ${cas.diagnosis}`,margin,y);y+=6;
+        }
+        const opts=q.options||[];
+        opts.forEach((opt,oi)=>{
+          const isCorrect=oi===q.correct;
+          doc.setFont('helvetica',isCorrect?'bold':'normal');doc.setFontSize(8.5);
+          doc.setTextColor(isCorrect?22:80,isCorrect?163:80,isCorrect?74:80);
+          doc.text(`${String.fromCharCode(65+oi)}. ${opt}`,margin+3,y);y+=6;
+        });
+        drawLine();y+=3;doc.setTextColor(30,30,30);
+      });
+    }
+
+    // Footer on each page
+    const totalPages=doc.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){
+      doc.setPage(i);doc.setFontSize(7);doc.setTextColor(160,160,160);
+      doc.text(`MARIAM PRO · ${title}`,margin,pageH-6);
+      doc.text(`Page ${i} of ${totalPages}`,pageW-margin-18,pageH-6);
+    }
+
+    doc.save(`${title.replace(/[^a-zA-Z0-9]/g,'_')}_${type}.pdf`);
+    if(addToast)addToast('PDF exported! 📄','success');
+  }catch(e){
+    console.error('PDF export error:',e);
+    if(addToast)addToast(`PDF export failed: ${e.message}`,'error');
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   STUDY ANALYTICS — track sessions, streaks, scores
+   Stored in window to survive view changes
+═══════════════════════════════════════════════════════════════════ */
+if(!window.__MARIAM_ANALYTICS__)window.__MARIAM_ANALYTICS__={
+  sessions:[],streak:0,lastStudy:null,totalCards:0,totalExams:0,scores:[]
+};
+const ANALYTICS=window.__MARIAM_ANALYTICS__;
+const trackStudy=(type,score,total)=>{
+  const today=new Date().toDateString();
+  if(ANALYTICS.lastStudy!==today){
+    ANALYTICS.streak=(ANALYTICS.lastStudy===new Date(Date.now()-86400000).toDateString())?ANALYTICS.streak+1:1;
+    ANALYTICS.lastStudy=today;
+  }
+  if(type==='flashcard')ANALYTICS.totalCards++;
+  if(type==='exam'&&score!==undefined)ANALYTICS.scores.push({date:Date.now(),score,total,pct:Math.round(score/total*100)});
+  ANALYTICS.sessions.push({type,date:Date.now()});
+  if(ANALYTICS.sessions.length>500)ANALYTICS.sessions=ANALYTICS.sessions.slice(-500);
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS HOOK
+═══════════════════════════════════════════════════════════════════ */
+function useKeyboardShortcuts(shortcuts){
+  useEffect(()=>{
+    const handler=e=>{
+      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+      for(const[combo,fn]of shortcuts){
+        const parts=combo.toLowerCase().split('+');
+        const key=parts[parts.length-1];
+        const ctrl=parts.includes('ctrl');
+        const meta=parts.includes('meta');
+        const alt=parts.includes('alt');
+        if(e.key.toLowerCase()===key&&
+          (ctrl?(e.ctrlKey||e.metaKey):!e.ctrlKey)&&
+          (alt?e.altKey:!e.altKey)){
+          e.preventDefault();fn();break;
+        }
+      }
+    };
+    window.addEventListener('keydown',handler);
+    return()=>window.removeEventListener('keydown',handler);
+  },[shortcuts]);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLOBAL SEARCH — searches across all content
+═══════════════════════════════════════════════════════════════════ */
+function GlobalSearch({docs,flashcards,exams,cases,notes,onNavigate,onClose}){
+  const[q,setQ]=useState('');const inputRef=useRef(null);
+  useEffect(()=>{inputRef.current?.focus();},[]);
+
+  const results=useMemo(()=>{
+    if(!q.trim()||q.length<2)return[];
+    const lq=q.toLowerCase();const out=[];
+    docs.forEach(d=>{if(d.name.toLowerCase().includes(lq))out.push({type:'doc',icon:FileText,label:d.name,sub:`${d.totalPages} pages`,color:'#6366f1',action:()=>onNavigate('reader',d.id)});});
+    flashcards.forEach(set=>set.cards?.forEach(c=>{if((c.q+c.a).toLowerCase().includes(lq))out.push({type:'card',icon:Layers,label:c.q.slice(0,60),sub:set.title,color:'#8b5cf6',action:()=>onNavigate('flashcards')});}));
+    exams.forEach(ex=>ex.questions?.forEach(q2=>{if((q2.q||'').toLowerCase().includes(lq))out.push({type:'exam',icon:CheckSquare,label:(q2.q||'').slice(0,60),sub:ex.title,color:'#3b82f6',action:()=>onNavigate('exams')});}));
+    cases.forEach(set=>set.questions?.forEach(c=>{if((c.vignette||'').toLowerCase().includes(lq))out.push({type:'case',icon:Activity,label:(c.title||c.vignette||'').slice(0,60),sub:set.title,color:'#06b6d4',action:()=>onNavigate('cases')});}));
+    notes.forEach(n=>{if((n.title+n.content).toLowerCase().includes(lq))out.push({type:'note',icon:PenLine,label:n.title,sub:n.content?.slice(0,50),color:'#f59e0b',action:()=>onNavigate('library')});});
+    return out.slice(0,12);
+  },[q,docs,flashcards,exams,cases,notes]);
+
+  return(
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-16 px-4"
+      style={{background:'rgba(0,0,0,0.7)',backdropFilter:'blur(12px)'}}
+      onClick={onClose}>
+      <div className="w-full max-w-2xl glass rounded-3xl shadow-2xl overflow-hidden animate-slide-up border border-[var(--accent)]/30"
+        onClick={e=>e.stopPropagation()}>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)]">
+          <Search size={20} className="text-[var(--accent)] shrink-0"/>
+          <input ref={inputRef} value={q} onChange={e=>setQ(e.target.value)}
+            placeholder="Search everything — documents, cards, questions, cases, notes…"
+            className="flex-1 bg-transparent text-sm outline-none font-medium placeholder:opacity-40 text-[var(--text)]"/>
+          <kbd className="text-xs font-black opacity-30 px-2 py-1 glass rounded-lg">ESC</kbd>
+          <button onClick={onClose} className="opacity-40 hover:opacity-80"><X size={18}/></button>
+        </div>
+        {q.length>=2&&(
+          <div className="max-h-96 overflow-y-auto custom-scrollbar">
+            {results.length===0?(
+              <div className="py-12 text-center opacity-40">
+                <Search size={32} className="mx-auto mb-3"/>
+                <p className="text-sm font-bold">No results for "{q}"</p>
+              </div>
+            ):results.map((r,i)=>(
+              <button key={i} onClick={()=>{r.action();onClose();}}
+                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-[var(--accent)]/5 transition-colors text-left border-b border-[var(--border)]/50 last:border-0">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{background:r.color+'20'}}>
+                  <r.icon size={16} style={{color:r.color}}/>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold truncate">{r.label}</p>
+                  <p className="text-xs opacity-50 truncate">{r.sub}</p>
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1 glass rounded-lg shrink-0">{r.type}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {!q&&(
+          <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[['Documents','doc',FileText,'#6366f1'],['Flashcards','flashcards',Layers,'#8b5cf6'],['Exams','exams',CheckSquare,'#3b82f6'],['Cases','cases',Activity,'#06b6d4']].map(([lbl,v,Icon,col])=>(
+              <button key={v} onClick={()=>{onNavigate(v);onClose();}}
+                className="glass rounded-2xl p-3 flex flex-col items-center gap-2 hover:border-[var(--accent)]/30 transition-all">
+                <Icon size={20} style={{color:col}}/>
+                <span className="text-xs font-black">{lbl}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DASHBOARD VIEW — stats, streaks, recent activity, quick actions
+═══════════════════════════════════════════════════════════════════ */
+function DashboardView({docs,flashcards,exams,cases,notes,chatSessions,setView,setActiveId,addToast,settings}){
+  const totalCards=flashcards.reduce((s,f)=>s+(f.cards?.length||0),0);
+  const totalQ=exams.reduce((s,e)=>s+(e.questions?.length||0),0);
+  const totalCases=cases.reduce((s,c)=>s+(c.questions?.length||0),0);
+  const dueCards=flashcards.reduce((s,f)=>s+(f.cards?.filter(c=>c.nextReview<=Date.now()).length||0),0);
+  const recentScores=ANALYTICS.scores.slice(-7);
+  const avgScore=recentScores.length?Math.round(recentScores.reduce((s,r)=>s+r.pct,0)/recentScores.length):0;
+  const streak=ANALYTICS.streak||0;
+
+  const STAT_CARDS=[
+    {label:'Documents',value:docs.length,icon:FileText,color:'#6366f1',sub:'uploaded'},
+    {label:'Flashcards',value:totalCards,icon:Layers,color:'#8b5cf6',sub:`${dueCards} due today`,urgent:dueCards>0},
+    {label:'Exam Qs',value:totalQ,icon:CheckSquare,color:'#3b82f6',sub:`${exams.length} exams`},
+    {label:'Cases',value:totalCases,icon:Activity,color:'#06b6d4',sub:`${cases.length} sets`},
+    {label:'Notes',value:notes.length,icon:PenLine,color:'#f59e0b',sub:'saved'},
+    {label:'Study Streak',value:streak,icon:Flame,color:'#ef4444',sub:'days 🔥',urgent:streak>=3},
+  ];
+
+  const recentDocs=docs.slice(-4).reverse();
+  const bgTaskList=Object.values(window.__MARIAM_BG__?.tasks||{});
+
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="w-full p-6 lg:p-8 xl:p-10 space-y-6">
+        {/* Welcome */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-black">Dashboard</h1>
+            <p className="text-base opacity-50 mt-1 font-medium">{new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</p>
+          </div>
+          <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover shadow-lg border-2 border-[var(--accent)]/20" alt="MARIAM"/>
+        </div>
+
+        {/* Stat grid */}
+        <div className="grid grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4">
+          {STAT_CARDS.map(({label,value,icon:Icon,color,sub,urgent})=>(
+            <div key={label} className={`glass rounded-2xl p-5 lg:p-6 border transition-all cursor-default ${urgent?'border-[color:var(--ac)] shadow-lg':'border-[var(--border)]'}`}
+              style={urgent?{'--ac':color+'60'}:{}}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:color+'20'}}>
+                  <Icon size={20} style={{color}}/>
+                </div>
+                {urgent&&<div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{background:color}}/>}
+              </div>
+              <p className="text-4xl font-black leading-none mt-2" style={{color}}>{value}</p>
+              <p className="text-sm font-black uppercase tracking-widest opacity-50 mt-2 leading-tight">{label}</p>
+              <p className="text-sm opacity-40 mt-1">{sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Active background tasks */}
+        {bgTaskList.filter(t=>t.status==='running'||t.status==='done').length>0&&(
+          <div className="glass rounded-2xl p-5 border border-[var(--accent)]/20">
+            <h2 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4 flex items-center gap-2"><Zap size={18} className="text-[var(--accent)]"/>Active Generation Tasks</h2>
+            <div className="space-y-3">
+              {bgTaskList.map((t,i)=>(
+                <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border ${t.status==='done'?'border-emerald-500/30 bg-emerald-500/5':'border-[var(--border)]'}`}>
+                  {t.status==='running'?<Loader2 size={16} className="text-[var(--accent)] animate-spin shrink-0"/>:<CheckCircle2 size={16} className="text-emerald-500 shrink-0"/>}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate capitalize">{t.type} · {t.docName?.slice(0,30)}</p>
+                    {t.status==='running'&&t.total>1&&(
+                      <div className="mt-1.5 w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-[var(--accent)] rounded-full transition-all" style={{width:`${((t.done||0)/t.total)*100}%`}}/>
+                      </div>
+                    )}
+                    {t.status==='done'&&<p className="text-xs opacity-40 mt-0.5">{t.result?.count} items ready</p>}
+                  </div>
+                  <span className={`text-xs font-black px-3 py-1.5 rounded-lg ${t.status==='done'?'bg-emerald-500/20 text-emerald-600':'bg-[var(--accent)]/10 text-[var(--accent)]'}`}>
+                    {t.status==='done'?'Done':'Running'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Documents */}
+          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><History size={18}/>Recent Documents</h2>
+              <button onClick={()=>setView('library')} className="text-sm font-black text-[var(--accent)] hover:underline">See all →</button>
+            </div>
+            {recentDocs.length===0?(
+              <div className="text-center py-10 opacity-30">
+                <FileText size={40} className="mx-auto mb-3"/><p className="text-sm font-bold">No documents yet</p>
+              </div>
+            ):recentDocs.map(doc=>(
+              <button key={doc.id} onClick={()=>{setActiveId(doc.id);setView('reader');}}
+                className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--accent)]/5 transition-all mb-1.5">
+                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${FILE_ICONS[doc.fileCategory||'unknown']?.from||'from-slate-500'} ${FILE_ICONS[doc.fileCategory||'unknown']?.to||'to-slate-700'} flex items-center justify-center shrink-0`}>
+                  <FileText size={18} className="text-white opacity-80"/>
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-base font-bold truncate">{doc.name}</p>
+                  <p className="text-sm opacity-40 mt-0.5">{doc.totalPages} pages · {new Date(doc.addedAt||0).toLocaleDateString()}</p>
+                </div>
+                <ChevronRight size={16} className="opacity-30 shrink-0"/>
+              </button>
+            ))}
+          </div>
+
+          {/* Study Progress */}
+          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
+            <h2 className="text-base font-black uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2"><BarChart size={18}/>Study Progress</h2>
+            <div className="space-y-4">
+              {[
+                {label:'Avg Exam Score',value:`${avgScore}%`,max:100,cur:avgScore,color:'#3b82f6'},
+                {label:'Cards Studied',value:ANALYTICS.totalCards,max:Math.max(ANALYTICS.totalCards,totalCards)||1,cur:ANALYTICS.totalCards,color:'#8b5cf6'},
+                {label:'Due Cards',value:dueCards,max:Math.max(dueCards,totalCards)||1,cur:dueCards,color:dueCards>0?'#ef4444':'#10b981'},
+              ].map(({label,value,max,cur,color})=>(
+                <div key={label}>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-base font-bold opacity-60">{label}</span>
+                    <span className="text-base font-black" style={{color}}>{value}</span>
+                  </div>
+                  <div className="w-full h-3 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-1000" style={{width:`${Math.min(100,max?(cur/max)*100:0)}%`,background:color}}/>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {[
+                ['Study Cards',Layers,'flashcards','#8b5cf6'],
+                ['Take Exam',CheckSquare,'exams','#3b82f6'],
+                ['Practice Cases',Activity,'cases','#06b6d4'],
+                ['AI Chat',MessageSquare,'chat','#f59e0b'],
+              ].map(([lbl,Icon,v,col])=>(
+                <button key={v} onClick={()=>setView(v)}
+                  className="flex items-center gap-3 p-4 glass rounded-xl hover:border-[color:var(--hc)] transition-all text-base font-black"
+                  style={{'--hc':col+'60'}}>
+                  <Icon size={16} style={{color:col}}/>{lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent exam scores chart */}
+        {recentScores.length>0&&(
+          <div className="glass rounded-2xl p-7 border border-[var(--border)]">
+            <h2 className="text-sm font-black uppercase tracking-widest opacity-60 mb-5 flex items-center gap-2"><TrendingUp size={18}/>Recent Exam Scores</h2>
+            <div className="flex items-end gap-3 h-28">
+              {recentScores.map((s,i)=>(
+                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                  <span className="text-xs font-black" style={{color:s.pct>=80?'#10b981':s.pct>=60?'#f59e0b':'#ef4444'}}>{s.pct}%</span>
+                  <div className="w-full rounded-t-lg transition-all" style={{height:`${Math.max(8,s.pct*0.88)}px`,background:s.pct>=80?'#10b981':s.pct>=60?'#f59e0b':'#ef4444',opacity:0.8}}/>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BACKGROUND TASKS
+   Tasks survive page navigation, component unmounts, and even if the
+   user switches views mid-generation. Uses module-level storage so
+   React state lifecycle doesn't kill ongoing fetch chains.
+═══════════════════════════════════════════════════════════════════ */
+if(!window.__MARIAM_BG__)window.__MARIAM_BG__={tasks:{},listeners:new Set()};
+
+const BG=window.__MARIAM_BG__;
+
+const bgEmit=()=>BG.listeners.forEach(fn=>fn({...BG.tasks}));
+
+const bgStart=(id,meta)=>{BG.tasks[id]={...meta,startedAt:Date.now(),status:'running'};bgEmit();};
+const bgUpdate=(id,patch)=>{if(BG.tasks[id]){BG.tasks[id]={...BG.tasks[id],...patch};bgEmit();}};
+const bgFinish=(id,result)=>{if(BG.tasks[id]){BG.tasks[id]={...BG.tasks[id],status:'done',result,finishedAt:Date.now()};bgEmit();}};
+const bgFail=(id,err)=>{if(BG.tasks[id]){BG.tasks[id]={...BG.tasks[id],status:'error',error:err};bgEmit();}};
+const bgClear=(id)=>{delete BG.tasks[id];bgEmit();};
+
+function useBgTasks(){
+  const[tasks,setTasks]=useState({...BG.tasks});
+  useEffect(()=>{
+    const fn=t=>setTasks({...t});
+    BG.listeners.add(fn);
+    return()=>BG.listeners.delete(fn);
+  },[]);
+  return tasks;
+}
+
+/**
+ * Run a generation task fully in the background.
+ * Calls startGen-style logic but stores progress in the BG registry
+ * so it persists regardless of which page the user is on.
+ */
+const runBgGeneration=async({taskId,docId,docName,taskType,startPage,endPage,count,difficultyLevel,targetLang,settings,onSave})=>{
+  const batchSize=40;
+  const isBatch=count>batchSize&&['flashcards','exam','cases'].includes(taskType);
+  const numBatches=isBatch?Math.ceil(count/batchSize):1;
+
+  bgStart(taskId,{type:taskType,docName,msg:'Loading document…',done:0,total:numBatches});
+
+  try{
+    const fileData=await getFile(docId);
+    if(!fileData)throw new Error('Document not found in storage.');
+
+    const pageRange=Array.from({length:endPage-startPage+1},(_,i)=>startPage+i);
+    const textChunks=pageRange.map(p=>(fileData.pagesText?.[p]||'')).filter(Boolean);
+    const fullText=textChunks.join('\n\n').substring(0,80000);
+
+    if(!fullText.trim())throw new Error('No text could be extracted from the selected page range.');
+
+    bgUpdate(taskId,{msg:'Generating…',done:0,total:numBatches});
+
+    const makePrompt=(bc)=>{
+      const base=`DOCUMENT: "${docName}" | Pages ${startPage}-${endPage}\n\nDOCUMENT CONTENT (generate ONLY from this):\n${fullText}\n\nDIFFICULTY: ${difficultyLevel}\n\n`;
+      if(taskType==='flashcards')return`${base}Generate exactly ${bc} detailed flashcards using ONLY topics and facts from the document above. Each question must be a complete, multi-sentence clinical/academic question with sufficient context. Answers must be comprehensive (3-5 sentences) with explanation. RETURN JSON ONLY: {"items":[{"q":"long detailed question with full context from document","a":"comprehensive multi-sentence answer with explanation","evidence":"exact quote from document","sourcePage":1}]}`;
+      if(taskType==='exam')return`${base}Generate exactly ${bc} high-quality MCQ questions using ONLY content from the document above. Each question stem must be long (2-4 sentences) with a detailed clinical/academic scenario. All 4 options must be plausible. Explanation must be 3-5 sentences citing the document. RETURN JSON ONLY: {"items":[{"q":"detailed multi-sentence question stem with full scenario","options":["A. detailed option","B. detailed option","C. detailed option","D. detailed option"],"correct":0,"explanation":"thorough 3-5 sentence explanation citing document content","evidence":"exact quote","sourcePage":1}]}`;
+      if(taskType==='cases')return`${base}Generate ${bc} detailed clinical case vignettes using ONLY information from the document above. Each vignette must be 5-8 sentences with full patient presentation, history, vitals, and findings. RETURN JSON ONLY: {"items":[{"vignette":"detailed 5-8 sentence patient case with all clinical details","title":"descriptive case title","examQuestion":{"q":"detailed question about the case","options":["A. option","B. option","C. option","D. option"],"correct":0,"explanation":"thorough explanation citing document"},"diagnosis":"specific diagnosis with reasoning"}]}`;
+      return`${base}Analyze this content comprehensively using only the document provided.`;
+    };
+
+    const isJson=['flashcards','exam','cases'].includes(taskType);
+    const tasks=Array.from({length:numBatches},(_,i)=>{
+      const bc=i===numBatches-1&&count%batchSize!==0?count%batchSize:batchSize;
+      return()=>callAI(makePrompt(bc),isJson,false,settings,8000);
+    });
+
+    let all=[];
+    const results=await runParallel(tasks,50,(done,total)=>{
+      bgUpdate(taskId,{done,total,msg:`${done}/${total} batches complete…`});
+    });
+
+    for(const r of results){
+      if(r.status==='fulfilled'){
+        try{
+          const p=parseJson(r.value);
+          all=[...all,...(p.items||p.cases||p.questions||p.flashcards||[])];
+        }catch(e){console.warn('BG parse err:',e.message);}
+      }
+    }
+    if(!all.length)throw new Error('AI returned no parseable data. Try again with a different page range.');
+
+    const finalData=all.slice(0,count);
+    bgFinish(taskId,{type:taskType,data:finalData,pages:`${startPage}-${endPage}`,docName,count:finalData.length});
+    if(onSave)onSave(finalData,taskId);
+  }catch(e){
+    bgFail(taskId,e.message||String(e));
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   GLOBAL TASK INDICATOR — floating pill visible on all pages
+═══════════════════════════════════════════════════════════════════ */
+function GlobalTaskIndicator({onViewResult}){
+  const tasks=useBgTasks();
+  const list=Object.entries(tasks);
+  if(!list.length)return null;
+  const running=list.filter(([,t])=>t.status==='running');
+  const done=list.filter(([,t])=>t.status==='done');
+  const errors=list.filter(([,t])=>t.status==='error');
+  return(
+    <div className="fixed bottom-20 lg:bottom-6 right-3 z-[9990] flex flex-col gap-2 items-end pointer-events-none" style={{maxWidth:320}}>
+      {running.map(([id,t])=>(
+        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl border border-[var(--accent)]/30 flex items-center gap-3 animate-slide-in" style={{background:'var(--card)'}}>
+          <div className="w-8 h-8 rounded-xl bg-[var(--accent)]/15 flex items-center justify-center shrink-0">
+            <Loader2 size={15} className="text-[var(--accent)] animate-spin"/>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-widest text-[var(--accent)] truncate">{t.type} · {t.docName?.slice(0,22)||'…'}</p>
+            <p className="text-xs opacity-50 font-bold">{t.msg||'Generating…'}</p>
+            {t.total>1&&(
+              <div className="mt-1 w-32 h-1 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-[var(--accent)] rounded-full transition-all duration-500" style={{width:`${t.total?((t.done||0)/t.total)*100:10}%`}}/>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+      {done.map(([id,t])=>(
+        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl border border-emerald-500/30 flex items-center gap-3 animate-slide-in cursor-pointer hover:border-emerald-500/60 transition-colors"
+          onClick={()=>onViewResult&&onViewResult(id,t)}>
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+            <CheckCircle2 size={15} className="text-emerald-500"/>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-black uppercase tracking-widest text-emerald-500">{t.type} ready!</p>
+            <p className="text-xs opacity-50 font-bold">{t.result?.count||0} items · {t.docName?.slice(0,20)||'…'} · tap to save</p>
+          </div>
+          <button onClick={e=>{e.stopPropagation();bgClear(id);}} className="text-xs opacity-40 hover:opacity-80 ml-1 shrink-0"><X size={16}/></button>
+        </div>
+      ))}
+      {errors.map(([id,t])=>(
+        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl border border-red-500/30 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
+            <AlertCircle size={18} className="text-red-500"/>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-black uppercase tracking-widest text-red-500">Failed</p>
+            <p className="text-xs opacity-50 font-bold truncate">{t.error?.slice(0,40)||'Unknown error'}</p>
+          </div>
+          <button onClick={()=>bgClear(id)} className="text-xs opacity-40 hover:opacity-80 ml-1 shrink-0"><X size={16}/></button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   QUICK GENERATE MODAL — for Flashcards / Exams / Cases pages
+   Lets users upload a new file or pick from their library,
+   choose page range, difficulty, and count (1–1000).
+═══════════════════════════════════════════════════════════════════ */
+function QuickGenerateModal({type,docs,settings,onClose,onTaskStart,addToast,
+  setFlashcards,setExams,setCases}){
+  const[tab,setTab]=useState('library'); // 'library' | 'upload'
+  const[selDocId,setSelDocId]=useState(docs[0]?.id||null);
+  const[uploadedDoc,setUploadedDoc]=useState(null);
+  const[uploading,setUploading]=useState(false);
+  const[uploadPct,setUploadPct]=useState(0);
+  const[entireFile,setEntireFile]=useState(true);
+  const[startPage,setStartPage]=useState(1);
+  const[endPage,setEndPage]=useState(1);
+  const[count,setCount]=useState(20);
+  const[difficulty,setDifficulty]=useState(2);
+  const levels=['Easy','Medium','Hard'];
+  const inputRef=useRef(null);
+
+  const activeDoc=tab==='upload'?uploadedDoc:(docs.find(d=>d.id===selDocId)||null);
+
+  useEffect(()=>{
+    if(activeDoc){setStartPage(1);setEndPage(activeDoc.totalPages||1);}
+  },[activeDoc?.id]);
+
+  const handleFileUpload=async(files)=>{
+    const file=files[0];if(!file)return;
+    setUploading(true);setUploadPct(5);
+    try{
+      const data=await extractUniversal(file,p=>setUploadPct(5+p*85));
+      const id='tmp_'+Date.now();
+      const doc={id,name:file.name,size:file.size,fileCategory:data.fileCategory,
+        totalPages:data.totalPages,createdAt:new Date().toISOString()};
+      await saveFile(id,{...data,name:file.name,size:file.size});
+      setUploadedDoc(doc);setUploadPct(100);
+      setStartPage(1);setEndPage(data.totalPages);
+      addToast(`"${file.name}" loaded!`,'success');
+    }catch(e){addToast(e.message,'error');}
+    finally{setUploading(false);}
+  };
+
+  const typeConfig={
+    flashcards:{label:'Flashcards',icon:Layers,color:'#6366f1'},
+    exam:{label:'Exam',icon:CheckSquare,color:'#3b82f6'},
+    cases:{label:'Cases',icon:Activity,color:'#8b5cf6'},
+  };
+  const tc=typeConfig[type]||typeConfig.flashcards;
+  const Icon=tc.icon;
+
+  const handleGo=()=>{
+    if(!activeDoc){addToast('Select or upload a document first.','error');return;}
+    const sp=entireFile?1:startPage;
+    const ep=entireFile?activeDoc.totalPages:endPage;
+    const taskId='task_'+Date.now();
+    const onSave=(data,tid)=>{
+      const now=new Date().toISOString();
+      if(type==='flashcards'){
+        const cards=data.map(c=>({id:Date.now()+Math.random(),q:c.q,a:c.a,evidence:c.evidence,
+          sourcePage:c.sourcePage,repetitions:0,ef:2.5,interval:1,nextReview:Date.now(),lastReview:Date.now()}));
+        setFlashcards(p=>[...p,{id:taskId,docId:activeDoc.id,sourcePages:`${sp}-${ep}`,
+          title:`Cards — ${activeDoc.name.slice(0,30)}`,cards,createdAt:now}]);
+        addToast(`${cards.length} flashcards saved! ⚡`,'success');
+      }else if(type==='exam'){
+        setExams(p=>[...p,{id:taskId,docId:activeDoc.id,sourcePages:`${sp}-${ep}`,
+          title:`Exam — ${activeDoc.name.slice(0,30)}`,questions:data,createdAt:now}]);
+        addToast(`${data.length} exam questions saved! ⚡`,'success');
+      }else if(type==='cases'){
+        setCases(p=>[...p,{id:taskId,docId:activeDoc.id,sourcePages:`${sp}-${ep}`,
+          title:`Cases — ${activeDoc.name.slice(0,30)}`,questions:data,createdAt:now}]);
+        addToast(`${data.length} cases saved! ⚡`,'success');
+      }
+      bgClear(tid);
+    };
+    runBgGeneration({taskId,docId:activeDoc.id,docName:activeDoc.name,
+      taskType:type,startPage:sp,endPage:ep,count,
+      difficultyLevel:levels[difficulty-1],settings,onSave});
+    if(onTaskStart)onTaskStart(taskId);
+    addToast(`Generating ${count} ${tc.label}… runs in background!`,'info');
+    onClose();
+  };
+
+  return(
+    <div className="fixed inset-0 z-[9000] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{background:'rgba(0,0,0,0.6)',backdropFilter:'blur(8px)'}}>
+      <div className="w-full sm:max-w-lg glass rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[92dvh] overflow-hidden shadow-2xl animate-slide-in">
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-[var(--border)] shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{background:tc.color+'22'}}>
+              <Icon size={20} style={{color:tc.color}}/>
+            </div>
+            <div>
+              <h2 className="font-black text-sm">Generate {tc.label}</h2>
+              <p className="text-xs opacity-50 font-bold">From any document • Runs in background</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100"><X size={16}/></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+          {/* Source tabs */}
+          <div className="flex gap-1 p-1 glass rounded-2xl">
+            {[['library','From Library',BookOpen],['upload','Upload File',FileUp]].map(([id,lbl,TIcon])=>(
+              <button key={id} onClick={()=>setTab(id)}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all
+                  ${tab===id?'bg-[var(--accent)] text-white shadow-md':'opacity-50 hover:opacity-80'}`}>
+                <TIcon size={16}/>{lbl}
+              </button>
+            ))}
+          </div>
+
+          {/* Library picker */}
+          {tab==='library'&&(
+            <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+              {!docs.length?(
+                <div className="text-center py-6 opacity-40">
+                  <BookOpen size={28} className="mx-auto mb-2"/>
+                  <p className="text-xs font-bold">No documents in library</p>
+                  <p className="text-xs mt-1">Switch to "Upload File" tab</p>
+                </div>
+              ):docs.map(doc=>(
+                <button key={doc.id} onClick={()=>setSelDocId(doc.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all border
+                    ${selDocId===doc.id?'bg-[var(--accent)]/10 border-[var(--accent)]/40':'glass border-transparent hover:border-[var(--border)]'}`}>
+                  <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${FILE_ICONS[doc.fileCategory||'unknown']?.from||'from-slate-500'} ${FILE_ICONS[doc.fileCategory||'unknown']?.to||'to-slate-700'} flex items-center justify-center shrink-0`}>
+                    <FileText size={18} className="text-white opacity-80"/>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold truncate">{doc.name}</p>
+                    <p className="text-xs opacity-40 font-mono">{doc.totalPages} pages</p>
+                  </div>
+                  {selDocId===doc.id&&<CheckCircle2 size={16} className="text-[var(--accent)] shrink-0"/>}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* File upload */}
+          {tab==='upload'&&(
+            <div>
+              {!uploadedDoc?(
+                <div
+                  onDragOver={e=>e.preventDefault()}
+                  onDrop={e=>{e.preventDefault();handleFileUpload(e.dataTransfer.files);}}
+                  onClick={()=>inputRef.current?.click()}
+                  className="border-2 border-dashed border-[var(--border)] rounded-2xl p-8 text-center cursor-pointer hover:border-[var(--accent)]/50 transition-colors">
+                  {uploading?(
+                    <div className="space-y-3">
+                      <Loader2 size={28} className="mx-auto text-[var(--accent)] animate-spin"/>
+                      <p className="text-xs font-bold">Processing…</p>
+                      <div className="w-full bg-black/10 rounded-full h-1.5"><div className="h-full bg-[var(--accent)] rounded-full transition-all" style={{width:`${uploadPct}%`}}/></div>
+                    </div>
+                  ):(
+                    <>
+                      <FileUp size={32} className="mx-auto mb-3 opacity-30"/>
+                      <p className="text-sm font-black opacity-60">Drop file here or click to browse</p>
+                      <p className="text-xs opacity-30 mt-1">PDF, Word, Excel, CSV, images, text</p>
+                    </>
+                  )}
+                  <input ref={inputRef} type="file" className="hidden" accept=".pdf,.docx,.doc,.xlsx,.xls,.csv,.txt,.md,.jpg,.jpeg,.png,.webp"
+                    onChange={e=>handleFileUpload(e.target.files)}/>
+                </div>
+              ):(
+                <div className="flex items-center gap-3 p-3 glass rounded-2xl border border-emerald-500/30">
+                  <CheckCircle2 size={18} className="text-emerald-500 shrink-0"/>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold truncate">{uploadedDoc.name}</p>
+                    <p className="text-xs opacity-40">{uploadedDoc.totalPages} pages extracted</p>
+                  </div>
+                  <button onClick={()=>setUploadedDoc(null)} className="opacity-40 hover:opacity-80"><X size={14}/></button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Page range */}
+          {activeDoc&&(
+            <div className="glass rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><BookOpen size={16}/>Page Range</h3>
+                <span className="text-xs font-bold opacity-40">{activeDoc.totalPages} total</span>
+              </div>
+              <div className="flex gap-3 items-center">
+                <button onClick={()=>setEntireFile(true)}
+                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[var(--border)] opacity-60'}`}>
+                  Entire File
+                </button>
+                <button onClick={()=>setEntireFile(false)}
+                  className={`flex-1 py-2 rounded-xl text-xs font-black border transition-all ${!entireFile?'bg-[var(--accent)] text-white border-transparent':'glass border-[var(--border)] opacity-60'}`}>
+                  Page Range
+                </button>
+              </div>
+              {!entireFile&&(
+                <div className="flex gap-3">
+                  {[['From',startPage,setStartPage],['To',endPage,setEndPage]].map(([l,v,s])=>(
+                    <div key={l} className="flex-1">
+                      <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
+                      <input type="number" min={1} max={activeDoc.totalPages} value={v}
+                        onChange={e=>s(Math.max(1,Math.min(activeDoc.totalPages,Number(e.target.value))))}
+                        className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {entireFile&&<p className="text-xs text-[var(--accent)] font-bold text-center">All {activeDoc.totalPages} pages selected</p>}
+            </div>
+          )}
+
+          {/* Count */}
+          <div className="glass rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><Hash size={16}/>Quantity</h3>
+              <span className="text-lg font-black text-[var(--accent)]">{count}</span>
+            </div>
+            <input type="range" min="1" max="1000" value={count} onChange={e=>setCount(+e.target.value)}
+              className="w-full accent-[var(--accent)]"/>
+            <div className="flex gap-1.5 flex-wrap">
+              {[5,10,20,50,100,200,500,1000].map(n=>(
+                <button key={n} onClick={()=>setCount(n)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${count===n?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>{n}</button>
+              ))}
+            </div>
+            {count>50&&<p className="text-xs text-amber-500 font-bold flex items-center gap-1.5"><AlertCircle size={10}/>Parallel AI — runs fully in background</p>}
+          </div>
+
+          {/* Difficulty */}
+          <div className="glass rounded-2xl p-4 space-y-3">
+            <h3 className="text-xs font-black uppercase tracking-widest opacity-60">Difficulty Level</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {levels.map((l,i)=>(
+                <button key={l} onClick={()=>setDifficulty(i+1)}
+                  className={`py-2.5 rounded-xl text-xs font-black border transition-all
+                    ${difficulty===i+1?'text-white border-transparent shadow-md':'glass border-[var(--border)] opacity-60 hover:opacity-100'}`}
+                  style={difficulty===i+1?{background:['#10b981','#f59e0b','#ef4444'][i]}:{}}>
+                  {['🟢','🟡','🔴'][i]} {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-5 border-t border-[var(--border)] shrink-0">
+          <button onClick={handleGo} disabled={!activeDoc}
+            className="w-full py-4 btn-accent rounded-2xl text-sm font-black uppercase tracking-widest disabled:opacity-40 flex items-center justify-center gap-3 shadow-xl">
+            <Zap size={18} fill="currentColor"/>
+            Generate {count} {tc.label} in Background
+          </button>
+          <p className="text-xs text-center opacity-30 font-bold mt-2">You can switch pages — generation never stops</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    PWA SETUP
@@ -355,7 +1338,7 @@ const setupPWA=()=>{
   // Service Worker (best-effort, may fail in sandboxed environments)
   if('serviceWorker' in navigator){
     const swCode=`
-const CACHE='mariam-v5';
+const CACHE='mariam-v7';
 const OFFLINE_RESP=new Response('MARIAM PRO is cached and ready!',{headers:{'Content-Type':'text/plain'}});
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/'])).catch(()=>{})));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))));
@@ -391,7 +1374,7 @@ function ToastContainer({toasts}){
       {toasts.map(t=>(
         <div key={t.id} className={`px-4 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2.5 animate-slide-in pointer-events-auto
           ${t.type==='success'?'bg-emerald-500 text-white':t.type==='error'?'bg-red-500 text-white':t.type==='warn'?'bg-amber-500 text-white':'bg-[var(--card)] border border-[var(--border)] text-[var(--text)]'}`}>
-          {t.type==='success'?<CheckCircle2 size={15}/>:t.type==='error'?<AlertCircle size={15}/>:<Info size={15}/>}
+          {t.type==='success'?<CheckCircle2 size={15}/>:t.type==='error'?<AlertCircle size={18}/>:<Info size={18}/>}
           <span className="truncate max-w-[280px]">{t.msg}</span>
         </div>
       ))}
@@ -434,7 +1417,7 @@ function FileCover({category,className='h-28 lg:h-32',name=''}){
   return(
     <div className={`bg-gradient-to-br ${cfg.from} ${cfg.to} flex flex-col items-center justify-center gap-2 ${className}`}>
       <Icon size={36} className="text-white opacity-60"/>
-      <span className="text-white text-[9px] font-black uppercase tracking-widest opacity-70 px-2 py-0.5 bg-black/20 rounded-full">{cfg.label}</span>
+      <span className="text-white text-xs font-black uppercase tracking-widest opacity-70 px-2 py-0.5 bg-black/20 rounded-full">{cfg.label}</span>
     </div>
   );
 }
@@ -528,14 +1511,14 @@ function TimelineView({events=[]}){
       <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[var(--accent)] via-[var(--accent)]/40 to-transparent"/>
       {events.map((ev,i)=>(
         <div key={i} className="relative">
-          <div className="absolute -left-5 w-4 h-4 rounded-full bg-[var(--accent)] border-2 border-[var(--bg)] flex items-center justify-center text-[8px] text-white font-black">{i+1}</div>
+          <div className="absolute -left-5 w-4 h-4 rounded-full bg-[var(--accent)] border-2 border-[var(--bg)] flex items-center justify-center text-xs text-white font-black">{i+1}</div>
           <div className="glass rounded-xl p-3">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[9px] font-black text-[var(--accent)] uppercase tracking-widest">{ev.date||ev.time||ev.year||''}</span>
-              {ev.page&&<span className="text-[9px] opacity-40 font-mono">p.{ev.page}</span>}
+              <span className="text-xs font-black text-[var(--accent)] uppercase tracking-widest">{ev.date||ev.time||ev.year||''}</span>
+              {ev.page&&<span className="text-xs opacity-40 font-mono">p.{ev.page}</span>}
             </div>
             <p className="text-xs font-bold leading-relaxed">{ev.event||ev.title||ev.description||ev}</p>
-            {ev.significance&&<p className="text-[10px] opacity-60 mt-1 italic">{ev.significance}</p>}
+            {ev.significance&&<p className="text-xs opacity-60 mt-1 italic">{ev.significance}</p>}
           </div>
         </div>
       ))}
@@ -553,7 +1536,7 @@ function LabTable({rows}){
       <table className="w-full border-collapse">
         <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[var(--border)]">
           {['Test','Result','Range','Units'].map(h=>(
-            <th key={h} className="py-1.5 px-3 text-[9px] font-black uppercase tracking-wider text-left opacity-50">{h}</th>
+            <th key={h} className="py-1.5 px-3 text-xs font-black uppercase tracking-wider text-left opacity-50">{h}</th>
           ))}
         </tr></thead>
         <tbody>
@@ -563,11 +1546,11 @@ function LabTable({rows}){
               <td className="py-2 px-3 text-center">
                 <span className={`font-black inline-flex items-center gap-1 ${r.flag==='L'?'text-blue-500':r.flag==='H'?'text-red-500':''}`}>
                   {r.result}
-                  {r.flag&&<span className={`text-[8px] font-black px-1 py-0.5 rounded ${r.flag==='L'?'bg-blue-100 dark:bg-blue-900/40 text-blue-600':'bg-red-100 dark:bg-red-900/40 text-red-600'}`}>{r.flag}</span>}
+                  {r.flag&&<span className={`text-xs font-black px-1 py-0.5 rounded ${r.flag==='L'?'bg-blue-100 dark:bg-blue-900/40 text-blue-600':'bg-red-100 dark:bg-red-900/40 text-red-600'}`}>{r.flag}</span>}
                 </span>
               </td>
               <td className="py-2 px-3 text-center opacity-50 font-mono">{r.range}</td>
-              <td className="py-2 px-3 text-center opacity-40 font-mono text-[9px] uppercase">{r.units}</td>
+              <td className="py-2 px-3 text-center opacity-40 font-mono text-xs uppercase">{r.units}</td>
             </tr>
           ))}
         </tbody>
@@ -594,7 +1577,7 @@ function SplitPane({left,right,defaultSplit=60,minLeft=30,maxLeft=85,direction='
       <div style={{width:`${split}%`}} className="flex flex-col h-full overflow-hidden min-w-0">{left}</div>
       <div onMouseDown={startDrag} onTouchStart={startDrag}
         className="w-2 shrink-0 cursor-col-resize flex items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/30 transition-colors group touch-none select-none z-10">
-        <GripVertical size={12} className="text-[var(--text)] opacity-40 group-hover:opacity-100"/>
+        <GripVertical size={16} className="text-[var(--text)] opacity-40 group-hover:opacity-100"/>
       </div>
       <div style={{width:`${100-split}%`}} className="flex flex-col h-full overflow-hidden min-w-0">{right}</div>
     </div>
@@ -657,15 +1640,15 @@ function TutorChat({context,settings,contextLabel=''}){
     <div className="flex flex-col h-full bg-[var(--bg)]">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--card)] shrink-0">
         <img src={MARIAM_IMG} className="w-7 h-7 rounded-lg object-cover" alt="AI"/>
-        <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
+        <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
         {loading&&<div className="ml-auto flex gap-1">{[0,1,2].map(i=><div key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}</div>}
       </div>
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 min-h-0">
-        {msgs.length===0&&<div className="flex flex-col items-center justify-center h-full opacity-40 text-center"><Brain size={32} className="mb-2"/><p className="text-[10px] font-bold">Ask me anything</p></div>}
+        {msgs.length===0&&<div className="flex flex-col items-center justify-center h-full opacity-40 text-center"><Brain size={32} className="mb-2"/><p className="text-xs font-bold">Ask me anything</p></div>}
         {msgs.map((m,i)=>(
           <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden'}`}>
-              {m.role==='user'?<UserCircle2 size={13} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
+              {m.role==='user'?<UserCircle2 size={16} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
             </div>
             <div className={`px-3 py-2 text-[11px] leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
               ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'bg-[var(--card)] border border-[var(--border)] rounded-tl-sm'}`}>
@@ -683,11 +1666,11 @@ function TutorChat({context,settings,contextLabel=''}){
             className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-[11px] outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
           <button onClick={toggleVoice}
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white animate-pulse':'glass text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
-            {listening?<MicOff size={14}/>:<Mic size={14}/>}
+            {listening?<MicOff size={18}/>:<Mic size={18}/>}
           </button>
           <button onClick={send} disabled={loading||!input.trim()}
             className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0">
-            <Send size={14}/>
+            <Send size={18}/>
           </button>
         </div>
       </div>
@@ -764,7 +1747,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto p-4 lg:p-6 space-y-5">
+      <div className="w-full p-6 lg:p-8 space-y-6">
         {/* Stats bar */}
         {docs.length>0&&(
           <div className="grid grid-cols-4 gap-3">
@@ -777,7 +1760,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
               <div key={label} className="glass rounded-2xl p-3 text-center">
                 <Icon size={18} className={`mx-auto mb-1 ${color}`}/>
                 <div className={`text-xl font-black ${color}`}>{val}</div>
-                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{label}</div>
+                <div className="text-xs font-black uppercase tracking-widest opacity-40">{label}</div>
               </div>
             ))}
           </div>
@@ -799,8 +1782,8 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
               <option value="type">Type</option>
             </select>
             <div className="flex glass rounded-xl overflow-hidden border border-[var(--border)]">
-              <button onClick={()=>setViewMode('grid')} className={`p-2.5 transition-colors ${viewMode==='grid'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><Grid size={14}/></button>
-              <button onClick={()=>setViewMode('list')} className={`p-2.5 transition-colors ${viewMode==='list'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><List size={14}/></button>
+              <button onClick={()=>setViewMode('grid')} className={`p-2.5 transition-colors ${viewMode==='grid'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><Grid size={18}/></button>
+              <button onClick={()=>setViewMode('list')} className={`p-2.5 transition-colors ${viewMode==='list'?'bg-[var(--accent)] text-white':'opacity-50 hover:opacity-100'}`}><List size={18}/></button>
             </div>
             <label className={`btn-accent flex items-center gap-2 text-xs font-black uppercase tracking-widest px-4 py-2.5 rounded-xl shadow-lg cursor-pointer whitespace-nowrap ${uploading?'opacity-50 pointer-events-none':''}`}>
               {uploading?<Loader2 size={16} className="animate-spin"/>:<FileUp size={16}/>}
@@ -838,7 +1821,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
                 <div key={doc.id} onClick={()=>onOpen(doc.id)} className="card-hover glass rounded-2xl overflow-hidden flex flex-col relative group cursor-pointer">
                   <button onClick={ev=>onDelete(doc.id,ev)}
                     className="absolute top-2 right-2 z-10 w-7 h-7 bg-black/60 hover:bg-red-500 rounded-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                    <Trash2 size={13}/>
+                    <Trash2 size={16}/>
                   </button>
                   {cat==='image'&&doc.imagePreview
                     ?<div className="h-28 lg:h-32 overflow-hidden"><img src={doc.imagePreview} className="w-full h-full object-cover" alt={doc.name}/></div>
@@ -847,13 +1830,13 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
                   <div className="p-3 flex-1 flex flex-col gap-2">
                     <h3 className="font-bold text-[11px] lg:text-xs leading-snug line-clamp-2 flex-1">{doc.name}</h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-[8px] opacity-40 font-mono">{doc.totalPages} {cat==='image'?'view':'pages'}</span>
-                      <span className="text-[8px] font-black uppercase text-[var(--accent)] opacity-60">{(FILE_ICONS[cat]||FILE_ICONS.unknown).label}</span>
+                      <span className="text-xs opacity-40 font-mono">{doc.totalPages} {cat==='image'?'view':'pages'}</span>
+                      <span className="text-xs font-black uppercase text-[var(--accent)] opacity-60">{(FILE_ICONS[cat]||FILE_ICONS.unknown).label}</span>
                     </div>
                     <div className="flex gap-1 flex-wrap">
-                      {nCards>0&&<span className="text-[8px] font-bold px-1.5 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md">{nCards} Cards</span>}
-                      {nExams>0&&<span className="text-[8px] font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">{nExams} Exams</span>}
-                      {nCases>0&&<span className="text-[8px] font-bold px-1.5 py-0.5 bg-blue-500/10 text-blue-500 rounded-md">{nCases} Cases</span>}
+                      {nCards>0&&<span className="text-xs font-bold px-1.5 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md">{nCards} Cards</span>}
+                      {nExams>0&&<span className="text-xs font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">{nExams} Exams</span>}
+                      {nCases>0&&<span className="text-xs font-bold px-1.5 py-0.5 bg-blue-500/10 text-blue-500 rounded-md">{nCases} Cases</span>}
                     </div>
                   </div>
                 </div>
@@ -877,10 +1860,10 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm truncate">{doc.name}</div>
-                    <div className="text-[10px] opacity-40 mt-0.5">{cfg.label} · {doc.totalPages} pages · {new Date(doc.addedAt).toLocaleDateString()}</div>
+                    <div className="text-xs opacity-40 mt-0.5">{cfg.label} · {doc.totalPages} pages · {new Date(doc.addedAt).toLocaleDateString()}</div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {nCards>0&&<span className="text-[9px] font-bold px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">{nCards} cards</span>}
+                    {nCards>0&&<span className="text-xs font-bold px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">{nCards} cards</span>}
                     <button onClick={ev=>onDelete(doc.id,ev)} className="w-8 h-8 hover:bg-red-500/10 hover:text-red-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
                       <Trash2 size={14}/>
                     </button>
@@ -998,9 +1981,9 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
         <span className="font-bold text-xs truncate flex-1 min-w-0">{activeDoc.name}</span>
         {isPdf&&(
           <div className="flex items-center gap-1 shrink-0">
-            <button onClick={()=>setScale(s=>Math.max(s-.2,.5))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomOut size={13}/></button>
-            <button onClick={()=>setScale(1)} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><Maximize size={13}/></button>
-            <button onClick={()=>setScale(s=>Math.min(s+.2,4))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomIn size={13}/></button>
+            <button onClick={()=>setScale(s=>Math.max(s-.2,.5))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomOut size={16}/></button>
+            <button onClick={()=>setScale(1)} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><Maximize size={16}/></button>
+            <button onClick={()=>setScale(s=>Math.min(s+.2,4))} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-60 hover:opacity-100"><ZoomIn size={16}/></button>
           </div>
         )}
       </div>
@@ -1013,7 +1996,7 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
             const dc=FILE_ICONS[doc.fileCategory||'pdf']||FILE_ICONS.pdf;
             return(
               <div key={id} onClick={()=>setActiveId(id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg cursor-pointer text-[10px] font-bold shrink-0 transition-colors
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg cursor-pointer text-xs font-bold shrink-0 transition-colors
                   ${id===activeDoc.id?'bg-[var(--accent)] text-white':'glass hover:bg-black/5 dark:hover:bg-white/5'}`}>
                 <dc.Icon size={10}/>
                 <span className="truncate max-w-[80px]">{doc.name}</span>
@@ -1042,7 +2025,7 @@ function DocWorkspace({activeDoc,setDocs,currentPage,setCurrentPage,openDocs,clo
             <img src={imageData} alt={activeDoc.name} className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl"/>
           </div>
         ):(
-          <div className="p-4 pb-20 lg:pb-4 max-w-4xl mx-auto">
+          <div className="p-6 pb-20 lg:pb-6 w-full">
             <div className="bg-[var(--card)] rounded-2xl p-6 shadow-sm border border-[var(--border)] min-h-[60vh]">
               <pre className="text-sm leading-relaxed whitespace-pre-wrap font-mono text-[var(--text)] opacity-90 break-words">{pageText||'(No content on this page)'}</pre>
             </div>
@@ -1131,9 +2114,9 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           <CheckCircle2 size={15}/>{Array.isArray(bgTask.result?.data)?`${bgTask.result.data.length} items ready`:'Done!'}
         </span>
         <div className="flex gap-2">
-          <button onClick={onClear} className="px-3 py-1.5 glass rounded-xl text-[10px] font-black uppercase opacity-60 hover:opacity-100">Discard</button>
-          <button onClick={save} className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase flex items-center gap-1.5 shadow-md">
-            <Save size={12}/> Save
+          <button onClick={onClear} className="px-3 py-1.5 glass rounded-xl text-xs font-black uppercase opacity-60 hover:opacity-100">Discard</button>
+          <button onClick={save} className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase flex items-center gap-1.5 shadow-md">
+            <Save size={16}/> Save
           </button>
         </div>
       </div>
@@ -1141,9 +2124,9 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
         {/* Flashcard preview */}
         {bgTask.result?.type==='flashcards'&&bgTask.result.data.slice(0,5).map((item,i)=>(
           <div key={i} className="glass p-4 rounded-2xl">
-            <p className="font-bold text-xs mb-3 leading-relaxed"><span className="opacity-30 mr-1.5 font-mono text-[9px]">Q{i+1}</span>{item.q}</p>
+            <p className="font-bold text-xs mb-3 leading-relaxed"><span className="opacity-30 mr-1.5 font-mono text-xs">Q{i+1}</span>{item.q}</p>
             <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/20 p-3 rounded-xl text-xs text-[var(--accent)]">{item.a}</div>
-            {item.evidence&&<p className="mt-2 text-[10px] opacity-40 italic">"{item.evidence}" — Pg {item.sourcePage}</p>}
+            {item.evidence&&<p className="mt-2 text-xs opacity-40 italic">"{item.evidence}" — Pg {item.sourcePage}</p>}
           </div>
         ))}
         {/* Exam/cases preview */}
@@ -1151,7 +2134,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           const q=item.examQuestion||item;
           return(
             <div key={i} className="glass p-4 rounded-2xl">
-              <p className="font-bold text-xs mb-3"><span className="opacity-30 mr-1.5 text-[9px]">Q{i+1}</span>{item.vignette||q.q}</p>
+              <p className="font-bold text-xs mb-3"><span className="opacity-30 mr-1.5 text-xs">Q{i+1}</span>{item.vignette||q.q}</p>
               <div className="space-y-1.5">
                 {(q.options||[]).map((opt,oi)=>(
                   <div key={oi} className={`px-3 py-2 rounded-xl text-[11px] font-medium border ${oi===q.correct?'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold':'glass border-transparent'}`}>
@@ -1171,7 +2154,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           <div key={i} className="glass p-4 rounded-2xl">
             <p className="font-black text-xs mb-1 text-[var(--accent)]">{c.concept||c.term}</p>
             <p className="text-[11px] leading-relaxed opacity-80">{c.definition||c.explanation}</p>
-            {c.example&&<p className="text-[10px] mt-2 opacity-50 italic">Ex: {c.example}</p>}
+            {c.example&&<p className="text-xs mt-2 opacity-50 italic">Ex: {c.example}</p>}
           </div>
         ))}
         {/* Text results */}
@@ -1180,7 +2163,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
             <pre className="text-xs leading-relaxed whitespace-pre-wrap text-[var(--text)] opacity-90">{bgTask.result.data}</pre>
           </div>
         )}
-        {bgTask.result?.data?.length>5&&<p className="text-center text-[10px] opacity-40 font-bold">+{bgTask.result.data.length-5} more items saved</p>}
+        {bgTask.result?.data?.length>5&&<p className="text-center text-xs opacity-40 font-bold">+{bgTask.result.data.length-5} more items saved</p>}
       </div>
     </div>
   );
@@ -1190,7 +2173,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
       {/* Page range */}
       <div className="glass rounded-2xl p-4">
-        <h3 className="text-xs font-black uppercase tracking-widest opacity-60 mb-3 flex items-center gap-2"><BookOpen size={13}/> Page Range</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4 flex items-center gap-2"><BookOpen size={16}/> Page Range</h3>
         <label className="flex items-center gap-2 mb-3 cursor-pointer">
           <div onClick={()=>setEntireFile(v=>!v)}
             className={`w-9 h-5 rounded-full transition-colors relative ${entireFile?'bg-[var(--accent)]':'bg-gray-300 dark:bg-zinc-600'}`}>
@@ -1202,26 +2185,26 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           <div className="flex gap-3">
             {[['From',startPage,setStartPage],['To',endPage,setEndPage]].map(([l,v,s])=>(
               <div key={l} className="flex-1">
-                <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
+                <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1">{l}</label>
                 <input type="number" min={1} max={activeDoc.totalPages} value={v} onChange={e=>s(Number(e.target.value))}
                   className="w-full glass rounded-xl px-3 py-2.5 text-center font-mono font-bold text-sm outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
               </div>
             ))}
           </div>
         )}
-        {entireFile&&<p className="text-[10px] text-[var(--accent)] font-bold mt-2 text-center">All {activeDoc.totalPages} pages selected</p>}
+        {entireFile&&<p className="text-xs text-[var(--accent)] font-bold mt-2 text-center">All {activeDoc.totalPages} pages selected</p>}
       </div>
 
       {/* Tool selector */}
       <div className="glass rounded-2xl p-4">
-        <h3 className="text-xs font-black uppercase tracking-widest opacity-60 mb-3 flex items-center gap-2"><Zap size={13}/> AI Tool</h3>
+        <h3 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4 flex items-center gap-2"><Zap size={16}/> AI Tool</h3>
         <div className="grid grid-cols-4 gap-1.5">
           {TOOLS.map(([id,lbl,Icon,color])=>(
             <button key={id} onClick={()=>setType(id)}
-              className={`py-2.5 flex flex-col items-center gap-1 rounded-xl text-[8px] font-black uppercase tracking-wider transition-all border
+              className={`py-2.5 flex flex-col items-center gap-1 rounded-xl text-xs font-black uppercase tracking-wider transition-all border
                 ${type===id?'text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}
               style={type===id?{backgroundColor:color}:{}}>
-              <Icon size={14}/>{lbl}
+              <Icon size={18}/>{lbl}
             </button>
           ))}
         </div>
@@ -1230,11 +2213,11 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
       {/* Language picker for translate */}
       {type==='translate'&&(
         <div className="glass rounded-2xl p-4">
-          <h3 className="text-xs font-black uppercase tracking-widest opacity-60 mb-3">Target Language</h3>
+          <h3 className="text-sm font-black uppercase tracking-widest opacity-60 mb-4">Target Language</h3>
           <div className="flex flex-wrap gap-2">
             {['Arabic','Spanish','French','German','Chinese','Japanese','Portuguese','Turkish','Hindi','Urdu'].map(lang=>(
               <button key={lang} onClick={()=>setTargetLang(lang)}
-                className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${targetLang===lang?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>
+                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${targetLang===lang?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>
                 {lang}
               </button>
             ))}
@@ -1248,7 +2231,7 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
       {['flashcards','exam','cases'].includes(type)&&(
         <div className="glass rounded-2xl p-4">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><ListChecks size={13}/> Quantity</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest opacity-60 flex items-center gap-2"><ListChecks size={16}/> Quantity</h3>
             <span className="text-sm font-black text-[var(--accent)]">{count}</span>
           </div>
           <input type="range" min="1" max="1000" value={count} onChange={e=>setCount(+e.target.value)}
@@ -1256,10 +2239,10 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
           <div className="flex gap-1.5 flex-wrap">
             {[5,10,20,50,100,250,500,1000].map(n=>(
               <button key={n} onClick={()=>setCount(n)}
-                className={`px-2 py-1 rounded-lg text-[9px] font-black transition-colors ${count===n?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>{n}</button>
+                className={`px-2 py-1 rounded-lg text-xs font-black transition-colors ${count===n?'bg-[var(--accent)] text-white':'glass opacity-60 hover:opacity-100'}`}>{n}</button>
             ))}
           </div>
-          {count>50&&<p className="text-[9px] text-amber-500 font-bold mt-2 flex items-center gap-1"><AlertCircle size={10}/>Parallel AI — {count}+ items in ~30-120s</p>}
+          {count>50&&<p className="text-xs text-amber-500 font-bold mt-2 flex items-center gap-1"><AlertCircle size={10}/>Parallel AI — {count}+ items in ~30-120s</p>}
         </div>
       )}
 
@@ -1286,8 +2269,8 @@ function GeneratePanel({activeDoc,bgTask,onStart,onClear,setFlashcards,setExams,
       {bgTask&&!bgTask.isFinished&&(
         <div className="glass rounded-2xl p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-black opacity-60">{bgTask.msg}</span>
-            <span className="text-[10px] font-black text-[var(--accent)]">{bgTask.done||0}/{bgTask.total||1}</span>
+            <span className="text-xs font-black opacity-60">{bgTask.msg}</span>
+            <span className="text-xs font-black text-[var(--accent)]">{bgTask.done||0}/{bgTask.total||1}</span>
           </div>
           <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2.5 overflow-hidden">
             <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-300 animate-pulse"
@@ -1352,7 +2335,7 @@ function ChatPanel({activeDoc,settings,currentPage}){
       <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
         {['page','document'].map(m=>(
           <button key={m} onClick={()=>setMode(m)}
-            className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-colors border-b-2
+            className={`flex-1 py-2.5 text-xs font-black uppercase tracking-widest transition-colors border-b-2
               ${mode===m?'border-[var(--accent)] text-[var(--accent)]':'border-transparent opacity-50 hover:opacity-80'}`}>
             {m==='page'?`Page ${currentPage}`:'Full Doc'}
           </button>
@@ -1380,10 +2363,10 @@ function ChatPanel({activeDoc,settings,currentPage}){
             className="flex-1 bg-[var(--bg)] border border-[var(--border)] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24"/>
           <button onClick={toggleVoice}
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${listening?'bg-red-500 text-white animate-pulse':'glass text-[var(--accent)]'}`}>
-            {listening?<MicOff size={14}/>:<Mic size={14}/>}
+            {listening?<MicOff size={18}/>:<Mic size={18}/>}
           </button>
           <button onClick={send} disabled={loading||!input.trim()}
-            className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0"><Send size={14}/></button>
+            className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0"><Send size={18}/></button>
         </div>
       </div>
     </div>
@@ -1408,9 +2391,9 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
       <button onClick={()=>toggle(id)} className="w-full flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
         <div className="flex items-center gap-2">
           <span className={`text-xs font-black uppercase tracking-widest ${colorClass}`}>{title}</span>
-          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${colorClass} bg-current/10`}>{count}</span>
+          <span className={`text-xs font-black px-2 py-0.5 rounded-full ${colorClass} bg-current/10`}>{count}</span>
         </div>
-        {expanded[id]?<ChevronUp size={14} className="opacity-40"/>:<ChevronDown size={14} className="opacity-40"/>}
+        {expanded[id]?<ChevronUp size={18} className="opacity-40"/>:<ChevronDown size={18} className="opacity-40"/>}
       </button>
       {expanded[id]&&<div className="border-t border-[var(--border)] p-3 space-y-2">{children}</div>}
     </div>
@@ -1423,41 +2406,41 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
           <div key={set.id} className="flex items-center justify-between p-3 glass rounded-xl">
             <div>
               <p className="text-[11px] font-bold">{set.title}</p>
-              <p className="text-[9px] opacity-40">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
+              <p className="text-xs opacity-40">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
             </div>
             <div className="flex gap-1.5">
-              <button onClick={()=>setView('flashcards')} className="text-[9px] font-black px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">Study</button>
-              <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="text-[9px] font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setView('flashcards')} className="text-xs font-black px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">Study</button>
+              <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
             </div>
           </div>
         ))}
-        {!docFc.length&&<p className="text-center text-[10px] opacity-40 py-2 font-bold">No flashcards yet</p>}
+        {!docFc.length&&<p className="text-center text-xs opacity-40 py-2 font-bold">No flashcards yet</p>}
       </Section>
 
       <Section id="ex" title="Exams" count={docEx.reduce((s,e)=>s+(e.questions?.length||0),0)} colorClass="text-emerald-500">
         {docEx.map(ex=>(
           <div key={ex.id} className="flex items-center justify-between p-3 glass rounded-xl">
-            <div><p className="text-[11px] font-bold">{ex.title}</p><p className="text-[9px] opacity-40">{ex.questions?.length} Qs</p></div>
+            <div><p className="text-[11px] font-bold">{ex.title}</p><p className="text-xs opacity-40">{ex.questions?.length} Qs</p></div>
             <div className="flex gap-1.5">
-              <button onClick={()=>setView('exams')} className="text-[9px] font-black px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg">Take</button>
-              <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="text-[9px] font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setView('exams')} className="text-xs font-black px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg">Take</button>
+              <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
             </div>
           </div>
         ))}
-        {!docEx.length&&<p className="text-center text-[10px] opacity-40 py-2 font-bold">No exams yet</p>}
+        {!docEx.length&&<p className="text-center text-xs opacity-40 py-2 font-bold">No exams yet</p>}
       </Section>
 
       <Section id="ca" title="Cases" count={docCa.reduce((s,c)=>s+(c.questions?.length||0),0)} colorClass="text-blue-500">
         {docCa.map(c=>(
           <div key={c.id} className="flex items-center justify-between p-3 glass rounded-xl">
-            <div><p className="text-[11px] font-bold">{c.title}</p><p className="text-[9px] opacity-40">{c.questions?.length} cases</p></div>
+            <div><p className="text-[11px] font-bold">{c.title}</p><p className="text-xs opacity-40">{c.questions?.length} cases</p></div>
             <div className="flex gap-1.5">
-              <button onClick={()=>setView('cases')} className="text-[9px] font-black px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">Start</button>
-              <button onClick={()=>setCases(p=>p.filter(x=>x.id!==c.id))} className="text-[9px] font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setView('cases')} className="text-xs font-black px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">Start</button>
+              <button onClick={()=>setCases(p=>p.filter(x=>x.id!==c.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
             </div>
           </div>
         ))}
-        {!docCa.length&&<p className="text-center text-[10px] opacity-40 py-2 font-bold">No cases yet</p>}
+        {!docCa.length&&<p className="text-center text-xs opacity-40 py-2 font-bold">No cases yet</p>}
       </Section>
 
       <Section id="no" title="Notes" count={docNo.length} colorClass="text-amber-500">
@@ -1465,19 +2448,19 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
           <div key={n.id} className="p-3 glass rounded-xl">
             <div className="flex justify-between items-start mb-2">
               <p className="text-[11px] font-bold">{n.title}</p>
-              <button onClick={()=>setNotes(p=>p.filter(x=>x.id!==n.id))} className="text-[9px] px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-lg font-black">Del</button>
+              <button onClick={()=>setNotes(p=>p.filter(x=>x.id!==n.id))} className="text-xs px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-lg font-black">Del</button>
             </div>
-            <p className="text-[10px] opacity-60 line-clamp-3 leading-relaxed">{n.content}</p>
+            <p className="text-xs opacity-60 line-clamp-3 leading-relaxed">{n.content}</p>
           </div>
         ))}
-        {!docNo.length&&<p className="text-center text-[10px] opacity-40 py-2 font-bold">No notes yet</p>}
+        {!docNo.length&&<p className="text-center text-xs opacity-40 py-2 font-bold">No notes yet</p>}
       </Section>
 
       {docMm.length>0&&(
         <Section id="mm" title="Mind Maps" count={docMm.length} colorClass="text-purple-500">
           {docMm.map((m,i)=>(
             <div key={m.id} className="glass rounded-xl overflow-hidden">
-              <p className="text-[10px] font-bold p-2 border-b border-[var(--border)] opacity-60">{m.data?.topic||`Map ${i+1}`} · Pgs {m.pages}</p>
+              <p className="text-xs font-bold p-2 border-b border-[var(--border)] opacity-60">{m.data?.topic||`Map ${i+1}`} · Pgs {m.pages}</p>
               <MindMap data={m.data}/>
             </div>
           ))}
@@ -1488,7 +2471,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
         <Section id="tl" title="Timelines" count={docTl.length} colorClass="text-teal-500">
           {docTl.map((t,i)=>(
             <div key={t.id} className="glass rounded-xl p-3">
-              <p className="text-[10px] font-bold mb-3 opacity-60">Timeline · Pgs {t.pages}</p>
+              <p className="text-xs font-bold mb-3 opacity-60">Timeline · Pgs {t.pages}</p>
               <TimelineView events={t.events||[]}/>
             </div>
           ))}
@@ -1497,60 +2480,87 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
     </div>
   );
 }
-
 /* ═══════════════════════════════════════════════════════════════════
-   FLASHCARDS VIEW — spaced repetition
+   FLASHCARDS VIEW — v6 with Quick Generate + better UI
 ═══════════════════════════════════════════════════════════════════ */
-function FlashcardsView({flashcards,setFlashcards,settings,addToast}){
+function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExams,setCases}){
   const[selSet,setSelSet]=useState(null);const[idx,setIdx]=useState(0);
-  const[flipped,setFlipped]=useState(false);const[mode,setMode]=useState('list');
-  const[showAnswer,setShowAnswer]=useState(false);
+  const[flipped,setFlipped]=useState(false);const[mode,setMode]=useState('browse');
+  const[showModal,setShowModal]=useState(false);
+  const[exporting,setExporting]=useState(null);
+  const[filterDocId,setFilterDocId]=useState('all');
 
-  const sm2=(card,q)=>{
-    let{ef=2.5,interval=1,repetitions=0}=card;
-    if(q>=3){repetitions++;interval=repetitions===1?1:repetitions===2?6:Math.round(interval*ef);}
-    else{repetitions=0;interval=1;}
-    ef=Math.max(1.3,ef+(0.1-(5-q)*(0.08+(5-q)*0.02)));
-    return{...card,ef,interval,repetitions,nextReview:Date.now()+interval*86400000,lastReview:Date.now()};
+  const rateCard=useCallback(q=>{
+    trackStudy('flashcard');
+    setFlashcards(p=>p.map(set=>{
+      if(set.id!==selSet.id)return set;
+      return{...set,cards:set.cards.map((c,i)=>{
+        if(i!==idx)return c;
+        const ef=Math.max(1.3,c.ef+(0.1-(5-q)*(0.08+(5-q)*0.02)));
+        const interval=q<3?1:Math.round(c.interval*(c.repetitions===0?1:ef));
+        return{...c,ef,interval,repetitions:(c.repetitions||0)+1,
+          nextReview:Date.now()+interval*86400000,lastReview:Date.now()};
+      })};
+    }));
+    const nextIdx=idx+1;
+    if(nextIdx<selSet.cards.length){setIdx(nextIdx);setFlipped(false);}
+    else{addToast('🎉 Set complete!','success');setSelSet(null);setIdx(0);}
+  },[selSet,idx,setFlashcards,addToast]);
+
+  const handleExport=async(set)=>{
+    setExporting(set.id);
+    await exportToPDF('flashcards',set.cards,set.title,addToast);
+    setExporting(null);
   };
 
-  const rateCard=(q)=>{
-    if(!selSet)return;
-    const cards=selSet.cards.map((c,i)=>i===idx?sm2(c,q):c);
-    const updated={...selSet,cards};
-    setSelSet(updated);
-    setFlashcards(p=>p.map(f=>f.id===selSet.id?updated:f));
-    if(idx<selSet.cards.length-1){setIdx(i=>i+1);setFlipped(false);setShowAnswer(false);}
-    else{addToast('Set complete! 🎉','success');setMode('list');setSelSet(null);setIdx(0);}
-  };
+  const filteredSets=useMemo(()=>{
+    if(filterDocId==='all')return flashcards;
+    return flashcards.filter(f=>f.docId===filterDocId);
+  },[flashcards,filterDocId]);
 
-  if(mode==='study'&&selSet){
+  if(selSet){
     const card=selSet.cards[idx];
+    const progress=((idx+1)/selSet.cards.length)*100;
     return(
-      <div className="flex-1 flex flex-col items-center justify-center p-4 gap-6 scroll-content overflow-y-auto">
-        <div className="w-full max-w-2xl">
+      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+        <div className="w-full p-6 lg:p-8">
           <div className="flex items-center justify-between mb-4">
-            <button onClick={()=>{setMode('list');setSelSet(null);setIdx(0);setFlipped(false);}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={14}/>Back</button>
-            <span className="text-xs font-black opacity-40">{idx+1} / {selSet.cards.length}</span>
+            <button onClick={()=>{setSelSet(null);setIdx(0);setFlipped(false);}}
+              className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
+            <div className="text-center">
+              <p className="text-xs font-black opacity-60 truncate max-w-40">{selSet.title}</p>
+              <p className="text-xs opacity-40">{idx+1} / {selSet.cards.length}</p>
+            </div>
+            <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-xs font-black flex items-center gap-2 opacity-60 hover:opacity-100">
+              <Printer size={16}/>PDF
+            </button>
           </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mb-6">
-            <div className="bg-[var(--accent)] h-full rounded-full transition-all" style={{width:`${((idx+1)/selSet.cards.length)*100}%`}}/>
+          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mb-6 overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-500" style={{width:`${progress}%`}}/>
           </div>
-          <div className="glass rounded-3xl p-8 min-h-[280px] flex flex-col justify-between cursor-pointer shadow-xl" onClick={()=>setFlipped(f=>!f)}>
-            <div className="text-[9px] font-black uppercase tracking-widest opacity-30 mb-4">{flipped?'Answer':'Question'} · tap to flip</div>
-            <p className="text-base font-bold leading-relaxed text-center flex-1 flex items-center justify-center">
+          <div className="glass rounded-3xl p-8 mb-4 cursor-pointer min-h-[200px] flex flex-col justify-between select-none
+            border border-[var(--border)] hover:border-[var(--accent)]/30 transition-all"
+            onClick={()=>setFlipped(f=>!f)}>
+            <div className="flex items-start justify-between mb-4">
+              <span className="text-xs font-black uppercase tracking-widest px-2 py-1 rounded-full opacity-40 glass">{flipped?'Answer':'Question'}</span>
+              {card.sourcePage&&<span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+            </div>
+            <p className={`text-base font-bold leading-relaxed flex-1 ${flipped?'text-[var(--accent)]':''}`}>
               {flipped?card.a:card.q}
             </p>
-            {flipped&&card.evidence&&<p className="text-[10px] opacity-40 italic mt-4 text-center border-t border-[var(--border)] pt-3">"{card.evidence}" — Pg {card.sourcePage}</p>}
+            {flipped&&card.evidence&&<p className="text-xs opacity-40 mt-3 italic border-t border-[var(--border)] pt-3">"{card.evidence}"</p>}
+            {!flipped&&<p className="text-xs opacity-30 text-center mt-4">Tap to reveal answer</p>}
           </div>
           {flipped&&(
             <div className="grid grid-cols-4 gap-2 mt-4">
-              {[['Again',0,'bg-red-500'],[' Hard',2,'bg-amber-500'],['Good',3,'bg-blue-500'],['Easy',5,'bg-emerald-500']].map(([l,q,bg])=>(
-                <button key={l} onClick={()=>rateCard(q)} className={`${bg} text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform`}>{l}</button>
+              {[['Again',0,'#ef4444'],['Hard',2,'#f59e0b'],['Good',3,'#3b82f6'],['Easy',5,'#10b981']].map(([l,q,col])=>(
+                <button key={l} onClick={()=>rateCard(q)}
+                  className="text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+                  style={{background:col}}>{l}</button>
               ))}
             </div>
           )}
-          {!flipped&&<button onClick={()=>setFlipped(true)} className="mt-4 w-full py-3 btn-accent rounded-2xl text-sm font-black">Show Answer</button>}
+          {!flipped&&<button onClick={()=>setFlipped(true)} className="mt-4 w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">Show Answer</button>}
         </div>
       </div>
     );
@@ -1558,134 +2568,77 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast}){
 
   return(
     <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-      <div className="max-w-3xl mx-auto p-4 lg:p-6 space-y-4">
-        <h1 className="text-3xl font-black flex items-center gap-3"><Layers size={28} className="opacity-40"/> Flashcards</h1>
+      {showModal&&<QuickGenerateModal type="flashcards" docs={docs||[]} settings={settings}
+        onClose={()=>setShowModal(false)} addToast={addToast}
+        setFlashcards={setFlashcards} setExams={setExams} setCases={setCases}/>}
+      <div className="w-full p-6 lg:p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl lg:text-3xl font-black flex items-center gap-3"><Layers size={26} className="opacity-40"/> Flashcards</h1>
+          <button onClick={()=>setShowModal(true)}
+            className="btn-accent px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg">
+            <FilePlus size={18}/> New from File
+          </button>
+        </div>
+
+        {flashcards.length>0&&(
+          <>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                ['Sets',flashcards.length,'#6366f1'],
+                ['Cards',flashcards.reduce((s,f)=>s+(f.cards?.length||0),0),'#3b82f6'],
+                ['Due Today',flashcards.reduce((s,f)=>s+(f.cards?.filter(c=>!c.nextReview||c.nextReview<=Date.now()).length||0),0),'#f59e0b'],
+              ].map(([l,n,col])=>(
+                <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+                  <p className="text-xl font-black" style={{color:col}}>{n}</p>
+                  <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
+                </div>
+              ))}
+            </div>
+            {docs?.length>0&&(
+              <select value={filterDocId} onChange={e=>setFilterDocId(e.target.value)}
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                <option value="all">All Documents</option>
+                {[...new Set(flashcards.map(f=>f.docId))].map(id=>{const doc=docs?.find(d=>d.id===id);return doc?<option key={id} value={id}>{doc.name.slice(0,30)}</option>:null;})}
+              </select>
+            )}
+          </>
+        )}
+
         {!flashcards.length?(
           <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
             <Layers size={48} className="mx-auto mb-4 opacity-20"/>
             <p className="text-lg font-black opacity-40">No flashcard sets yet</p>
-            <p className="text-sm opacity-30 mt-1">Open a document → AI Studio → Generate → Cards</p>
+            <p className="text-sm opacity-30 mt-1 mb-6">Generate cards from any document</p>
+            <button onClick={()=>setShowModal(true)} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl flex items-center gap-2 mx-auto">
+              <FilePlus size={16}/> Generate from File
+            </button>
           </div>
-        ):(
-          flashcards.map(set=>(
-            <div key={set.id} className="glass rounded-2xl p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="font-black text-sm">{set.title}</h3>
-                  <p className="text-[10px] opacity-40 mt-0.5">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={()=>{setSelSet(set);setIdx(0);setFlipped(false);setMode('study');}}
-                    className="btn-accent px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md">
-                    <Brain size={14}/> Study
-                  </button>
-                  <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))}
-                    className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500"><Trash2 size={14}/></button>
-                </div>
+        ):(filteredSets.map(set=>(
+          <div key={set.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-black text-sm truncate">{set.title}</h3>
+                <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
+                {set.docId&&docs?.find(d=>d.id===set.docId)&&(
+                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d=>d.id===set.docId).name}</p>
+                )}
+                {set.cards?.some(c=>!c.nextReview||c.nextReview<=Date.now())&&(
+                  <span className="text-xs font-black text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    {set.cards.filter(c=>!c.nextReview||c.nextReview<=Date.now()).length} due today
+                  </span>
+                )}
               </div>
-              <div className="flex gap-2 flex-wrap">
-                {set.cards?.slice(0,3).map((c,i)=>(
-                  <div key={i} className="glass rounded-xl px-3 py-2 text-[10px] font-medium opacity-60 max-w-[200px] truncate">{c.q}</div>
-                ))}
-                {set.cards?.length>3&&<div className="glass rounded-xl px-3 py-2 text-[10px] font-bold opacity-40">+{set.cards.length-3} more</div>}
+              <div className="flex gap-2 shrink-0">
+                <button onClick={()=>handleExport(set)} disabled={exporting===set.id} title="Export PDF"
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors">
+                  {exporting===set.id?<Loader2 size={14} className="animate-spin"/>:<Printer size={18}/>}
+                </button>
+                <button onClick={()=>{setSelSet(set);setIdx(0);setFlipped(false);}}
+                  className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2">
+                  <Layers size={16}/> Study
+                </button>
+                <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
               </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   EXAMS VIEW
-═══════════════════════════════════════════════════════════════════ */
-function ExamsView({exams,setExams,settings,addToast}){
-  const[selEx,setSelEx]=useState(null);const[qi,setQi]=useState(0);
-  const[selected,setSelected]=useState(null);const[submitted,setSubmitted]=useState(false);
-  const[score,setScore]=useState(null);const[answers,setAnswers]=useState([]);
-
-  const startExam=ex=>{setSelEx(ex);setQi(0);setSelected(null);setSubmitted(false);setScore(null);setAnswers([]);};
-  const submit=()=>{
-    if(selected===null)return;
-    const correct=selEx.questions[qi].correct===selected;
-    const newAnswers=[...answers,{qi,selected,correct}];
-    setAnswers(newAnswers);setSubmitted(true);
-    if(qi===selEx.questions.length-1)setScore(newAnswers.filter(a=>a.correct).length);
-  };
-  const next=()=>{
-    if(qi<selEx.questions.length-1){setQi(i=>i+1);setSelected(null);setSubmitted(false);}
-    else{addToast(`Exam done! Score: ${score}/${selEx.questions.length}`,'success');}
-  };
-
-  if(selEx&&score===null){
-    const q=selEx.questions[qi];
-    return(
-      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-        <div className="max-w-2xl mx-auto p-4 lg:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={()=>{setSelEx(null);setScore(null);}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={14}/>Exit</button>
-            <span className="text-xs font-black opacity-40">{qi+1}/{selEx.questions.length}</span>
-          </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mb-6">
-            <div className="bg-[var(--accent)] h-full rounded-full" style={{width:`${((qi+1)/selEx.questions.length)*100}%`}}/>
-          </div>
-          <div className="glass rounded-3xl p-6 mb-4">
-            <p className="text-sm font-bold leading-relaxed">{q.q}</p>
-          </div>
-          <div className="space-y-2.5 mb-6">
-            {(q.options||[]).map((opt,oi)=>(
-              <button key={oi} disabled={submitted} onClick={()=>setSelected(oi)}
-                className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all border
-                  ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
-                    submitted&&oi===selected&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
-                    selected===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30'}`}>
-                <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
-              </button>
-            ))}
-          </div>
-          {submitted&&q.explanation&&<div className="glass p-4 rounded-2xl mb-4 border-l-4 border-[var(--accent)]"><p className="text-xs leading-relaxed opacity-80">{q.explanation}</p></div>}
-          {!submitted?
-            <button onClick={submit} disabled={selected===null} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black disabled:opacity-40 shadow-lg">Submit Answer</button>:
-            <button onClick={next} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">{qi<selEx.questions.length-1?'Next Question →':'Finish Exam'}</button>
-          }
-        </div>
-      </div>
-    );
-  }
-
-  if(score!==null){
-    const pct=Math.round((score/selEx.questions.length)*100);
-    return(
-      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-        <div className="glass rounded-3xl p-10 text-center max-w-sm">
-          <div className={`text-6xl font-black mb-2 ${pct>=80?'text-emerald-500':pct>=60?'text-amber-500':'text-red-500'}`}>{pct}%</div>
-          <p className="text-sm font-black opacity-60 mb-2">{score} / {selEx.questions.length} correct</p>
-          <p className="text-xs opacity-40">{pct>=80?'Excellent! 🎉':pct>=60?'Good effort! Keep studying 📚':'Need more review 💪'}</p>
-        </div>
-        <button onClick={()=>{setSelEx(null);setScore(null);}} className="btn-accent px-8 py-3 rounded-2xl font-black shadow-xl">Back to Exams</button>
-      </div>
-    );
-  }
-
-  return(
-    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-      <div className="max-w-3xl mx-auto p-4 lg:p-6 space-y-4">
-        <h1 className="text-3xl font-black flex items-center gap-3"><CheckSquare size={28} className="opacity-40"/> Exams</h1>
-        {!exams.length?(
-          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
-            <CheckSquare size={48} className="mx-auto mb-4 opacity-20"/>
-            <p className="text-lg font-black opacity-40">No exams yet</p>
-          </div>
-        ):(exams.map(ex=>(
-          <div key={ex.id} className="glass rounded-2xl p-5 flex items-center justify-between">
-            <div>
-              <h3 className="font-black text-sm">{ex.title}</h3>
-              <p className="text-[10px] opacity-40 mt-0.5">{ex.questions?.length} questions · {new Date(ex.createdAt).toLocaleDateString()}</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={()=>startExam(ex)} className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Target size={14}/> Start</button>
-              <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500"><Trash2 size={14}/></button>
             </div>
           </div>
         )))}
@@ -1695,20 +2648,274 @@ function ExamsView({exams,setExams,settings,addToast}){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CASES VIEW
+   EXAMS VIEW
 ═══════════════════════════════════════════════════════════════════ */
-function CasesView({cases,setCases,settings,addToast}){
+function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases}){
+  const[selEx,setSelEx]=useState(null);const[qi,setQi]=useState(0);
+  const[selected,setSelected]=useState(null);const[submitted,setSubmitted]=useState(false);
+  const[score,setScore]=useState(null);const[answers,setAnswers]=useState([]);
+  const[showModal,setShowModal]=useState(false);
+  const[reviewMode,setReviewMode]=useState(false);
+  const[exporting,setExporting]=useState(false);
+  const[filterDocId,setFilterDocId]=useState('all');
+  const[sortMode,setSortMode]=useState('newest');
+
+  const startExam=ex=>{setSelEx(ex);setQi(0);setSelected(null);setSubmitted(false);setScore(null);setAnswers([]);setReviewMode(false);};
+  const submit=()=>{
+    if(selected===null)return;
+    const correct=selEx.questions[qi].correct===selected;
+    const newAnswers=[...answers,{qi,selected,correct}];
+    setAnswers(newAnswers);setSubmitted(true);
+    if(qi===selEx.questions.length-1){
+      const sc=newAnswers.filter(a=>a.correct).length;
+      setScore(sc);
+      trackStudy('exam',sc,selEx.questions.length);
+    }
+  };
+  const next=()=>{
+    if(qi<selEx.questions.length-1){setQi(i=>i+1);setSelected(null);setSubmitted(false);}
+  };
+
+  const handleExport=async(ex)=>{
+    setExporting(true);
+    await exportToPDF('exam',ex.questions,ex.title,addToast);
+    setExporting(false);
+  };
+
+  const filteredExams=useMemo(()=>{
+    let r=[...exams];
+    if(filterDocId!=='all')r=r.filter(e=>e.docId===filterDocId);
+    if(sortMode==='newest')r.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    if(sortMode==='oldest')r.sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+    if(sortMode==='most')r.sort((a,b)=>(b.questions?.length||0)-(a.questions?.length||0));
+    return r;
+  },[exams,filterDocId,sortMode]);
+
+  if(selEx&&score===null&&!reviewMode){
+    const q=selEx.questions[qi];
+    const progress=((qi+1)/selEx.questions.length)*100;
+    return(
+      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+        <div className="w-full p-6 lg:p-8">
+          <div className="flex items-center justify-between mb-4">
+            <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
+            <div className="text-center">
+              <p className="text-sm font-black">{selEx.title}</p>
+              <p className="text-xs opacity-40">{qi+1}/{selEx.questions.length}</p>
+            </div>
+            <button onClick={()=>{setReviewMode(true);}} className="glass px-3 py-2 rounded-xl text-xs font-black opacity-60 hover:opacity-100">Review All</button>
+          </div>
+          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2 mb-6 overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-500" style={{width:`${progress}%`}}/>
+          </div>
+          <div className="glass rounded-3xl p-6 mb-4 border border-[var(--border)]">
+            {q.sourcePage&&<span className="text-xs font-mono opacity-30 mb-2 block">Source: p.{q.sourcePage}</span>}
+            <p className="text-sm font-bold leading-relaxed">{q.q}</p>
+          </div>
+          <div className="space-y-2.5 mb-6">
+            {(q.options||[]).map((opt,oi)=>(
+              <button key={oi} disabled={submitted} onClick={()=>setSelected(oi)}
+                className={`w-full text-left px-4 py-4 rounded-2xl text-sm font-medium transition-all border
+                  ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
+                    submitted&&oi===selected&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
+                    selected===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30 hover:bg-[var(--accent)]/5'}`}>
+                <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
+                {submitted&&oi===q.correct&&<CheckCircle2 size={14} className="inline ml-2 text-emerald-500"/>}
+              </button>
+            ))}
+          </div>
+          {submitted&&q.explanation&&(
+            <div className="glass p-4 rounded-2xl mb-4 border-l-4 border-[var(--accent)] bg-[var(--accent)]/5">
+              <p className="text-xs font-bold opacity-60 mb-1 uppercase tracking-widest">Explanation</p>
+              <p className="text-xs leading-relaxed">{q.explanation}</p>
+              {q.evidence&&<p className="text-xs opacity-40 italic mt-2 pt-2 border-t border-[var(--border)]">"{q.evidence}"</p>}
+            </div>
+          )}
+          {!submitted?
+            <button onClick={submit} disabled={selected===null} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black disabled:opacity-40 shadow-lg">Submit Answer</button>:
+            qi<selEx.questions.length-1?
+              <button onClick={next} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">Next Question →</button>:
+              <button onClick={()=>setSubmitted(true)} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">See Results →</button>
+          }
+        </div>
+      </div>
+    );
+  }
+
+  // Review mode — all questions at once
+  if(reviewMode&&selEx){
+    return(
+      <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+        <div className="w-full p-6 lg:p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={()=>setReviewMode(false)} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Back</button>
+            <h2 className="font-black text-lg">{selEx.title} — Review</h2>
+            <button onClick={()=>handleExport(selEx)} disabled={exporting}
+              className="ml-auto btn-accent px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md">
+              {exporting?<Loader2 size={16} className="animate-spin"/>:<Printer size={16}/>}Print PDF
+            </button>
+          </div>
+          <div className="space-y-4">
+            {selEx.questions.map((q,i)=>(
+              <div key={i} className="glass rounded-2xl p-5 border border-[var(--border)]">
+                <p className="text-xs font-black text-[var(--accent)] mb-2">Q{i+1}</p>
+                <p className="text-sm font-bold mb-3">{q.q}</p>
+                <div className="space-y-1.5">
+                  {(q.options||[]).map((opt,oi)=>(
+                    <div key={oi} className={`px-3 py-2 rounded-xl text-xs font-medium ${oi===q.correct?'bg-emerald-500/15 text-emerald-600 font-bold border border-emerald-500/30':'opacity-50'}`}>
+                      <span className="font-black mr-2">{String.fromCharCode(65+oi)}.</span>{opt}
+                      {oi===q.correct&&<CheckCircle2 size={16} className="inline ml-2 text-emerald-500"/>}
+                    </div>
+                  ))}
+                </div>
+                {q.explanation&&<p className="text-xs opacity-50 mt-3 italic">{q.explanation}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if(score!==null&&selEx){
+    const pct=Math.round((score/selEx.questions.length)*100);
+    const grade=pct>=90?'A':pct>=80?'B':pct>=70?'C':pct>=60?'D':'F';
+    return(
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full border border-[var(--border)]">
+          <div className={`text-7xl font-black mb-1 ${pct>=80?'text-emerald-500':pct>=60?'text-amber-500':'text-red-500'}`}>{pct}%</div>
+          <div className={`text-3xl font-black mb-4 ${pct>=80?'text-emerald-500':pct>=60?'text-amber-500':'text-red-500'}`}>Grade {grade}</div>
+          <p className="text-sm font-black opacity-60 mb-1">{score} / {selEx.questions.length} correct</p>
+          <p className="text-xs opacity-40">{pct>=80?'Outstanding! 🎉':pct>=60?'Good effort! Keep studying 📚':'Need more review 💪'}</p>
+          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-3 mt-6 overflow-hidden">
+            <div className="h-full rounded-full transition-all duration-1000" style={{width:`${pct}%`,background:pct>=80?'#10b981':pct>=60?'#f59e0b':'#ef4444'}}/>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={()=>{setReviewMode(true);}} className="glass px-6 py-3 rounded-2xl font-black border border-[var(--border)]">Review Answers</button>
+          <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl">Back to Exams</button>
+        </div>
+      </div>
+    );
+  }
+
+  return(
+    <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
+      {showModal&&<QuickGenerateModal type="exam" docs={docs||[]} settings={settings}
+        onClose={()=>setShowModal(false)} addToast={addToast}
+        setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams} setCases={setCases||((fn)=>{})}/>}
+      <div className="w-full p-6 lg:p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl lg:text-3xl font-black flex items-center gap-3"><CheckSquare size={26} className="opacity-40"/> Exams</h1>
+          <button onClick={()=>setShowModal(true)} className="btn-accent px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg">
+            <FilePlus size={18}/> New from File
+          </button>
+        </div>
+
+        {exams.length>0&&(
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                ['Total Exams',exams.length,'#3b82f6'],
+                ['Questions',exams.reduce((s,e)=>s+(e.questions?.length||0),0),'#6366f1'],
+                ['Avg Score',ANALYTICS.scores.length?`${Math.round(ANALYTICS.scores.reduce((s,r)=>s+r.pct,0)/ANALYTICS.scores.length)}%`:'—','#10b981'],
+                ['Attempts',ANALYTICS.scores.length,'#f59e0b'],
+              ].map(([l,n,col])=>(
+                <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+                  <p className="text-xl font-black" style={{color:col}}>{n}</p>
+                  <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
+                </div>
+              ))}
+            </div>
+            {/* Filters */}
+            <div className="flex gap-2 flex-wrap">
+              <select value={filterDocId} onChange={e=>setFilterDocId(e.target.value)}
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                <option value="all">All Documents</option>
+                {[...new Set(exams.map(e=>e.docId))].map(id=>{const doc=docs?.find(d=>d.id===id);return doc?<option key={id} value={id}>{doc.name.slice(0,30)}</option>:null;})}
+              </select>
+              <select value={sortMode} onChange={e=>setSortMode(e.target.value)}
+                className="glass rounded-xl px-3 py-2 text-xs font-bold border border-[var(--border)] outline-none text-[var(--text)]">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="most">Most questions</option>
+              </select>
+            </div>
+          </>
+        )}
+
+        {!exams.length?(
+          <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
+            <CheckSquare size={48} className="mx-auto mb-4 opacity-20"/>
+            <p className="text-lg font-black opacity-40">No exams yet</p>
+            <p className="text-sm opacity-30 mt-1 mb-6">Generate exams from any document</p>
+            <button onClick={()=>setShowModal(true)} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl flex items-center gap-2 mx-auto">
+              <FilePlus size={16}/> Generate from File
+            </button>
+          </div>
+        ):(filteredExams.map(ex=>(
+          <div key={ex.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-black text-sm truncate">{ex.title}</h3>
+                <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {new Date(ex.createdAt).toLocaleDateString()}</p>
+                {ex.docId&&docs?.find(d=>d.id===ex.docId)&&(
+                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d=>d.id===ex.docId).name}</p>
+                )}
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={()=>handleExport(ex)} disabled={exporting} title="Export as PDF"
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors" >
+                  {exporting?<Loader2 size={14} className="animate-spin"/>:<Printer size={18}/>}
+                </button>
+                <button onClick={()=>{setSelEx(ex);setReviewMode(true);}} title="Review all questions"
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-[var(--accent)]/10 hover:text-[var(--accent)] transition-colors">
+                  <Eye size={18}/>
+                </button>
+                <button onClick={()=>startExam(ex)} className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Target size={18}/> Start</button>
+                <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+              </div>
+            </div>
+          </div>
+        )))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CASES VIEW — v6 with Quick Generate
+═══════════════════════════════════════════════════════════════════ */
+function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams}){
   const[selSet,setSelSet]=useState(null);const[ci,setCi]=useState(0);
   const[stage,setStage]=useState('vignette');const[selOpt,setSelOpt]=useState(null);const[submitted,setSubmitted]=useState(false);
+  const[showModal,setShowModal]=useState(false);
+  const[exporting,setExporting]=useState(null);
+
+  const handleExport=async(set)=>{
+    setExporting(set.id);
+    await exportToPDF('cases',set.questions,set.title,addToast);
+    setExporting(null);
+  };
 
   if(selSet){
     const cas=selSet.questions[ci];const q=cas.examQuestion||cas;
     return(
       <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-        <div className="max-w-2xl mx-auto p-4 lg:p-6 space-y-4">
+        <div className="w-full p-6 lg:p-8 space-y-4">
           <div className="flex items-center justify-between">
-            <button onClick={()=>{setSelSet(null);setCi(0);setStage('vignette');}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={14}/>Exit</button>
-            <span className="text-xs font-black opacity-40">Case {ci+1}/{selSet.questions.length}</span>
+            <button onClick={()=>{setSelSet(null);setCi(0);setStage('vignette');}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
+            <div className="text-center">
+              <p className="text-xs font-black opacity-40">Case {ci+1}/{selSet.questions.length}</p>
+              <div className="flex gap-1 mt-1">
+                {selSet.questions.map((_,i)=>(
+                  <div key={i} className={`h-1 rounded-full transition-all ${i===ci?'w-6 bg-[var(--accent)]':i<ci?'w-2 bg-emerald-500':'w-2 bg-black/10 dark:bg-white/10'}`}/>
+                ))}
+              </div>
+            </div>
+            <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-xs font-black opacity-60 hover:opacity-100 flex items-center gap-1">
+              <Printer size={16}/>PDF
+            </button>
           </div>
           {cas.title&&<h2 className="text-lg font-black">{cas.title}</h2>}
           <div className="glass p-5 rounded-2xl border-l-4 border-[var(--accent)]">
@@ -1718,26 +2925,31 @@ function CasesView({cases,setCases,settings,addToast}){
           {cas.labPanels?.length>0&&cas.labPanels.map((panel,i)=>(
             <div key={i}><p className="text-xs font-black opacity-60 mb-2">{panel.panelName}</p><LabTable rows={panel.rows}/></div>
           ))}
-          <div className="space-y-2">
-            {(q.options||[]).map((opt,oi)=>(
-              <button key={oi} disabled={submitted} onClick={()=>setSelOpt(oi)}
-                className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all border
-                  ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
-                    submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
-                    selOpt===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30'}`}>
-                <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
-              </button>
-            ))}
+          <div className="glass rounded-2xl p-4 border border-[var(--border)]">
+            <p className="text-xs font-black opacity-60 mb-3">{q.q}</p>
+            <div className="space-y-2">
+              {(q.options||[]).map((opt,oi)=>(
+                <button key={oi} disabled={submitted} onClick={()=>setSelOpt(oi)}
+                  className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all border
+                    ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
+                      submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
+                      selOpt===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30'}`}>
+                  <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
+                  {submitted&&oi===q.correct&&<CheckCircle2 size={16} className="inline ml-2 text-emerald-500"/>}
+                </button>
+              ))}
+            </div>
           </div>
           {submitted&&<div className="glass p-4 rounded-2xl border-l-4 border-emerald-500">
-            {cas.diagnosis&&<p className="text-xs font-black text-emerald-500 mb-1">Diagnosis: {cas.diagnosis}</p>}
-            {q.explanation&&<p className="text-xs leading-relaxed opacity-80">{q.explanation}</p>}
+            {cas.diagnosis&&<p className="text-xs font-black text-emerald-500 mb-2">✓ Diagnosis: {cas.diagnosis}</p>}
+            {q.explanation&&<p className="text-xs leading-relaxed">{q.explanation}</p>}
+            {q.evidence&&<p className="text-xs opacity-40 italic mt-2">"{q.evidence}"</p>}
           </div>}
           {!submitted?
-            <button onClick={()=>setSubmitted(true)} disabled={selOpt===null} className="w-full py-3.5 btn-accent rounded-2xl font-black disabled:opacity-40 shadow-lg">Submit</button>:
+            <button onClick={()=>setSubmitted(true)} disabled={selOpt===null} className="w-full py-3.5 btn-accent rounded-2xl font-black disabled:opacity-40 shadow-lg">Submit Answer</button>:
             ci<selSet.questions.length-1?
               <button onClick={()=>{setCi(i=>i+1);setSelOpt(null);setSubmitted(false);}} className="w-full py-3.5 btn-accent rounded-2xl font-black shadow-lg">Next Case →</button>:
-              <button onClick={()=>{setSelSet(null);setCi(0);addToast('All cases done! 🏆','success');}} className="w-full py-3.5 bg-emerald-500 text-white rounded-2xl font-black shadow-lg">Finish Session</button>
+              <button onClick={()=>{setSelSet(null);setCi(0);addToast('All cases complete! 🏆','success');}} className="w-full py-3.5 bg-emerald-500 text-white rounded-2xl font-black shadow-lg">Finish Session 🎉</button>
           }
         </div>
       </div>
@@ -1746,23 +2958,58 @@ function CasesView({cases,setCases,settings,addToast}){
 
   return(
     <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-      <div className="max-w-3xl mx-auto p-4 lg:p-6 space-y-4">
-        <h1 className="text-3xl font-black flex items-center gap-3"><Activity size={28} className="opacity-40"/> Clinical Cases</h1>
+      {showModal&&<QuickGenerateModal type="cases" docs={docs||[]} settings={settings}
+        onClose={()=>setShowModal(false)} addToast={addToast}
+        setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams||((fn)=>{})} setCases={setCases}/>}
+      <div className="w-full p-6 lg:p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl lg:text-3xl font-black flex items-center gap-3"><Activity size={26} className="opacity-40"/> Clinical Cases</h1>
+          <button onClick={()=>setShowModal(true)} className="btn-accent px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg">
+            <FilePlus size={18}/> New from File
+          </button>
+        </div>
+        {cases.length>0&&(
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              ['Case Sets',cases.length,'#8b5cf6'],
+              ['Total Cases',cases.reduce((s,c)=>s+(c.questions?.length||0),0),'#06b6d4'],
+              ['Docs Used',[...new Set(cases.map(c=>c.docId))].filter(Boolean).length,'#10b981'],
+            ].map(([l,n,col])=>(
+              <div key={l} className="glass rounded-2xl p-3 text-center border border-[var(--border)]">
+                <p className="text-xl font-black" style={{color:col}}>{n}</p>
+                <p className="text-xs font-black uppercase tracking-widest opacity-50 mt-0.5">{l}</p>
+              </div>
+            ))}
+          </div>
+        )}
         {!cases.length?(
           <div className="glass border-dashed border-2 border-[var(--border)] rounded-3xl p-12 text-center">
             <Activity size={48} className="mx-auto mb-4 opacity-20"/>
             <p className="text-lg font-black opacity-40">No cases yet</p>
+            <p className="text-sm opacity-30 mt-1 mb-6">Generate clinical cases from any medical document</p>
+            <button onClick={()=>setShowModal(true)} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl flex items-center gap-2 mx-auto">
+              <FilePlus size={16}/> Generate from File
+            </button>
           </div>
         ):(cases.map(set=>(
-          <div key={set.id} className="glass rounded-2xl p-5 flex items-center justify-between">
-            <div>
-              <h3 className="font-black text-sm">{set.title}</h3>
-              <p className="text-[10px] opacity-40 mt-0.5">{set.questions?.length} cases</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={()=>{setSelSet(set);setCi(0);setSelOpt(null);setSubmitted(false);}}
-                className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Stethoscope size={14}/>Practice</button>
-              <button onClick={()=>setCases(p=>p.filter(c=>c.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500"><Trash2 size={14}/></button>
+          <div key={set.id} className="glass rounded-2xl p-5 border border-[var(--border)] hover:border-[var(--accent)]/20 transition-all card-hover">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-black text-sm truncate">{set.title}</h3>
+                <p className="text-xs opacity-40 mt-0.5">{set.questions?.length} cases · {new Date(set.createdAt||0).toLocaleDateString()}</p>
+                {set.docId&&docs?.find(d=>d.id===set.docId)&&(
+                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d=>d.id===set.docId).name}</p>
+                )}
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={()=>handleExport(set)} disabled={exporting===set.id} title="Export PDF"
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors">
+                  {exporting===set.id?<Loader2 size={14} className="animate-spin"/>:<Printer size={18}/>}
+                </button>
+                <button onClick={()=>{setSelSet(set);setCi(0);setSelOpt(null);setSubmitted(false);}}
+                  className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Stethoscope size={18}/>Practice</button>
+                <button onClick={()=>setCases(p=>p.filter(c=>c.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+              </div>
             </div>
           </div>
         )))}
@@ -1780,85 +3027,263 @@ function ChatView({settings,sessions,setSessions}){
   const[input,setInput]=useState('');
   const[loading,setLoading]=useState(false);
   const[listening,setListening]=useState(false);
-  const endRef=useRef(null);const recogRef=useRef(null);
+  const[sidebarOpen,setSidebarOpen]=useState(true);
+  const[sessSearch,setSessSearch]=useState('');
+  const[pinnedIds,setPinnedIds]=useState([]);
+  const[contextMenu,setContextMenu]=useState(null);
+  const endRef=useRef(null);const recogRef=useRef(null);const inputRef=useRef(null);
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,loading]);
+
+  const STARTERS=[
+    'Explain this topic simply','Create a study plan','What are the key concepts?',
+    'Give me 5 quiz questions','Compare and contrast','Summarize the main points',
+  ];
 
   const toggleVoice=()=>{
     if(listening){recogRef.current?.stop();setListening(false);return;}
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR)return;
+    if(!SR){alert('Voice not supported in this browser.');return;}
     const r=new SR();r.continuous=false;r.interimResults=true;
     r.onresult=e=>{setInput(Array.from(e.results).map(r=>r[0].transcript).join(''));};
     r.onend=()=>setListening(false);r.onerror=()=>setListening(false);
     r.start();recogRef.current=r;setListening(true);
   };
 
-  const newSession=()=>{setSelSess(null);setMsgs([{role:'assistant',content:'Hello! I\'m your AI assistant. Ask me anything, upload files, or get help with your studies.'}]);};
-  const saveSession=useCallback((ms)=>{
-    if(!ms.length)return;
-    const sess={id:selSess||Date.now().toString(),title:ms.find(m=>m.role==='user')?.content?.slice(0,40)||'New Chat',messages:ms,updatedAt:new Date().toISOString()};
-    setSessions(p=>{const ex=p.findIndex(s=>s.id===sess.id);return ex>=0?[...p.slice(0,ex),sess,...p.slice(ex+1)]:[sess,...p];});
-    setSelSess(sess.id);
+  const newSession=()=>{
+    setSelSess(null);
+    setMsgs([{role:'assistant',content:"Hi! I'm MARIAM — your AI study assistant. I can help you understand topics, create study plans, answer questions, or just think through ideas with you. What are you working on today?"}]);
+    inputRef.current?.focus();
+  };
+
+  const saveSession=useCallback((ms,id)=>{
+    if(!ms.filter(m=>m.role==='user').length)return;
+    const sessId=id||selSess||Date.now().toString();
+    const title=ms.find(m=>m.role==='user')?.content?.slice(0,45)||'New Chat';
+    const sess={id:sessId,title,messages:ms,updatedAt:new Date().toISOString(),msgCount:ms.filter(m=>m.role==='user').length};
+    setSessions(p=>{const ex=p.findIndex(s=>s.id===sessId);return ex>=0?[...p.slice(0,ex),sess,...p.slice(ex+1)]:[sess,...p];});
+    setSelSess(sessId);
   },[selSess,setSessions]);
 
-  const send=async()=>{
-    if(!input.trim()||loading)return;
-    const msg=input;setInput('');
-    const newMsgs=[...msgs,{role:'user',content:msg},{role:'assistant',content:''}];
+  const loadSession=sess=>{setSelSess(sess.id);setMsgs(sess.messages||[]);};
+
+  const deleteSession=id=>{
+    setSessions(p=>p.filter(s=>s.id!==id));
+    setPinnedIds(p=>p.filter(x=>x!==id));
+    if(selSess===id){setSelSess(null);setMsgs([]);}
+    setContextMenu(null);
+  };
+
+  const copySession=id=>{
+    const sess=sessions.find(s=>s.id===id);
+    if(!sess)return;
+    const text=sess.messages.map(m=>`${m.role==='user'?'You':'MARIAM'}: ${m.content}`).join('\n\n');
+    navigator.clipboard?.writeText(text);
+    setContextMenu(null);
+  };
+
+  const send=async(overrideMsg)=>{
+    const msg=overrideMsg||input;
+    if(!msg.trim()||loading)return;
+    setInput('');
+    const sessId=selSess||Date.now().toString();
+    if(!selSess)setSelSess(sessId);
+    const newMsgs=[...msgs,{role:'user',content:msg},{role:'assistant',content:'',timestamp:Date.now()}];
     setMsgs(newMsgs);setLoading(true);
     try{
-      const hist=newMsgs.slice(-8,-1).map(m=>`${m.role==='user'?'USER':'AI'}: ${m.content}`).join('\n');
-      const prompt=`You are a brilliant AI assistant. Conversation:\n${hist}\n\nUser: ${msg}\n\nAssistant:`;
-      await callAIStreaming(prompt,chunk=>{setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:chunk}]);},settings,4000);
-      const final=[...newMsgs.slice(0,-1)];
-      setTimeout(()=>saveSession(final),500);
+      const hist=newMsgs.slice(-10,-1).map(m=>`${m.role==='user'?'USER':'MARIAM'}: ${m.content}`).join('\n');
+      const sysPrompt=`You are MARIAM, a brilliant, warm, and knowledgeable AI study assistant. You help students understand complex topics, create study materials, and achieve their academic goals. Be concise but thorough. Use formatting (bold, lists, headers) when it helps clarity.`;
+      const prompt=`${sysPrompt}\n\nConversation:\n${hist}\n\nUSER: ${msg}\n\nMARIAM:`;
+      await callAIStreaming(prompt,chunk=>{setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:chunk}]);},settings,5000);
+      const finalMsgs=[...newMsgs.slice(0,-1),{...newMsgs[newMsgs.length-1]}];
+      setTimeout(()=>saveSession(finalMsgs,sessId),300);
     }catch(e){setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:`⚠️ ${e.message}`}]);}
     finally{setLoading(false);}
   };
 
+  const filteredSessions=useMemo(()=>{
+    const q=sessSearch.toLowerCase();
+    return sessions.filter(s=>!q||s.title.toLowerCase().includes(q)||s.messages?.some(m=>m.content?.toLowerCase().includes(q)));
+  },[sessions,sessSearch]);
+
+  const pinned=filteredSessions.filter(s=>pinnedIds.includes(s.id));
+  const unpinned=filteredSessions.filter(s=>!pinnedIds.includes(s.id)).sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));
+
+  const SessionItem=({s})=>(
+    <button className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all group relative ${selSess===s.id?'bg-[var(--accent)]/10 border border-[var(--accent)]/30':'hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'}`}
+      onClick={()=>loadSession(s)}>
+      <MessageSquare size={16} className={`shrink-0 mt-0.5 ${selSess===s.id?'text-[var(--accent)]':'opacity-40'}`}/>
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-bold truncate">{s.title}</p>
+        <p className="text-xs opacity-40 mt-0.5">{s.msgCount||0} msgs · {new Date(s.updatedAt).toLocaleDateString()}</p>
+      </div>
+      <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0"
+        onClick={e=>{e.stopPropagation();setContextMenu({id:s.id,x:e.clientX,y:e.clientY});}}>
+        <MoreVertical size={16}/>
+      </button>
+    </button>
+  );
+
   return(
-    <div className="flex flex-col h-full min-h-0">
-      {msgs.length===0&&!selSess&&(
-        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-          <img src={MARIAM_IMG} className="w-20 h-20 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
-          <h2 className="text-2xl font-black text-center">Hi, I'm MARIAM</h2>
-          <p className="text-sm opacity-50 text-center max-w-xs">Your universal AI assistant. I can discuss anything from your documents or just help you think.</p>
-          <button onClick={newSession} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl flex items-center gap-2"><MessageSquare size={16}/>Start Chat</button>
+    <div className="flex h-full min-h-0 overflow-hidden" onClick={()=>contextMenu&&setContextMenu(null)}>
+      {/* Context menu */}
+      {contextMenu&&(
+        <div className="fixed z-[9999] glass rounded-xl shadow-2xl border border-[var(--border)] py-1 min-w-[160px]"
+          style={{left:Math.min(contextMenu.x,window.innerWidth-180),top:Math.min(contextMenu.y,window.innerHeight-120)}}>
+          <button onClick={()=>{setPinnedIds(p=>p.includes(contextMenu.id)?p.filter(x=>x!==contextMenu.id):[...p,contextMenu.id]);setContextMenu(null);}}
+            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold hover:bg-[var(--accent)]/10 transition-colors">
+            <Pin size={16}/>{pinnedIds.includes(contextMenu.id)?'Unpin':'Pin Session'}
+          </button>
+          <button onClick={()=>copySession(contextMenu.id)}
+            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold hover:bg-[var(--accent)]/10 transition-colors">
+            <Copy size={16}/>Copy Transcript
+          </button>
+          <div className="my-1 border-t border-[var(--border)]"/>
+          <button onClick={()=>deleteSession(contextMenu.id)}
+            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 transition-colors">
+            <Trash2 size={16}/>Delete
+          </button>
         </div>
       )}
-      {(msgs.length>0||selSess)&&(
-        <>
+
+      {/* SIDEBAR */}
+      <div className={`flex flex-col border-r border-[var(--border)] bg-[var(--card)] transition-all duration-300 shrink-0 ${sidebarOpen?'w-64':'w-0 overflow-hidden'}`}>
+        <div className="flex items-center justify-between px-3 py-3 border-b border-[var(--border)] shrink-0">
+          <span className="text-xs font-black uppercase tracking-widest opacity-60">Chat History</span>
+          <button onClick={newSession} className="w-7 h-7 btn-accent rounded-lg flex items-center justify-center shadow-md" title="New chat">
+            <Plus size={16}/>
+          </button>
+        </div>
+        <div className="px-2 py-2 shrink-0">
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-2.5 opacity-30"/>
+            <input value={sessSearch} onChange={e=>setSessSearch(e.target.value)}
+              placeholder="Search chats…"
+              className="w-full bg-black/5 dark:bg-white/5 rounded-xl pl-7 pr-3 py-2 text-xs outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-2 pb-4 space-y-0.5">
+          {pinned.length>0&&(
+            <>
+              <p className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1.5 flex items-center gap-1"><Pin size={9}/>Pinned</p>
+              {pinned.map(s=><SessionItem key={s.id} s={s}/>)}
+              <div className="my-2 border-t border-[var(--border)]"/>
+            </>
+          )}
+          {unpinned.length>0&&(
+            <>
+              {pinned.length>0&&<p className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1.5">Recent</p>}
+              {unpinned.map(s=><SessionItem key={s.id} s={s}/>)}
+            </>
+          )}
+          {!sessions.length&&(
+            <div className="text-center py-10 opacity-30">
+              <MessageSquare size={28} className="mx-auto mb-2"/>
+              <p className="text-xs font-bold">No chats yet</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* MAIN CHAT AREA */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0">
+        {/* Chat toolbar */}
+        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[var(--border)] bg-[var(--card)] shrink-0">
+          <button onClick={()=>setSidebarOpen(o=>!o)} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0">
+            <History size={18}/>
+          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-black truncate">{selSess?sessions.find(s=>s.id===selSess)?.title||'Untitled Chat':'New Chat'}</p>
+          </div>
+          {msgs.length>0&&(
+            <button onClick={()=>{
+              const text=msgs.map(m=>`${m.role==='user'?'You':'MARIAM'}: ${m.content}`).join('\n\n');
+              navigator.clipboard?.writeText(text);
+            }} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100" title="Copy transcript">
+              <Copy size={18}/>
+            </button>
+          )}
+          <button onClick={newSession} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0" title="New chat">
+            <Plus size={18}/>
+          </button>
+        </div>
+
+        {/* Welcome / starters */}
+        {msgs.length===0&&(
+          <div className="flex-1 flex flex-col items-center justify-center p-6 gap-5">
+            <div className="relative">
+              <img src={MARIAM_IMG} className="w-20 h-20 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"/>
+              </div>
+            </div>
+            <div className="text-center">
+              <h2 className="text-2xl font-black">Hi! I'm MARIAM</h2>
+              <p className="text-sm opacity-50 mt-1 max-w-sm">Your AI study assistant — ready to help with anything</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-lg">
+              {STARTERS.map(s=>(
+                <button key={s} onClick={()=>send(s)}
+                  className="glass rounded-2xl p-3 text-xs font-bold text-left hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-all leading-relaxed border border-[var(--border)]">
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Messages */}
+        {msgs.length>0&&(
           <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 min-h-0" style={{paddingBottom:`calc(80px + ${NAV_H}px + env(safe-area-inset-bottom))`}}>
             {msgs.map((m,i)=>(
-              <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''}`}>
+              <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''} group`}>
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[var(--border)]'}`}>
                   {m.role==='user'?<UserCircle2 size={18} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
                 </div>
-                <div className={`px-4 py-3 text-sm leading-relaxed max-w-[80%] whitespace-pre-wrap rounded-3xl
-                  ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass rounded-tl-sm'}`}>
-                  {m.content||<span className="opacity-30">▊</span>}
+                <div className="flex flex-col gap-1 max-w-[80%]">
+                  <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-3xl
+                    ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass rounded-tl-sm border border-[var(--border)]'}`}>
+                    {m.content||<span className="opacity-30">▊</span>}
+                  </div>
+                  <button onClick={()=>navigator.clipboard?.writeText(m.content)}
+                    className="opacity-0 group-hover:opacity-40 hover:!opacity-80 text-xs font-bold flex items-center gap-1 transition-opacity self-start px-2">
+                    <Copy size={10}/>copy
+                  </button>
                 </div>
               </div>
             ))}
+            {loading&&(
+              <div className="flex gap-3">
+                <div className="w-9 h-9 rounded-xl overflow-hidden border border-[var(--border)] shrink-0"><img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/></div>
+                <div className="glass rounded-3xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
+                  {[0,1,2].map(i=><div key={i} className="w-2 h-2 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
+                </div>
+              </div>
+            )}
             <div ref={endRef}/>
           </div>
-          <div className="shrink-0 p-4 border-t border-[var(--border)] bg-[var(--card)]"
-            style={{paddingBottom:`calc(16px + ${NAV_H}px + env(safe-area-inset-bottom))`}}>
-            <div className="max-w-3xl mx-auto flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)]">
-              <textarea value={input} onChange={e=>setInput(e.target.value)}
-                onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
-                placeholder="Ask anything…" disabled={loading}
-                className="flex-1 bg-transparent p-2 text-sm outline-none resize-none max-h-28 custom-scrollbar text-[var(--text)] min-h-[40px]"/>
-              <button onClick={toggleVoice}
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white':'opacity-50 hover:opacity-100'}`}>
-                {listening?<MicOff size={16}/>:<Mic size={16}/>}
-              </button>
-              <button onClick={send} disabled={loading||!input.trim()}
-                className="w-10 h-10 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg"><Send size={16}/></button>
-            </div>
+        )}
+
+        {/* Input area */}
+        <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]"
+          style={{paddingBottom:`calc(12px + ${NAV_H}px + env(safe-area-inset-bottom))`}}>
+          <div className="w-full flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)] focus-within:border-[var(--accent)]/50 transition-colors">
+            <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+              placeholder="Ask me anything… (Enter to send, Shift+Enter for newline)" disabled={loading}
+              className="flex-1 bg-transparent p-2 text-sm outline-none resize-none max-h-40 custom-scrollbar text-[var(--text)] min-h-[40px]"/>
+            <button onClick={toggleVoice}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white animate-pulse':'opacity-50 hover:opacity-100'}`}
+              title="Voice input">
+              {listening?<MicOff size={18}/>:<Mic size={18}/>}
+            </button>
+            <button onClick={()=>send()} disabled={loading||!input.trim()}
+              className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg transition-transform active:scale-95">
+              <Send size={18}/>
+            </button>
           </div>
-        </>
-      )}
+          <p className="text-xs text-center opacity-20 font-bold mt-1.5">Enter to send · Shift+Enter for newline · / commands coming soon</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1875,7 +3300,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
 
   return(
     <div className="flex-1 overflow-y-auto custom-scrollbar scroll-content">
-      <div className="max-w-2xl mx-auto p-4 lg:p-8 space-y-4">
+      <div className="w-full p-6 lg:p-8 space-y-6">
         <h1 className="text-3xl font-black flex items-center gap-3 mb-6"><Settings size={28} className="opacity-40"/> Settings</h1>
 
         {/* Install PWA */}
@@ -1884,7 +3309,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
             <h2 className="font-black text-sm mb-2 flex items-center gap-2 text-[var(--accent)]"><Smartphone size={16}/> Install as App</h2>
             <p className="text-xs opacity-60 mb-4">Install MARIAM PRO on your device for offline access, faster loading, and a native app experience.</p>
             <div className="flex gap-3">
-              <button onClick={onInstall} className="btn-accent px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg"><Download size={14}/> Install Now</button>
+              <button onClick={onInstall} className="btn-accent px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg"><Download size={18}/> Install Now</button>
             </div>
           </section>
         )}
@@ -1895,19 +3320,19 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
             {Object.entries(PROVIDERS).map(([id,{label}])=>(
               <button key={id} onClick={()=>changeProvider(id)}
-                className={`py-2.5 px-2 rounded-xl text-[10px] font-black leading-tight transition-all border
+                className={`py-2.5 px-2 rounded-xl text-xs font-black leading-tight transition-all border
                   ${settings.provider===id?'bg-[var(--accent)] text-white border-transparent shadow-md scale-105':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
-                {label.split(' ')[0]}<br/><span className="opacity-70 font-normal normal-case text-[9px]">{label.split(' ').slice(1).join(' ')}</span>
+                {label.split(' ')[0]}<br/><span className="opacity-70 font-normal normal-case text-xs">{label.split(' ').slice(1).join(' ')}</span>
               </button>
             ))}
           </div>
           <div className={`flex items-start gap-2 p-3 rounded-xl mb-4 text-xs font-medium ${pr.needsKey?'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300':'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'}`}>
-            {pr.needsKey?<AlertCircle size={14} className="shrink-0 mt-0.5"/>:<CheckCircle2 size={14} className="shrink-0 mt-0.5"/>}
+            {pr.needsKey?<AlertCircle size={18} className="shrink-0 mt-0.5"/>:<CheckCircle2 size={14} className="shrink-0 mt-0.5"/>}
             {pr.note}
           </div>
           {pr.needsKey&&(
             <div className="mb-3">
-              <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5 flex items-center gap-1"><KeyRound size={10}/>API Key</label>
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5 flex items-center gap-1"><KeyRound size={10}/>API Key</label>
               <input type="password" placeholder="Paste your API key…" value={settings.apiKey||''}
                 onChange={e=>setSettings(s=>({...s,apiKey:e.target.value}))}
                 className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
@@ -1915,14 +3340,14 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
           )}
           {(settings.provider==='custom'||settings.provider==='ollama')&&(
             <div className="mb-3">
-              <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5">Base URL</label>
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5">Base URL</label>
               <input type="text" placeholder="https://your-api.com" value={settings.baseUrl||''}
                 onChange={e=>setSettings(s=>({...s,baseUrl:e.target.value}))}
                 className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
             </div>
           )}
           <div>
-            <label className="text-[9px] font-black uppercase tracking-widest opacity-40 block mb-1.5">Model (optional)</label>
+            <label className="text-xs font-black uppercase tracking-widest opacity-40 block mb-1.5">Model (optional)</label>
             <input type="text" placeholder={pr.defaultModel||'e.g. gpt-4o'} value={settings.model||''}
               onChange={e=>setSettings(s=>({...s,model:e.target.value}))}
               className="w-full glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[var(--border)] text-[var(--text)]"/>
@@ -1935,14 +3360,14 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
           <div className="grid grid-cols-4 gap-2 mb-5">
             {themes.map(t=>(
               <button key={t.id} onClick={()=>setSettings({...settings,theme:t.id})}
-                className={`py-4 flex flex-col items-center gap-2 rounded-xl text-[10px] font-black uppercase border transition-all
+                className={`py-4 flex flex-col items-center gap-2 rounded-xl text-xs font-black uppercase border transition-all
                   ${settings.theme===t.id?'bg-[var(--accent)] text-white border-transparent shadow-lg':'glass opacity-60 hover:opacity-100 border-[var(--border)]'}`}>
                 <t.icon size={18}/>{t.label}
               </button>
             ))}
           </div>
           <div className="flex gap-3 items-center mb-5">
-            <span className="text-[9px] font-black opacity-40 uppercase tracking-widest shrink-0">Accent</span>
+            <span className="text-xs font-black opacity-40 uppercase tracking-widest shrink-0">Accent</span>
             <div className="flex gap-2">
               {accents.map(a=>(
                 <button key={a.id} onClick={()=>setSettings({...settings,accentColor:a.id})}
@@ -1952,7 +3377,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
             </div>
           </div>
           <div>
-            <span className="text-[9px] font-black opacity-40 uppercase tracking-widest block mb-2">Font Size</span>
+            <span className="text-xs font-black opacity-40 uppercase tracking-widest block mb-2">Font Size</span>
             <div className="flex gap-2 glass rounded-xl p-1.5">
               {sizes.map(s=>(
                 <button key={s.id} onClick={()=>setSettings({...settings,fontSize:s.id})}
@@ -1969,7 +3394,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
           <label className="flex items-center justify-between cursor-pointer">
             <div>
               <span className="text-xs font-bold">Strict Mode</span>
-              <p className="text-[10px] opacity-50 mt-0.5">Use ONLY document text, no outside knowledge</p>
+              <p className="text-xs opacity-50 mt-0.5">Use ONLY document text, no outside knowledge</p>
             </div>
             <div onClick={()=>setSettings(s=>({...s,strictMode:!s.strictMode}))}
               className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${settings.strictMode?'bg-[var(--accent)]':'bg-gray-300 dark:bg-zinc-600'}`}>
@@ -1982,8 +3407,8 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
         <section className="glass rounded-2xl p-5 text-center">
           <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 shadow-lg" alt="MARIAM"/>
           <h3 className="font-black text-sm">MARIAM PRO {APP_VER}</h3>
-          <p className="text-[10px] opacity-40 mt-1">Universal AI Document Intelligence</p>
-          <div className="flex justify-center gap-3 mt-3 text-[9px] font-black uppercase tracking-widest opacity-30">
+          <p className="text-xs opacity-40 mt-1">Universal AI Document Intelligence</p>
+          <div className="flex justify-center gap-3 mt-3 text-xs font-black uppercase tracking-widest opacity-30">
             <span>PDF · Word · Excel · Images · Code</span>
           </div>
         </section>
@@ -1997,6 +3422,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
 ═══════════════════════════════════════════════════════════════════ */
 export default function App(){
   const[loaded,setLoaded]=useState(false);
+  const[bootError,setBootError]=useState(null); // Fix 9: surface DB failures to user
   const[docs,setDocs]=useState([]);
   const[openDocs,setOpenDocs]=useState([]);
   const[activeId,setActiveId]=useState(null);
@@ -2011,13 +3437,26 @@ export default function App(){
   const[settings,setSettings]=useState(DEFAULT_SETTINGS);
   const[uploading,setUploading]=useState(false);
   const[uploadPct,setUploadPct]=useState(0);
-  const[view,setView]=useState('library');
+  const[view,setView]=useState('dashboard');
   const[rpTab,setRpTab]=useState('generate');
   const[rpOpen,setRpOpen]=useState(false);
   const[rpW,setRpW]=useState(420);
   const[bgTask,setBgTask]=useState(null);
   const[installPrompt,setInstallPrompt]=useState(null);
+  const[showGlobalSearch,setShowGlobalSearch]=useState(false);
   const{toasts,addToast}=useToast();
+
+  useKeyboardShortcuts([
+    ['ctrl+k',()=>setShowGlobalSearch(true)],
+    ['ctrl+/',()=>setShowGlobalSearch(true)],
+    ['Escape',()=>setShowGlobalSearch(false)],
+    ['ctrl+1',()=>setView('dashboard')],
+    ['ctrl+2',()=>setView('library')],
+    ['ctrl+3',()=>setView('flashcards')],
+    ['ctrl+4',()=>setView('exams')],
+    ['ctrl+5',()=>setView('cases')],
+    ['ctrl+6',()=>setView('chat')],
+  ]);
 
   // PWA setup
   useEffect(()=>{
@@ -2035,7 +3474,7 @@ export default function App(){
     m.content='width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
   },[]);
 
-  // Load state
+  // Load persisted state — show a clear error if IndexedDB is unavailable
   useEffect(()=>{(async()=>{
     try{
       const[d,fc,ex,ca,no,ch,st,od,dp,mm,tl]=await Promise.all([
@@ -2046,10 +3485,15 @@ export default function App(){
       if(no)setNotes(no);if(ch)setChatSessions(ch);if(od)setOpenDocs(od);if(dp)setDocPages(dp);
       if(mm)setMindMaps(mm);if(tl)setTimelines(tl);
       if(st)setSettings(p=>({...DEFAULT_SETTINGS,...p,...st}));
-    }catch(e){console.warn(e);}finally{setLoaded(true);}
+    }catch(err){
+      logError('boot',err);
+      // Non-fatal: app still works, just without persisted data
+      console.warn('Could not restore saved data. Starting fresh.',err.message);
+      setBootError(err.message);
+    }finally{setLoaded(true);}
   })();},[]);
 
-  // Persist
+  // Persist state to IndexedDB — debounced 800ms, silent failures (non-critical)
   useEffect(()=>{
     if(!loaded)return;
     const t=setTimeout(async()=>{
@@ -2060,7 +3504,10 @@ export default function App(){
           saveState('chats',chatSessions),saveState('settings',settings),
           saveState('openDocs',openDocs),saveState('docPages',docPages),
           saveState('mindMaps',mindMaps),saveState('timelines',timelines)]);
-      }catch(e){console.warn(e);}
+      }catch(err){
+        logError('persist',err);
+        // Don't interrupt the user — data is safe in memory for this session
+      }
     },800);
     return()=>clearTimeout(t);
   },[docs,flashcards,exams,cases,notes,chatSessions,settings,openDocs,docPages,mindMaps,timelines,loaded]);
@@ -2073,7 +3520,7 @@ export default function App(){
     if(th==='system')th=window.matchMedia?.('(prefers-color-scheme:dark)').matches?'dark':'pure-white';
     root.classList.add(th);
     root.style.setProperty('color-scheme',(th==='dark'||th==='oled')?'dark':'light');
-    root.style.fontSize={small:'14px',medium:'16px',large:'18px',xl:'20px'}[settings.fontSize]||'16px';
+    root.style.fontSize={small:'15px',medium:'18px',large:'20px',xl:'22px'}[settings.fontSize]||'18px';
     const clrs={
       indigo:{hex:'#6366f1',rgb:'99,102,241',soft:'#4f46e5'},
       purple:{hex:'#a855f7',rgb:'168,85,247',soft:'#9333ea'},
@@ -2215,7 +3662,7 @@ export default function App(){
       }):[()=>callAI(makePrompt(count),isJson,settings.strictMode,settings,8000)];
 
       let all=[];
-      const exRes=await runParallel(tasks,10,(done,total)=>{
+      const exRes=await runParallel(tasks,50,(done,total)=>{
         setBgTask(p=>({...p,done,msg:`${done}/${total} batches complete…`}));
       });
 
@@ -2259,13 +3706,15 @@ export default function App(){
       </div>
       <div className="text-center">
         <p className="text-lg font-black text-indigo-500">MARIAM PRO</p>
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-1">{APP_VER} · Loading…</p>
+        <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30 mt-1">{APP_VER} · Loading</p>
       </div>
     </div>
   );
 
   const showReader=view==='reader'&&!!activeId&&!!activeDoc;
+
   const NAV_ITEMS=[
+    {icon:LayoutDashboard,label:'Home',v:'dashboard'},
     {icon:BookOpen,label:'Library',v:'library'},
     {icon:BookMarked,label:'Reader',v:'reader',dis:!activeId},
     {icon:Layers,label:'Cards',v:'flashcards'},
@@ -2291,7 +3740,10 @@ export default function App(){
         .card-hover{transition:.25s ease;}
         .card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(var(--accent-rgb),.12);}
         @keyframes slide-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+        @keyframes slide-up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+        @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 30%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 0%,transparent)}}
         .animate-slide-in{animation:slide-in .2s ease-out forwards;}
+        .animate-slide-up{animation:slide-up .3s ease-out forwards;}
         .bottom-nav-safe{padding-bottom:max(8px,env(safe-area-inset-bottom));}
         .scroll-content{padding-bottom:calc(${NAV_H}px + env(safe-area-inset-bottom) + 24px);}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
@@ -2299,31 +3751,54 @@ export default function App(){
         textarea{min-height:40px;}
       `}</style>
       <ToastContainer toasts={toasts}/>
+      {showGlobalSearch&&<GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
+        onNavigate={(v,id)=>{setView(v);if(id){setActiveId(id);setOpenDocs(p=>p.includes(id)?p:[...p,id]);setDocPages(p=>({...p,[id]:1}));};}}
+        onClose={()=>setShowGlobalSearch(false)}/>}
+      <GlobalTaskIndicator onViewResult={(id,task)=>{
+        // Auto-navigate to the right page when clicking a done task
+        if(task.type==='flashcards')setView('flashcards');
+        else if(task.type==='exam')setView('exams');
+        else if(task.type==='cases')setView('cases');
+      }}/>
+
+      {/* Boot error banner — shown when IndexedDB failed to restore saved data */}
+      {bootError&&(
+        <div className="shrink-0 bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300">
+          <AlertCircle size={16} className="shrink-0"/>
+          <span>Could not restore your previous session — starting fresh. ({bootError})</span>
+          <button onClick={()=>setBootError(null)} className="ml-auto opacity-60 hover:opacity-100"><X size={16}/></button>
+        </div>
+      )}
 
       {/* HEADER */}
-      <header className="h-14 lg:h-16 glass flex items-center justify-between px-4 lg:px-6 shrink-0 z-40 border-t-0 border-x-0">
-        <div className="flex items-center gap-2.5">
-          <img src={MARIAM_IMG} className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl object-cover border border-[var(--border)]" alt=""/>
+      <header className="h-16 lg:h-20 glass flex items-center justify-between px-4 lg:px-8 shrink-0 z-40 border-t-0 border-x-0">
+        <div className="flex items-center gap-3">
+          <img src={MARIAM_IMG} className="w-9 h-9 lg:w-11 lg:h-11 rounded-xl object-cover border border-[var(--border)]" alt=""/>
           <span className="text-2xl lg:text-3xl font-black tracking-tight text-[var(--accent)]" style={{fontFamily:'system-ui'}}>MARIAM</span>
-          <span className="text-[9px] font-black bg-[var(--accent)] text-white px-2 py-0.5 rounded-full hidden sm:inline">{APP_VER}</span>
+          <span className="text-[11px] font-black bg-[var(--accent)] text-white px-2.5 py-1 rounded-full hidden sm:inline">{APP_VER}</span>
+          {Object.values(window.__MARIAM_BG__?.tasks||{}).filter(t=>t.status==='running').length>0&&(
+            <span className="text-xs font-black bg-amber-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <Loader2 size={9} className="animate-spin"/>{Object.values(window.__MARIAM_BG__.tasks).filter(t=>t.status==='running').length} running
+            </span>
+          )}
         </div>
-        <div className="hidden md:flex flex-1 max-w-sm mx-6">
-          <div className="relative w-full">
-            <input placeholder="Search documents…" className="w-full bg-black/5 dark:bg-white/5 rounded-full py-2 pl-9 pr-4 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
-            <Search className="absolute left-3 top-2.5 opacity-30" size={16}/>
-          </div>
+        <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <button onClick={()=>setShowGlobalSearch(true)} className="relative w-full">
+            <input readOnly placeholder="Search everything… (Ctrl+K)" className="w-full bg-black/5 dark:bg-white/5 rounded-full py-2.5 pl-10 pr-4 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)] cursor-pointer"/>
+            <Search className="absolute left-3.5 top-3 opacity-30" size={16}/>
+          </button>
         </div>
         <div className="flex items-center gap-2">
           {installPrompt&&(
             <button onClick={onInstall} className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 hover:bg-[var(--accent)] hover:text-white transition-all">
-              <Download size={13}/> Install
+              <Download size={16}/> Install
             </button>
           )}
           {activeDoc&&(
             <button onClick={()=>{setRpOpen(o=>!o);if(view!=='reader')setView('reader');}}
               className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest transition-all
                 ${rpOpen?'bg-[var(--accent)] text-white':'glass text-[var(--accent)] border border-[var(--accent)]/30'}`}>
-              <Sparkles size={14}/> AI Studio
+              <Sparkles size={18}/> AI Studio
             </button>
           )}
           <button onClick={()=>setView('settings')} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100"><Settings size={17}/></button>
@@ -2333,16 +3808,16 @@ export default function App(){
       {/* BODY */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* DESKTOP SIDEBAR */}
-        <nav className="hidden lg:flex w-[78px] flex-col items-center py-6 gap-1 glass shrink-0 border-t-0 border-b-0 border-l-0 z-30">
+        <nav className="hidden lg:flex w-[110px] flex-col items-center py-6 gap-1 glass shrink-0 border-t-0 border-b-0 border-l-0 z-30">
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
               disabled={dis} title={label}
-              className={`flex flex-col items-center gap-1 w-full py-2.5 rounded-2xl mx-1 transition-all text-[8px] font-black uppercase tracking-widest
+              className={`flex flex-col items-center gap-1.5 w-full py-3 rounded-2xl mx-1 transition-all text-xs font-black uppercase tracking-widest
                 ${dis?'opacity-20 cursor-not-allowed':''}
                 ${view===v?'text-[var(--accent)]':''}`}>
-              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all
-                ${view===v?'bg-[var(--accent)] text-white shadow-lg':'text-[var(--text)] opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}>
-                <Icon size={19} strokeWidth={view===v?2.5:2}/>
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all
+                ${view===v?'bg-[var(--accent)] text-white shadow-lg shadow-[var(--accent)]/30':'text-[var(--text)] opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                <Icon size={26} strokeWidth={view===v?2.5:2}/>
               </div>
               <span className={view===v?'text-[var(--accent)]':'opacity-50'}>{label}</span>
             </button>
@@ -2357,19 +3832,23 @@ export default function App(){
             </div>
           )}
 
+          <ViewWrapper active={view==='dashboard'}>
+            <DashboardView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions}
+              setView={setView} setActiveId={id=>{setActiveId(id);setOpenDocs(p=>p.includes(id)?p:[...p,id]);}} addToast={addToast} settings={settings}/>
+          </ViewWrapper>
           <ViewWrapper active={view==='library'}>
             <LibraryView docs={docs} uploading={uploading} onUpload={handleUpload}
               onOpen={id=>{setOpenDocs(p=>p.includes(id)?p:[...p,id]);setActiveId(id);setView('reader');}}
               onDelete={deleteDoc} flashcards={flashcards} exams={exams} cases={cases} notes={notes}/>
           </ViewWrapper>
           <ViewWrapper active={view==='flashcards'}>
-            <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast}/>
+            <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast} docs={docs} setExams={setExams} setCases={setCases}/>
           </ViewWrapper>
           <ViewWrapper active={view==='exams'}>
-            <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast}/>
+            <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setCases={setCases}/>
           </ViewWrapper>
           <ViewWrapper active={view==='cases'}>
-            <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast}/>
+            <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setExams={setExams}/>
           </ViewWrapper>
           <ViewWrapper active={view==='chat'}>
             <ChatView settings={settings} sessions={chatSessions} setSessions={setChatSessions}/>
@@ -2392,7 +3871,7 @@ export default function App(){
           <>
             <div onMouseDown={startRpDrag} onTouchStart={startRpDrag}
               className="hidden lg:flex w-2 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/30 shrink-0 z-[120] touch-none transition-colors group">
-              <GripVertical size={12} className="text-[var(--text)] opacity-20 group-hover:opacity-60"/>
+              <GripVertical size={16} className="text-[var(--text)] opacity-20 group-hover:opacity-60"/>
             </div>
             <aside style={{width:window.innerWidth>=1024?`${rpW}px`:'100%'}}
               className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in">
@@ -2403,9 +3882,9 @@ export default function App(){
               <div className="flex shrink-0 border-b border-[var(--border)] bg-[var(--card)]">
                 {[['generate','Generate',Zap],['chat','Chat',MessageSquare],['vault','Vault',Database]].map(([id,lbl,Icon])=>(
                   <button key={id} onClick={()=>setRpTab(id)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[10px] font-black uppercase tracking-widest transition-colors border-b-2
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-black uppercase tracking-widest transition-colors border-b-2
                       ${rpTab===id?'border-[var(--accent)] text-[var(--accent)]':'border-transparent text-[var(--text)] opacity-50 hover:opacity-80'}`}>
-                    <Icon size={13}/>{lbl}
+                    <Icon size={16}/>{lbl}
                   </button>
                 ))}
               </div>
@@ -2441,8 +3920,8 @@ export default function App(){
           <button key={v} disabled={dis}
             onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
             className={`flex-1 flex flex-col items-center gap-1 pt-2 pb-1 transition-all ${dis?'opacity-20':''}`}>
-            <Icon size={19} strokeWidth={view===v?2.5:2} className={view===v?'text-[var(--accent)]':'text-[var(--text)] opacity-55'}/>
-            <span className={`text-[8px] font-black uppercase tracking-wider ${view===v?'text-[var(--accent)]':'opacity-40'}`}>{label}</span>
+            <Icon size={26} strokeWidth={view===v?2.5:2} className={view===v?'text-[var(--accent)]':'text-[var(--text)] opacity-55'}/>
+            <span className={`text-xs font-black uppercase tracking-wider ${view===v?'text-[var(--accent)]':'opacity-40'}`}>{label}</span>
           </button>
         ))}
       </nav>
