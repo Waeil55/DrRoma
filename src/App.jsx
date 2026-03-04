@@ -4540,8 +4540,8 @@ export default function App(){
         }
 
         /* ══ MISC ══ */
-        /* Mobile: pad bottom so content clears the pill nav (pill nav ~70px + safe area) */
-        .scroll-content { padding-bottom:calc(76px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+        /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
+        .scroll-content { padding-bottom:calc(62px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -4662,7 +4662,7 @@ export default function App(){
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+        .scroll-content{padding-bottom:calc(62px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
         /* ── PILL NAV ITEM ACTIVE ── */
@@ -4905,8 +4905,17 @@ export default function App(){
 
       {/* MOBILE BOTTOM NAV — only rendered when mobile */}
       {isMobile&&(
-      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:9999,display:'flex',justifyContent:'center',alignItems:'flex-end',paddingLeft:12,paddingRight:12,paddingBottom:'calc(10px + env(safe-area-inset-bottom))',paddingTop:6,pointerEvents:'none',
-        background:'linear-gradient(to top, rgba(var(--bg-rgb,245,247,255),0.7) 0%, transparent 100%)',
+      <div style={{
+        position:'fixed',
+        bottom:0,left:0,right:0,
+        zIndex:9999,
+        pointerEvents:'none',
+        /* Fill the entire bottom area including safe zone — no white gap */
+        paddingBottom:'env(safe-area-inset-bottom)',
+        background:'var(--nav-bg, rgba(245,247,255,0.92))',
+        backdropFilter:'saturate(180%) blur(20px)',
+        WebkitBackdropFilter:'saturate(180%) blur(20px)',
+        borderTop:'1px solid var(--border)',
       }}>
         <nav style={{
           pointerEvents:'all',
@@ -4915,15 +4924,8 @@ export default function App(){
           flexWrap:'nowrap',
           alignItems:'center',
           justifyContent:'space-around',
-          width:'calc(100vw - 24px)',
-          maxWidth:500,
-          padding:'5px 6px',
-          borderRadius:999,
-          background:'rgba(255,255,255,0.62)',
-          backdropFilter:'saturate(200%) blur(30px)',
-          WebkitBackdropFilter:'saturate(200%) blur(30px)',
-          border:'1px solid rgba(255,255,255,0.8)',
-          boxShadow:'0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95)',
+          width:'100%',
+          padding:'4px 8px 6px 8px',
         }}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
