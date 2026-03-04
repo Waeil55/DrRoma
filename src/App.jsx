@@ -745,7 +745,7 @@ function DashboardView({docs,flashcards,exams,cases,notes,chatSessions,setView,s
   const bgTaskList=Object.values(window.__MARIAM_BG__?.tasks||{});
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
       <div className="w-full p-6 lg:p-8 xl:p-10 space-y-6">
         {/* Welcome */}
         <div className="flex items-center justify-between">
@@ -940,7 +940,7 @@ const runBgGeneration=async({taskId,docId,docName,taskType,startPage,endPage,cou
       const base=`DOCUMENT: "${docName}" | Pages ${startPage}-${endPage}\n\nDOCUMENT CONTENT (generate ONLY from this):\n${fullText}\n\nDIFFICULTY: ${difficultyLevel}\n\n`;
       if(taskType==='flashcards')return`${base}Generate exactly ${bc} detailed flashcards using ONLY topics and facts from the document above. Each question must be a complete, multi-sentence clinical/academic question with sufficient context. Answers must be comprehensive (3-5 sentences) with explanation. RETURN JSON ONLY: {"items":[{"q":"long detailed question with full context from document","a":"comprehensive multi-sentence answer with explanation","evidence":"exact quote from document","sourcePage":1}]}`;
       if(taskType==='exam')return`${base}Generate exactly ${bc} high-quality MCQ questions using ONLY content from the document above. Each question stem must be long (2-4 sentences) with a detailed clinical/academic scenario. All 4 options must be plausible. Explanation must be 3-5 sentences citing the document. RETURN JSON ONLY: {"items":[{"q":"detailed multi-sentence question stem with full scenario","options":["A. detailed option","B. detailed option","C. detailed option","D. detailed option"],"correct":0,"explanation":"thorough 3-5 sentence explanation citing document content","evidence":"exact quote","sourcePage":1}]}`;
-      if(taskType==='cases')return`${base}Generate ${bc} detailed clinical case vignettes using ONLY information from the document above. Each vignette must be 5-8 sentences with full patient presentation, history, vitals, and findings. RETURN JSON ONLY: {"items":[{"vignette":"detailed 5-8 sentence patient case with all clinical details","title":"descriptive case title","examQuestion":{"q":"detailed question about the case","options":["A. option","B. option","C. option","D. option"],"correct":0,"explanation":"thorough explanation citing document"},"diagnosis":"specific diagnosis with reasoning"}]}`;
+      if(taskType==='cases')return`${base}Generate ${bc} richly detailed clinical case vignettes based ONLY on this document. Requirements: (1) Vignette 8-12 sentences: age/sex, chief complaint, HPI, PMH, medications, social history, vitals (BP/HR/RR/Temp/SpO2), physical exam, review of systems; (2) MUST include 3 lab panels with 4-5 rows each (CBC, BMP, disease-specific) = 12+ total lab rows; (3) 5 answer options (A-E); (4) Explanation 4-6 sentences. RETURN JSON ONLY: {"items":[{"vignette":"8-12 sentence detailed case","title":"descriptive title","diagnosis":"specific diagnosis","labPanels":[{"panelName":"COMPLETE BLOOD COUNT","rows":[{"test":"WBC","result":"value","flag":"H|L|","range":"4.5-11.0","units":"K/uL"},{"test":"Hgb","result":"value","flag":"","range":"12-16","units":"g/dL"},{"test":"Hct","result":"value","flag":"","range":"36-46","units":"%"},{"test":"Platelets","result":"value","flag":"","range":"150-400","units":"K/uL"},{"test":"MCV","result":"value","flag":"","range":"80-100","units":"fL"}]},{"panelName":"BASIC METABOLIC PANEL","rows":[{"test":"Sodium","result":"value","flag":"","range":"135-145","units":"mEq/L"},{"test":"Potassium","result":"value","flag":"","range":"3.5-5.0","units":"mEq/L"},{"test":"Creatinine","result":"value","flag":"","range":"0.6-1.2","units":"mg/dL"},{"test":"BUN","result":"value","flag":"","range":"7-20","units":"mg/dL"},{"test":"Glucose","result":"value","flag":"","range":"70-100","units":"mg/dL"}]},{"panelName":"DISEASE-SPECIFIC PANEL","rows":[{"test":"test1","result":"value","flag":"H","range":"range","units":"units"},{"test":"test2","result":"value","flag":"L","range":"range","units":"units"},{"test":"test3","result":"value","flag":"","range":"range","units":"units"},{"test":"test4","result":"value","flag":"","range":"range","units":"units"}]}],"examQuestion":{"q":"detailed 2-3 sentence question stem","options":["A) option","B) option","C) option","D) option","E) option"],"correct":0,"explanation":"4-6 sentence explanation"}}]}`;
       return`${base}Analyze this content comprehensively using only the document provided.`;
     };
 
@@ -1732,7 +1732,7 @@ function LibraryView({docs,uploading,onUpload,onOpen,onDelete,flashcards,exams,c
   },[onUpload]);
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content"
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}
       onDragOver={e=>{e.preventDefault();setDragging(true);}}
       onDragLeave={()=>setDragging(false)}
       onDrop={handleDrop}>
@@ -2483,6 +2483,137 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
 /* ═══════════════════════════════════════════════════════════════════
    FLASHCARDS VIEW — v6 with Quick Generate + better UI
 ═══════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   AI TUTOR PANEL — draggable side panel for Flashcards, Exams, Cases
+═══════════════════════════════════════════════════════════════════ */
+function AiTutorPanel({settings,context,onClose,width,onDragStart,alwaysOpen=false}){
+  const[msgs,setMsgs]=useState([{role:'assistant',content:"Hi! I'm your AI Tutor 🎓\nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!"}]);
+  const[input,setInput]=useState('');
+  const[loading,setLoading]=useState(false);
+  const endRef=useRef(null);
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,loading]);
+
+  const send=async(override)=>{
+    const msg=override||input;
+    if(!msg.trim()||loading)return;
+    setInput('');
+    const newMsgs=[...msgs,{role:'user',content:msg},{role:'assistant',content:''}];
+    setMsgs(newMsgs);setLoading(true);
+    try{
+      const hist=newMsgs.slice(-8,-1).map(m=>`${m.role==='user'?'STUDENT':'TUTOR'}: ${m.content}`).join('\n');
+      const prompt=`You are an expert medical/academic AI tutor. The student is currently studying the following content:\n\nCONTEXT:\n${context||'General study session'}\n\nConversation so far:\n${hist}\n\nSTUDENT: ${msg}\n\nTUTOR: Provide a clear, educational explanation. Use bullet points, bold key terms, and be thorough but concise.`;
+      await callAIStreaming(prompt,chunk=>{setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:chunk}]);},settings,4000);
+    }catch(e){setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:`⚠️ ${e.message}`}]);}
+    finally{setLoading(false);}
+  };
+
+  const QUICK=[
+    'Explain this in detail',
+    'Why is this the correct answer?',
+    'What are common mistakes here?',
+    'Give me a mnemonic',
+    'What else should I know?',
+    'Create a practice question',
+  ];
+
+  return(
+    <div className="flex flex-col h-full min-h-0 bg-[var(--card)] border-l border-[var(--border)]" style={{width:width||360}}>
+      {/* Header - draggable */}
+      <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-between px-4 py-3 shrink-0 cursor-grab select-none"
+        onMouseDown={onDragStart} onTouchStart={onDragStart}>
+        <div>
+          <span className="font-black flex items-center gap-2 text-base"><GraduationCap size={20}/> AI Tutor</span>
+          <p className="text-xs opacity-70 mt-0.5">Ask about anything you're studying</p>
+        </div>
+        {!alwaysOpen&&onClose&&<button onClick={onClose} className="w-9 h-9 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors"><X size={18}/></button>}
+      </div>
+      {/* Messages */}
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
+        {msgs.map((m,i)=>(
+          <div key={i} className={`flex gap-2 ${m.role==='user'?'flex-row-reverse':''}`}>
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-black ${m.role==='user'?'bg-[var(--accent)] text-white':'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-white'}`}>
+              {m.role==='user'?'You':'AI'}
+            </div>
+            <div className={`px-3 py-2.5 text-sm leading-relaxed rounded-2xl max-w-[85%] whitespace-pre-wrap
+              ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass border border-[var(--border)] rounded-tl-sm'}`}>
+              {m.content||<span className="opacity-30 animate-pulse">▊</span>}
+            </div>
+          </div>
+        ))}
+        {loading&&(
+          <div className="flex gap-2">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-white flex items-center justify-center text-xs font-black shrink-0">AI</div>
+            <div className="glass rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-[var(--border)]">
+              {[0,1,2].map(i=><div key={i} className="w-2 h-2 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
+            </div>
+          </div>
+        )}
+        <div ref={endRef}/>
+      </div>
+      {/* Quick prompts */}
+      <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[var(--border)]">
+        {QUICK.map(q=>(
+          <button key={q} onClick={()=>send(q)}
+            className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[var(--border)] leading-tight text-left">
+            {q}
+          </button>
+        ))}
+      </div>
+      {/* Input */}
+      <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]">
+        <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)] focus-within:border-[var(--accent)]/50">
+          <textarea value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+            placeholder="Ask your tutor anything…" disabled={loading} rows={1}
+            className="flex-1 bg-transparent p-1.5 text-sm outline-none resize-none max-h-32 custom-scrollbar text-[var(--text)] min-h-[36px]"/>
+          <button onClick={()=>send()} disabled={loading||!input.trim()}
+            className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg">
+            <Send size={18}/>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Wrapper that adds the draggable AI Tutor panel to any view */
+function WithAiTutor({settings,context,children}){
+  const[open,setOpen]=useState(false);
+  const[w,setW]=useState(380);
+  const isMobile=window.innerWidth<1024;
+  const handleDrag=useCallback(x=>{setW(Math.max(300,Math.min(680,window.innerWidth-x)));},[]);
+  const startDrag=useDrag(handleDrag,[handleDrag]);
+  return(
+    <div className="flex-1 min-h-0 flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">{children}</div>
+      {/* Toggle button */}
+      {!open&&(
+        <button onClick={()=>setOpen(true)}
+          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] text-white rounded-xl font-black text-sm shadow-xl hover:opacity-90 transition-all">
+          <GraduationCap size={16}/>AI Tutor
+        </button>
+      )}
+      {/* Mobile overlay backdrop */}
+      {open&&isMobile&&(
+        <div className="fixed inset-0 bg-black/50 z-[48] backdrop-blur-sm" onClick={()=>setOpen(false)}/>
+      )}
+      {open&&(
+        <>
+          <div onMouseDown={startDrag} onTouchStart={startDrag}
+            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/40 shrink-0 z-50 touch-none transition-colors group">
+            <GripVertical size={14} className="opacity-20 group-hover:opacity-60 text-[var(--text)]"/>
+          </div>
+          <div className={isMobile?"fixed inset-y-0 right-0 z-[49] shadow-2xl":"h-full"}
+            style={isMobile?{width:'90vw',maxWidth:400}:{width:w,minWidth:300,maxWidth:680,flexShrink:0}}>
+            <AiTutorPanel settings={settings} context={context} onClose={()=>setOpen(false)} width={isMobile?400:w} onDragStart={startDrag}/>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExams,setCases}){
   const[selSet,setSelSet]=useState(null);const[idx,setIdx]=useState(0);
   const[flipped,setFlipped]=useState(false);const[mode,setMode]=useState('browse');
@@ -2518,56 +2649,84 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
     return flashcards.filter(f=>f.docId===filterDocId);
   },[flashcards,filterDocId]);
 
+  const[fcTutorW,setFcTutorW]=useState(380);
+  const handleFcTutorDrag=useCallback(x=>{setFcTutorW(Math.max(280,Math.min(560,window.innerWidth-x)));},[]);
+  const startFcTutorDrag=useDrag(handleFcTutorDrag,[handleFcTutorDrag]);
+
   if(selSet){
     const card=selSet.cards[idx];
     const progress=((idx+1)/selSet.cards.length)*100;
+    const tutorCtx=`Flashcard study session.\nSet: ${selSet.title}\nCard ${idx+1}/${selSet.cards.length}\nQuestion: ${card?.q}\nAnswer: ${card?.a}\nEvidence: ${card?.evidence||'N/A'}`;
     return(
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
-        <div className="w-full p-6 lg:p-8">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={()=>{setSelSet(null);setIdx(0);setFlipped(false);}}
-              className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
-            <div className="text-center">
-              <p className="text-xs font-black opacity-60 truncate max-w-40">{selSet.title}</p>
-              <p className="text-xs opacity-40">{idx+1} / {selSet.cards.length}</p>
-            </div>
-            <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-xs font-black flex items-center gap-2 opacity-60 hover:opacity-100">
-              <Printer size={16}/>PDF
-            </button>
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+          <button onClick={()=>{setSelSet(null);setIdx(0);setFlipped(false);}}
+            className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
+          <div className="text-center">
+            <p className="text-sm font-black truncate max-w-xs">{selSet.title}</p>
+            <p className="text-xs opacity-40">{idx+1} / {selSet.cards.length}</p>
           </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mb-6 overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-500" style={{width:`${progress}%`}}/>
-          </div>
-          <div className="glass rounded-3xl p-8 mb-4 cursor-pointer min-h-[200px] flex flex-col justify-between select-none
-            border border-[var(--border)] hover:border-[var(--accent)]/30 transition-all"
-            onClick={()=>setFlipped(f=>!f)}>
-            <div className="flex items-start justify-between mb-4">
-              <span className="text-xs font-black uppercase tracking-widest px-2 py-1 rounded-full opacity-40 glass">{flipped?'Answer':'Question'}</span>
-              {card.sourcePage&&<span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+          <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-sm font-black flex items-center gap-2 opacity-60 hover:opacity-100">
+            <Printer size={16}/>PDF
+          </button>
+        </div>
+        {/* Progress bar */}
+        <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
+          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
+        </div>
+        {/* Two-panel row */}
+        <div className="flex-1 min-h-0 flex overflow-hidden">
+          {/* LEFT: card + controls */}
+          <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-5" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
+            {/* Flip card */}
+            <div className="glass rounded-3xl p-8 cursor-pointer min-h-[220px] flex flex-col justify-between select-none border border-[var(--border)] hover:border-[var(--accent)]/40 transition-all active:scale-[0.99]"
+              onClick={()=>setFlipped(f=>!f)}>
+              <div className="flex items-start justify-between mb-4">
+                <span className={`text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border ${flipped?'border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/8':'glass opacity-50'}`}>
+                  {flipped?'Answer':'Question'}
+                </span>
+                {card.sourcePage&&<span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+              </div>
+              <p className={`text-base font-semibold leading-relaxed flex-1 ${flipped?'text-[var(--accent)]':''}`}>
+                {flipped?card.a:card.q}
+              </p>
+              {flipped&&card.evidence&&<p className="text-xs opacity-40 mt-4 italic border-t border-[var(--border)] pt-3">"{card.evidence}"</p>}
+              {!flipped&&<p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-1"><RefreshCw size={11}/>Tap to flip</p>}
             </div>
-            <p className={`text-base font-bold leading-relaxed flex-1 ${flipped?'text-[var(--accent)]':''}`}>
-              {flipped?card.a:card.q}
-            </p>
-            {flipped&&card.evidence&&<p className="text-xs opacity-40 mt-3 italic border-t border-[var(--border)] pt-3">"{card.evidence}"</p>}
-            {!flipped&&<p className="text-xs opacity-30 text-center mt-4">Tap to reveal answer</p>}
+            {/* Rating buttons */}
+            {flipped?(
+              <div className="grid grid-cols-4 gap-3">
+                {[['Again',0,'#ef4444','🔁'],['Hard',2,'#f59e0b','😓'],['Good',3,'#3b82f6','👍'],['Easy',5,'#10b981','⚡']].map(([l,q,col,em])=>(
+                  <button key={l} onClick={()=>rateCard(q)}
+                    className="text-white py-4 rounded-2xl text-sm font-black uppercase tracking-wide shadow-lg active:scale-95 transition-all flex flex-col items-center gap-1"
+                    style={{background:col}}>
+                    <span className="text-base">{em}</span>{l}
+                  </button>
+                ))}
+              </div>
+            ):(
+              <button onClick={()=>setFlipped(true)} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">
+                Show Answer
+              </button>
+            )}
           </div>
-          {flipped&&(
-            <div className="grid grid-cols-4 gap-2 mt-4">
-              {[['Again',0,'#ef4444'],['Hard',2,'#f59e0b'],['Good',3,'#3b82f6'],['Easy',5,'#10b981']].map(([l,q,col])=>(
-                <button key={l} onClick={()=>rateCard(q)}
-                  className="text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
-                  style={{background:col}}>{l}</button>
-              ))}
-            </div>
-          )}
-          {!flipped&&<button onClick={()=>setFlipped(true)} className="mt-4 w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">Show Answer</button>}
+          {/* Drag handle */}
+          <div onMouseDown={startFcTutorDrag} onTouchStart={startFcTutorDrag}
+            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 touch-none transition-colors group">
+            <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
+          </div>
+          {/* RIGHT: AI Tutor always open */}
+          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0" style={{width:fcTutorW}}>
+            <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={fcTutorW} onDragStart={startFcTutorDrag} alwaysOpen={true}/>
+          </div>
         </div>
       </div>
     );
   }
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
       {showModal&&<QuickGenerateModal type="flashcards" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards} setExams={setExams} setCases={setCases}/>}
@@ -2691,52 +2850,80 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
     return r;
   },[exams,filterDocId,sortMode]);
 
+  const[examTutorW,setExamTutorW]=useState(380);
+  const handleExamTutorDrag=useCallback(x=>{setExamTutorW(Math.max(280,Math.min(580,window.innerWidth-x)));},[]);
+  const startExamTutorDrag=useDrag(handleExamTutorDrag,[handleExamTutorDrag]);
+
   if(selEx&&score===null&&!reviewMode){
     const q=selEx.questions[qi];
     const progress=((qi+1)/selEx.questions.length)*100;
+    const tutorCtx=`Exam session: ${selEx.title}\nQuestion ${qi+1}/${selEx.questions.length}\nQ: ${q?.q}\nOptions: ${(q?.options||[]).join(' | ')}\nCorrect answer: ${q?.options?.[q?.correct]}\nExplanation: ${q?.explanation||'N/A'}`;
     return(
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
-        <div className="w-full p-6 lg:p-8">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
-            <div className="text-center">
-              <p className="text-sm font-black">{selEx.title}</p>
-              <p className="text-xs opacity-40">{qi+1}/{selEx.questions.length}</p>
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {/* Top bar */}
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+          <button onClick={()=>{setSelEx(null);setScore(null);setAnswers([]);}} className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
+          <div className="text-center">
+            <p className="text-sm font-black truncate max-w-xs">{selEx.title}</p>
+            <p className="text-xs opacity-40">{qi+1} / {selEx.questions.length} questions</p>
+          </div>
+          <button onClick={()=>setReviewMode(true)} className="glass px-3 py-2 rounded-xl text-sm font-black opacity-60 hover:opacity-100">Review All</button>
+        </div>
+        {/* Progress */}
+        <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
+          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full transition-all duration-500" style={{width:`${progress}%`}}/>
+        </div>
+        {/* Two-panel row */}
+        <div className="flex-1 min-h-0 flex overflow-hidden">
+          {/* LEFT: question + options */}
+          <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-6 space-y-4" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
+            <div className="glass rounded-2xl p-6 border border-[var(--border)]">
+              {q.sourcePage&&<p className="text-xs font-mono opacity-30 mb-3">Source: p.{q.sourcePage}</p>}
+              <p className="text-base font-semibold leading-relaxed">{q.q}</p>
             </div>
-            <button onClick={()=>{setReviewMode(true);}} className="glass px-3 py-2 rounded-xl text-xs font-black opacity-60 hover:opacity-100">Review All</button>
-          </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2 mb-6 overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] h-full rounded-full transition-all duration-500" style={{width:`${progress}%`}}/>
-          </div>
-          <div className="glass rounded-3xl p-6 mb-4 border border-[var(--border)]">
-            {q.sourcePage&&<span className="text-xs font-mono opacity-30 mb-2 block">Source: p.{q.sourcePage}</span>}
-            <p className="text-sm font-bold leading-relaxed">{q.q}</p>
-          </div>
-          <div className="space-y-2.5 mb-6">
-            {(q.options||[]).map((opt,oi)=>(
-              <button key={oi} disabled={submitted} onClick={()=>setSelected(oi)}
-                className={`w-full text-left px-4 py-4 rounded-2xl text-sm font-medium transition-all border
-                  ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
-                    submitted&&oi===selected&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
-                    selected===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30 hover:bg-[var(--accent)]/5'}`}>
-                <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
-                {submitted&&oi===q.correct&&<CheckCircle2 size={14} className="inline ml-2 text-emerald-500"/>}
-              </button>
-            ))}
-          </div>
-          {submitted&&q.explanation&&(
-            <div className="glass p-4 rounded-2xl mb-4 border-l-4 border-[var(--accent)] bg-[var(--accent)]/5">
-              <p className="text-xs font-bold opacity-60 mb-1 uppercase tracking-widest">Explanation</p>
-              <p className="text-xs leading-relaxed">{q.explanation}</p>
-              {q.evidence&&<p className="text-xs opacity-40 italic mt-2 pt-2 border-t border-[var(--border)]">"{q.evidence}"</p>}
+            <div className="space-y-2.5">
+              {(q.options||[]).map((opt,oi)=>(
+                <button key={oi} disabled={submitted} onClick={()=>setSelected(oi)}
+                  className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
+                    ${submitted&&oi===q.correct?'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
+                      submitted&&oi===selected&&oi!==q.correct?'bg-red-500/15 border-red-500 text-red-500':
+                      selected===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
+                    ${submitted&&oi===q.correct?'bg-emerald-500 border-emerald-500 text-white':
+                      submitted&&oi===selected&&oi!==q.correct?'bg-red-500 border-red-500 text-white':
+                      selected===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[var(--border)] opacity-50'}`}>
+                    {String.fromCharCode(65+oi)}
+                  </span>
+                  <span className="flex-1">{opt}</span>
+                  {submitted&&oi===q.correct&&<CheckCircle2 size={15} className="text-emerald-500 shrink-0"/>}
+                </button>
+              ))}
             </div>
-          )}
-          {!submitted?
-            <button onClick={submit} disabled={selected===null} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black disabled:opacity-40 shadow-lg">Submit Answer</button>:
-            qi<selEx.questions.length-1?
-              <button onClick={next} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">Next Question →</button>:
-              <button onClick={()=>setSubmitted(true)} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-black shadow-lg">See Results →</button>
-          }
+            {submitted&&q.explanation&&(
+              <div className="glass p-5 rounded-2xl border-l-4 border-[var(--accent)] bg-[var(--accent)]/5">
+                <p className="text-xs font-black opacity-60 mb-2 uppercase tracking-widest">Explanation</p>
+                <p className="text-sm leading-relaxed">{q.explanation}</p>
+                {q.evidence&&<p className="text-xs opacity-40 italic mt-3 pt-3 border-t border-[var(--border)]">"{q.evidence}"</p>}
+              </div>
+            )}
+            <div className="pb-4">
+              {!submitted?
+                <button onClick={submit} disabled={selected===null} className="w-full py-4 btn-accent rounded-2xl text-base font-black disabled:opacity-40 shadow-xl">Submit Answer</button>:
+                qi<selEx.questions.length-1?
+                  <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question →</button>:
+                  <button onClick={()=>{const sc=answers.filter(a=>a.correct).length;setScore(sc);trackStudy('exam',sc,selEx.questions.length);}} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
+              }
+            </div>
+          </div>
+          {/* Drag handle */}
+          <div onMouseDown={startExamTutorDrag} onTouchStart={startExamTutorDrag}
+            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 touch-none transition-colors group">
+            <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
+          </div>
+          {/* RIGHT: AI Tutor always open */}
+          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0" style={{width:examTutorW}}>
+            <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true}/>
+          </div>
         </div>
       </div>
     );
@@ -2745,7 +2932,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
   // Review mode — all questions at once
   if(reviewMode&&selEx){
     return(
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
         <div className="w-full p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={()=>setReviewMode(false)} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Back</button>
@@ -2800,7 +2987,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
   }
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
       {showModal&&<QuickGenerateModal type="exam" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams} setCases={setCases||((fn)=>{})}/>}
@@ -2898,66 +3085,218 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
     setExporting(null);
   };
 
+  /* ── draggable panel widths ── */
+  const[labW,setLabW]=useState(420);
+  const[tutorW,setTutorW]=useState(360);
+  const handleLabDrag=useCallback(x=>{setLabW(Math.max(280,Math.min(600,window.innerWidth-x)));},[]);
+  const handleTutorDrag=useCallback(x=>{setTutorW(Math.max(260,Math.min(520,window.innerWidth-x)));},[]);
+  const startLabDrag=useDrag(handleLabDrag,[handleLabDrag]);
+  const startTutorDrag=useDrag(handleTutorDrag,[handleTutorDrag]);
+
   if(selSet){
     const cas=selSet.questions[ci];const q=cas.examQuestion||cas;
+    const tutorCtx=`Clinical case: ${cas?.title||'Untitled'}\nVignette: ${cas?.vignette||''}\nDiagnosis: ${cas?.diagnosis||'N/A'}\nQuestion: ${q?.q}\nCorrect answer: ${q?.options?.[q?.correct]}\nExplanation: ${q?.explanation||'N/A'}`;
     return(
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
-        <div className="w-full p-6 lg:p-8 space-y-4">
-          <div className="flex items-center justify-between">
-            <button onClick={()=>{setSelSet(null);setCi(0);setStage('vignette');}} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18}/>Exit</button>
-            <div className="text-center">
-              <p className="text-xs font-black opacity-40">Case {ci+1}/{selSet.questions.length}</p>
-              <div className="flex gap-1 mt-1">
+      /* ══ THREE-PANEL LAYOUT ══ */
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+
+        {/* ── TOP BAR ── */}
+        <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[var(--border)] border-x-0 border-t-0">
+          <button onClick={()=>{setSelSet(null);setCi(0);setSelOpt(null);setSubmitted(false);}}
+            className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 hover:border-[var(--accent)]/40 transition-all">
+            <ChevronLeft size={18}/>Exit
+          </button>
+          <div className="text-center">
+            {cas.title&&<p className="text-base font-black truncate max-w-xs">{cas.title}</p>}
+            <div className="flex items-center gap-2 justify-center mt-0.5">
+              <p className="text-xs font-bold opacity-50">Case {ci+1} / {selSet.questions.length}</p>
+              <div className="flex gap-0.5">
                 {selSet.questions.map((_,i)=>(
-                  <div key={i} className={`h-1 rounded-full transition-all ${i===ci?'w-6 bg-[var(--accent)]':i<ci?'w-2 bg-emerald-500':'w-2 bg-black/10 dark:bg-white/10'}`}/>
+                  <div key={i} className={`h-1.5 rounded-full transition-all ${i===ci?'w-6 bg-[var(--accent)]':i<ci?'w-2 bg-emerald-500':'w-2 bg-black/10 dark:bg-white/10'}`}/>
                 ))}
               </div>
             </div>
-            <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-xs font-black opacity-60 hover:opacity-100 flex items-center gap-1">
-              <Printer size={16}/>PDF
-            </button>
           </div>
-          {cas.title&&<h2 className="text-lg font-black">{cas.title}</h2>}
-          <div className="glass p-5 rounded-2xl border-l-4 border-[var(--accent)]">
-            <p className="text-xs font-black uppercase tracking-widest text-[var(--accent)] mb-2">Clinical Vignette</p>
-            <p className="text-sm leading-relaxed">{cas.vignette}</p>
-          </div>
-          {cas.labPanels?.length>0&&cas.labPanels.map((panel,i)=>(
-            <div key={i}><p className="text-xs font-black opacity-60 mb-2">{panel.panelName}</p><LabTable rows={panel.rows}/></div>
-          ))}
-          <div className="glass rounded-2xl p-4 border border-[var(--border)]">
-            <p className="text-xs font-black opacity-60 mb-3">{q.q}</p>
-            <div className="space-y-2">
+          <button onClick={()=>handleExport(selSet)} className="glass px-3 py-2 rounded-xl text-sm font-black opacity-60 hover:opacity-100 flex items-center gap-2">
+            <Printer size={16}/>PDF
+          </button>
+        </div>
+
+        {/* ── MAIN THREE-PANEL ROW ── */}
+        <div className="flex-1 min-h-0 flex overflow-hidden">
+
+          {/* ═══ LEFT: Vignette + Question + Answers (scrollable) ═══ */}
+          <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-5 space-y-4" style={{touchAction:'pan-y',WebkitOverflowScrolling:'touch'}}>
+
+            {/* Patient Vignette */}
+            <div className="glass rounded-2xl p-5 border border-[var(--border)]">
+              <p className="text-xs font-black uppercase tracking-widest text-[var(--accent)] mb-3 flex items-center gap-2">
+                <Stethoscope size={13}/> Patient Vignette
+              </p>
+              <p className="text-sm leading-[1.85]">{cas.vignette}</p>
+            </div>
+
+            {/* Question stem */}
+            <div className="glass rounded-2xl p-5 border border-[var(--border)]">
+              <p className="text-sm font-black uppercase tracking-widest opacity-40 mb-3 flex items-center gap-2"><CheckSquare size={13}/>Question</p>
+              <p className="text-base font-semibold leading-relaxed">{q.q}</p>
+            </div>
+
+            {/* Answer options */}
+            <div className="space-y-2.5">
               {(q.options||[]).map((opt,oi)=>(
                 <button key={oi} disabled={submitted} onClick={()=>setSelOpt(oi)}
-                  className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all border
-                    ${submitted&&oi===q.correct?'bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
-                      submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500/20 border-red-500 text-red-600 dark:text-red-400':
-                      selOpt===oi?'bg-[var(--accent)]/15 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/30'}`}>
-                  <span className="font-black opacity-50 mr-3">{String.fromCharCode(65+oi)}.</span>{opt}
-                  {submitted&&oi===q.correct&&<CheckCircle2 size={16} className="inline ml-2 text-emerald-500"/>}
+                  className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
+                    ${submitted&&oi===q.correct?'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold':
+                      submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500/15 border-red-500 text-red-500':
+                      selOpt===oi?'bg-[var(--accent)]/10 border-[var(--accent)] font-bold':'glass border-[var(--border)] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
+                    ${submitted&&oi===q.correct?'bg-emerald-500 border-emerald-500 text-white':
+                      submitted&&oi===selOpt&&oi!==q.correct?'bg-red-500 border-red-500 text-white':
+                      selOpt===oi?'bg-[var(--accent)] border-[var(--accent)] text-white':'border-[var(--border)] opacity-50'}`}>
+                    {String.fromCharCode(65+oi)}
+                  </span>
+                  <span className="flex-1">{opt}</span>
+                  {submitted&&oi===q.correct&&<CheckCircle2 size={16} className="text-emerald-500 shrink-0"/>}
                 </button>
               ))}
             </div>
+
+            {/* Explanation */}
+            {submitted&&(
+              <div className="glass p-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-500/5 space-y-2">
+                {cas.diagnosis&&<p className="text-sm font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={15}/>Diagnosis: {cas.diagnosis}</p>}
+                {q.explanation&&<p className="text-sm leading-relaxed">{q.explanation}</p>}
+                {q.evidence&&<p className="text-xs opacity-40 italic pt-3 border-t border-[var(--border)]">"{q.evidence}" — p.{q.sourcePage}</p>}
+              </div>
+            )}
+
+            {/* Action */}
+            <div className="pb-4">
+              {!submitted?
+                <button onClick={()=>setSubmitted(true)} disabled={selOpt===null}
+                  className="w-full py-4 btn-accent rounded-2xl text-base font-black disabled:opacity-40 shadow-xl">
+                  Submit Answer
+                </button>:
+                ci<selSet.questions.length-1?
+                  <button onClick={()=>{setCi(i=>i+1);setSelOpt(null);setSubmitted(false);}}
+                    className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl flex items-center justify-center gap-2">
+                    <ChevronRight size={20}/>Next Case
+                  </button>:
+                  <button onClick={()=>{setSelSet(null);setCi(0);addToast('All cases complete! 🏆','success');}}
+                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-base font-black shadow-xl">
+                    Finish Session 🎉
+                  </button>
+              }
+            </div>
           </div>
-          {submitted&&<div className="glass p-4 rounded-2xl border-l-4 border-emerald-500">
-            {cas.diagnosis&&<p className="text-xs font-black text-emerald-500 mb-2">✓ Diagnosis: {cas.diagnosis}</p>}
-            {q.explanation&&<p className="text-xs leading-relaxed">{q.explanation}</p>}
-            {q.evidence&&<p className="text-xs opacity-40 italic mt-2">"{q.evidence}"</p>}
-          </div>}
-          {!submitted?
-            <button onClick={()=>setSubmitted(true)} disabled={selOpt===null} className="w-full py-3.5 btn-accent rounded-2xl font-black disabled:opacity-40 shadow-lg">Submit Answer</button>:
-            ci<selSet.questions.length-1?
-              <button onClick={()=>{setCi(i=>i+1);setSelOpt(null);setSubmitted(false);}} className="w-full py-3.5 btn-accent rounded-2xl font-black shadow-lg">Next Case →</button>:
-              <button onClick={()=>{setSelSet(null);setCi(0);addToast('All cases complete! 🏆','success');}} className="w-full py-3.5 bg-emerald-500 text-white rounded-2xl font-black shadow-lg">Finish Session 🎉</button>
-          }
+
+          {/* ═══ DRAG HANDLE: left ↔ lab ═══ */}
+          <div onMouseDown={startLabDrag} onTouchStart={startLabDrag}
+            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 z-10 touch-none transition-colors group">
+            <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
+          </div>
+
+          {/* ═══ MIDDLE: Lab Results (scrollable, draggable width) ═══ */}
+          <div className="hidden lg:flex flex-col border-l border-[var(--border)] bg-[var(--card)] overflow-hidden shrink-0"
+            style={{width:labW}}>
+            {/* Lab header */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] shrink-0 cursor-grab select-none"
+              onMouseDown={startLabDrag} onTouchStart={startLabDrag}>
+              <Thermometer size={15} className="text-[var(--accent)] shrink-0"/>
+              <span className="text-sm font-black uppercase tracking-widest text-[var(--accent)]">Laboratory Results</span>
+              <GripVertical size={13} className="ml-auto opacity-20"/>
+            </div>
+            {/* Lab content */}
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-5">
+              {cas.labPanels?.length>0?cas.labPanels.map((panel,pi)=>(
+                <div key={pi}>
+                  <p className="text-xs font-black uppercase tracking-widest opacity-50 mb-2 px-1">{panel.panelName}</p>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-[var(--border)]">
+                        {['TEST','RESULT','RANGE','UNITS'].map(h=>(
+                          <th key={h} className="text-left py-1.5 px-2 text-xs font-black uppercase tracking-wider opacity-40">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(panel.rows||[]).map((row,ri)=>(
+                        <tr key={ri} className="border-b border-[var(--border)]/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                          <td className="py-2 px-2 font-bold text-sm">{row.test}</td>
+                          <td className="py-2 px-2 font-black text-sm">
+                            <span className="flex items-center gap-1" style={{color:row.flag==='H'?'#ef4444':row.flag==='L'?'#3b82f6':undefined}}>
+                              {row.result}
+                              {row.flag&&<span className="text-xs font-black px-1 py-0.5 rounded" style={{backgroundColor:row.flag==='H'?'#ef444420':row.flag==='L'?'#3b82f620':'transparent'}}>{row.flag}</span>}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-sm opacity-45 font-mono">{row.range}</td>
+                          <td className="py-2 px-2 text-sm opacity-35 font-mono">{row.units}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )):(
+                <div className="flex flex-col items-center justify-center h-32 opacity-25">
+                  <Thermometer size={28} className="mb-2"/>
+                  <p className="text-sm font-bold">No lab data</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ═══ DRAG HANDLE: lab ↔ tutor ═══ */}
+          <div onMouseDown={startTutorDrag} onTouchStart={startTutorDrag}
+            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 z-10 touch-none transition-colors group">
+            <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]"/>
+          </div>
+
+          {/* ═══ RIGHT: AI Tutor (always open, draggable width) ═══ */}
+          <div className="hidden lg:flex flex-col border-l border-[var(--border)] shrink-0 overflow-hidden"
+            style={{width:tutorW}}>
+            <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={tutorW} onDragStart={startTutorDrag} alwaysOpen={true}/>
+          </div>
+
         </div>
+
+        {/* Mobile: lab results below (collapsed accordion) */}
+        <div className="lg:hidden border-t border-[var(--border)]">
+          {cas.labPanels?.length>0&&(
+            <details className="group">
+              <summary className="flex items-center gap-2 px-4 py-3 cursor-pointer bg-[var(--card)] text-sm font-black select-none">
+                <Thermometer size={15} className="text-[var(--accent)]"/>
+                <span className="text-[var(--accent)] uppercase tracking-widest text-xs">Lab Results</span>
+                <ChevronDown size={14} className="ml-auto opacity-40 group-open:rotate-180 transition-transform"/>
+              </summary>
+              <div className="p-4 overflow-x-auto">
+                {cas.labPanels.map((panel,pi)=>(
+                  <div key={pi} className="mb-4">
+                    <p className="text-xs font-black uppercase tracking-widest opacity-50 mb-2">{panel.panelName}</p>
+                    <table className="w-full text-xs">
+                      <thead><tr className="border-b border-[var(--border)]">{['TEST','RESULT','RANGE','UNITS'].map(h=><th key={h} className="text-left py-1 px-2 font-black uppercase opacity-40">{h}</th>)}</tr></thead>
+                      <tbody>{(panel.rows||[]).map((row,ri)=>(
+                        <tr key={ri} className="border-b border-[var(--border)]/20">
+                          <td className="py-1.5 px-2 font-bold">{row.test}</td>
+                          <td className="py-1.5 px-2 font-black" style={{color:row.flag==='H'?'#ef4444':row.flag==='L'?'#3b82f6':undefined}}>{row.result}{row.flag&&` ${row.flag}`}</td>
+                          <td className="py-1.5 px-2 opacity-40 font-mono">{row.range}</td>
+                          <td className="py-1.5 px-2 opacity-35 font-mono">{row.units}</td>
+                        </tr>
+                      ))}</tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
+
       </div>
     );
   }
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
       {showModal&&<QuickGenerateModal type="cases" docs={docs||[]} settings={settings}
         onClose={()=>setShowModal(false)} addToast={addToast}
         setFlashcards={setFlashcards||((fn)=>{})} setExams={setExams||((fn)=>{})} setCases={setCases}/>}
@@ -3031,12 +3370,22 @@ function ChatView({settings,sessions,setSessions}){
   const[sessSearch,setSessSearch]=useState('');
   const[pinnedIds,setPinnedIds]=useState([]);
   const[contextMenu,setContextMenu]=useState(null);
+  const[projects,setProjects]=useState([]);
+  const[selProject,setSelProject]=useState(null);
+  const[showNewProject,setShowNewProject]=useState(false);
+  const[newProjectName,setNewProjectName]=useState('');
+  const[sidebarTab,setSidebarTab]=useState('chats'); // 'chats'|'projects'
+  const[inputRows,setInputRows]=useState(1);
   const endRef=useRef(null);const recogRef=useRef(null);const inputRef=useRef(null);
   useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs,loading]);
 
   const STARTERS=[
-    'Explain this topic simply','Create a study plan','What are the key concepts?',
-    'Give me 5 quiz questions','Compare and contrast','Summarize the main points',
+    {icon:'🧬',text:'Explain a complex topic'},
+    {icon:'📋',text:'Create a study plan'},
+    {icon:'❓',text:'Quiz me on key concepts'},
+    {icon:'🔍',text:'Compare and contrast'},
+    {icon:'📝',text:'Summarize main points'},
+    {icon:'💡',text:'Give me clinical pearls'},
   ];
 
   const toggleVoice=()=>{
@@ -3051,18 +3400,18 @@ function ChatView({settings,sessions,setSessions}){
 
   const newSession=()=>{
     setSelSess(null);
-    setMsgs([{role:'assistant',content:"Hi! I'm MARIAM — your AI study assistant. I can help you understand topics, create study plans, answer questions, or just think through ideas with you. What are you working on today?"}]);
+    setMsgs([]);
     inputRef.current?.focus();
   };
 
   const saveSession=useCallback((ms,id)=>{
     if(!ms.filter(m=>m.role==='user').length)return;
     const sessId=id||selSess||Date.now().toString();
-    const title=ms.find(m=>m.role==='user')?.content?.slice(0,45)||'New Chat';
-    const sess={id:sessId,title,messages:ms,updatedAt:new Date().toISOString(),msgCount:ms.filter(m=>m.role==='user').length};
+    const title=ms.find(m=>m.role==='user')?.content?.slice(0,50)||'New Chat';
+    const sess={id:sessId,title,messages:ms,updatedAt:new Date().toISOString(),msgCount:ms.filter(m=>m.role==='user').length,projectId:selProject||null};
     setSessions(p=>{const ex=p.findIndex(s=>s.id===sessId);return ex>=0?[...p.slice(0,ex),sess,...p.slice(ex+1)]:[sess,...p];});
     setSelSess(sessId);
-  },[selSess,setSessions]);
+  },[selSess,setSessions,selProject]);
 
   const loadSession=sess=>{setSelSess(sess.id);setMsgs(sess.messages||[]);};
 
@@ -3081,19 +3430,28 @@ function ChatView({settings,sessions,setSessions}){
     setContextMenu(null);
   };
 
+  const createProject=()=>{
+    if(!newProjectName.trim())return;
+    const p={id:Date.now().toString(),name:newProjectName.trim(),color:['#6366f1','#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444'][Math.floor(Math.random()*6)],createdAt:new Date().toISOString()};
+    setProjects(prev=>[...prev,p]);
+    setNewProjectName('');
+    setShowNewProject(false);
+  };
+
   const send=async(overrideMsg)=>{
     const msg=overrideMsg||input;
     if(!msg.trim()||loading)return;
-    setInput('');
+    setInput('');setInputRows(1);
     const sessId=selSess||Date.now().toString();
     if(!selSess)setSelSess(sessId);
-    const newMsgs=[...msgs,{role:'user',content:msg},{role:'assistant',content:'',timestamp:Date.now()}];
+    const newMsgs=[...msgs,{role:'user',content:msg,timestamp:Date.now()},{role:'assistant',content:'',timestamp:Date.now()}];
     setMsgs(newMsgs);setLoading(true);
     try{
-      const hist=newMsgs.slice(-10,-1).map(m=>`${m.role==='user'?'USER':'MARIAM'}: ${m.content}`).join('\n');
-      const sysPrompt=`You are MARIAM, a brilliant, warm, and knowledgeable AI study assistant. You help students understand complex topics, create study materials, and achieve their academic goals. Be concise but thorough. Use formatting (bold, lists, headers) when it helps clarity.`;
+      const hist=newMsgs.slice(-12,-1).map(m=>`${m.role==='user'?'USER':'MARIAM'}: ${m.content}`).join('\n');
+      const projCtx=selProject?`\n\nProject context: ${projects.find(p=>p.id===selProject)?.name||''}`:'';
+      const sysPrompt=`You are MARIAM, a brilliant, warm, and knowledgeable AI study assistant specialized in medicine and academia. You help students understand complex topics, create study materials, explain clinical concepts, and achieve their academic goals.${projCtx}\n\nFormatting rules:\n- Use **bold** for key terms and important concepts\n- Use bullet points and numbered lists when listing items\n- Use headers (##) for major sections in long responses\n- Be thorough but organized — students need to be able to study from your answers\n- Always cite clinical evidence when relevant`;
       const prompt=`${sysPrompt}\n\nConversation:\n${hist}\n\nUSER: ${msg}\n\nMARIAM:`;
-      await callAIStreaming(prompt,chunk=>{setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:chunk}]);},settings,5000);
+      await callAIStreaming(prompt,chunk=>{setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:chunk,timestamp:Date.now()}]);},settings,6000);
       const finalMsgs=[...newMsgs.slice(0,-1),{...newMsgs[newMsgs.length-1]}];
       setTimeout(()=>saveSession(finalMsgs,sessId),300);
     }catch(e){setMsgs(p=>[...p.slice(0,-1),{role:'assistant',content:`⚠️ ${e.message}`}]);}
@@ -3101,187 +3459,377 @@ function ChatView({settings,sessions,setSessions}){
   };
 
   const filteredSessions=useMemo(()=>{
+    let s=[...sessions];
+    if(sidebarTab==='projects'&&selProject) s=s.filter(x=>x.projectId===selProject);
     const q=sessSearch.toLowerCase();
-    return sessions.filter(s=>!q||s.title.toLowerCase().includes(q)||s.messages?.some(m=>m.content?.toLowerCase().includes(q)));
-  },[sessions,sessSearch]);
+    if(q) s=s.filter(x=>x.title.toLowerCase().includes(q)||x.messages?.some(m=>m.content?.toLowerCase().includes(q)));
+    return s;
+  },[sessions,sessSearch,sidebarTab,selProject]);
 
   const pinned=filteredSessions.filter(s=>pinnedIds.includes(s.id));
   const unpinned=filteredSessions.filter(s=>!pinnedIds.includes(s.id)).sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));
 
+  // Group by date
+  const groupByDate=(items)=>{
+    const today=new Date();today.setHours(0,0,0,0);
+    const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+    const week=new Date(today);week.setDate(week.getDate()-7);
+    const groups={Today:[],Yesterday:[],'Last 7 Days':[],'Older':[]};
+    items.forEach(s=>{
+      const d=new Date(s.updatedAt);
+      if(d>=today) groups.Today.push(s);
+      else if(d>=yesterday) groups.Yesterday.push(s);
+      else if(d>=week) groups['Last 7 Days'].push(s);
+      else groups.Older.push(s);
+    });
+    return groups;
+  };
+  const grouped=groupByDate(unpinned);
+
   const SessionItem=({s})=>(
-    <button className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all group relative ${selSess===s.id?'bg-[var(--accent)]/10 border border-[var(--accent)]/30':'hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'}`}
+    <button className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left transition-all group relative ${selSess===s.id?'bg-[var(--accent)]/10 border border-[var(--accent)]/20':'hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'}`}
       onClick={()=>loadSession(s)}>
-      <MessageSquare size={16} className={`shrink-0 mt-0.5 ${selSess===s.id?'text-[var(--accent)]':'opacity-40'}`}/>
+      {s.projectId&&<div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{backgroundColor:projects.find(p=>p.id===s.projectId)?.color||'#6366f1'}}/>}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold truncate">{s.title}</p>
-        <p className="text-xs opacity-40 mt-0.5">{s.msgCount||0} msgs · {new Date(s.updatedAt).toLocaleDateString()}</p>
+        <p className={`text-sm truncate font-medium ${selSess===s.id?'text-[var(--accent)] font-bold':''}`}>{s.title}</p>
+        <p className="text-xs opacity-40 mt-0.5">{new Date(s.updatedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</p>
       </div>
-      <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0"
+      <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0 p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10"
         onClick={e=>{e.stopPropagation();setContextMenu({id:s.id,x:e.clientX,y:e.clientY});}}>
-        <MoreVertical size={16}/>
+        <MoreVertical size={14}/>
       </button>
     </button>
   );
 
+  const formatMsg=(text)=>{
+    // Simple markdown-like formatting
+    return text.split('\n').map((line,i)=>{
+      if(line.startsWith('## ')) return <h3 key={i} className="text-base font-black mt-3 mb-1">{line.slice(3)}</h3>;
+      if(line.startsWith('# ')) return <h2 key={i} className="text-lg font-black mt-4 mb-1">{line.slice(2)}</h2>;
+      if(line.startsWith('- ')||line.startsWith('• ')) return <li key={i} className="ml-4 list-disc text-sm leading-relaxed">{formatInline(line.slice(2))}</li>;
+      if(/^\d+\. /.test(line)) return <li key={i} className="ml-4 list-decimal text-sm leading-relaxed">{formatInline(line.replace(/^\d+\. /,''))}</li>;
+      if(line===''&&i>0) return <div key={i} className="h-2"/>;
+      return <p key={i} className="text-sm leading-relaxed">{formatInline(line)}</p>;
+    });
+  };
+
+  const formatInline=(text)=>{
+    const parts=text.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((p,i)=>p.startsWith('**')&&p.endsWith('**')?<strong key={i} className="font-black">{p.slice(2,-2)}</strong>:p);
+  };
+
+  const curSessData=sessions.find(s=>s.id===selSess);
+
   return(
-    <div className="flex h-full min-h-0 overflow-hidden" onClick={()=>contextMenu&&setContextMenu(null)}>
+    <div className="flex h-full min-h-0 overflow-hidden bg-[var(--bg)]" onClick={()=>contextMenu&&setContextMenu(null)}>
+
       {/* Context menu */}
       {contextMenu&&(
-        <div className="fixed z-[9999] glass rounded-xl shadow-2xl border border-[var(--border)] py-1 min-w-[160px]"
-          style={{left:Math.min(contextMenu.x,window.innerWidth-180),top:Math.min(contextMenu.y,window.innerHeight-120)}}>
+        <div className="fixed z-[9999] glass rounded-xl shadow-2xl border border-[var(--border)] py-1 min-w-[180px]"
+          style={{left:Math.min(contextMenu.x,window.innerWidth-200),top:Math.min(contextMenu.y,window.innerHeight-140)}}>
           <button onClick={()=>{setPinnedIds(p=>p.includes(contextMenu.id)?p.filter(x=>x!==contextMenu.id):[...p,contextMenu.id]);setContextMenu(null);}}
-            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold hover:bg-[var(--accent)]/10 transition-colors">
-            <Pin size={16}/>{pinnedIds.includes(contextMenu.id)?'Unpin':'Pin Session'}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[var(--accent)]/10 transition-colors">
+            <Pin size={15}/>{pinnedIds.includes(contextMenu.id)?'Unpin':'Pin to top'}
           </button>
           <button onClick={()=>copySession(contextMenu.id)}
-            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold hover:bg-[var(--accent)]/10 transition-colors">
-            <Copy size={16}/>Copy Transcript
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[var(--accent)]/10 transition-colors">
+            <Copy size={15}/>Copy transcript
           </button>
           <div className="my-1 border-t border-[var(--border)]"/>
           <button onClick={()=>deleteSession(contextMenu.id)}
-            className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500/10 transition-colors">
-            <Trash2 size={16}/>Delete
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors">
+            <Trash2 size={15}/>Delete chat
           </button>
         </div>
       )}
 
-      {/* SIDEBAR */}
-      <div className={`flex flex-col border-r border-[var(--border)] bg-[var(--card)] transition-all duration-300 shrink-0 ${sidebarOpen?'w-64':'w-0 overflow-hidden'}`}>
-        <div className="flex items-center justify-between px-3 py-3 border-b border-[var(--border)] shrink-0">
-          <span className="text-xs font-black uppercase tracking-widest opacity-60">Chat History</span>
-          <button onClick={newSession} className="w-7 h-7 btn-accent rounded-lg flex items-center justify-center shadow-md" title="New chat">
-            <Plus size={16}/>
-          </button>
-        </div>
-        <div className="px-2 py-2 shrink-0">
-          <div className="relative">
-            <Search size={11} className="absolute left-2.5 top-2.5 opacity-30"/>
-            <input value={sessSearch} onChange={e=>setSessSearch(e.target.value)}
-              placeholder="Search chats…"
-              className="w-full bg-black/5 dark:bg-white/5 rounded-xl pl-7 pr-3 py-2 text-xs outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
-          </div>
-        </div>
-        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-2 pb-4 space-y-0.5">
-          {pinned.length>0&&(
-            <>
-              <p className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1.5 flex items-center gap-1"><Pin size={9}/>Pinned</p>
-              {pinned.map(s=><SessionItem key={s.id} s={s}/>)}
-              <div className="my-2 border-t border-[var(--border)]"/>
-            </>
-          )}
-          {unpinned.length>0&&(
-            <>
-              {pinned.length>0&&<p className="text-xs font-black uppercase tracking-widest opacity-30 px-2 py-1.5">Recent</p>}
-              {unpinned.map(s=><SessionItem key={s.id} s={s}/>)}
-            </>
-          )}
-          {!sessions.length&&(
-            <div className="text-center py-10 opacity-30">
-              <MessageSquare size={28} className="mx-auto mb-2"/>
-              <p className="text-xs font-bold">No chats yet</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* ── SIDEBAR ─────────────────────────────────────────────── */}
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen&&(
+        <div className="lg:hidden fixed inset-0 bg-black/40 z-[40] backdrop-blur-sm"
+          onClick={()=>setSidebarOpen(false)}/>
+      )}
+      <div className={`flex flex-col bg-[var(--card)] border-r border-[var(--border)] transition-all duration-300 shrink-0 z-[41]
+        ${sidebarOpen?'w-72':'w-0 overflow-hidden'}
+        lg:relative absolute inset-y-0 left-0`}>
 
-      {/* MAIN CHAT AREA */}
-      <div className="flex-1 flex flex-col min-h-0 min-w-0">
-        {/* Chat toolbar */}
-        <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[var(--border)] bg-[var(--card)] shrink-0">
-          <button onClick={()=>setSidebarOpen(o=>!o)} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0">
-            <History size={18}/>
-          </button>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-black truncate">{selSess?sessions.find(s=>s.id===selSess)?.title||'Untitled Chat':'New Chat'}</p>
-          </div>
-          {msgs.length>0&&(
-            <button onClick={()=>{
-              const text=msgs.map(m=>`${m.role==='user'?'You':'MARIAM'}: ${m.content}`).join('\n\n');
-              navigator.clipboard?.writeText(text);
-            }} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100" title="Copy transcript">
-              <Copy size={18}/>
+        {/* Sidebar header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] shrink-0">
+          <span className="text-base font-black">MARIAM Chat</span>
+          <div className="flex items-center gap-1">
+            <button onClick={newSession}
+              className="w-8 h-8 btn-accent rounded-xl flex items-center justify-center shadow-sm" title="New chat">
+              <Plus size={18}/>
             </button>
-          )}
-          <button onClick={newSession} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0" title="New chat">
-            <Plus size={18}/>
-          </button>
+            <button onClick={()=>setSidebarOpen(false)}
+              className="lg:hidden w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60">
+              <X size={18}/>
+            </button>
+          </div>
         </div>
 
-        {/* Welcome / starters */}
-        {msgs.length===0&&(
-          <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-6 gap-5 overflow-y-auto">
-            <div className="relative">
-              <img src={MARIAM_IMG} className="w-20 h-20 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full"/>
+        {/* Search */}
+        <div className="px-3 py-2 shrink-0">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40"/>
+            <input value={sessSearch} onChange={e=>setSessSearch(e.target.value)}
+              placeholder="Search conversations…"
+              className="w-full bg-black/5 dark:bg-white/5 rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]"/>
+          </div>
+        </div>
+
+        {/* Sidebar tabs: Chats | Projects */}
+        <div className="flex border-b border-[var(--border)] shrink-0 px-3 gap-1">
+          {[['chats','Chats',MessageSquare],['projects','Projects',FolderOpen]].map(([id,lbl,Icon])=>(
+            <button key={id} onClick={()=>setSidebarTab(id)}
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-black uppercase tracking-widest border-b-2 transition-colors -mb-px
+                ${sidebarTab===id?'border-[var(--accent)] text-[var(--accent)]':'border-transparent opacity-50 hover:opacity-80'}`}>
+              <Icon size={14}/>{lbl}
+            </button>
+          ))}
+        </div>
+
+        {/* Chats list */}
+        {sidebarTab==='chats'&&(
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar py-2">
+            {pinned.length>0&&(
+              <div className="mb-2">
+                <p className="text-xs font-black uppercase tracking-widest opacity-30 px-4 py-1.5 flex items-center gap-1.5"><Pin size={10}/>Pinned</p>
+                {pinned.map(s=><SessionItem key={s.id} s={s}/>)}
+                <div className="mx-3 my-2 border-t border-[var(--border)]"/>
               </div>
-            </div>
-            <div className="text-center">
-              <h2 className="text-2xl font-black">Hi! I'm MARIAM</h2>
-              <p className="text-sm opacity-50 mt-1 max-w-sm">Your AI study assistant — ready to help with anything</p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-lg">
-              {STARTERS.map(s=>(
-                <button key={s} onClick={()=>send(s)}
-                  className="glass rounded-2xl p-3 text-xs font-bold text-left hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-all leading-relaxed border border-[var(--border)]">
-                  {s}
-                </button>
-              ))}
-            </div>
+            )}
+            {Object.entries(grouped).map(([grp,items])=>items.length>0&&(
+              <div key={grp} className="mb-3">
+                <p className="text-xs font-black uppercase tracking-widest opacity-30 px-4 py-1.5">{grp}</p>
+                {items.map(s=><SessionItem key={s.id} s={s}/>)}
+              </div>
+            ))}
+            {!sessions.length&&(
+              <div className="text-center py-16 px-4 opacity-30">
+                <MessageSquare size={32} className="mx-auto mb-3"/>
+                <p className="text-sm font-bold">No chats yet</p>
+                <p className="text-xs mt-1">Start a conversation below</p>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Messages */}
-        {msgs.length>0&&(
-          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4" style={{}}>
-            {msgs.map((m,i)=>(
-              <div key={i} className={`flex gap-3 ${m.role==='user'?'flex-row-reverse':''} group`}>
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[var(--border)]'}`}>
-                  {m.role==='user'?<UserCircle2 size={18} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
-                </div>
-                <div className="flex flex-col gap-1 max-w-[80%]">
-                  <div className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap rounded-3xl
-                    ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm':'glass rounded-tl-sm border border-[var(--border)]'}`}>
-                    {m.content||<span className="opacity-30">▊</span>}
-                  </div>
-                  <button onClick={()=>navigator.clipboard?.writeText(m.content)}
-                    className="opacity-0 group-hover:opacity-40 hover:!opacity-80 text-xs font-bold flex items-center gap-1 transition-opacity self-start px-2">
-                    <Copy size={10}/>copy
-                  </button>
-                </div>
-              </div>
-            ))}
-            {loading&&(
-              <div className="flex gap-3">
-                <div className="w-9 h-9 rounded-xl overflow-hidden border border-[var(--border)] shrink-0"><img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/></div>
-                <div className="glass rounded-3xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
-                  {[0,1,2].map(i=><div key={i} className="w-2 h-2 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
+        {/* Projects tab */}
+        {sidebarTab==='projects'&&(
+          <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar py-2">
+            <button onClick={()=>setShowNewProject(true)}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors">
+              <Plus size={16}/>New Project
+            </button>
+            {showNewProject&&(
+              <div className="mx-3 mb-3 p-3 glass rounded-xl border border-[var(--border)] space-y-2">
+                <input value={newProjectName} onChange={e=>setNewProjectName(e.target.value)}
+                  onKeyDown={e=>e.key==='Enter'&&createProject()}
+                  placeholder="Project name…" autoFocus
+                  className="w-full text-sm bg-transparent outline-none border-b border-[var(--border)] pb-1 text-[var(--text)]"/>
+                <div className="flex gap-2">
+                  <button onClick={createProject} className="flex-1 py-1.5 btn-accent rounded-lg text-xs font-black">Create</button>
+                  <button onClick={()=>setShowNewProject(false)} className="flex-1 py-1.5 glass rounded-lg text-xs font-black opacity-60">Cancel</button>
                 </div>
               </div>
             )}
-            <div ref={endRef}/>
+            {projects.length===0&&!showNewProject&&(
+              <div className="text-center py-12 px-4 opacity-30">
+                <FolderOpen size={32} className="mx-auto mb-3"/>
+                <p className="text-sm font-bold">No projects yet</p>
+                <p className="text-xs mt-1">Organize chats into projects</p>
+              </div>
+            )}
+            {[{id:null,name:'All Chats',color:'#6366f1'},...projects].map(p=>(
+              <button key={p.id||'all'} onClick={()=>{setSelProject(p.id);setSidebarTab(p.id?'projects':'chats');}}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all mx-0
+                  ${selProject===p.id?'bg-[var(--accent)]/10':'hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                <div className="w-3 h-3 rounded-full shrink-0" style={{backgroundColor:p.color}}/>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold truncate">{p.name}</p>
+                  <p className="text-xs opacity-40">{sessions.filter(s=>s.projectId===p.id).length} chats</p>
+                </div>
+                {p.id&&(
+                  <button onClick={e=>{e.stopPropagation();setProjects(prev=>prev.filter(x=>x.id!==p.id));}}
+                    className="opacity-0 group-hover:opacity-60 hover:!opacity-100 w-6 h-6 rounded-lg hover:bg-red-500/10 flex items-center justify-center">
+                    <Trash2 size={12} className="text-red-500"/>
+                  </button>
+                )}
+              </button>
+            ))}
+            {selProject&&(
+              <div className="border-t border-[var(--border)] mt-2 pt-2">
+                <p className="text-xs font-black uppercase tracking-widest opacity-30 px-4 py-1.5">Chats in project</p>
+                {filteredSessions.map(s=><SessionItem key={s.id} s={s}/>)}
+                {filteredSessions.length===0&&<p className="text-xs opacity-30 text-center py-4">No chats in this project</p>}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Input area */}
-        <div className="shrink-0 p-3 border-t border-[var(--border)] bg-[var(--card)]"
-          style={{}}>
-          <div className="w-full flex gap-2 items-end glass rounded-2xl p-2 border border-[var(--border)] focus-within:border-[var(--accent)]/50 transition-colors">
-            <textarea ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
-              placeholder="Ask me anything… (Enter to send, Shift+Enter for newline)" disabled={loading}
-              className="flex-1 bg-transparent p-2 text-sm outline-none resize-none max-h-40 custom-scrollbar text-[var(--text)] min-h-[40px]"/>
-            <button onClick={toggleVoice}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening?'bg-red-500 text-white animate-pulse':'opacity-50 hover:opacity-100'}`}
-              title="Voice input">
-              {listening?<MicOff size={18}/>:<Mic size={18}/>}
-            </button>
-            <button onClick={()=>send()} disabled={loading||!input.trim()}
-              className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg transition-transform active:scale-95">
-              <Send size={18}/>
-            </button>
+        {/* Sidebar footer */}
+        <div className="shrink-0 p-3 border-t border-[var(--border)]">
+          <div className="flex items-center gap-2 px-2 py-2 text-xs opacity-40">
+            <Brain size={14}/>
+            <span className="font-bold">{sessions.length} conversations · {sessions.reduce((a,s)=>a+(s.msgCount||0),0)} messages</span>
           </div>
-          <p className="text-xs text-center opacity-20 font-bold mt-1.5">Enter to send · Shift+Enter for newline · / commands coming soon</p>
+        </div>
+      </div>
+
+      {/* ── MAIN CHAT AREA ──────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 relative">
+
+        {/* Top bar */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-sm shrink-0">
+          <button onClick={()=>setSidebarOpen(o=>!o)}
+            className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0 transition-all">
+            <History size={18}/>
+          </button>
+          <div className="flex-1 min-w-0">
+            {curSessData?.projectId&&(
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <div className="w-2 h-2 rounded-full" style={{backgroundColor:projects.find(p=>p.id===curSessData.projectId)?.color||'#6366f1'}}/>
+                <span className="text-xs opacity-50 font-bold">{projects.find(p=>p.id===curSessData.projectId)?.name||'Project'}</span>
+              </div>
+            )}
+            <p className="text-sm font-black truncate">{curSessData?.title||'New Conversation'}</p>
+          </div>
+          <div className="flex items-center gap-1">
+            {msgs.length>0&&(
+              <button onClick={()=>{const t=msgs.map(m=>`${m.role==='user'?'You':'MARIAM'}: ${m.content}`).join('\n\n');navigator.clipboard?.writeText(t);}}
+                className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 transition-all" title="Copy transcript">
+                <Copy size={18}/>
+              </button>
+            )}
+            {msgs.length>0&&(
+              <button onClick={newSession}
+                className="flex items-center gap-2 px-3 py-2 glass rounded-xl text-sm font-black opacity-60 hover:opacity-100 transition-all">
+                <Plus size={16}/>New
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Messages area */}
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+          {msgs.length===0?(
+            <div className="flex flex-col items-center justify-center min-h-full p-6 gap-8">
+              <div className="text-center space-y-3">
+                <div className="relative inline-block">
+                  <img src={MARIAM_IMG} className="w-24 h-24 rounded-3xl object-cover shadow-2xl border-4 border-[var(--border)]" alt="MARIAM AI"/>
+                  <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-white rounded-full"/>
+                  </div>
+                </div>
+                <h1 className="text-3xl font-black">What can I help you study?</h1>
+                <p className="text-base opacity-50 max-w-md">Your AI study assistant — medicine, sciences, and beyond</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-2xl">
+                {STARTERS.map(s=>(
+                  <button key={s.text} onClick={()=>send(s.text)}
+                    className="glass rounded-2xl p-4 text-left hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5 transition-all border border-[var(--border)] group">
+                    <div className="text-2xl mb-2">{s.icon}</div>
+                    <p className="text-sm font-bold group-hover:text-[var(--accent)] transition-colors">{s.text}</p>
+                  </button>
+                ))}
+              </div>
+              {selProject&&(
+                <div className="glass rounded-2xl px-4 py-3 flex items-center gap-3 border border-[var(--accent)]/20">
+                  <div className="w-3 h-3 rounded-full" style={{backgroundColor:projects.find(p=>p.id===selProject)?.color}}/>
+                  <span className="text-sm font-bold">Project: {projects.find(p=>p.id===selProject)?.name}</span>
+                  <button onClick={()=>setSelProject(null)} className="ml-auto text-xs opacity-50 hover:opacity-100"><X size={14}/></button>
+                </div>
+              )}
+            </div>
+          ):(
+            <div className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+              {msgs.map((m,i)=>(
+                <div key={i} className={`flex gap-4 ${m.role==='user'?'flex-row-reverse':''} group`}>
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 ${m.role==='user'?'bg-[var(--accent)]':'overflow-hidden border border-[var(--border)]'}`}>
+                    {m.role==='user'?<UserCircle2 size={20} className="text-white"/>:<img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/>}
+                  </div>
+                  <div className={`flex-1 max-w-[85%] flex flex-col gap-1.5 ${m.role==='user'?'items-end':''}`}>
+                    <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed
+                      ${m.role==='user'?'bg-[var(--accent)] text-white rounded-tr-sm max-w-[80%]':'rounded-tl-sm'}`}>
+                      {m.role==='assistant'?(
+                        <div className="prose-custom space-y-1">{formatMsg(m.content||'')}</div>
+                      ):(
+                        <p className="whitespace-pre-wrap">{m.content}</p>
+                      )}
+                      {!m.content&&m.role==='assistant'&&<span className="opacity-30 animate-pulse">▊</span>}
+                    </div>
+                    <div className="flex items-center gap-2 px-1">
+                      <button onClick={()=>navigator.clipboard?.writeText(m.content)}
+                        className="opacity-0 group-hover:opacity-40 hover:!opacity-80 text-xs font-bold flex items-center gap-1 transition-opacity">
+                        <Copy size={12}/>Copy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {loading&&(
+                <div className="flex gap-4">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden border border-[var(--border)] shrink-0 mt-1"><img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI"/></div>
+                  <div className="glass rounded-2xl rounded-tl-sm px-4 py-3.5 flex items-center gap-1.5">
+                    {[0,1,2].map(i=><div key={i} className="w-2.5 h-2.5 bg-[var(--accent)] rounded-full animate-bounce" style={{animationDelay:`${i*0.15}s`}}/>)}
+                  </div>
+                </div>
+              )}
+              <div ref={endRef}/>
+            </div>
+          )}
+        </div>
+
+        {/* Input area — ChatGPT-style */}
+        <div className="shrink-0 px-4 py-4 border-t border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-sm">
+          <div className="max-w-3xl mx-auto">
+            {/* Project badge if active */}
+            {selProject&&(
+              <div className="flex items-center gap-2 mb-2 px-1">
+                <div className="w-2 h-2 rounded-full" style={{backgroundColor:projects.find(p=>p.id===selProject)?.color}}/>
+                <span className="text-xs font-bold opacity-60">{projects.find(p=>p.id===selProject)?.name}</span>
+                <button onClick={()=>setSelProject(null)} className="opacity-40 hover:opacity-80 ml-1"><X size={12}/></button>
+              </div>
+            )}
+            <div className="glass rounded-2xl border border-[var(--border)] focus-within:border-[var(--accent)]/60 transition-colors shadow-lg">
+              <textarea ref={inputRef} value={input}
+                onChange={e=>{setInput(e.target.value);setInputRows(Math.min(8,e.target.value.split('\n').length));}}
+                onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+                placeholder="Message MARIAM…" disabled={loading} rows={inputRows}
+                className="w-full bg-transparent px-4 pt-4 pb-2 text-sm outline-none resize-none custom-scrollbar text-[var(--text)] min-h-[52px]"/>
+              <div className="flex items-center justify-between px-3 pb-3">
+                <div className="flex items-center gap-1">
+                  <button onClick={toggleVoice}
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${listening?'bg-red-500 text-white animate-pulse':'opacity-40 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10'}`}
+                    title="Voice input">
+                    {listening?<MicOff size={16}/>:<Mic size={16}/>}
+                  </button>
+                  {projects.length>0&&(
+                    <div className="relative group">
+                      <button className="w-8 h-8 rounded-xl flex items-center justify-center opacity-40 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 transition-all" title="Assign to project">
+                        <FolderOpen size={16}/>
+                      </button>
+                      <div className="absolute bottom-10 left-0 hidden group-hover:flex flex-col glass rounded-xl border border-[var(--border)] shadow-xl min-w-[160px] py-1 z-50">
+                        {projects.map(p=>(
+                          <button key={p.id} onClick={()=>setSelProject(p.id)}
+                            className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-[var(--accent)]/10 transition-colors">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{backgroundColor:p.color}}/>
+                            {p.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <button onClick={()=>send()} disabled={loading||!input.trim()}
+                  className="w-9 h-9 bg-[var(--accent)] disabled:opacity-30 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg transition-all hover:opacity-90 active:scale-95">
+                  {loading?<Loader2 size={18} className="animate-spin"/>:<Send size={16}/>}
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-center opacity-20 font-medium mt-2">MARIAM can make mistakes. Verify important medical information.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -3299,7 +3847,7 @@ function SettingsView({settings,setSettings,installPrompt,onInstall}){
   const changeProvider=p=>{const pr=PROVIDERS[p];setSettings(s=>({...s,provider:p,baseUrl:pr.baseUrl,model:pr.defaultModel}));};
 
   return(
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{touchAction:"pan-y",WebkitOverflowScrolling:"touch"}}>
       <div className="w-full p-6 lg:p-8 space-y-6">
         <h1 className="text-3xl font-black flex items-center gap-3 mb-6"><Settings size={28} className="opacity-40"/> Settings</h1>
 
@@ -3638,7 +4186,7 @@ export default function App(){
         const base=`Difficulty: ${diff}. USE ONLY provided text.\nDOCUMENT:\n${textContext}`;
         if(taskType==='flashcards')return`${base}\nGenerate ${bc} expert flashcards.\nJSON: {"items":[{"q":"...","a":"...","evidence":"...","sourcePage":1}]}`;
         if(taskType==='exam')return`${base}\nGenerate ${bc} exam questions.\nJSON: {"items":[{"q":"...","options":["A","B","C","D"],"correct":0,"explanation":"...","evidence":"...","sourcePage":1}]}`;
-        if(taskType==='cases')return`${base}\nGenerate ${bc} clinical cases.\nJSON: {"cases":[{"title":"...","vignette":"...","diagnosis":"...","labPanels":[{"panelName":"...","rows":[{"test":"...","result":"...","flag":"H|L|","range":"...","units":"..."}]}],"examQuestion":{"q":"...","options":["A","B","C","D"],"correct":0,"explanation":"...","evidence":"...","sourcePage":1}}]}`;
+        if(taskType==='cases')return`${base}\nGenerate exactly ${bc} richly detailed clinical cases from ONLY the document content. EACH case MUST have:\n- vignette: 6-10 sentences with demographics, chief complaint, HPI, PMH, meds, vitals, physical exam\n- labPanels: MINIMUM 3 panels (CBC, BMP, LFTs, others) with 5+ rows each (12-20 total lab values), flag abnormals H/L\n- examQuestion with 5 answer options (A-E), long stem, thorough explanation\nJSON ONLY: {"cases":[{"title":"descriptive title","vignette":"6-10 sentence detailed vignette","diagnosis":"specific ICD diagnosis","labPanels":[{"panelName":"COMPLETE BLOOD COUNT","rows":[{"test":"WBC","result":"15.2","flag":"H","range":"4.5-11.0","units":"K/uL"},{"test":"Hemoglobin","result":"11.5","flag":"L","range":"12.0-16.0","units":"g/dL"},{"test":"Hematocrit","result":"34.5","flag":"L","range":"36-46","units":"%"},{"test":"Platelets","result":"250","flag":"","range":"150-400","units":"K/uL"},{"test":"MCV","result":"80","flag":"","range":"80-100","units":"fL"},{"test":"Neutrophils","result":"85","flag":"H","range":"50-70","units":"%"}]},{"panelName":"BASIC METABOLIC PANEL","rows":[{"test":"Na","result":"138","flag":"","range":"135-145","units":"mEq/L"},{"test":"K","result":"3.2","flag":"L","range":"3.5-5.0","units":"mEq/L"},{"test":"Cl","result":"100","flag":"","range":"98-107","units":"mEq/L"},{"test":"CO2","result":"24","flag":"","range":"22-28","units":"mEq/L"},{"test":"BUN","result":"28","flag":"H","range":"7-20","units":"mg/dL"},{"test":"Creatinine","result":"1.5","flag":"H","range":"0.6-1.2","units":"mg/dL"}]},{"panelName":"LIVER FUNCTION TESTS","rows":[{"test":"AST","result":"150","flag":"H","range":"10-40","units":"U/L"},{"test":"ALT","result":"175","flag":"H","range":"7-56","units":"U/L"},{"test":"ALP","result":"90","flag":"","range":"44-147","units":"U/L"},{"test":"Total Bilirubin","result":"1.2","flag":"","range":"0.1-1.2","units":"mg/dL"},{"test":"Albumin","result":"3.0","flag":"L","range":"3.5-5.0","units":"g/dL"}]}],"examQuestion":{"q":"Detailed 2-3 sentence question stem about the case","options":["A) specific option","B) specific option","C) specific option","D) specific option","E) specific option"],"correct":0,"explanation":"Thorough 4-5 sentence explanation","evidence":"document quote","sourcePage":1}}]}`;
         if(taskType==='mindmap')return`${base}\nCreate a comprehensive mind map.\nJSON: {"topic":"Central Topic","branches":[{"label":"Branch Name","subtopics":["sub1","sub2","sub3"]}]}`;
         if(taskType==='concepts')return`${base}\nExtract key concepts with definitions.\nJSON: {"items":[{"concept":"...","definition":"...","example":"...","sourcePage":1}]}`;
         if(taskType==='timeline')return`${base}\nExtract chronological events.\nJSON: {"events":[{"date":"...","event":"...","significance":"...","page":1}]}`;
@@ -3732,7 +4280,7 @@ export default function App(){
         .oled{--bg:#000;--text:#f1f5f9;--card:#0a0a0a;--border:#1a1a1a;}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
         body{margin:0;padding:0;overflow:hidden;}
-        .custom-scrollbar::-webkit-scrollbar{width:4px;height:4px;}
+        .custom-scrollbar::-webkit-scrollbar{width:4px;height:4px;} .custom-scrollbar{-webkit-overflow-scrolling:touch;overflow-scrolling:touch;}
         .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(128,128,128,.2);border-radius:4px;}
         .glass{background:var(--card);border:1px solid var(--border);}
         .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent-soft));color:#fff;border:none;cursor:pointer;}
@@ -3745,7 +4293,7 @@ export default function App(){
         .animate-slide-in{animation:slide-in .2s ease-out forwards;}
         .animate-slide-up{animation:slide-up .3s ease-out forwards;}
         .bottom-nav-safe{padding-bottom:max(8px,env(safe-area-inset-bottom));}
-        .scroll-content{padding-bottom:calc(${NAV_H}px + env(safe-area-inset-bottom) + 24px);}
+        .scroll-content{padding-bottom:calc(${NAV_H}px + env(safe-area-inset-bottom) + 24px);-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
         canvas{display:block;max-width:100%;height:auto!important;}
         textarea{min-height:40px;}
