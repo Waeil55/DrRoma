@@ -4067,7 +4067,14 @@ export default function App(){
   const[bgTask,setBgTask]=useState(null);
   const[installPrompt,setInstallPrompt]=useState(null);
   const[showGlobalSearch,setShowGlobalSearch]=useState(false);
+  const[isMobile,setIsMobile]=useState(()=>window.innerWidth<1024);
   const{toasts,addToast}=useToast();
+
+  useEffect(()=>{
+    const onResize=()=>setIsMobile(window.innerWidth<1024);
+    window.addEventListener('resize',onResize);
+    return()=>window.removeEventListener('resize',onResize);
+  },[]);
 
   useKeyboardShortcuts([
     ['ctrl+k',()=>setShowGlobalSearch(true)],
@@ -4499,27 +4506,8 @@ export default function App(){
           border-bottom:1px solid var(--border);
         }
 
-        /* ══ PILL NAV ══ */
-        .pill-nav-wrap {
-          position:fixed; bottom:0; left:0; right:0; z-index:500;
-          display:flex; justify-content:center;
-          padding-bottom:max(16px,env(safe-area-inset-bottom));
-          pointer-events:none;
-        }
-        .pill-nav {
-          pointer-events:all;
-          background: var(--surface,var(--card));
-          border: 1px solid var(--border2,var(--border));
-          border-radius: 999px;
-          box-shadow: 0 8px 40px rgba(0,0,0,.22), 0 2px 8px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.08);
-          padding: 4px 6px;
-          display:flex; flex-direction:row !important; align-items:center; gap:2px;
-          flex-wrap: nowrap !important;
-          width: min(520px,calc(100vw - 16px));
-          overflow: hidden;
-          backdrop-filter: saturate(180%) blur(24px);
-          -webkit-backdrop-filter: saturate(180%) blur(24px);
-        }
+        /* ══ PILL NAV / SIDEBAR — controlled by React isMobile state, not CSS ══ */
+        /* Glass pill nav styles (applied via inline styles in JSX) */
 
         /* ══ BG MESH ══ */
         .bg-mesh {
@@ -4798,25 +4786,16 @@ export default function App(){
 
       {/* BODY */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* DESKTOP SIDEBAR */}
-        <nav className="hidden lg:flex flex-col items-center shrink-0 z-30 py-4 gap-0.5"
-          style={{width:120,background:'var(--sidebar-bg,var(--surface2))',borderRight:'1px solid var(--border)'}}>
+        {/* DESKTOP SIDEBAR — only rendered when not mobile */}
+        {!isMobile&&(
+        <nav style={{width:120,display:'flex',flexDirection:'column',alignItems:'center',flexShrink:0,zIndex:30,paddingTop:16,paddingBottom:16,gap:2,background:'var(--sidebar-bg,var(--surface2))',borderRight:'1px solid var(--border)'}}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
               disabled={dis} title={label}
-              className={`relative flex flex-col items-center gap-1.5 w-full py-3 transition-all ${dis?'opacity-20 cursor-not-allowed':''} ${view===v?'nav-item-active':''}`}
-              style={{borderRadius:0,paddingLeft:4,paddingRight:4}}>
-              <div className="flex items-center justify-center transition-all"
-                style={view===v?{
-                  background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.18),rgba(var(--acc-rgb,99,102,241),.08))',
-                  border:'1.5px solid rgba(var(--acc-rgb,99,102,241),.28)',
-                  color:'var(--accent)',
-                  boxShadow:'0 4px 16px rgba(var(--acc-rgb,99,102,241),.2)',
-                  borderRadius:16,width:56,height:56,
-                }:dis?{borderRadius:16,width:56,height:56,opacity:.3,color:'var(--text3,var(--text))'}:{
-                  borderRadius:16,width:56,height:56,
-                  color:'var(--text2,var(--text))',opacity:.6,
-                }}>
+              style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:6,width:'100%',padding:'10px 4px',border:'none',background:'none',cursor:dis?'not-allowed':'pointer',opacity:dis?0.2:1,transition:'all .15s'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'center',borderRadius:16,width:56,height:56,transition:'all .15s',
+                ...(view===v?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.18),rgba(var(--acc-rgb,99,102,241),.08))',border:'1.5px solid rgba(var(--acc-rgb,99,102,241),.28)',color:'var(--accent)',boxShadow:'0 4px 16px rgba(var(--acc-rgb,99,102,241),.2)'}:
+                dis?{color:'var(--text3,var(--text))'}:{color:'var(--text2,var(--text))',opacity:.6})}}>
                 <Icon size={24} strokeWidth={view===v?2.5:1.8}/>
               </div>
               <span style={{fontSize:10,color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.7,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.06em'}}>
@@ -4825,6 +4804,7 @@ export default function App(){
             </button>
           ))}
         </nav>
+        )}
 
         {/* MAIN CONTENT */}
         <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
@@ -4915,23 +4895,71 @@ export default function App(){
         )}
       </div>
 
-                  {/* MOBILE BOTTOM NAV — Floating Pill */}
-      <div className="lg:hidden pill-nav-wrap">
-        <nav className="pill-nav">
+      {/* MOBILE BOTTOM NAV — only rendered when mobile */}
+      {isMobile&&(
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:9999,display:'flex',justifyContent:'center',alignItems:'center',padding:`10px 12px max(18px, env(safe-area-inset-bottom)) 12px`,pointerEvents:'none'}}>
+        <nav style={{
+          pointerEvents:'all',
+          display:'flex',
+          flexDirection:'row',
+          flexWrap:'nowrap',
+          alignItems:'center',
+          justifyContent:'space-around',
+          width:'calc(100vw - 24px)',
+          maxWidth:500,
+          padding:'5px 6px',
+          borderRadius:999,
+          background:'rgba(255,255,255,0.62)',
+          backdropFilter:'saturate(200%) blur(30px)',
+          WebkitBackdropFilter:'saturate(200%) blur(30px)',
+          border:'1px solid rgba(255,255,255,0.8)',
+          boxShadow:'0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95)',
+        }}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
               onClick={()=>{if(!dis){if(v==='reader'&&activeId)setView('reader');else if(v!=='reader')setView(v);}}}
-              className={`relative flex-1 flex flex-col items-center gap-0 py-1.5 rounded-3xl transition-all ${dis?'opacity-20':''}`}
-              style={{minWidth:0,flexShrink:1,...(view===v?{background:'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.15),rgba(var(--acc-rgb,99,102,241),.06))'}:{})}}>
-              {view===v&&<div style={{position:'absolute',top:-1,left:'50%',transform:'translateX(-50%)',height:2,width:18,borderRadius:999,background:'var(--accent)'}}/>}
-              <div style={{width:28,height:28,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',color:view===v?'var(--accent)':'var(--text2)',opacity:dis?0.3:view===v?1:.55}}>
-                <Icon size={15} strokeWidth={view===v?2.5:1.8}/>
+              style={{
+                position:'relative',
+                flex:1,
+                display:'flex',
+                flexDirection:'column',
+                alignItems:'center',
+                justifyContent:'center',
+                gap:2,
+                padding:'5px 2px',
+                borderRadius:22,
+                border:'none',
+                cursor:dis?'not-allowed':'pointer',
+                minWidth:0,
+                flexShrink:1,
+                background:view===v?'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.16),rgba(var(--acc-rgb,99,102,241),.07))':'transparent',
+                opacity:dis?0.25:1,
+                transition:'all .15s ease',
+                WebkitTapHighlightColor:'transparent',
+              }}>
+              {view===v&&<div style={{position:'absolute',top:1,left:'50%',transform:'translateX(-50%)',height:2,width:16,borderRadius:999,background:'var(--accent)'}}/>}
+              <div style={{
+                width:30,height:30,borderRadius:10,
+                display:'flex',alignItems:'center',justifyContent:'center',
+                color:view===v?'var(--accent)':'var(--text2,#555)',
+                background:view===v?'rgba(var(--acc-rgb,99,102,241),.13)':'transparent',
+                opacity:view===v?1:0.62,
+                transition:'all .15s',
+              }}>
+                <Icon size={16} strokeWidth={view===v?2.5:1.8}/>
               </div>
-              <span style={{fontSize:8,fontWeight:800,textTransform:'uppercase',letterSpacing:'0.04em',color:view===v?'var(--accent)':'var(--text3,var(--text))',opacity:dis?0.3:view===v?1:.55,whiteSpace:'nowrap'}}>{label}</span>
+              <span style={{
+                fontSize:8,fontWeight:800,
+                textTransform:'uppercase',letterSpacing:'0.04em',
+                whiteSpace:'nowrap',lineHeight:1,
+                color:view===v?'var(--accent)':'var(--text3,#888)',
+                opacity:view===v?1:0.62,
+              }}>{label}</span>
             </button>
           ))}
         </nav>
       </div>
+      )}
     </div>
   );
 }
