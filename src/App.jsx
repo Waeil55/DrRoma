@@ -46,6 +46,22 @@ MoreVertical,CheckCheck,CircleDot,Flame,Heart,Leaf,
  * Injects a <script> tag and resolves with the global the library exposes.
  * Safe to call multiple times — returns the cached global immediately if loaded.
  */
+/* ── IMMEDIATE MOBILE FIXES (runs before first React render) ──────────────────
+   1. viewport-fit=cover  →  env(safe-area-inset-*) gets real iPhone values
+   2. body background     →  no white flash / gap behind fixed nav
+──────────────────────────────────────────────────────────────────────────── */
+(()=>{
+  // viewport-fit=cover must exist BEFORE first paint for safe-area-inset to work
+  let vp=document.querySelector('meta[name="viewport"]');
+  if(!vp){vp=document.createElement('meta');vp.name='viewport';document.head.appendChild(vp);}
+  if(!vp.content.includes('viewport-fit=cover')){
+    vp.content='width=device-width, initial-scale=1, viewport-fit=cover';
+  }
+  // Make html+body fill screen colour so no white shows behind fixed nav
+  document.documentElement.style.cssText+='height:100%;background:#f5f7ff;';
+  document.body.style.cssText+='height:100%;background:#f5f7ff;margin:0;padding:0;overflow:hidden;';
+})();
+
 const loadScript=async(src,globalName)=>{
   if(window[globalName])return window[globalName];
   return new Promise((res,rej)=>{
@@ -4082,6 +4098,13 @@ export default function App(){
     return()=>window.removeEventListener('resize',onResize);
   },[]);
 
+  // Keep body/html bg in sync with theme — eliminates ANY white gap behind fixed nav
+  useEffect(()=>{
+    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f5f7ff';
+    document.documentElement.style.background=bg;
+    document.body.style.background=bg;
+  },[settings.theme]);
+
   useKeyboardShortcuts([
     ['ctrl+k',()=>setShowGlobalSearch(true)],
     ['ctrl+/',()=>setShowGlobalSearch(true)],
@@ -4541,7 +4564,7 @@ export default function App(){
 
         /* ══ MISC ══ */
         /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
-        .scroll-content { padding-bottom:calc(62px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+        .scroll-content { padding-bottom:calc(84px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -4662,7 +4685,7 @@ export default function App(){
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(62px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+        .scroll-content{padding-bottom:calc(84px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
         /* ── PILL NAV ITEM ACTIVE ── */
@@ -4903,19 +4926,21 @@ export default function App(){
         )}
       </div>
 
-      {/* MOBILE BOTTOM NAV — only rendered when mobile */}
+      {/* MOBILE BOTTOM NAV — floating glass pill */}
       {isMobile&&(
       <div style={{
         position:'fixed',
         bottom:0,left:0,right:0,
         zIndex:9999,
         pointerEvents:'none',
-        /* Fill the entire bottom area including safe zone — no white gap */
-        paddingBottom:'env(safe-area-inset-bottom)',
-        background:'var(--nav-bg, rgba(245,247,255,0.92))',
-        backdropFilter:'saturate(180%) blur(20px)',
-        WebkitBackdropFilter:'saturate(180%) blur(20px)',
-        borderTop:'1px solid var(--border)',
+        /* Transparent wrapper — height = pill + gap + safe-area-inset-bottom */
+        height:'calc(68px + env(safe-area-inset-bottom))',
+        /* Fill the safe-area-inset-bottom zone with app background so no white gap */
+        background:'linear-gradient(to top, var(--bg,#f5f7ff) calc(env(safe-area-inset-bottom)), transparent 100%)',
+        display:'flex',
+        alignItems:'flex-start',
+        justifyContent:'center',
+        paddingTop:8,
       }}>
         <nav style={{
           pointerEvents:'all',
@@ -4924,8 +4949,15 @@ export default function App(){
           flexWrap:'nowrap',
           alignItems:'center',
           justifyContent:'space-around',
-          width:'100%',
-          padding:'4px 8px 6px 8px',
+          width:'calc(100vw - 24px)',
+          maxWidth:520,
+          padding:'4px 6px',
+          borderRadius:999,
+          background:'rgba(255,255,255,0.75)',
+          backdropFilter:'saturate(200%) blur(28px)',
+          WebkitBackdropFilter:'saturate(200%) blur(28px)',
+          border:'1px solid rgba(255,255,255,0.85)',
+          boxShadow:'0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
         }}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
@@ -4951,21 +4983,21 @@ export default function App(){
               }}>
               {view===v&&<div style={{position:'absolute',top:1,left:'50%',transform:'translateX(-50%)',height:2,width:16,borderRadius:999,background:'var(--accent)'}}/>}
               <div style={{
-                width:30,height:30,borderRadius:10,
+                width:28,height:28,borderRadius:10,
                 display:'flex',alignItems:'center',justifyContent:'center',
                 color:view===v?'var(--accent)':'var(--text2,#555)',
                 background:view===v?'rgba(var(--acc-rgb,99,102,241),.13)':'transparent',
-                opacity:view===v?1:0.62,
+                opacity:view===v?1:0.6,
                 transition:'all .15s',
               }}>
-                <Icon size={16} strokeWidth={view===v?2.5:1.8}/>
+                <Icon size={15} strokeWidth={view===v?2.5:1.8}/>
               </div>
               <span style={{
                 fontSize:8,fontWeight:800,
                 textTransform:'uppercase',letterSpacing:'0.04em',
                 whiteSpace:'nowrap',lineHeight:1,
                 color:view===v?'var(--accent)':'var(--text3,#888)',
-                opacity:view===v?1:0.62,
+                opacity:view===v?1:0.6,
               }}>{label}</span>
             </button>
           ))}
