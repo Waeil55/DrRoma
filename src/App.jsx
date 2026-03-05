@@ -4529,6 +4529,16 @@ export default function App(){
           width:3px; height:30px; border-radius:0 6px 6px 0;
           background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));
         }
+        /* ══ ROOT RESET — zero margin/padding, exact screen fit ══ */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body {
+          margin: 0; padding: 0;
+          width: 100%; height: 100dvh;
+          overflow: hidden;
+          overscroll-behavior: none;
+          background: var(--bg, #f5f7ff);
+        }
+
         .main-header {
           background:var(--nav-bg);
           backdrop-filter:saturate(200%) blur(20px); -webkit-backdrop-filter:saturate(200%) blur(20px);
@@ -4564,7 +4574,7 @@ export default function App(){
 
         /* ══ MISC ══ */
         /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
-        .scroll-content { padding-bottom:calc(84px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+        .scroll-content { padding-bottom:calc(76px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -4619,8 +4629,13 @@ export default function App(){
   ];
 
   return(
-    <div className={`h-[100dvh] w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme||'pure-white'} accent-${settings.accentColor||'indigo'}`}
-      style={{paddingTop:'env(safe-area-inset-top)'}}>
+    <div className={`w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme||'pure-white'} accent-${settings.accentColor||'indigo'}`}
+      style={{
+        height:'100dvh',
+        maxHeight:'100dvh',
+        boxSizing:'border-box',
+        /* safe-area-inset-top is handled by the header below */
+      }}>
       <style>{`
         /* ── LIGHT THEMES ── */
         .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(245,247,255,.88);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
@@ -4685,7 +4700,7 @@ export default function App(){
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(84px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+        .scroll-content{padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
         /* ── PILL NAV ITEM ACTIVE ── */
@@ -4744,8 +4759,13 @@ export default function App(){
       )}
 
       {/* HEADER */}
-      <header className="main-header shrink-0 z-40" style={{height:64}}>
-        <div className="flex items-center justify-between h-full px-4 lg:px-6 gap-4">
+      <header className="main-header shrink-0 z-40"
+        style={{
+          paddingTop:'env(safe-area-inset-top)',
+          height:'calc(64px + env(safe-area-inset-top))',
+          boxSizing:'border-box',
+        }}>
+        <div className="flex items-center justify-between h-full px-4 lg:px-6 gap-4" style={{height:64}}>
 
           {/* Logo */}
           <div className="flex items-center gap-3 shrink-0">
@@ -4933,14 +4953,18 @@ export default function App(){
         bottom:0,left:0,right:0,
         zIndex:9999,
         pointerEvents:'none',
-        /* Transparent wrapper — height = pill + gap + safe-area-inset-bottom */
+        /* Exact height = pill (60px) + gap (8px) + safe-area-inset-bottom */
         height:'calc(68px + env(safe-area-inset-bottom))',
-        /* Fill the safe-area-inset-bottom zone with app background so no white gap */
-        background:'linear-gradient(to top, var(--bg,#f5f7ff) calc(env(safe-area-inset-bottom)), transparent 100%)',
+        boxSizing:'border-box',
+        /* Fill from bottom with app bg — covers the safe area zone completely */
+        background:'var(--bg,#f5f7ff)',
+        /* Pill sits at top, safe-area fills below it */
         display:'flex',
-        alignItems:'flex-start',
-        justifyContent:'center',
+        flexDirection:'column',
+        alignItems:'center',
         paddingTop:8,
+        paddingLeft:12,
+        paddingRight:12,
       }}>
         <nav style={{
           pointerEvents:'all',
@@ -4949,15 +4973,15 @@ export default function App(){
           flexWrap:'nowrap',
           alignItems:'center',
           justifyContent:'space-around',
-          width:'calc(100vw - 24px)',
-          maxWidth:520,
+          width:'100%',
+          maxWidth:540,
           padding:'4px 6px',
           borderRadius:999,
-          background:'rgba(255,255,255,0.75)',
+          background:'rgba(255,255,255,0.78)',
           backdropFilter:'saturate(200%) blur(28px)',
           WebkitBackdropFilter:'saturate(200%) blur(28px)',
-          border:'1px solid rgba(255,255,255,0.85)',
-          boxShadow:'0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
+          border:'1px solid rgba(255,255,255,0.88)',
+          boxShadow:'0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
         }}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
