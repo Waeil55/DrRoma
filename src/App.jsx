@@ -4945,15 +4945,13 @@ export default function App(){
       {isMobile&&(
       <div style={{
         position:'fixed',
-        bottom:0,
-        left:0,right:0,
+        bottom:0,left:0,right:0,
         zIndex:9999,
         pointerEvents:'none',
         display:'flex',
         justifyContent:'center',
         paddingLeft:12,
         paddingRight:12,
-        paddingBottom:12,
       }}>
         <nav style={{
           pointerEvents:'all',
@@ -4964,13 +4962,17 @@ export default function App(){
           justifyContent:'space-around',
           width:'100%',
           maxWidth:540,
-          padding:'4px 6px',
-          borderRadius:999,
+          paddingTop:6,
+          paddingLeft:6,
+          paddingRight:6,
+          paddingBottom:'calc(10px + env(safe-area-inset-bottom))',
+          borderRadius:'24px 24px 0 0',
           background:'rgba(255,255,255,0.78)',
           backdropFilter:'saturate(200%) blur(28px)',
           WebkitBackdropFilter:'saturate(200%) blur(28px)',
           border:'1px solid rgba(255,255,255,0.88)',
-          boxShadow:'0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
+          borderBottom:'none',
+          boxShadow:'0 -4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.95)',
         }}>
           {NAV_ITEMS.map(({icon:Icon,label,v,dis})=>(
             <button key={v} disabled={dis}
