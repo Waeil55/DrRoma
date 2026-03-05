@@ -4953,12 +4953,9 @@ export default function App(){
         bottom:0,left:0,right:0,
         zIndex:9999,
         pointerEvents:'none',
-        /* Exact height = pill (60px) + gap (8px) + safe-area-inset-bottom */
         height:'calc(68px + env(safe-area-inset-bottom))',
         boxSizing:'border-box',
-        /* Fill from bottom with app bg — covers the safe area zone completely */
-        background:'var(--bg,#f5f7ff)',
-        /* Pill sits at top, safe-area fills below it */
+        background:'transparent',
         display:'flex',
         flexDirection:'column',
         alignItems:'center',
