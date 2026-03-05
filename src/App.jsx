@@ -4574,7 +4574,7 @@ export default function App(){
 
         /* ══ MISC ══ */
         /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
-        .scroll-content { padding-bottom:calc(76px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+        .scroll-content { padding-bottom:80px; -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -4700,7 +4700,7 @@ export default function App(){
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(76px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+        .scroll-content{padding-bottom:80px;-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
         /* ── PILL NAV ITEM ACTIVE ── */
@@ -4950,7 +4950,7 @@ export default function App(){
       {isMobile&&(
       <div style={{
         position:'fixed',
-        bottom:'calc(8px + env(safe-area-inset-bottom))',
+        bottom:12,
         left:12,right:12,
         zIndex:9999,
         pointerEvents:'none',
