@@ -4950,18 +4950,12 @@ export default function App(){
       {isMobile&&(
       <div style={{
         position:'fixed',
-        bottom:0,left:0,right:0,
+        bottom:'calc(8px + env(safe-area-inset-bottom))',
+        left:12,right:12,
         zIndex:9999,
         pointerEvents:'none',
-        height:'calc(68px + env(safe-area-inset-bottom))',
-        boxSizing:'border-box',
-        background:'transparent',
         display:'flex',
-        flexDirection:'column',
-        alignItems:'center',
-        paddingTop:8,
-        paddingLeft:12,
-        paddingRight:12,
+        justifyContent:'center',
       }}>
         <nav style={{
           pointerEvents:'all',
