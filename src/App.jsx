@@ -4965,7 +4965,7 @@ export default function App(){
           paddingTop:6,
           paddingLeft:6,
           paddingRight:6,
-          paddingBottom:'calc(10px + env(safe-area-inset-bottom))',
+          paddingBottom:'calc(20px + env(safe-area-inset-bottom))',
           borderRadius:'24px 24px 0 0',
           background:'rgba(255,255,255,0.78)',
           backdropFilter:'saturate(200%) blur(28px)',
