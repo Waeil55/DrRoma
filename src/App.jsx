@@ -58,8 +58,8 @@ MoreVertical,CheckCheck,CircleDot,Flame,Heart,Leaf,
     vp.content='width=device-width, initial-scale=1, viewport-fit=cover';
   }
   // Make html+body fill screen colour so no white shows behind fixed nav
-  document.documentElement.style.cssText+='height:100%;background:#f5f7ff;';
-  document.body.style.cssText+='height:100%;background:#f5f7ff;margin:0;padding:0;overflow:hidden;';
+  document.documentElement.style.cssText+='height:100%;background:transparent;';
+  document.body.style.cssText+='height:100%;background:transparent;margin:0;padding:0;overflow:hidden;';
 })();
 
 const loadScript=async(src,globalName)=>{
@@ -4098,12 +4098,7 @@ export default function App(){
     return()=>window.removeEventListener('resize',onResize);
   },[]);
 
-  // Keep body/html bg in sync with theme — eliminates ANY white gap behind fixed nav
-  useEffect(()=>{
-    const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#f5f7ff';
-    document.documentElement.style.background=bg;
-    document.body.style.background=bg;
-  },[settings.theme]);
+  // (body background kept transparent — app div covers full screen)
 
   useKeyboardShortcuts([
     ['ctrl+k',()=>setShowGlobalSearch(true)],
@@ -4536,7 +4531,7 @@ export default function App(){
           width: 100%; height: 100dvh;
           overflow: hidden;
           overscroll-behavior: none;
-          background: var(--bg, #f5f7ff);
+          background: transparent;
         }
 
         .main-header {
