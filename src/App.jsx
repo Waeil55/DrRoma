@@ -4945,12 +4945,15 @@ export default function App(){
       {isMobile&&(
       <div style={{
         position:'fixed',
-        bottom:12,
-        left:12,right:12,
+        bottom:0,
+        left:0,right:0,
         zIndex:9999,
         pointerEvents:'none',
         display:'flex',
         justifyContent:'center',
+        paddingLeft:12,
+        paddingRight:12,
+        paddingBottom:12,
       }}>
         <nav style={{
           pointerEvents:'all',
