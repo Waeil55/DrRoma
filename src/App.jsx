@@ -1,4 +1,8 @@
 import React,{useState,useEffect,useRef,useCallback,useMemo}from'react';
+import{counselingData}from'./Counseling.js';
+import{diseasesData}from'./Diseases.js';
+import{drugData}from'./drugData.js';
+import{lawData}from'./lawData.js';
 /*
  * ╔══════════════════════════════════════════════════════════════════╗
  * ║  MARIAM PRO v7.0 ULTRA — Universal AI Document Intelligence     ║
@@ -1765,6 +1769,89 @@ const PROVIDERS={
 const DEFAULT_SETTINGS={provider:'anthropic',apiKey:'',baseUrl:'',model:'',strictMode:false,theme:'pure-white',fontSize:'medium',accentColor:'indigo'};
 
 /* ═══════════════════════════════════════════════════════════════════
+   BUILT-IN SETS — generated from imported data files.
+   These sets are PERMANENT and cannot be deleted by the user.
+   Each data file exports an array of items. We support two shapes:
+     Flashcard item:  { q, a, ... }  OR  { question, answer, ... }
+     Exam item:       { q, options:[], correct, explanation, ... }
+   We auto-detect which shape each file uses.
+═══════════════════════════════════════════════════════════════════ */
+
+/** Normalise any item from the data files into a flashcard card object */
+const _toCard=(item,i)=>{
+  if(!item)return null;
+  // Support q/a, question/answer, term/definition, front/back, name/description patterns
+  const q=item.q||item.question||item.term||item.front||item.name||item.title||item.concept||`Item ${i+1}`;
+  const a=item.a||item.answer||item.definition||item.back||item.description||item.details||item.explanation||'—';
+  return{id:`builtin_${i}_${Math.random().toString(36).slice(2)}`,q:String(q),a:String(a),
+    evidence:item.evidence||item.source||'',sourcePage:item.page||item.sourcePage||null,
+    repetitions:0,ef:2.5,interval:1,nextReview:Date.now(),lastReview:Date.now()};
+};
+
+/** Normalise any item into an exam question object */
+const _toExamQ=(item,i)=>{
+  if(!item)return null;
+  // Already has options array → treat as MCQ
+  if(Array.isArray(item.options)&&item.options.length){
+    return{q:String(item.q||item.question||item.stem||`Question ${i+1}`),
+      options:item.options.map(String),
+      correct:typeof item.correct==='number'?item.correct:0,
+      explanation:String(item.explanation||item.rationale||item.reason||''),
+      evidence:item.evidence||'',sourcePage:item.page||null};
+  }
+  // Flashcard-style → build 4 synthetic options (correct + 3 distractors built later)
+  const q=item.q||item.question||item.term||item.front||item.name||item.concept||`Question ${i+1}`;
+  const a=item.a||item.answer||item.definition||item.back||item.description||item.details||'—';
+  return{q:String(q),options:[String(a),'See explanation for details','Refer to source material','None of the above'],
+    correct:0,explanation:String(a),evidence:item.evidence||'',sourcePage:item.page||null};
+};
+
+/** Safe array normaliser — handles array, object-of-arrays, or object-of-objects */
+const _safeArr=(raw)=>{
+  if(!raw)return[];
+  if(Array.isArray(raw))return raw;
+  // e.g. { diseases:[...], conditions:[...] }  → flatten all values that are arrays
+  const vals=Object.values(raw);
+  const arrVals=vals.filter(Array.isArray);
+  if(arrVals.length)return arrVals.flat();
+  // e.g. { 0:{...}, 1:{...} }
+  return vals;
+};
+
+const _makeBuiltinFC=(id,title,icon,color,rawData)=>{
+  const cards=_safeArr(rawData).map(_toCard).filter(Boolean);
+  return{id,title,isBuiltin:true,builtinIcon:icon,builtinColor:color,
+    docId:null,sourcePages:'built-in',createdAt:'2025-01-01T00:00:00.000Z',cards};
+};
+
+const _makeBuiltinExam=(id,title,icon,color,rawData)=>{
+  const questions=_safeArr(rawData).map(_toExamQ).filter(Boolean);
+  return{id,title,isBuiltin:true,builtinIcon:icon,builtinColor:color,
+    docId:null,sourcePages:'built-in',createdAt:'2025-01-01T00:00:00.000Z',questions};
+};
+
+/* ── Try/catch each import so a bad data file doesn't break the whole app ── */
+let _counselingArr=[],_diseasesArr=[],_drugArr=[],_lawArr=[];
+try{_counselingArr=_safeArr(counselingData);}catch(e){console.warn('[BUILTIN] Counseling:',e.message);}
+try{_diseasesArr=_safeArr(diseasesData);}catch(e){console.warn('[BUILTIN] Diseases:',e.message);}
+try{_drugArr=_safeArr(drugData);}catch(e){console.warn('[BUILTIN] Drugs:',e.message);}
+try{_lawArr=_safeArr(lawData);}catch(e){console.warn('[BUILTIN] Law:',e.message);}
+
+export const BUILTIN_FLASHCARD_SETS=[
+  _makeBuiltinFC('builtin_counseling','📋 Counseling','Clipboard','#8b5cf6',_counselingArr),
+  _makeBuiltinFC('builtin_diseases','🩺 Diseases & Conditions','Activity','#ef4444',_diseasesArr),
+  _makeBuiltinFC('builtin_drugs','💊 Pharmacology — Drug Guide','Pill','#f59e0b',_drugArr),
+  _makeBuiltinFC('builtin_law','⚖️ Medical Law & Ethics','BookMarked','#06b6d4',_lawArr),
+].filter(s=>s.cards.length>0);
+
+export const BUILTIN_EXAM_SETS=[
+  _makeBuiltinExam('builtin_exam_counseling','📋 Counseling Exam','Clipboard','#8b5cf6',_counselingArr),
+  _makeBuiltinExam('builtin_exam_diseases','🩺 Diseases Exam','Activity','#ef4444',_diseasesArr),
+  _makeBuiltinExam('builtin_exam_drugs','💊 Pharmacology Exam','Pill','#f59e0b',_drugArr),
+  _makeBuiltinExam('builtin_exam_law','⚖️ Medical Law Exam','BookMarked','#06b6d4',_lawArr),
+].filter(s=>s.questions.length>0);
+
+/* ═══════════════════════════════════════════════════════════════════
    VIEW WRAPPER
 ═══════════════════════════════════════════════════════════════════ */
 const ViewWrapper=({active,children})=>(
@@ -2482,7 +2569,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
             </div>
             <div className="flex gap-1.5">
               <button onClick={()=>setView('flashcards')} className="text-xs font-black px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">Study</button>
-              <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{display:set.isBuiltin?'none':'inline-flex'}}>Del</button>
             </div>
           </div>
         ))}
@@ -2495,7 +2582,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
             <div><p className="text-xs font-bold">{ex.title}</p><p className="text-xs opacity-40">{ex.questions?.length} Qs</p></div>
             <div className="flex gap-1.5">
               <button onClick={()=>setView('exams')} className="text-xs font-black px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg">Take</button>
-              <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{display:ex.isBuiltin?'none':'inline-flex'}}>Del</button>
             </div>
           </div>
         ))}
@@ -2508,7 +2595,7 @@ function VaultPanel({activeDocId,flashcards,setFlashcards,exams,setExams,cases,s
             <div><p className="text-xs font-bold">{c.title}</p><p className="text-xs opacity-40">{c.questions?.length} cases</p></div>
             <div className="flex gap-1.5">
               <button onClick={()=>setView('cases')} className="text-xs font-black px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">Start</button>
-              <button onClick={()=>setCases(p=>p.filter(x=>x.id!==c.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg">Del</button>
+              <button onClick={()=>setCases(p=>p.filter(x=>x.id!==c.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{display:c.isBuiltin?'none':'inline-flex'}}>Del</button>
             </div>
           </div>
         ))}
@@ -2845,11 +2932,14 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
             </button>
           </div>
         ):(filteredSets.map(set=>(
-          <div key={set.id} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20 transition-all card-hover">
+          <div key={set.id} className={`glass rounded-2xl p-5 border transition-all card-hover ${set.isBuiltin?'border-[var(--accent)]/30 bg-[var(--accent)]/3':'border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20'}`}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <h3 className="font-black text-sm truncate">{set.title}</h3>
-                <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-black text-sm truncate">{set.title}</h3>
+                  {set.isBuiltin&&<span className="text-xs font-black px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">📚 Built-in</span>}
+                </div>
+                <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {set.isBuiltin?'Always available':new Date(set.createdAt).toLocaleDateString()}</p>
                 {set.docId&&docs?.find(d=>d.id===set.docId)&&(
                   <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d=>d.id===set.docId).name}</p>
                 )}
@@ -2868,7 +2958,7 @@ function FlashcardsView({flashcards,setFlashcards,settings,addToast,docs,setExam
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2">
                   <Layers size={16}/> Study
                 </button>
-                <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+                <button onClick={()=>setFlashcards(p=>p.filter(f=>f.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{display:set.isBuiltin?'none':'flex'}}><Trash2 size={14}/></button>
               </div>
             </div>
           </div>
@@ -3113,11 +3203,14 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
             </button>
           </div>
         ):(filteredExams.map(ex=>(
-          <div key={ex.id} className="glass rounded-2xl p-5 border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20 transition-all card-hover">
+          <div key={ex.id} className={`glass rounded-2xl p-5 border transition-all card-hover ${ex.isBuiltin?'border-emerald-500/30 bg-emerald-500/3':'border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20'}`}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <h3 className="font-black text-sm truncate">{ex.title}</h3>
-                <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {new Date(ex.createdAt).toLocaleDateString()}</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-black text-sm truncate">{ex.title}</h3>
+                  {ex.isBuiltin&&<span className="text-xs font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">📚 Built-in</span>}
+                </div>
+                <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {ex.isBuiltin?'Always available':new Date(ex.createdAt).toLocaleDateString()}</p>
                 {ex.docId&&docs?.find(d=>d.id===ex.docId)&&(
                   <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d=>d.id===ex.docId).name}</p>
                 )}
@@ -3132,7 +3225,7 @@ function ExamsView({exams,setExams,settings,addToast,docs,setFlashcards,setCases
                   <Eye size={18}/>
                 </button>
                 <button onClick={()=>startExam(ex)} className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Target size={18}/> Start</button>
-                <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+                <button onClick={()=>setExams(p=>p.filter(e=>e.id!==ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{display:ex.isBuiltin?'none':'flex'}}><Trash2 size={14}/></button>
               </div>
             </div>
           </div>
@@ -3419,7 +3512,7 @@ function CasesView({cases,setCases,settings,addToast,docs,setFlashcards,setExams
                 </button>
                 <button onClick={()=>{setSelSet(set);setCi(0);setSelOpt(null);setSubmitted(false);}}
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Stethoscope size={18}/>Practice</button>
-                <button onClick={()=>setCases(p=>p.filter(c=>c.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
+                <button onClick={()=>setCases(p=>p.filter(c=>c.id!==set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{display:set.isBuiltin?'none':'flex'}}><Trash2 size={14}/></button>
               </div>
             </div>
           </div>
@@ -4138,13 +4231,21 @@ export default function App(){
         getState('docs'),getState('flashcards'),getState('exams'),getState('cases'),
         getState('notes'),getState('chats'),getState('settings'),getState('openDocs'),
         getState('docPages'),getState('mindMaps'),getState('timelines')]);
-      if(d)setDocs(d);if(fc)setFlashcards(fc);if(ex)setExams(ex);if(ca)setCases(ca);
+      if(d)setDocs(d);
+      // Merge built-in sets — always present, user sets follow after them
+      const userFC=(fc||[]).filter(f=>!f.isBuiltin);
+      const userEx=(ex||[]).filter(e=>!e.isBuiltin);
+      setFlashcards([...BUILTIN_FLASHCARD_SETS,...userFC]);
+      setExams([...BUILTIN_EXAM_SETS,...userEx]);
+      if(ca)setCases(ca);
       if(no)setNotes(no);if(ch)setChatSessions(ch);if(od)setOpenDocs(od);if(dp)setDocPages(dp);
       if(mm)setMindMaps(mm);if(tl)setTimelines(tl);
       if(st)setSettings(p=>({...DEFAULT_SETTINGS,...p,...st}));
     }catch(err){
       logError('boot',err);
-      // Non-fatal: app still works, just without persisted data
+      // Non-fatal: still seed built-ins even if DB fails
+      setFlashcards([...BUILTIN_FLASHCARD_SETS]);
+      setExams([...BUILTIN_EXAM_SETS]);
       console.warn('Could not restore saved data. Starting fresh.',err.message);
       setBootError(err.message);
     }finally{setLoaded(true);}
@@ -4156,8 +4257,11 @@ export default function App(){
     const t=setTimeout(async()=>{
       try{
         const slim=docs.map(d=>{const c={...d};delete c.pagesText;delete c.buffer;return c;});
-        await Promise.all([saveState('docs',slim),saveState('flashcards',flashcards),
-          saveState('exams',exams),saveState('cases',cases),saveState('notes',notes),
+        // Exclude built-in sets from persistence — they are always seeded from code
+        const userFC=flashcards.filter(f=>!f.isBuiltin);
+        const userEx=exams.filter(e=>!e.isBuiltin);
+        await Promise.all([saveState('docs',slim),saveState('flashcards',userFC),
+          saveState('exams',userEx),saveState('cases',cases),saveState('notes',notes),
           saveState('chats',chatSessions),saveState('settings',settings),
           saveState('openDocs',openDocs),saveState('docPages',docPages),
           saveState('mindMaps',mindMaps),saveState('timelines',timelines)]);
