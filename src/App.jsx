@@ -2610,8 +2610,10 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
         ))}
         <div ref={endRef} />
       </div>
-      <div className="shrink-0 p-3 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
-        <div className="flex gap-2 items-end">
+      {/* Input inside AiTutorPanel */}
+      <div className="shrink-0 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]"
+        style={{ padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px' }}>
+        <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/50">
           <textarea value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
             placeholder="Ask about this document…" disabled={loading} rows={1}
@@ -3007,16 +3009,29 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
           </div>
         </div>
 
-        {/* MOBILE: floating Tutor button */}
-        <button onClick={() => setMobileTutorOpen(true)}
-          className="lg:hidden fixed z-40 w-14 h-14 rounded-2xl btn-accent shadow-2xl flex items-center justify-center"
-          style={{bottom: `calc(${88}px + env(safe-area-inset-bottom, 0px))`, right: 16}}
-          title="AI Tutor"><MessageSquare size={22} /></button>
+        {/* MOBILE: floating AI Tutor FAB */}
+        <button onClick={() => {
+          if (typeof setMobileTutorOpen === 'function') setMobileTutorOpen(true);
+          if (typeof setExamMobileOpen === 'function') setExamMobileOpen(true);
+          if (typeof setCasesMobileTutorOpen === 'function') setCasesMobileTutorOpen(true);
+        }}
+          className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+          style={{
+            bottom: 'calc(76px + env(safe-area-inset-bottom))',
+            right: 16,
+            zIndex: 9000 /* Increased from 40 so it stays above content but below navbar */
+          }}
+          title="AI Tutor">
+          <MessageSquare size={24} />
+        </button>
 
+        {/* Mobile Drawer Wrapper for Tutor */}
         {mobileTutorOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end" style={{background:'rgba(0,0,0,0.55)'}}
-            onClick={e => e.target===e.currentTarget && setMobileTutorOpen(false)}>
-            <div className="glass rounded-t-3xl flex flex-col" style={{height:'72vh',boxShadow:'0 -8px 40px rgba(0,0,0,.3)'}}>
+          <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }}
+            onClick={e => e.target === e.currentTarget && setMobileTutorOpen(false)}>
+            <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up"
+              style={{ height: '85dvh', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }}
+              onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
                 <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
                 <button onClick={() => setMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
@@ -3231,18 +3246,31 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
           {/* RIGHT: AI Tutor always open */}
-          {/* MOBILE: floating Tutor button */}
-          <button onClick={() => setExamMobileOpen(true)}
-            className="lg:hidden fixed z-40 w-14 h-14 rounded-2xl btn-accent shadow-2xl flex items-center justify-center"
-            style={{bottom: `calc(${88}px + env(safe-area-inset-bottom, 0px))`, right: 16}}
-            title="AI Tutor"><MessageSquare size={22} /></button>
+          {/* MOBILE: floating AI Tutor FAB */}
+          <button onClick={() => {
+            if (typeof setMobileTutorOpen === 'function') setMobileTutorOpen(true);
+            if (typeof setExamMobileOpen === 'function') setExamMobileOpen(true);
+            if (typeof setCasesMobileTutorOpen === 'function') setCasesMobileTutorOpen(true);
+          }}
+            className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+            style={{
+              bottom: 'calc(76px + env(safe-area-inset-bottom))',
+              right: 16,
+              zIndex: 9000 /* Increased from 40 so it stays above content but below navbar */
+            }}
+            title="AI Tutor">
+            <MessageSquare size={24} />
+          </button>
           {examMobileOpen && (() => {
             const eq = selEx?.questions?.[qi];
-            const ec = `Exam: ${selEx?.title}\nQ${qi+1}: ${eq?.q}\nOptions: ${eq?.options?.join(' | ')}\nCorrect: ${eq?.options?.[eq?.correct]}`;
+            const ec = `Exam: ${selEx?.title}\nQ${qi + 1}: ${eq?.q}\nOptions: ${eq?.options?.join(' | ')}\nCorrect: ${eq?.options?.[eq?.correct]}`;
             return (
-              <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end" style={{background:'rgba(0,0,0,0.55)'}}
-                onClick={e => e.target===e.currentTarget && setExamMobileOpen(false)}>
-                <div className="glass rounded-t-3xl flex flex-col" style={{height:'72vh',boxShadow:'0 -8px 40px rgba(0,0,0,.3)'}}>
+              <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }}
+                onClick={e => e.target === e.currentTarget && setExamMobileOpen(false)}>
+                {/* Mobile Drawer Wrapper for Tutor */}
+                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up"
+                  style={{ height: '85dvh', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }}
+                  onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
                     <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
                     <button onClick={() => setExamMobileOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
@@ -3258,7 +3286,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true} />
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 
@@ -3411,6 +3439,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
 ═══════════════════════════════════════════════════════════════════ */
 function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, setExams }) {
   const [selSet, setSelSet] = useState(null); const [ci, setCi] = useState(0);
+  const [casesMobileTutorOpen, setCasesMobileTutorOpen] = useState(false);
   const [stage, setStage] = useState('vignette'); const [selOpt, setSelOpt] = useState(null); const [submitted, setSubmitted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [exporting, setExporting] = useState(null);
@@ -3626,6 +3655,40 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
             </details>
           )}
         </div>
+
+        {/* MOBILE: floating AI Tutor FAB */}
+        <button onClick={() => {
+          if (typeof setMobileTutorOpen === 'function') setMobileTutorOpen(true);
+          if (typeof setExamMobileOpen === 'function') setExamMobileOpen(true);
+          if (typeof setCasesMobileTutorOpen === 'function') setCasesMobileTutorOpen(true);
+        }}
+          className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+          style={{
+            bottom: 'calc(76px + env(safe-area-inset-bottom))',
+            right: 16,
+            zIndex: 9000 /* Increased from 40 so it stays above content but below navbar */
+          }}
+          title="AI Tutor">
+          <MessageSquare size={24} />
+        </button>
+
+        {/* Mobile Drawer Wrapper for Tutor */}
+        {casesMobileTutorOpen && (
+          <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }}
+            onClick={e => e.target === e.currentTarget && setCasesMobileTutorOpen(false)}>
+            <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up"
+              style={{ height: '85dvh', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
+                <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
+                <button onClick={() => setCasesMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setCasesMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     );
@@ -4308,10 +4371,10 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
           <div className="mb-5">
             <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{ color: 'var(--text3)', opacity: .7 }}>Line Spacing</span>
             <div className="flex gap-1.5 glass rounded-xl p-1.5">
-              {[['compact','Compact',1.4],['normal','Normal',1.7],['relaxed','Relaxed',2.0],['loose','Loose',2.4]].map(([id,label,lh]) => (
+              {[['compact', 'Compact', 1.4], ['normal', 'Normal', 1.7], ['relaxed', 'Relaxed', 2.0], ['loose', 'Loose', 2.4]].map(([id, label, lh]) => (
                 <button key={id} onClick={() => setSettings(s => ({ ...s, lineSpacing: id }))}
                   className="flex-1 py-2 rounded-lg font-black transition-all text-xs"
-                  style={(settings.lineSpacing||'normal') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
+                  style={(settings.lineSpacing || 'normal') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
                 >{label}<span style={{ fontSize: 8, display: 'block', opacity: .7 }}>×{lh}</span></button>
               ))}
             </div>
@@ -4321,10 +4384,10 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
           <div className="mb-5">
             <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{ color: 'var(--text3)', opacity: .7 }}>Card / Panel Density</span>
             <div className="flex gap-1.5 glass rounded-xl p-1.5">
-              {[['compact','Compact'],['comfortable','Comfortable'],['spacious','Spacious']].map(([id,label]) => (
+              {[['compact', 'Compact'], ['comfortable', 'Comfortable'], ['spacious', 'Spacious']].map(([id, label]) => (
                 <button key={id} onClick={() => setSettings(s => ({ ...s, cardStyle: id }))}
                   className="flex-1 py-2.5 rounded-lg font-black transition-all text-xs"
-                  style={(settings.cardStyle||'comfortable') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
+                  style={(settings.cardStyle || 'comfortable') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
                 >{label}</button>
               ))}
             </div>
@@ -4393,12 +4456,12 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
    NAVIGATION ITEMS — used by both desktop sidebar and mobile bottom nav
 ═══════════════════════════════════════════════════════════════════ */
 const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Home',      v: 'dashboard', dis: false },
-  { icon: FolderOpen,      label: 'Library',   v: 'library',   dis: false },
-  { icon: Layers,          label: 'Cards',     v: 'flashcards',dis: false },
-  { icon: CheckSquare,     label: 'Exams',     v: 'exams',     dis: false },
-  { icon: Activity,        label: 'Cases',     v: 'cases',     dis: false },
-  { icon: MessageSquare,   label: 'Tutor',     v: 'chat',      dis: false },
+  { icon: LayoutDashboard, label: 'Home', v: 'dashboard', dis: false },
+  { icon: FolderOpen, label: 'Library', v: 'library', dis: false },
+  { icon: Layers, label: 'Cards', v: 'flashcards', dis: false },
+  { icon: CheckSquare, label: 'Exams', v: 'exams', dis: false },
+  { icon: Activity, label: 'Cases', v: 'cases', dis: false },
+  { icon: MessageSquare, label: 'Tutor', v: 'chat', dis: false },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -4995,16 +5058,16 @@ function App() {
       }}>
       <style>{`
         /* ── LIGHT THEMES ── */
-        .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(245,247,255,.88);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
-        .light{--bg:#eef2ff;--bg2:#e4eaff;--surface:#ffffff;--surface2:#eef2ff;--text:#050f2a;--text2:#334070;--text3:#6a7ba0;--border:rgba(40,70,220,.09);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(238,242,255,.92);--sidebar-bg:linear-gradient(180deg,#e4eaff 0%,#d8e2ff 100%);--card:#fff;--border-old:#e2e8f0;}
-        .warm{--bg:#fffbf5;--bg2:#fff5e8;--surface:#ffffff;--surface2:#fff8f0;--text:#1a0f05;--text2:#5c3d1e;--text3:#9e7555;--border:rgba(180,100,20,.08);--border2:rgba(180,100,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,.92);--sidebar-bg:linear-gradient(180deg,#fff5e8 0%,#ffefd6 100%);--card:#fff;--border-old:#fde8cc;}
-        .rose{--bg:#fff5f7;--bg2:#ffe8ed;--surface:#ffffff;--surface2:#fff0f4;--text:#1a0508;--text2:#5c1a28;--text3:#a05070;--border:rgba(200,30,80,.08);--border2:rgba(200,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,.92);--sidebar-bg:linear-gradient(180deg,#ffe8ed 0%,#ffd6e0 100%);--card:#fff;--border-old:#ffc0cb;}
-        .forest{--bg:#f0faf5;--bg2:#e0f5ea;--surface:#ffffff;--surface2:#eef9f3;--text:#031a0a;--text2:#1a4a28;--text3:#4a8060;--border:rgba(20,130,60,.08);--border2:rgba(20,130,60,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,250,245,.92);--sidebar-bg:linear-gradient(180deg,#e0f5ea 0%,#cff0dc 100%);--card:#fff;--border-old:#b7f5d0;}
+        .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(255,255,255,0.70);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
+        .light{--bg:#eef2ff;--bg2:#e4eaff;--surface:#ffffff;--surface2:#eef2ff;--text:#050f2a;--text2:#334070;--text3:#6a7ba0;--border:rgba(40,70,220,.09);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(238,242,255,0.70);--sidebar-bg:linear-gradient(180deg,#e4eaff 0%,#d8e2ff 100%);--card:#fff;--border-old:#e2e8f0;}
+        .warm{--bg:#fffbf5;--bg2:#fff5e8;--surface:#ffffff;--surface2:#fff8f0;--text:#1a0f05;--text2:#5c3d1e;--text3:#9e7555;--border:rgba(180,100,20,.08);--border2:rgba(180,100,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,0.70);--sidebar-bg:linear-gradient(180deg,#fff5e8 0%,#ffefd6 100%);--card:#fff;--border-old:#fde8cc;}
+        .rose{--bg:#fff5f7;--bg2:#ffe8ed;--surface:#ffffff;--surface2:#fff0f4;--text:#1a0508;--text2:#5c1a28;--text3:#a05070;--border:rgba(200,30,80,.08);--border2:rgba(200,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,0.70);--sidebar-bg:linear-gradient(180deg,#ffe8ed 0%,#ffd6e0 100%);--card:#fff;--border-old:#ffc0cb;}
+        .forest{--bg:#f0faf5;--bg2:#e0f5ea;--surface:#ffffff;--surface2:#eef9f3;--text:#031a0a;--text2:#1a4a28;--text3:#4a8060;--border:rgba(20,130,60,.08);--border2:rgba(20,130,60,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,250,245,0.70);--sidebar-bg:linear-gradient(180deg,#e0f5ea 0%,#cff0dc 100%);--card:#fff;--border-old:#b7f5d0;}
         /* ── DARK THEMES ── */
-        .dark{--bg:#04080f;--bg2:#070c18;--surface:#0c1220;--surface2:#101828;--text:#ccd8f8;--text2:#5c6e98;--text3:#384562;--border:rgba(100,130,255,.08);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(4,8,15,.94);--sidebar-bg:linear-gradient(180deg,#06090f 0%,#040810 100%);--card:#0c1220;--border-old:#252840;}
-        .oled{--bg:#000000;--bg2:#030610;--surface:#060c18;--surface2:#0a1020;--text:#c0d0f0;--text2:#404e70;--text3:#28344c;--border:rgba(80,120,255,.07);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,.97);--sidebar-bg:linear-gradient(180deg,#020408 0%,#000000 100%);--card:#060c18;--border-old:#1a1a1a;}
-        .midnight{--bg:#0a0a14;--bg2:#0e0e1e;--surface:#12122a;--surface2:#18183a;--text:#e0e0ff;--text2:#6060a0;--text3:#404080;--border:rgba(140,140,255,.08);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(10,10,20,.96);--sidebar-bg:linear-gradient(180deg,#0e0e1e 0%,#0a0a14 100%);--card:#12122a;--border-old:#1e1e40;}
-        .slate{--bg:#0f1117;--bg2:#161820;--surface:#1e2130;--surface2:#252840;--text:#dce8f8;--text2:#5a6a88;--text3:#384558;--border:rgba(100,130,180,.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,17,23,.96);--sidebar-bg:linear-gradient(180deg,#161820 0%,#0f1117 100%);--card:#1e2130;--border-old:#2a2d40;}
+        .dark{--bg:#04080f;--bg2:#070c18;--surface:#0c1220;--surface2:#101828;--text:#ccd8f8;--text2:#5c6e98;--text3:#384562;--border:rgba(100,130,255,.08);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(12,18,32,0.70);--sidebar-bg:linear-gradient(180deg,#06090f 0%,#040810 100%);--card:#0c1220;--border-old:#252840;}
+        .oled{--bg:#000000;--bg2:#030610;--surface:#060c18;--surface2:#0a1020;--text:#c0d0f0;--text2:#404e70;--text3:#28344c;--border:rgba(80,120,255,.07);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.70);--sidebar-bg:linear-gradient(180deg,#020408 0%,#000000 100%);--card:#060c18;--border-old:#1a1a1a;}
+        .midnight{--bg:#0a0a14;--bg2:#0e0e1e;--surface:#12122a;--surface2:#18183a;--text:#e0e0ff;--text2:#6060a0;--text3:#404080;--border:rgba(140,140,255,.08);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(18,18,42,0.70);--sidebar-bg:linear-gradient(180deg,#0e0e1e 0%,#0a0a14 100%);--card:#12122a;--border-old:#1e1e40;}
+        .slate{--bg:#0f1117;--bg2:#161820;--surface:#1e2130;--surface2:#252840;--text:#dce8f8;--text2:#5a6a88;--text3:#384558;--border:rgba(100,130,180,.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,17,23,0.70);--sidebar-bg:linear-gradient(180deg,#161820 0%,#0f1117 100%);--card:#1e2130;--border-old:#2a2d40;}
         /* ── ACCENT OVERRIDES (when user picks accent color) ── */
         .accent-indigo{--accent:#5046e5;--accent2:#7c3aed;--acc-rgb:80,70,229;}
         .accent-purple{--accent:#9333ea;--accent2:#7c3aed;--acc-rgb:147,51,234;}
@@ -5015,7 +5078,14 @@ function App() {
         .accent-cyan{--accent:#0891b2;--accent2:#0e7490;--acc-rgb:8,145,178;}
         .accent-teal{--accent:#0d9488;--accent2:#059669;--acc-rgb:13,148,136;}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-        body{margin:0;padding:0;overflow:hidden;}
+        /* ── ROOT RESET ── */
+        html, body {
+          margin: 0; padding: 0;
+          width: 100%; height: 100dvh;
+          overflow: hidden;
+          overscroll-behavior: none;
+          background-color: var(--bg) !important; /* Fixes the white flash at the bottom */
+        }
         input,textarea,select{font-size:16px!important;}
         .custom-scrollbar{-webkit-overflow-scrolling:touch;}
         .custom-scrollbar::-webkit-scrollbar{width:2px;height:2px;}
@@ -5305,77 +5375,44 @@ function App() {
         )}
       </div>
 
-      {/* MOBILE BOTTOM NAV — floating glass pill */}
+      {/* MOBILE BOTTOM NAV — Full Width iOS Glass Bar */}
       {isMobile && (
         <div style={{
           position: 'fixed',
-          bottom: 0,
-          left: 0, right: 0,
+          bottom: 0, left: 0, right: 0,
           zIndex: 9999,
-          pointerEvents: 'none',
           display: 'flex',
           justifyContent: 'center',
-          paddingLeft: 12,
-          paddingRight: 12,
-          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          background: 'var(--nav-bg)',
+          backdropFilter: 'saturate(200%) blur(24px)',
+          WebkitBackdropFilter: 'saturate(200%) blur(24px)',
+          borderTop: '1px solid var(--border)',
         }}>
           <nav style={{
-            pointerEvents: 'all',
             display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'nowrap',
-            alignItems: 'center',
-            justifyContent: 'space-around',
             width: '100%',
             maxWidth: 540,
-            padding: '4px 6px',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.78)',
-            backdropFilter: 'saturate(200%) blur(28px)',
-            WebkitBackdropFilter: 'saturate(200%) blur(28px)',
-            border: '1px solid rgba(255,255,255,0.88)',
-            boxShadow: '0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
+            padding: '8px 6px 4px 6px',
+            justifyContent: 'space-around',
           }}>
             {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
               <button key={v} disabled={dis}
                 onClick={() => { if (!dis) { if (v === 'reader' && activeId) setView('reader'); else if (v !== 'reader') setView(v); } }}
                 style={{
-                  position: 'relative',
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                  padding: '5px 2px',
-                  borderRadius: 22,
-                  border: 'none',
-                  cursor: dis ? 'not-allowed' : 'pointer',
-                  minWidth: 0,
-                  flexShrink: 1,
-                  background: view === v ? 'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.16),rgba(var(--acc-rgb,99,102,241),.07))' : 'transparent',
-                  opacity: dis ? 0.25 : 1,
-                  transition: 'all .15s ease',
-                  WebkitTapHighlightColor: 'transparent',
+                  position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, padding: '4px 0', border: 'none', background: 'transparent', cursor: dis ? 'not-allowed' : 'pointer', opacity: dis ? 0.3 : 1, WebkitTapHighlightColor: 'transparent',
                 }}>
-                {view === v && <div style={{ position: 'absolute', top: 1, left: '50%', transform: 'translateX(-50%)', height: 2, width: 16, borderRadius: 999, background: 'var(--accent)' }} />}
                 <div style={{
-                  width: 28, height: 28, borderRadius: 10,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: view === v ? 'var(--accent)' : 'var(--text2,#555)',
-                  background: view === v ? 'rgba(var(--acc-rgb,99,102,241),.13)' : 'transparent',
                   opacity: view === v ? 1 : 0.6,
-                  transition: 'all .15s',
+                  transform: view === v ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}>
-                  <Icon size={15} strokeWidth={view === v ? 2.5 : 1.8} />
+                  <Icon size={22} strokeWidth={view === v ? 2.5 : 2} />
                 </div>
-                <span style={{
-                  fontSize: 8, fontWeight: 800,
-                  textTransform: 'uppercase', letterSpacing: '0.04em',
-                  whiteSpace: 'nowrap', lineHeight: 1,
-                  color: view === v ? 'var(--accent)' : 'var(--text3,#888)',
-                  opacity: view === v ? 1 : 0.6,
-                }}>{label}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: view === v ? 'var(--accent)' : 'var(--text3,#888)', opacity: view === v ? 1 : 0.6 }}>
+                  {label}
+                </span>
               </button>
             ))}
           </nav>
@@ -5398,7 +5435,7 @@ class AppErrorBoundary extends React.Component {
         <pre style={{ background: '#fee', padding: 16, borderRadius: 8, fontSize: 12, textAlign: 'left', overflowX: 'auto' }}>
           {this.state.error?.message}
         </pre>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           style={{ marginTop: 20, padding: '10px 20px', borderRadius: 8, background: 'var(--accent, #6366f1)', color: 'white', border: 'none', cursor: 'pointer' }}
         >

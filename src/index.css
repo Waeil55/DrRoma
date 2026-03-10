@@ -4,13 +4,23 @@
 
 /* ─── ROOT HEIGHT LOCK ─────────────────────────────────────────────────────── */
 html,
-body,
-#root {
+body {
   height: 100%;
-  max-height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;          /* dynamic VH — accounts for mobile browser chrome */
+  max-height: 100dvh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  overflow-x: hidden;          /* no horizontal scroll ever */
+  overscroll-behavior-y: none; /* kill iOS rubber-band bounce (white flash) */
+}
+
+#root {
+  height: 100%;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* ─── CUSTOM SCROLLBAR (clean & thin) ─────────────────────────────────────── */
