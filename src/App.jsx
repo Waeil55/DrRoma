@@ -69,6 +69,7 @@ import {
   Bell, Archive, BarChart, BookCopy, CalendarDays, FlameKindling,
   Trophy, Percent, PenLine, Scissors, Bookmark, History, Plus,
   MoreVertical, CheckCheck, CircleDot, Flame, Heart, Leaf,
+  Layout, LayoutGrid, BotMessageSquare,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -2874,6 +2875,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
   const [showModal, setShowModal] = useState(false);
   const [exporting, setExporting] = useState(null);
   const [filterDocId, setFilterDocId] = useState('all');
+  const [mobileTutorOpen, setMobileTutorOpen] = useState(false);
 
   const rateCard = useCallback(q => {
     trackStudy('flashcard');
@@ -3004,6 +3006,27 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={fcTutorW} onDragStart={startFcTutorDrag} alwaysOpen={true} />
           </div>
         </div>
+
+        {/* MOBILE: floating Tutor button */}
+        <button onClick={() => setMobileTutorOpen(true)}
+          className="lg:hidden fixed z-40 w-14 h-14 rounded-2xl btn-accent shadow-2xl flex items-center justify-center"
+          style={{bottom: `calc(${88}px + env(safe-area-inset-bottom, 0px))`, right: 16}}
+          title="AI Tutor"><MessageSquare size={22} /></button>
+
+        {mobileTutorOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end" style={{background:'rgba(0,0,0,0.55)'}}
+            onClick={e => e.target===e.currentTarget && setMobileTutorOpen(false)}>
+            <div className="glass rounded-t-3xl flex flex-col" style={{height:'72vh',boxShadow:'0 -8px 40px rgba(0,0,0,.3)'}}>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
+                <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
+                <button onClick={() => setMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -3104,6 +3127,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
   const [exporting, setExporting] = useState(false);
   const [filterDocId, setFilterDocId] = useState('all');
   const [sortMode, setSortMode] = useState('newest');
+  const [examMobileOpen, setExamMobileOpen] = useState(false);
 
   const startExam = ex => { setSelEx(ex); setQi(0); setSelected(null); setSubmitted(false); setScore(null); setAnswers([]); setReviewMode(false); };
   const submit = () => {
@@ -3207,6 +3231,29 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
           {/* RIGHT: AI Tutor always open */}
+          {/* MOBILE: floating Tutor button */}
+          <button onClick={() => setExamMobileOpen(true)}
+            className="lg:hidden fixed z-40 w-14 h-14 rounded-2xl btn-accent shadow-2xl flex items-center justify-center"
+            style={{bottom: `calc(${88}px + env(safe-area-inset-bottom, 0px))`, right: 16}}
+            title="AI Tutor"><MessageSquare size={22} /></button>
+          {examMobileOpen && (() => {
+            const eq = selEx?.questions?.[qi];
+            const ec = `Exam: ${selEx?.title}\nQ${qi+1}: ${eq?.q}\nOptions: ${eq?.options?.join(' | ')}\nCorrect: ${eq?.options?.[eq?.correct]}`;
+            return (
+              <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end" style={{background:'rgba(0,0,0,0.55)'}}
+                onClick={e => e.target===e.currentTarget && setExamMobileOpen(false)}>
+                <div className="glass rounded-t-3xl flex flex-col" style={{height:'72vh',boxShadow:'0 -8px 40px rgba(0,0,0,.3)'}}>
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
+                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
+                    <button onClick={() => setExamMobileOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-hidden">
+                    <AiTutorPanel settings={settings} context={ec} onClose={() => setExamMobileOpen(false)} alwaysOpen={true} width={window.innerWidth} />
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0" style={{ width: examTutorW }}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true} />
           </div>
