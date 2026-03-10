@@ -2945,20 +2945,37 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
         <div className="flex-1 min-h-0 flex overflow-hidden">
           {/* LEFT: card + controls */}
           <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-5" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
-            {/* Flip card */}
-            <div className="glass rounded-3xl p-8 cursor-pointer min-h-[220px] flex flex-col justify-between select-none border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 transition-all active:scale-[0.99]"
-              onClick={() => setFlipped(f => !f)}>
-              <div className="flex items-start justify-between mb-4">
-                <span className={`text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border ${flipped ? 'border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/8' : 'glass opacity-50'}`}>
-                  {flipped ? 'Answer' : 'Question'}
-                </span>
-                {card.sourcePage && <span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+            {/* Quizlet-style 3D flip card */}
+            <div style={{ perspective: '1200px', minHeight: 220 }} onClick={() => setFlipped(f => !f)} className="cursor-pointer select-none">
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                minHeight: 220,
+                transformStyle: 'preserve-3d',
+                transition: 'transform 0.55s cubic-bezier(0.45,0.05,0.55,0.95)',
+                transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+              }}>
+                {/* FRONT — Question */}
+                <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', position: 'absolute', inset: 0 }}
+                  className="glass rounded-3xl p-8 flex flex-col justify-between border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border glass opacity-50">Question</span>
+                    {card.sourcePage && <span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+                  </div>
+                  <p className="text-base font-semibold leading-relaxed flex-1">{card.q}</p>
+                  <p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-1"><RefreshCw size={11} />Tap to flip</p>
+                </div>
+                {/* BACK — Answer (rotated 180deg so it faces forward when card flips) */}
+                <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', position: 'absolute', inset: 0, transform: 'rotateY(180deg)' }}
+                  className="glass rounded-3xl p-8 flex flex-col justify-between border border-[var(--accent)]/30 bg-[var(--accent)]/4 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/10">Answer</span>
+                    {card.sourcePage && <span className="text-xs font-mono opacity-30">p.{card.sourcePage}</span>}
+                  </div>
+                  <p className="text-base font-semibold leading-relaxed flex-1 text-[var(--accent)]" style={{ whiteSpace: 'pre-line' }}>{card.a}</p>
+                  {card.evidence && <p className="text-xs opacity-40 mt-4 italic border-t border-[color:var(--border2,var(--border))] pt-3">"{card.evidence}"</p>}
+                </div>
               </div>
-              <p className={`text-base font-semibold leading-relaxed flex-1 ${flipped ? 'text-[var(--accent)]' : ''}`}>
-                {flipped ? card.a : card.q}
-              </p>
-              {flipped && card.evidence && <p className="text-xs opacity-40 mt-4 italic border-t border-[color:var(--border2,var(--border))] pt-3">"{card.evidence}"</p>}
-              {!flipped && <p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-1"><RefreshCw size={11} />Tap to flip</p>}
             </div>
             {/* Rating buttons */}
             {flipped ? (
@@ -3044,9 +3061,9 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-black text-sm truncate">{set.title}</h3>
-                  {set.isBuiltin && <span className="text-xs font-black px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">📚 Built-in</span>}
+                  {(set.isBuiltin || set.isBuiltIn) && <span className="text-xs font-black px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">📚 Built-in</span>}
                 </div>
-                <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {set.isBuiltin ? 'Always available' : new Date(set.createdAt).toLocaleDateString()}</p>
+                <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {(set.isBuiltin || set.isBuiltIn) ? 'Always available' : new Date(set.createdAt).toLocaleDateString()}</p>
                 {set.docId && docs?.find(d => d.id === set.docId) && (
                   <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === set.docId).name}</p>
                 )}
