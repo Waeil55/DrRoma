@@ -2135,9 +2135,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal law regulating controlled substances and creating a closed system for manufacture, distribution, and dispensing",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "High abuse potential\\nNo accepted medical use\\nLack of safety even under supervision",
+      "Less abuse than I & II, accepted medical use, moderate/low physical dependence or high psychological dependence",
+      "Lowest abuse potential\\nAccepted medical use\\nLimited dependence risk"
     ],
     "correct": 0
   },
@@ -2146,9 +2146,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "DEA (Drug Enforcement Administration) under the Department of Justice",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol",
+      "1. Add digits 1, 3, 5\\n2. Add digits 2, 4, 6 then x 2\\n3. Add both totals\\n4. Last digit must equal check digit",
+      "Narcotic treatment program application"
     ],
     "correct": 0
   },
@@ -2157,9 +2157,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "High abuse potential\nNo accepted medical use\nLack of safety even under supervision",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2 letters + 7 numbers\\nLast digit = check digit",
+      "60 days",
+      "Manual signature\\nElectronic (per DEA rules)"
     ],
     "correct": 0
   },
@@ -2168,9 +2168,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Heroin, LSD, marijuana, MDMA, psilocybin, peyote",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Narcotic treatment program application",
+      "Non-narcotics",
+      "NABP (National Association of Boards of Pharmacy)"
     ],
     "correct": 0
   },
@@ -2179,9 +2179,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "High abuse potential\nAccepted medical use (with restrictions)\nSevere dependence risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Execute new form\\nAttach statement with order # and date\\nNotify DEA if stolen",
+      "120 total questions (100 scored, 20 unscored)",
+      "100 scored questions"
     ],
     "correct": 0
   },
@@ -2190,9 +2190,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Morphine, oxycodone, fentanyl, hydrocodone combos, amphetamine, methylphenidate, methadone",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pharmacist and prescriber share responsibility for validity and legitimacy of controlled prescription",
+      "No, pharmacists are still responsible for individual state laws",
+      "Indiana Administrative Code (IAC)"
     ],
     "correct": 0
   },
@@ -2201,9 +2201,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Less abuse than I & II, accepted medical use, moderate/low physical dependence or high psychological dependence",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA must be notified to terminate registration. The registrant must:\\nReturn DEA registration certificate\\nReturn executed DEA Form 222s\\nDispose of controlled substances per DEA rules\\nMaintain records for at least 2 years",
+      "United States Code (USC)",
+      "No, it states principles but is not legally binding law"
     ],
     "correct": 0
   },
@@ -2212,9 +2212,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Tylenol #3, buprenorphine, ketamine, anabolic steroids, dronabinol",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2.5 hours (150 minutes)",
+      "Fair procedures (notice and hearing)",
+      "Double jeopardy, self-incrimination, due process, takings clause"
     ],
     "correct": 0
   },
@@ -2223,9 +2223,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Low abuse potential relative to III\nAccepted medical use\nLimited dependence risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, they are mixed together unless specifically stated",
+      "Legislative Branch (Congress)",
+      "President limited to two terms"
     ],
     "correct": 0
   },
@@ -2234,9 +2234,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Benzodiazepines, zolpidem, tramadol, carisoprodol",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Supremacy Clause (Article VI)",
+      "Powers not given to federal government belong to states or people",
+      "6 years"
     ],
     "correct": 0
   },
@@ -2245,9 +2245,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Lowest abuse potential\nAccepted medical use\nLimited dependence risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "United States Code (USC)",
+      "Voting age of 18",
+      "Cases involving the U.S. Constitution or federal law"
     ],
     "correct": 0
   },
@@ -2256,9 +2256,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Codeine cough syrups, pregabalin, diphenoxylate/atropine",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Agency issues a final rule or abandons rulemaking",
+      "6 years",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -2267,9 +2267,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "≤1.8 g per 100 mL OR ≤90 mg per dosage unit",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Religion, Speech, Press, Assembly, Petition",
+      "District Courts, Courts of Appeals, Supreme Court",
+      "A statute"
     ],
     "correct": 0
   },
@@ -2278,9 +2278,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "≤200 mg per 100 mL",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "27",
+      "The daily journal/newspaper of the federal government",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -2289,9 +2289,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Quantities divisible by 3",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Protection against unreasonable searches and seizures",
+      "Trade practices and consumer protection",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -2300,9 +2300,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Quantities divisible by 5",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Applies due process and equal protection to states",
+      "Section",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -2311,9 +2311,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "2 letters + 7 numbers\nLast digit = check digit",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "President limited to two terms",
+      "Title number for Indiana Administrative Code (Board of Pharmacy)",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -2322,9 +2322,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1. Add digits 1, 3, 5\n2. Add digits 2, 4, 6 then x 2\n3. Add both totals\n4. Last digit must equal check digit",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Vice President",
+      "Members of the public and interested parties",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -2333,9 +2333,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Certificate of registration",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "435",
+      "Creates or establishes a government program",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -2344,9 +2344,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "New application (pharmacy/practitioner)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Sign, Veto, Pocket Veto, Take no action (becomes law in 10 days)",
+      "They must be maintained separately from all other records",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -2355,9 +2355,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Renewal application",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "9",
+      "Professional negligence that causes harm to a patient",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -2366,9 +2366,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Chain pharmacy renewal affidavit",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The daily journal/newspaper of the federal government",
+      "No",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -2377,9 +2377,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Manufacturer/distributor/researcher application",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "FDA, CMS, CDC, NIH, HRSA, SAMHSA",
+      "Preventing misbranding and adulteration of food and drugs",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -2388,9 +2388,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Narcotic treatment program application",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "States",
+      "Drugs must be proven effective (not just safe) before approval",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -2399,9 +2399,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Ordering Schedule I & II drugs",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Title number",
+      "Bioequivalence - not full clinical trials",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -2410,9 +2410,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Single-sheet form (replaced triplicate)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Section number",
+      "Yes, under FDAAA",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -2421,9 +2421,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "20 items per form",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Register",
+      "10 years",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -2432,9 +2432,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Keep copy for 2 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Register (IR)",
+      "No",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -2443,9 +2443,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "60 days",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Code of Federal Regulations (CFR)",
+      "1996",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -2454,9 +2454,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Cannot correct - must replace and keep defective form for 4 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Provides funding for the program",
+      "Individuals eligible for both Medicare and Medicaid",
+      "Manual signature\\nElectronic (per DEA rules)"
     ],
     "correct": 0
   },
@@ -2465,9 +2465,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Execute new form\nAttach statement with order # and date\nNotify DEA if stolen",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The pharmacist",
+      "1. Medication therapy review\\n2. Personal medication record\\n3. Medication-related action plan\\n4. Intervention/referral\\n5. Documentation and follow-up",
+      "NABP (National Association of Boards of Pharmacy)"
     ],
     "correct": 0
   },
@@ -2476,9 +2476,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Allows someone to sign DEA Form 222 on registrant's behalf",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Up to 5 refills within 6 months of the issue date",
+      "No, if reasonable safeguards are in place",
+      "100 scored questions"
     ],
     "correct": 0
   },
@@ -2487,9 +2487,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Registrant signature\nPerson granted signature\n2 witnesses",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Professional negligence that causes harm to a patient",
+      "Less abuse than I & II, accepted medical use, moderate/low physical dependence or high psychological dependence",
+      "Indiana Administrative Code (IAC)"
     ],
     "correct": 0
   },
@@ -2498,9 +2498,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Signature of registrant (or last registrant signer)\n2 witnesses",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Review of records, inventory, security, and compliance procedures",
+      "1. Add digits 1, 3, 5\\n2. Add digits 2, 4, 6 then x 2\\n3. Add both totals\\n4. Last digit must equal check digit",
+      "No, it states principles but is not legally binding law"
     ],
     "correct": 0
   },
@@ -2509,9 +2509,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, DEA Form 363",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prompt notification to DEA and completion of DEA Form 106",
+      "60 days",
+      "Double jeopardy, self-incrimination, due process, takings clause"
     ],
     "correct": 0
   },
@@ -2520,9 +2520,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Patient name & address\nDrug name, strength, dosage form, quantity\nDirections\nDate issued\nPrescriber name, address, DEA #\nSignature",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Manufacturer/supplier intent controls - not how the consumer uses the product",
+      "3 years (36 months)",
+      "President limited to two terms"
     ],
     "correct": 0
   },
@@ -2531,9 +2531,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Manual signature\nElectronic (per DEA rules)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medical devices and cosmetics",
+      "2.5 hours (150 minutes)",
+      "6 years"
     ],
     "correct": 0
   },
@@ -2542,9 +2542,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Pharmacist and prescriber share responsibility for validity and legitimacy of controlled prescription",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Required informed consent from clinical trial participants",
+      "100 scored questions",
+      "Cases involving the U.S. Constitution or federal law"
     ],
     "correct": 0
   },
@@ -2553,9 +2553,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Altered Rx\nEarly refill requests\nCash payment for expensive opioids\nDoctor shopping\nUnusual quantities\nTraveling long distance\nMultiple prescribers/pharmacies",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hatch-Waxman",
+      "Code of Federal Regulations (CFR)",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -2564,9 +2564,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Non-narcotics",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Offer to counsel Medicaid patients (later expanded by states)",
+      "Protection of fundamental rights from government interference",
+      "A statute"
     ],
     "correct": 0
   },
@@ -2575,9 +2575,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "3 years (36 months)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "By examining labeling, advertising, promotional materials, and marketing format",
+      "Executive Branch (President)",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -2586,9 +2586,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1 year (12 months)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "$2,100 annual cap",
+      "Abolished slavery",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -2597,9 +2597,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, they may prescribe under the hospital's DEA registration if:\nLicensed by the state to prescribe\nActing within scope of employment\nAuthorized by hospital\nAssigned internal code suffix to institutional DEA number",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed",
+      "The President",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -2608,9 +2608,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "New application for chemical registrants, including entities distributing listed chemicals used in the manufacture of controlled substances",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "435",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -2619,9 +2619,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "DEA must be notified to terminate registration. The registrant must:\nReturn DEA registration certificate\nReturn executed DEA Form 222s\nDispose of controlled substances per DEA rules\nMaintain records for at least 2 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Drug Utilization Review (DUR)\\n2. Rebates (Best Price requirement)\\n3. Demonstration projects",
+      "Trial courts (federal question and diversity jurisdiction)",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -2630,9 +2630,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No. Hospital medication orders are not defined as prescriptions under federal law and do not need to be written on a security prescription blank because the medication is administered within the institution",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Health plans, clearinghouses, and healthcare providers transmitting electronic health information",
+      "1. Within agency authority\\n2. Based on statutory authority\\n3. Reasonably related to public health, safety, welfare",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -2641,9 +2641,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Prescription prepared by staff but personally signed by the prescriber\nPrescription prepared & signed by the prescriber",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "Interstate Commerce Clause (Article I, Section 8)",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -2652,9 +2652,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Staff signing prescriber's name (even with consent)\nRubber stamp signature\nPre-printed signature on prescription blank",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Deductible phase\\n2. Initial coverage phase\\n3. Catastrophic coverage phase",
+      "A specific paragraph within the section",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -2663,9 +2663,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Multistate Pharmacy Jurisprudence Examination",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Weight loss drugs, fertility drugs, cosmetic/hair growth drugs, OTC drugs, DESI drugs, non-FDA approved drugs",
+      "Indiana Board of Pharmacy",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -2674,9 +2674,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "NABP (National Association of Boards of Pharmacy)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Electronic healthcare transactions, privacy standards, security standards, NPI numbers",
+      "Indiana Professional Licensing Agency (PLA) website",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -2685,9 +2685,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "120 total questions (100 scored, 20 unscored)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Federal law regulating controlled substances and creating a closed system for manufacture, distribution, and dispensing",
+      "Provides funding for the program",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -2696,9 +2696,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "2.5 hours (150 minutes)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Tylenol #3, buprenorphine, ketamine, anabolic steroids, dronabinol",
+      "Limited quantity sufficient to treat during the emergency period (oral authorization allowed; written prescription required within 7 days)",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -2707,9 +2707,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "At least 107 questions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Quantities divisible by 3",
+      "Duty, breach, causation, damages",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -2718,9 +2718,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Pass/Fail only (no numerical score reported)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Chain pharmacy renewal affidavit",
+      "State law and Board of Pharmacy regulations",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -2729,9 +2729,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, question difficulty adapts based on answers",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "60 days",
+      "No",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -2740,9 +2740,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, questions must be answered in order with no review",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature",
+      "Well-controlled clinical trials",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -2751,9 +2751,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "5 attempts per state",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, they may prescribe under the hospital's DEA registration if:\\nLicensed by the state to prescribe\\nActing within scope of employment\\nAuthorized by hospital\\nAssigned internal code suffix to institutional DEA number",
+      "Generic access and brand patent protections",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -2762,9 +2762,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Multiple choice, Select All That Apply, K-type questions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "NABP (National Association of Boards of Pharmacy)",
+      "By examining labeling, advertising, promotional materials, and marketing format",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -2773,9 +2773,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, they are mixed together unless specifically stated",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "5 attempts per state",
+      "1% premium increase per month of delay",
+      "100 scored questions"
     ],
     "correct": 0
   },
@@ -2784,9 +2784,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, citations are not tested",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The U.S. Constitution",
+      "Lab, radiology, DME, outpatient drugs, PT/OT, home health, hospital services, etc",
+      "Indiana Administrative Code (IAC)"
     ],
     "correct": 0
   },
@@ -2795,9 +2795,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A standardized national jurisprudence exam covering laws common to all states",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "Individually identifiable health information related to condition, treatment, or payment",
+      "No, it states principles but is not legally binding law"
     ],
     "correct": 0
   },
@@ -2806,9 +2806,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, pharmacists are still responsible for individual state laws",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "regulations.gov",
+      "No",
+      "Double jeopardy, self-incrimination, due process, takings clause"
     ],
     "correct": 0
   },
@@ -2817,9 +2817,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "100 scored questions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Strict scrutiny",
+      "All commercially available vaccines not covered under Part B",
+      "President limited to two terms"
     ],
     "correct": 0
   },
@@ -2828,9 +2828,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Only 3 answer choices per questions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Bill of Rights (added in 1791)",
+      "Administrative, technical, and physical protections to limit PHI exposure",
+      "6 years"
     ],
     "correct": 0
   },
@@ -2839,9 +2839,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The U.S. Constitution",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No quartering soldiers in homes",
+      "Tylenol #3, buprenorphine, ketamine, anabolic steroids, dronabinol",
+      "Cases involving the U.S. Constitution or federal law"
     ],
     "correct": 0
   },
@@ -2850,9 +2850,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Supremacy Clause (Article VI)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Abolished slavery",
+      "Certificate of registration",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -2861,9 +2861,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Police powers under the 10th Amendment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Repealed Prohibition",
+      "Cannot correct - must replace and keep defective form for 4 years",
+      "A statute"
     ],
     "correct": 0
   },
@@ -2872,9 +2872,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "10th Amendment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Senate",
+      "3 years (36 months)",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -2883,9 +2883,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Legislatures (Congress or state legislatures)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "6 years",
+      "2.5 hours (150 minutes)",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -2894,9 +2894,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Administrative agencies (e.g., Board of Pharmacy, FDA, DEA)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Conference Committee",
+      "100 scored questions",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -2905,9 +2905,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Cases between citizens of different states where amount exceeds $75,000",
+      "Indiana Code (IC)",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -2916,9 +2916,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "\\\"To stand by things decided\\\" (follow precedent)",
+      "Strict scrutiny",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -2927,9 +2927,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "United States Code (USC)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Department of Health and Human Services",
+      "Judicial Branch (Courts)",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -2938,9 +2938,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Code of Federal Regulations (CFR)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Federal govenment",
+      "Applies due process and equal protection to states",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -2949,9 +2949,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Code (IC)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Title 21",
+      "4 years",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -2960,9 +2960,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Administrative Code (IAC)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Part number",
+      "2 years",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -2971,9 +2971,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Notice and Comment Rulemaking",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Board of Pharmacy",
+      "Cases involving the U.S. Constitution or federal law",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -2982,9 +2982,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal Register",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA",
+      "Issue guidance, policy statements, interpretive rules",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -2993,9 +2993,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "regulations.gov",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A Final Rule",
+      "Federal govenment",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -3004,9 +3004,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Agency issues a final rule or abandons rulemaking",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Creates or establishes a government program",
+      "The codified collection of federal agency regulations",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -3015,9 +3015,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Government must follow fair procedures before depriving life, liberty, or property",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "It must be issued for a legitimate medical purpose by a practitioner acting in the usual course of professional practice",
+      "Indiana Register",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -3026,9 +3026,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "5th Amendment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)",
+      "A preliminary notice asking for public input before proposing a formal rule",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -3037,9 +3037,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "14th Amendment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Proper training, environmental controls, and appropriate engineering controls (e.g., cleanroom standards)",
+      "No, it must be funded",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -3048,9 +3048,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Fair procedures (notice and hearing)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "For treatment, payment, healthcare operations (TPO)",
+      "To track controlled substance dispensing and detect misuse or diversion",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -3059,9 +3059,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Protection of fundamental rights from government interference",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Proper labeling, security, and patient confidentiality",
+      "When an employer is legally responsible for the actions of an employee",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -3070,9 +3070,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Strict scrutiny",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Dispensing an FDA-approved equivalent product in place of the brand-name drug",
+      "Proper labeling, security, and patient confidentiality",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -3081,9 +3081,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Religion, Speech, Press, Assembly, Petition",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Authority to inspect manufacturing facilities",
+      "The FDA",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -3092,9 +3092,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Declared the 13 colonies independent from Great Britain (July 4, 1776)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Well-controlled clinical trials",
+      "Required informed consent from clinical trial participants",
+      "No, it states principles but is not legally binding law"
     ],
     "correct": 0
   },
@@ -3103,9 +3103,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, it states principles but is not legally binding law",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Kefauver-Harris Amendment",
+      "Prevent accidental pediatric poisionings",
+      "Double jeopardy, self-incrimination, due process, takings clause"
     ],
     "correct": 0
   },
@@ -3114,9 +3114,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Common Sense by Thomas Paine",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prospective drug utilization review (DUR)",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)",
+      "President limited to two terms"
     ],
     "correct": 0
   },
@@ -3125,9 +3125,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Life, Liberty, and the Pursuit of Happiness",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, under FDAAA",
+      "A low-income subsidy (≤150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
+      "6 years"
     ],
     "correct": 0
   },
@@ -3136,9 +3136,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1787",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "$35 per month supply (no deductible required)",
+      "Submitting false or fraudulent claims to the federal government",
+      "Cases involving the U.S. Constitution or federal law"
     ],
     "correct": 0
   },
@@ -3147,9 +3147,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The Bill of Rights (added in 1791)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Caremark (CVS Health), Express Scripts (Cigna), Optum Rx (UnitedHealth Group)",
+      "Only disclose the minimum PHI necessary to accomplish the purpose",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -3158,9 +3158,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "27",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Physician self-referrals for designated health services to entities where they have a financial relationship",
+      "Yes",
+      "A statute"
     ],
     "correct": 0
   },
@@ -3169,9 +3169,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Legislative Branch (Congress)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization",
+      "Weight loss drugs, fertility drugs, cosmetic/hair growth drugs, OTC drugs, DESI drugs, non-FDA approved drugs",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -3180,9 +3180,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Executive Branch (President)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Only disclose the minimum PHI necessary to accomplish the purpose",
+      "Name, address, DOB, SSN, medical record number, email, photos",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -3191,9 +3191,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Judicial Branch (Courts)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "State and federal government (minimum 50% federal match)",
+      "Low abuse potential relative to III\\nAccepted medical use\\nLimited dependence risk",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -3202,9 +3202,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "2/3 of Congress + 3/4 of states",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Private insurance companies often follow Medicare coverage policies",
+      "New application (pharmacy/practitioner)",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -3213,9 +3213,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Right to bear arms",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "All commercially available vaccines not covered under Part B",
+      "Execute new form\\nAttach statement with order # and date\\nNotify DEA if stolen",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -3224,9 +3224,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No quartering soldiers in homes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Patient demographics, medication list, allergies, pharmacist interventions",
+      "1 year (12 months)",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -3235,9 +3235,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Protection against unreasonable searches and seizures",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Within 60 days if breach poses significant risk",
+      "At least 107 questions",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -3246,9 +3246,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Double jeopardy, self-incrimination, due process, takings clause",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Less abuse than I & II, accepted medical use, moderate/low physical dependence or high psychological dependence",
+      "Only 3 answer choices per questions",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -3257,9 +3257,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Speedy trial, impartial jury, right to attorney",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "≤200 mg per 100 mL",
+      "Indiana Code (IC)",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -3268,9 +3268,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No cruel and unusual punishment; no excessive fines/bails",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Renewal application",
+      "Strict scrutiny",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -3279,9 +3279,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Rights not listed still exist",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Keep copy for 2 years",
+      "Judicial Branch (Courts)",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -3290,9 +3290,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Powers not given to federal government belong to states or people",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, DEA Form 363",
+      "Race cannot be used to deny voting",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -3301,9 +3301,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Abolished slavery",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1 year (12 months)",
+      "Sign/veto bills, appoint judges, make treaties, pardon criminals",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -3312,9 +3312,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Applies due process and equal protection to states",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Multistate Pharmacy Jurisprudence Examination",
+      "218 (simple majority)",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -3323,9 +3323,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Race cannot be used to deny voting",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, questions must be answered in order with no review",
+      "Cases between citizens of different states where amount exceeds $75,000",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -3334,9 +3334,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal income tax",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "100 scored questions",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -3345,9 +3345,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Direct election of Senators",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Administrative agencies (e.g., Board of Pharmacy, FDA, DEA)",
+      "States",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -3356,9 +3356,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Prohibition (later repealed)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Notice and Comment Rulemaking",
+      "50 titles",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -3367,9 +3367,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Women's right to vote",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Fair procedures (notice and hearing)",
+      "Statutory authority granted by the legislature",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -3378,9 +3378,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Repealed Prohibition",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Life, Liberty, and the Pursuit of Happiness",
+      "The official published proposed rule during notice and comment",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -3389,9 +3389,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "President limited to two terms",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2/3 of Congress + 3/4 of states",
+      "Senate: HELP and Finance\\nHouse: Energy and Commerce and Ways and Means",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -3400,9 +3400,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Presidential succession and disability procedures",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Rights not listed still exist",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -3411,9 +3411,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Voting age of 18",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prohibition (later repealed)",
+      "Liability without needing to prove negligence (defective product cases)",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -3422,9 +3422,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The President",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Sign/veto bills, appoint judges, make treaties, pardon criminals",
+      "Prompt notification to DEA and completion of DEA Form 106",
+      "6 years"
     ],
     "correct": 0
   },
@@ -3433,9 +3433,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "4 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "100 (2 per state)",
+      "The sulfanilamide elixir tragedy (diethylene glycol poisoning)",
+      "Cases involving the U.S. Constitution or federal law"
     ],
     "correct": 0
   },
@@ -3444,9 +3444,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Sign/veto bills, appoint judges, make treaties, pardon criminals",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Committee/Subcommittee",
+      "Good Manufacturing Practices (GMPs)",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -3455,9 +3455,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Senate",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Cases involving the U.S. Constitution or federal law",
+      "Yes, via written request (blanket waivers allowed)",
+      "A statute"
     ],
     "correct": 0
   },
@@ -3466,9 +3466,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Vice President",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A prior court decision that is binding on lower courts",
+      "Yes, if it is marketed for both cosmetic and therapeutic purposes",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -3477,9 +3477,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Speaker of the House",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Standing, exhaustion of remedies, ripeness",
+      "Caremark (CVS Health), Express Scripts (Cigna), Optum Rx (UnitedHealth Group)",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -3488,9 +3488,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "President Pro Tempore of the Senate",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Interstate Commerce Clause (Article I, Section 8)",
+      "Treble (3x) damages",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -3499,9 +3499,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Secretary of State",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "51 titles",
+      "Health plans, clearinghouses, and healthcare providers transmitting electronic health information",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -3510,9 +3510,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Two chambers (House and Senate)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Food and Drugs",
+      "Yes",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -3521,9 +3521,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "100 (2 per state)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Title number for Indiana Administrative Code (Board of Pharmacy)",
+      "Hoosier Healthwise, Hoosier Care Connect, Healthy Indiana Plan (HIP), Traditional Medicaid, Indiana PathWays for Aging, HoosierRx",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -3532,9 +3532,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "6 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "States (under police powers/10th Amendment)",
+      "Provide notice, attempt to obtain written acknowledgement, document good faith effort, keep record for 6 years",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -3543,9 +3543,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "435",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The official published proposed rule during notice and comment",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -3554,9 +3554,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "2 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Court review of an agency's actions",
+      "Renewal application",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -3565,9 +3565,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "218 (simple majority)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Procedural due process and substantive due process",
+      "Allows someone to sign DEA Form 222 on registrant's behalf",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -3576,9 +3576,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "51 (simple majority)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "To track controlled substance dispensing and detect misuse or diversion",
+      "Yes, they may prescribe under the hospital's DEA registration if:\\nLicensed by the state to prescribe\\nActing within scope of employment\\nAuthorized by hospital\\nAssigned internal code suffix to institutional DEA number",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -3587,9 +3587,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A Senator or Representative (sponsor)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Handling of hazardous drugs to minimize exposure risk",
+      "Pass/Fail only (no numerical score reported)",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -3598,9 +3598,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Committee/Subcommittee",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Privacy Rule and Security Rule",
+      "The U.S. Constitution",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -3609,9 +3609,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Conference Committee",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "State law and Board of Pharmacy regulations",
+      "Indiana Administrative Code (IAC)",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -3620,9 +3620,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Sign, Veto, Pocket Veto, Take no action (becomes law in 10 days)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Dispensing a different drug than prescribed, usually within the same class (requires authorization)",
+      "Religion, Speech, Press, Assembly, Petition",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -3631,9 +3631,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "2/3 vote in both chambers",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Drugs must be proven safe before marketing",
+      "2/3 of Congress + 3/4 of states",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -3642,9 +3642,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Article III",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Drugs must be proven effective (not just safe) before approval",
+      "Race cannot be used to deny voting",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -3653,9 +3653,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "District Courts, Courts of Appeals, Supreme Court",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA",
+      "Sign/veto bills, appoint judges, make treaties, pardon criminals",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -3664,9 +3664,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Trial courts (federal question and diversity jurisdiction)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, via written request (blanket waivers allowed)",
+      "218 (simple majority)",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -3675,9 +3675,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Cases involving the U.S. Constitution or federal law",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Risk Evaluation and Mitigation Strategies (REMS)",
+      "9",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -3686,9 +3686,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Cases between citizens of different states where amount exceeds $75,000",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Part A: Inpatient (hospital insurance)\\nPart B: Outpatient/medical insurance\\nPart C: Medicare Advantage (managed care plans)\\nPart D: Prescription drug benefit",
+      "Courts (Judicial Review)",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -3697,9 +3697,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "9",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A low-income subsidy (≤150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
+      "Statute (broad framework)",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -3708,9 +3708,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Lifetime appointments",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Exceptions protecting certain arrangements from Anti-Kickback violations",
+      "Food and Drugs",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -3719,9 +3719,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A request asking the Supreme Court to hear a case",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "It mandated prospective DUR, counseling, and documentation as a condition of Medicaid participation",
+      "No",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -3730,9 +3730,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "~10,000 petitions; hears ~75-80 cases",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Individually identifiable health information related to condition, treatment, or payment",
+      "A Final Rule",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -3741,9 +3741,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Judge-made law created through court decisions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost",
+      "Health, Education, Labor and Pensions",
+      "Courts (Judicial Review)"
     ],
     "correct": 0
   },
@@ -3752,9 +3752,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A prior court decision that is binding on lower courts",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Individuals ≥65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
+      "Up to 5 refills within 6 months of the issue date",
+      "A statute"
     ],
     "correct": 0
   },
@@ -3763,9 +3763,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "\"To stand by things decided\" (follow precedent)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Medication therapy review\\n2. Personal medication record\\n3. Medication-related action plan\\n4. Intervention/referral\\n5. Documentation and follow-up",
+      "Protected Health Information (PHI)",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -3774,9 +3774,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The daily journal/newspaper of the federal government",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Drug interactions, duplication, incorrect dose/duration, drug-disease, allergies, misuse/abuse",
+      "A drug that fails purity, strength, or quality standards",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -3785,9 +3785,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1. Within agency authority\n2. Based on statutory authority\n3. Reasonably related to public health, safety, welfare",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Provide notice, attempt to obtain written acknowledgement, document good faith effort, keep record for 6 years",
+      "Drugs must be proven safe before marketing",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -3796,9 +3796,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Issue guidance, policy statements, interpretive rules",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Morphine, oxycodone, fentanyl, hydrocodone combos, amphetamine, methylphenidate, methadone",
+      "Yes - efficacy review of previously approved drugs began",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -3807,9 +3807,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Inspections, recalls, fines, injunctions, seizure, prosecution",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "≤1.8 g per 100 mL OR ≤90 mg per dosage unit",
+      "Prospective drug utilization review (DUR)",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -3818,9 +3818,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Courts (Judicial Review)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "New application (pharmacy/practitioner)",
+      "No - it must be classified as one or the other (unless it is a combination product)",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -3829,9 +3829,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Standing, exhaustion of remedies, ripeness",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "20 items per form",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -3840,9 +3840,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Department of Health and Human Services",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Signature of registrant (or last registrant signer)\\n2 witnesses",
+      "Whistleblower suits where private individuals can recover 15-25% of recovered funds",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -3851,9 +3851,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "FDA, CMS, CDC, NIH, HRSA, SAMHSA",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "3 years (36 months)",
+      "Office for Civil Rights (OCR)",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -3862,9 +3862,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Safety and efficacy of drugs, food, medical devices",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Staff signing prescriber's name (even with consent)\\nRubber stamp signature\\nPre-printed signature on prescription blank",
+      "Individuals ≥65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -3873,9 +3873,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Controlled substances",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, question difficulty adapts based on answers",
+      "Children ≤19 and pregnant women",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -3884,9 +3884,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Medicare and Medicaid",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, pharmacists are still responsible for individual state laws",
+      "Within 60 days if breach poses significant risk",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -3895,9 +3895,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Trade practices and consumer protection",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Legislatures (Congress or state legislatures)",
+      "Lowest abuse potential\\nAccepted medical use\\nLimited dependence risk",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -3906,9 +3906,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Interstate Commerce Clause (Article I, Section 8)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Administrative Code (IAC)",
+      "Chain pharmacy renewal affidavit",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -3917,9 +3917,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal govenment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "14th Amendment",
+      "Registrant signature\\nPerson granted signature\\n2 witnesses",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -3928,9 +3928,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "States",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Common Sense by Thomas Paine",
+      "New application for chemical registrants, including entities distributing listed chemicals used in the manufacture of controlled substances",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -3939,9 +3939,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Statute (broad framework)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Judicial Branch (Courts)",
+      "Yes, question difficulty adapts based on answers",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -3950,9 +3950,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Regulation (specific implementation details)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No cruel and unusual punishment; no excessive fines/bails",
+      "Supremacy Clause (Article VI)",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -3961,9 +3961,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A statute",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Direct election of Senators",
+      "Notice and Comment Rulemaking",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -3972,9 +3972,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The codified database of all general and permanent federal statutes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The President",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -3983,9 +3983,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "51 titles",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Secretary of State",
+      "Right to bear arms",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -3994,9 +3994,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Title 21",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "51 (simple majority)",
+      "Federal income tax",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -4005,9 +4005,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The Title number",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "District Courts, Courts of Appeals, Supreme Court",
+      "Senate",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -4016,9 +4016,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Section",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "~10,000 petitions; hears ~75-80 cases",
+      "51 (simple majority)",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -4027,9 +4027,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A specific paragraph within the section",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Inspections, recalls, fines, injunctions, seizure, prosecution",
+      "9",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -4038,9 +4038,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The codified collection of federal agency regulations",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medicare and Medicaid",
+      "Courts (Judicial Review)",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -4049,9 +4049,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "50 titles",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A statute",
+      "Statute (broad framework)",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -4060,9 +4060,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Food and Drugs",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The codified collection of federal agency regulations",
+      "The Part number",
+      "Indiana Code (state statutes)"
     ],
     "correct": 0
   },
@@ -4071,9 +4071,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The Part number",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Title",
+      "It must be within agency authority, based on statute, and reasonably related to public health, safety, and welfare",
+      "Indiana Register"
     ],
     "correct": 0
   },
@@ -4082,9 +4082,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The Section number",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Federal government (under Interstate Commerce Clause)",
+      "Code of Federal Regulations (CFR)",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -4093,9 +4093,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal Register",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A preliminary notice asking for public input before proposing a formal rule",
+      "Whether agency exceeded authority?\\nWhether proper procedures were followed?\\nWhether decision was arbitrary or capricious?",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -4104,9 +4104,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Code (state statutes)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Administrative Order",
+      "No",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -4115,9 +4115,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Administrative Code (state regulations)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Whether agency exceeded authority?\\nWhether proper procedures were followed?\\nWhether decision was arbitrary or capricious?",
+      "Privacy Rule and Security Rule",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -4126,9 +4126,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Title",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Limited quantity sufficient to treat during the emergency period (oral authorization allowed; written prescription required within 7 days)",
+      "False or misleading labeling or inadequate directions for use",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -4137,9 +4137,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Title number for Indiana Administrative Code (Board of Pharmacy)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "<795> governs nonsterile compounding; <797> governs sterile compounding",
+      "Authority to inspect manufacturing facilities",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -4148,9 +4148,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Board of Pharmacy",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Protected Health Information (PHI)",
+      "The 5-schedule classification system",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -4159,9 +4159,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Register",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "Offer to counsel Medicaid patients (later expanded by states)",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -4170,9 +4170,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Statutory authority granted by the legislature",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A committee formed to reconcile differences between House and Senate versions of a bill",
+      "No. Medicare eligibility is not based on income.",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -4181,9 +4181,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The sulfanilamide elixir tragedy (diethylene glycol poisoning)",
+      "Offering or receiving remuneration to generate federal healthcare business",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -4192,9 +4192,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "It must be within agency authority, based on statute, and reasonably related to public health, safety, and welfare",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Thalidomide causing birth defects (phocomelia)",
+      "It mandated prospective DUR, counseling, and documentation as a condition of Medicaid participation",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -4203,9 +4203,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Federal government (under Interstate Commerce Clause)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Abuse potential, medical use, and safety/dependence risk",
+      "6 years",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -4214,9 +4214,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "States (under police powers/10th Amendment)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevent accidental pediatric poisionings",
+      "Private insurance companies often follow Medicare coverage policies",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -4225,9 +4225,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "DEA",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Dissemination of certain off-label information to providers",
+      "Ages 19-64 with income ≤ ~138% FPL",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -4236,9 +4236,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Register (IR)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No. Medicare eligibility is not based on income.",
+      "Federal law regulating controlled substances and creating a closed system for manufacture, distribution, and dispensing",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -4247,9 +4247,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Register",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1% premium increase per month of delay",
+      "Codeine cough syrups, pregabalin, diphenoxylate/atropine",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -4258,9 +4258,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Members of the public and interested parties",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Office of Inspector General (OIG)",
+      "Manufacturer/distributor/researcher application",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -4269,9 +4269,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana Professional Licensing Agency (PLA) website",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Whistleblower suits where private individuals can recover 15-25% of recovered funds",
+      "Signature of registrant (or last registrant signer)\\n2 witnesses",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -4280,9 +4280,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A preliminary notice asking for public input before proposing a formal rule",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1996",
+      "DEA must be notified to terminate registration. The registrant must:\\nReturn DEA registration certificate\\nReturn executed DEA Form 222s\\nDispose of controlled substances per DEA rules\\nMaintain records for at least 2 years",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -4291,9 +4291,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The official published proposed rule during notice and comment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "No, questions must be answered in order with no review",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -4302,9 +4302,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A Final Rule",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "Police powers under the 10th Amendment",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -4313,9 +4313,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Code of Federal Regulations (CFR)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes",
+      "Federal Register",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -4324,9 +4324,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, through a resolution of disapproval (rare)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana residents ≥65 with income <150% FPL and enrolled in Part D",
+      "No, it states principles but is not legally binding law",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -4335,9 +4335,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, if unconstitutional, exceeds authority, or arbitrary/capricious",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Name, address, DOB, SSN, medical record number, email, photos",
+      "No quartering soldiers in homes",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -4346,9 +4346,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "An official who presides over agency hearings",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "High abuse potential\\nAccepted medical use (with restrictions)\\nSevere dependence risk",
+      "Direct election of Senators",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -4357,9 +4357,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Administrative Order",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Codeine cough syrups, pregabalin, diphenoxylate/atropine",
+      "Vice President",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -4368,9 +4368,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Court review of an agency's actions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Certificate of registration",
+      "A Senator or Representative (sponsor)",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -4379,9 +4379,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Creates or establishes a government program",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Single-sheet form (replaced triplicate)",
+      "Lifetime appointments",
+      "Provides funding for the program"
     ],
     "correct": 0
   },
@@ -4390,9 +4390,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Provides funding for the program",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Registrant signature\\nPerson granted signature\\n2 witnesses",
+      "Standing, exhaustion of remedies, ripeness",
+      "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)"
     ],
     "correct": 0
   },
@@ -4401,9 +4401,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, it must be funded",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Non-narcotics",
+      "Regulation (specific implementation details)",
+      "Privacy Rule and Security Rule"
     ],
     "correct": 0
   },
@@ -4412,9 +4412,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Senate: HELP and Finance\nHouse: Energy and Commerce and Ways and Means",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prescription prepared by staff but personally signed by the prescriber\\nPrescription prepared & signed by the prescriber",
+      "The Part number",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -4423,9 +4423,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Health, Education, Labor and Pensions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pass/Fail only (no numerical score reported)",
+      "It must be within agency authority, based on statute, and reasonably related to public health, safety, and welfare",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -4434,9 +4434,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Whether agency exceeded authority?\nWhether proper procedures were followed?\nWhether decision was arbitrary or capricious?",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A standardized national jurisprudence exam covering laws common to all states",
+      "Code of Federal Regulations (CFR)",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -4445,9 +4445,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Procedural due process and substantive due process",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "10th Amendment",
+      "Whether agency exceeded authority?\\nWhether proper procedures were followed?\\nWhether decision was arbitrary or capricious?",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -4456,9 +4456,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "It must be issued for a legitimate medical purpose by a practitioner acting in the usual course of professional practice",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Code (IC)",
+      "Once (unless pharmacies share a real-time electronic database)",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -4467,9 +4467,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The pharmacist",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "5th Amendment",
+      "For treatment, payment, healthcare operations (TPO)",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -4478,9 +4478,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "DEA Form 222 (or its electronic equivalent via CSOS)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, it states principles but is not legally binding law",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -4489,9 +4489,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Initially upon registration and at least every 2 years thereafter",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Executive Branch (President)",
+      "Medical devices and cosmetics",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -4500,9 +4500,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "They must be maintained separately from all other records",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Speedy trial, impartial jury, right to attorney",
+      "Abuse potential, medical use, and safety/dependence risk",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -4511,9 +4511,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Limited quantity sufficient to treat during the emergency period (oral authorization allowed; written prescription required within 7 days)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Federal income tax",
+      "Yes, but most states extended it to all patients",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -4522,9 +4522,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "To track controlled substance dispensing and detect misuse or diversion",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Voting age of 18",
+      "Part A: Inpatient (hospital insurance)\\nPart B: Outpatient/medical insurance\\nPart C: Medicare Advantage (managed care plans)\\nPart D: Prescription drug benefit",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -4533,9 +4533,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Authorized prescribers, pharmacists, regulatory boards, and sometimes law enforcement (depending on state law)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "President Pro Tempore of the Senate",
+      "Yes",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -4544,9 +4544,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Up to 5 refills within 6 months of the issue date",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "218 (simple majority)",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -4555,9 +4555,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Article III",
+      "Notify affects individuals within 60 days and notify media + HHS",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -4566,9 +4566,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Once (unless pharmacies share a real-time electronic database)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A request asking the Supreme Court to hear a case",
+      "1. Deductible phase\\n2. Initial coverage phase\\n3. Catastrophic coverage phase",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -4577,9 +4577,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Only in limited circumstances (e.g., pharmacy closure) and under strict federal guidelines",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Issue guidance, policy statements, interpretive rules",
+      "Indiana residents ≥65 with income <150% FPL and enrolled in Part D",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -4588,9 +4588,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "<795> governs nonsterile compounding; <797> governs sterile compounding",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Controlled substances",
+      "DEA (Drug Enforcement Administration) under the Department of Justice",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -4599,9 +4599,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Handling of hazardous drugs to minimize exposure risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Regulation (specific implementation details)",
+      "≤1.8 g per 100 mL OR ≤90 mg per dosage unit",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -4610,9 +4610,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Proper training, environmental controls, and appropriate engineering controls (e.g., cleanroom standards)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A specific paragraph within the section",
+      "Narcotic treatment program application",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -4621,9 +4621,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Professional negligence that causes harm to a patient",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Code (state statutes)",
+      "Yes, DEA Form 363",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -4632,9 +4632,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Duty, breach, causation, damages",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "No. Hospital medication orders are not defined as prescriptions under federal law and do not need to be written on a security prescription blank because the medication is administered within the institution",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -4643,9 +4643,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "When an employer is legally responsible for the actions of an employee",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Members of the public and interested parties",
+      "5 attempts per state",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -4654,9 +4654,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Liability without needing to prove negligence (defective product cases)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, if unconstitutional, exceeds authority, or arbitrary/capricious",
+      "10th Amendment",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -4665,9 +4665,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Protected Health Information (PHI)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Senate: HELP and Finance\\nHouse: Energy and Commerce and Ways and Means",
+      "regulations.gov",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -4676,9 +4676,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Privacy Rule and Security Rule",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Initially upon registration and at least every 2 years thereafter",
+      "Common Sense by Thomas Paine",
+      "Creates or establishes a government program"
     ],
     "correct": 0
   },
@@ -4687,9 +4687,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "For treatment, payment, healthcare operations (TPO)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Once (unless pharmacies share a real-time electronic database)",
+      "Protection against unreasonable searches and seizures",
+      "To track controlled substance dispensing and detect misuse or diversion"
     ],
     "correct": 0
   },
@@ -4698,9 +4698,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Review of records, inventory, security, and compliance procedures",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "When an employer is legally responsible for the actions of an employee",
+      "Prohibition (later repealed)",
+      "Protected Health Information (PHI)"
     ],
     "correct": 0
   },
@@ -4709,9 +4709,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Presiding over agency hearings",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The activities professionals are legally authorized to perform",
+      "Speaker of the House",
+      "A committee formed to reconcile differences between House and Senate versions of a bill"
     ],
     "correct": 0
   },
@@ -4720,9 +4720,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The final decision issued by an agency after a hearing",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die",
+      "Committee/Subcommittee",
+      "Yes - authorized refills"
     ],
     "correct": 0
   },
@@ -4731,9 +4731,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The activities professionals are legally authorized to perform",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The FDA",
+      "A request asking the Supreme Court to hear a case",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -4742,9 +4742,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes - authorized refills",
+      "Department of Health and Human Services",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -4753,9 +4753,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "State law and Board of Pharmacy regulations",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The 5-schedule classification system",
+      "A statute",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -4764,9 +4764,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Proper labeling, security, and patient confidentiality",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Generic access and brand patent protections",
+      "The Section number",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -4775,9 +4775,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Prompt notification to DEA and completion of DEA Form 106",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Transaction information, history, and statement",
+      "Federal government (under Interstate Commerce Clause)",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -4786,9 +4786,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A drug that fails purity, strength, or quality standards",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No - it must be classified as one or the other (unless it is a combination product)",
+      "Yes, through a resolution of disapproval (rare)",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -4797,9 +4797,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "False or misleading labeling or inadequate directions for use",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "10 years",
+      "Procedural due process and substantive due process",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -4808,9 +4808,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "When the President takes no action and Congress adjourns within 10 days, causing the bill to die",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No. They're considered illegal kickbacks",
+      "Once (unless pharmacies share a real-time electronic database)",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -4819,9 +4819,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A committee formed to reconcile differences between House and Senate versions of a bill",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treble (3x) damages",
+      "For treatment, payment, healthcare operations (TPO)",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -4830,9 +4830,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Dispensing a different drug than prescribed, usually within the same class (requires authorization)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Patient demographics, disease states, allergies, medication list, pharmacist interventions, refusals",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -4841,9 +4841,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Dispensing an FDA-approved equivalent product in place of the brand-name drug",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Notify affects individuals within 60 days and notify media + HHS",
+      "The distinction between prescription (Rx only) and OTC drugs",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -4852,9 +4852,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Manufacturer/supplier intent controls - not how the consumer uses the product",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "DEA",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -4863,9 +4863,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Preventing misbranding and adulteration of food and drugs",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Part D plan, Medicare",
+      "Track-and-trace system for prescription drugs in the supply chain",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -4874,9 +4874,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Ages 19-64 with income ≤ ~138% FPL",
+      "$35 per month supply (no deductible required)",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -4885,9 +4885,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The FDA",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Administrative, technical, and physical protections to limit PHI exposure",
+      "No. They're considered illegal kickbacks",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -4896,9 +4896,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The sulfanilamide elixir tragedy (diethylene glycol poisoning)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heroin, LSD, marijuana, MDMA, psilocybin, peyote",
+      "1. Drug Utilization Review (DUR)\\n2. Rebates (Best Price requirement)\\n3. Demonstration projects",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -4907,9 +4907,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Drugs must be proven safe before marketing",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Lowest abuse potential\\nAccepted medical use\\nLimited dependence risk",
+      "Yes",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -4918,9 +4918,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Authority to inspect manufacturing facilities",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Add digits 1, 3, 5\\n2. Add digits 2, 4, 6 then x 2\\n3. Add both totals\\n4. Last digit must equal check digit",
+      "25% coinsurance",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -4929,9 +4929,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Medical devices and cosmetics",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Ordering Schedule I & II drugs",
+      "Drug interactions, duplication, incorrect dose/duration, drug-disease, allergies, misuse/abuse",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -4940,9 +4940,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The distinction between prescription (Rx only) and OTC drugs",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Allows someone to sign DEA Form 222 on registrant's behalf",
+      "High abuse potential\\nNo accepted medical use\\nLack of safety even under supervision",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -4951,9 +4951,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "\"Caution: Federal law prohibits dispensing without a prescription\"",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Altered Rx\\nEarly refill requests\\nCash payment for expensive opioids\\nDoctor shopping\\nUnusual quantities\\nTraveling long distance\\nMultiple prescribers/pharmacies",
+      "≤200 mg per 100 mL",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -4962,9 +4962,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes - authorized refills",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No. Hospital medication orders are not defined as prescriptions under federal law and do not need to be written on a security prescription blank because the medication is administered within the institution",
+      "Ordering Schedule I & II drugs",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -4973,9 +4973,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Thalidomide causing birth defects (phocomelia)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "At least 107 questions",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature",
+      "Creates or establishes a government program"
     ],
     "correct": 0
   },
@@ -4984,9 +4984,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Drugs must be proven effective (not just safe) before approval",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, citations are not tested",
+      "Prescription prepared by staff but personally signed by the prescriber\\nPrescription prepared & signed by the prescriber",
+      "To track controlled substance dispensing and detect misuse or diversion"
     ],
     "correct": 0
   },
@@ -4995,9 +4995,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Well-controlled clinical trials",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Police powers under the 10th Amendment",
+      "Multiple choice, Select All That Apply, K-type questions",
+      "Protected Health Information (PHI)"
     ],
     "correct": 0
   },
@@ -5006,9 +5006,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Required informed consent from clinical trial participants",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Code of Federal Regulations (CFR)",
+      "Legislatures (Congress or state legislatures)",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die"
     ],
     "correct": 0
   },
@@ -5017,9 +5017,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Good Manufacturing Practices (GMPs)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Government must follow fair procedures before depriving life, liberty, or property",
+      "Agency issues a final rule or abandons rulemaking",
+      "\\\"Caution: Federal law prohibits dispensing without a prescription\\\""
     ],
     "correct": 0
   },
@@ -5028,9 +5028,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes - efficacy review of previously approved drugs began",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)",
+      "Life, Liberty, and the Pursuit of Happiness",
+      "Bioequivalence - not full clinical trials"
     ],
     "correct": 0
   },
@@ -5039,9 +5039,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The 5-schedule classification system",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Legislative Branch (Congress)",
+      "Double jeopardy, self-incrimination, due process, takings clause",
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)"
     ],
     "correct": 0
   },
@@ -5050,9 +5050,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Abuse potential, medical use, and safety/dependence risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Double jeopardy, self-incrimination, due process, takings clause",
+      "Women's right to vote",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -5061,9 +5061,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "DEA",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Race cannot be used to deny voting",
+      "President Pro Tempore of the Senate",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -5072,9 +5072,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Kefauver-Harris Amendment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Presidential succession and disability procedures",
+      "Conference Committee",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -5083,9 +5083,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Hatch-Waxman",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Speaker of the House",
+      "~10,000 petitions; hears ~75-80 cases",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -5094,9 +5094,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "The Abbreviated New Drug Application (ANDA) pathway",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2 years",
+      "FDA, CMS, CDC, NIH, HRSA, SAMHSA",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -5105,9 +5105,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Bioequivalence - not full clinical trials",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2/3 vote in both chambers",
+      "The codified database of all general and permanent federal statutes",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -5116,9 +5116,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Generic access and brand patent protections",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Lifetime appointments",
+      "Federal Register",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -5127,9 +5127,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Prevent accidental pediatric poisionings",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Within agency authority\\n2. Based on statutory authority\\n3. Reasonably related to public health, safety, welfare",
+      "States (under police powers/10th Amendment)",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -5138,9 +5138,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, via written request (blanket waivers allowed)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Safety and efficacy of drugs, food, medical devices",
+      "Yes, if unconstitutional, exceeds authority, or arbitrary/capricious",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -5149,9 +5149,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Prospective drug utilization review (DUR)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Statute (broad framework)",
+      "It must be issued for a legitimate medical purpose by a practitioner acting in the usual course of professional practice",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -5160,9 +5160,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Offer to counsel Medicaid patients (later expanded by states)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Section",
+      "Only in limited circumstances (e.g., pharmacy closure) and under strict federal guidelines",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -5171,9 +5171,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, but most states extended it to all patients",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Federal Register",
+      "Review of records, inventory, security, and compliance procedures",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -5182,9 +5182,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Track-and-trace system for prescription drugs in the supply chain",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Statutory authority granted by the legislature",
+      "A committee formed to reconcile differences between House and Senate versions of a bill",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -5193,9 +5193,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Transaction information, history, and statement",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Register",
+      "The distinction between prescription (Rx only) and OTC drugs",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -5204,9 +5204,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Dissemination of certain off-label information to providers",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, through a resolution of disapproval (rare)",
+      "DEA",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -5215,9 +5215,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Risk Evaluation and Mitigation Strategies (REMS)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, it must be funded",
+      "Track-and-trace system for prescription drugs in the supply chain",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -5226,9 +5226,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, under FDAAA",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA Form 222 (or its electronic equivalent via CSOS)",
+      "$2,100 annual cap",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -5237,9 +5237,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "By examining labeling, advertising, promotional materials, and marketing format",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "Office of Inspector General (OIG)",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -5248,9 +5248,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Duty, breach, causation, damages",
+      "It requires an offer to counsel (not forced counseling)",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -5259,9 +5259,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes, if it is marketed for both cosmetic and therapeutic purposes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Presiding over agency hearings",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -5270,9 +5270,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No - it must be classified as one or the other (unless it is a combination product)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "A drug that fails purity, strength, or quality standards",
+      "Part D plan, manufacturer, Medicare",
+      "Creates or establishes a government program"
     ],
     "correct": 0
   },
@@ -5281,9 +5281,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No. Medicare eligibility is not based on income.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Preventing misbranding and adulteration of food and drugs",
+      "Patient demographics, medication list, allergies, pharmacist interventions",
+      "To track controlled substance dispensing and detect misuse or diversion"
     ],
     "correct": 0
   },
@@ -5292,9 +5292,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Part A: Inpatient (hospital insurance)\nPart B: Outpatient/medical insurance\nPart C: Medicare Advantage (managed care plans)\nPart D: Prescription drug benefit",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The distinction between prescription (Rx only) and OTC drugs",
+      "Heroin, LSD, marijuana, MDMA, psilocybin, peyote",
+      "Protected Health Information (PHI)"
     ],
     "correct": 0
   },
@@ -5303,9 +5303,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "$35 per month supply (no deductible required)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Good Manufacturing Practices (GMPs)",
+      "Quantities divisible by 3",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die"
     ],
     "correct": 0
   },
@@ -5314,9 +5314,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "$2,100 annual cap",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Abbreviated New Drug Application (ANDA) pathway",
+      "Single-sheet form (replaced triplicate)",
+      "\\\"Caution: Federal law prohibits dispensing without a prescription\\\""
     ],
     "correct": 0
   },
@@ -5325,9 +5325,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Antidepressants, antipsychotics, anticonvulsants, antiretrovirals, antineoplastics, immunosuppressants",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, but most states extended it to all patients",
+      "Manual signature\\nElectronic (per DEA rules)",
+      "The Abbreviated New Drug Application (ANDA) pathway"
     ],
     "correct": 0
   },
@@ -5336,9 +5336,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Plans must accept participation from any pharmacy that agrees to plan terms and conditions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes, if it is intended to affect the structure or function of the body (unless properly regulated as a dietary supplement)",
+      "Staff signing prescriber's name (even with consent)\\nRubber stamp signature\\nPre-printed signature on prescription blank",
+      "By examining labeling, advertising, promotional materials, and marketing format"
     ],
     "correct": 0
   },
@@ -5347,9 +5347,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "10 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Antidepressants, antipsychotics, anticonvulsants, antiretrovirals, antineoplastics, immunosuppressants",
+      "No, they are mixed together unless specifically stated",
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed"
     ],
     "correct": 0
   },
@@ -5358,9 +5358,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1% premium increase per month of delay",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "Administrative agencies (e.g., Board of Pharmacy, FDA, DEA)",
+      "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization"
     ],
     "correct": 0
   },
@@ -5369,9 +5369,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "A low-income subsidy (≤150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Submitting false or fraudulent claims to the federal government",
+      "Government must follow fair procedures before depriving life, liberty, or property",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -5380,9 +5380,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Caremark (CVS Health), Express Scripts (Cigna), Optum Rx (UnitedHealth Group)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes. Must be informed and voluntary; document refusal",
+      "1787",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -5391,9 +5391,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "HMO: Must stay in network, usually need PCP + referrals\nPPO: More flexibility, high cost out-of-network, no referral needed",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "6 years",
+      "Speedy trial, impartial jury, right to attorney",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -5402,9 +5402,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Offering or receiving remuneration to generate federal healthcare business",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "Repealed Prohibition",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -5413,9 +5413,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Part D plan, manufacturer, Medicare",
+      "Secretary of State",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -5424,9 +5424,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No. They're considered illegal kickbacks",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Children ≤19 and pregnant women",
+      "Sign, Veto, Pocket Veto, Take no action (becomes law in 10 days)",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -5435,9 +5435,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Office of Inspector General (OIG)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, if reasonable safeguards are in place",
+      "Judge-made law created through court decisions",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -5446,9 +5446,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Exceptions protecting certain arrangements from Anti-Kickback violations",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "High abuse potential\\nNo accepted medical use\\nLack of safety even under supervision",
+      "Safety and efficacy of drugs, food, medical devices",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -5457,9 +5457,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Physician self-referrals for designated health services to entities where they have a financial relationship",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol",
+      "51 titles",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -5468,9 +5468,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2 letters + 7 numbers\\nLast digit = check digit",
+      "Indiana Code (state statutes)",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -5479,9 +5479,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Lab, radiology, DME, outpatient drugs, PT/OT, home health, hospital services, etc",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Narcotic treatment program application",
+      "DEA",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -5490,9 +5490,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Submitting false or fraudulent claims to the federal government",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Execute new form\\nAttach statement with order # and date\\nNotify DEA if stolen",
+      "An official who presides over agency hearings",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -5501,9 +5501,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Treble (3x) damages",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pharmacist and prescriber share responsibility for validity and legitimacy of controlled prescription",
+      "The pharmacist",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -5512,9 +5512,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Whistleblower suits where private individuals can recover 15-25% of recovered funds",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA must be notified to terminate registration. The registrant must:\\nReturn DEA registration certificate\\nReturn executed DEA Form 222s\\nDispose of controlled substances per DEA rules\\nMaintain records for at least 2 years",
+      "<795> governs nonsterile compounding; <797> governs sterile compounding",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -5523,9 +5523,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "It mandated prospective DUR, counseling, and documentation as a condition of Medicaid participation",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "2.5 hours (150 minutes)",
+      "Presiding over agency hearings",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -5534,9 +5534,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Therapeutic duplication, drug-disease contraindications, drug-drug interactions, incorrect dosage/duration, drug-allergy interactions, misuse/abuse, over/under utilization",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No, they are mixed together unless specifically stated",
+      "Dispensing a different drug than prescribed, usually within the same class (requires authorization)",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -5545,9 +5545,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1. Drug Utilization Review (DUR)\n2. Rebates (Best Price requirement)\n3. Demonstration projects",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Supremacy Clause (Article VI)",
+      "\\\"Caution: Federal law prohibits dispensing without a prescription\\\"",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -5556,9 +5556,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "It requires an offer to counsel (not forced counseling)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "United States Code (USC)",
+      "Kefauver-Harris Amendment",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -5567,9 +5567,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes. Must be informed and voluntary; document refusal",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Agency issues a final rule or abandons rulemaking",
+      "Transaction information, history, and statement",
+      "Creates or establishes a government program"
     ],
     "correct": 0
   },
@@ -5578,9 +5578,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Patient demographics, disease states, allergies, medication list, pharmacist interventions, refusals",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Religion, Speech, Press, Assembly, Petition",
+      "$2,100 annual cap",
+      "To track controlled substance dispensing and detect misuse or diversion"
     ],
     "correct": 0
   },
@@ -5589,9 +5589,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1996",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "27",
+      "Office of Inspector General (OIG)",
+      "Protected Health Information (PHI)"
     ],
     "correct": 0
   },
@@ -5600,9 +5600,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Individually identifiable health information related to condition, treatment, or payment",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Protection against unreasonable searches and seizures",
+      "It requires an offer to counsel (not forced counseling)",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die"
     ],
     "correct": 0
   },
@@ -5611,9 +5611,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Only disclose the minimum PHI necessary to accomplish the purpose",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Applies due process and equal protection to states",
+      "State and federal government (minimum 50% federal match)",
+      "\\\"Caution: Federal law prohibits dispensing without a prescription\\\""
     ],
     "correct": 0
   },
@@ -5622,9 +5622,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Health plans, clearinghouses, and healthcare providers transmitting electronic health information",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "President limited to two terms",
+      "Part D plan, Medicare",
+      "The Abbreviated New Drug Application (ANDA) pathway"
     ],
     "correct": 0
   },
@@ -5633,9 +5633,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Office for Civil Rights (OCR)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Vice President",
+      "Electronic healthcare transactions, privacy standards, security standards, NPI numbers",
+      "By examining labeling, advertising, promotional materials, and marketing format"
     ],
     "correct": 0
   },
@@ -5644,9 +5644,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "6 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "435",
+      "High abuse potential\\nAccepted medical use (with restrictions)\\nSevere dependence risk",
+      "Caremark (CVS Health), Express Scripts (Cigna), Optum Rx (UnitedHealth Group)"
     ],
     "correct": 0
   },
@@ -5655,9 +5655,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Notify affects individuals within 60 days and notify media + HHS",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Sign, Veto, Pocket Veto, Take no action (becomes law in 10 days)",
+      "Quantities divisible by 5",
+      "It mandated prospective DUR, counseling, and documentation as a condition of Medicaid participation"
     ],
     "correct": 0
   },
@@ -5666,9 +5666,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "9",
+      "20 items per form",
+      "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost"
     ],
     "correct": 0
   },
@@ -5677,9 +5677,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Allows refill/adherence communications about currently prescribed drugs if remuneration is reasonably related to cost",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The daily journal/newspaper of the federal government",
+      "Pharmacist and prescriber share responsibility for validity and legitimacy of controlled prescription",
+      "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes"
     ],
     "correct": 0
   },
@@ -5688,9 +5688,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "State and federal government (minimum 50% federal match)",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "FDA, CMS, CDC, NIH, HRSA, SAMHSA",
+      "Multistate Pharmacy Jurisprudence Examination",
+      "Administrative, technical, and physical protections to limit PHI exposure"
     ],
     "correct": 0
   },
@@ -5699,9 +5699,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "States",
+      "No, citations are not tested",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   },
@@ -5710,9 +5710,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Individuals eligible for both Medicare and Medicaid",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Title number",
+      "No",
+      "Manufacturer/distributor/researcher application"
     ],
     "correct": 0
   },
@@ -5721,9 +5721,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The Section number",
+      "5th Amendment",
+      "Patient name & address\\nDrug name, strength, dosage form, quantity\\nDirections\\nDate issued\\nPrescriber name, address, DEA #\\nSignature"
     ],
     "correct": 0
   },
@@ -5732,9 +5732,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Register",
+      "The Bill of Rights (added in 1791)",
+      "Multistate Pharmacy Jurisprudence Examination"
     ],
     "correct": 0
   },
@@ -5743,9 +5743,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Yes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Indiana Register (IR)",
+      "No cruel and unusual punishment; no excessive fines/bails",
+      "No, pharmacists are still responsible for individual state laws"
     ],
     "correct": 0
   },
@@ -5754,9 +5754,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Individuals ≥65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Code of Federal Regulations (CFR)",
+      "President limited to two terms",
+      "Indiana Code (IC)"
     ],
     "correct": 0
   },
@@ -5765,9 +5765,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Private insurance companies often follow Medicare coverage policies",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Provides funding for the program",
+      "Two chambers (House and Senate)",
+      "Declared the 13 colonies independent from Great Britain (July 4, 1776)"
     ],
     "correct": 0
   },
@@ -5776,9 +5776,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1. Deductible phase\n2. Initial coverage phase\n3. Catastrophic coverage phase",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "The pharmacist",
+      "2/3 vote in both chambers",
+      "Protection against unreasonable searches and seizures"
     ],
     "correct": 0
   },
@@ -5787,9 +5787,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "25% coinsurance",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Up to 5 refills within 6 months of the issue date",
+      "A prior court decision that is binding on lower courts",
+      "Repealed Prohibition"
     ],
     "correct": 0
   },
@@ -5798,9 +5798,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Part D plan, manufacturer, Medicare",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Professional negligence that causes harm to a patient",
+      "Controlled substances",
+      "100 (2 per state)"
     ],
     "correct": 0
   },
@@ -5809,9 +5809,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Part D plan, Medicare",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Review of records, inventory, security, and compliance procedures",
+      "Title 21",
+      "Trial courts (federal question and diversity jurisdiction)"
     ],
     "correct": 0
   },
@@ -5820,9 +5820,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Medication Therapy Management - pharmacist-provided services to optimize therapeutic outcomes",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prompt notification to DEA and completion of DEA Form 106",
+      "Indiana Administrative Code (state regulations)",
+      "Inspections, recalls, fines, injunctions, seizure, prosecution"
     ],
     "correct": 0
   },
@@ -5831,9 +5831,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "1. Medication therapy review\n2. Personal medication record\n3. Medication-related action plan\n4. Intervention/referral\n5. Documentation and follow-up",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Manufacturer/supplier intent controls - not how the consumer uses the product",
+      "Indiana Register (IR)",
+      "Regulation (specific implementation details)"
     ],
     "correct": 0
   },
@@ -5842,9 +5842,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "All commercially available vaccines not covered under Part B",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medical devices and cosmetics",
+      "Administrative Order",
+      "Federal Register"
     ],
     "correct": 0
   },
@@ -5853,9 +5853,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Weight loss drugs, fertility drugs, cosmetic/hair growth drugs, OTC drugs, DESI drugs, non-FDA approved drugs",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Required informed consent from clinical trial participants",
+      "DEA Form 222 (or its electronic equivalent via CSOS)",
+      "Indiana Register (IR)"
     ],
     "correct": 0
   },
@@ -5864,9 +5864,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Hoosier Healthwise, Hoosier Care Connect, Healthy Indiana Plan (HIP), Traditional Medicaid, Indiana PathWays for Aging, HoosierRx",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hatch-Waxman",
+      "Handling of hazardous drugs to minimize exposure risk",
+      "Creates or establishes a government program"
     ],
     "correct": 0
   },
@@ -5875,9 +5875,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Children ≤19 and pregnant women",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Offer to counsel Medicaid patients (later expanded by states)",
+      "The final decision issued by an agency after a hearing",
+      "To track controlled substance dispensing and detect misuse or diversion"
     ],
     "correct": 0
   },
@@ -5886,9 +5886,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Ages 19-64 with income ≤ ~138% FPL",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "By examining labeling, advertising, promotional materials, and marketing format",
+      "Dispensing an FDA-approved equivalent product in place of the brand-name drug",
+      "Protected Health Information (PHI)"
     ],
     "correct": 0
   },
@@ -5897,9 +5897,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Indiana residents ≥65 with income <150% FPL and enrolled in Part D",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "$2,100 annual cap",
+      "Yes - authorized refills",
+      "When the President takes no action and Congress adjourns within 10 days, causing the bill to die"
     ],
     "correct": 0
   },
@@ -5908,9 +5908,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Drug interactions, duplication, incorrect dose/duration, drug-disease, allergies, misuse/abuse",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "HMO: Must stay in network, usually need PCP + referrals\\nPPO: More flexibility, high cost out-of-network, no referral needed",
+      "Hatch-Waxman",
+      "\\\"Caution: Federal law prohibits dispensing without a prescription\\\""
     ],
     "correct": 0
   },
@@ -5919,9 +5919,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Patient demographics, medication list, allergies, pharmacist interventions",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "No",
+      "Dissemination of certain off-label information to providers",
+      "The Abbreviated New Drug Application (ANDA) pathway"
     ],
     "correct": 0
   },
@@ -5930,9 +5930,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Electronic healthcare transactions, privacy standards, security standards, NPI numbers",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Drug Utilization Review (DUR)\\n2. Rebates (Best Price requirement)\\n3. Demonstration projects",
+      "Antidepressants, antipsychotics, anticonvulsants, antiretrovirals, antineoplastics, immunosuppressants",
+      "By examining labeling, advertising, promotional materials, and marketing format"
     ],
     "correct": 0
   },
@@ -5941,9 +5941,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Health plans, clearinghouses, healthcare providers transmitting electronic data",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Health plans, clearinghouses, and healthcare providers transmitting electronic health information",
+      "Exceptions protecting certain arrangements from Anti-Kickback violations",
+      "Caremark (CVS Health), Express Scripts (Cigna), Optum Rx (UnitedHealth Group)"
     ],
     "correct": 0
   },
@@ -5952,9 +5952,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "No, if reasonable safeguards are in place",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Yes",
+      "Yes. Must be informed and voluntary; document refusal",
+      "It mandated prospective DUR, counseling, and documentation as a condition of Medicaid participation"
     ],
     "correct": 0
   },
@@ -5963,9 +5963,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Administrative, technical, and physical protections to limit PHI exposure",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "1. Deductible phase\\n2. Initial coverage phase\\n3. Catastrophic coverage phase",
+      "State and federal government (minimum 50% federal match)",
+      "Yes"
     ],
     "correct": 0
   },
@@ -5974,9 +5974,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Name, address, DOB, SSN, medical record number, email, photos",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Weight loss drugs, fertility drugs, cosmetic/hair growth drugs, OTC drugs, DESI drugs, non-FDA approved drugs",
+      "Part D plan, Medicare",
+      "1. Medication therapy review\\n2. Personal medication record\\n3. Medication-related action plan\\n4. Intervention/referral\\n5. Documentation and follow-up"
     ],
     "correct": 0
   },
@@ -5985,9 +5985,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Provide notice, attempt to obtain written acknowledgement, document good faith effort, keep record for 6 years",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Electronic healthcare transactions, privacy standards, security standards, NPI numbers",
+      "Health plans, clearinghouses, healthcare providers transmitting electronic data",
+      "No, if reasonable safeguards are in place"
     ],
     "correct": 0
   },
@@ -5996,9 +5996,9 @@ export const lawExams = [{
     "q": "What is a key point regarding this item?",
     "options": [
       "Within 60 days if breach poses significant risk",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "DEA (Drug Enforcement Administration) under the Department of Justice",
+      "Morphine, oxycodone, fentanyl, hydrocodone combos, amphetamine, methylphenidate, methadone",
+      "Benzodiazepines, zolpidem, tramadol, carisoprodol"
     ],
     "correct": 0
   }

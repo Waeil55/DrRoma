@@ -814,5 +814,532 @@ export const diseasesFlashcards = [{
 ]
 }];
 
-export const diseasesExams = [];
+
+export const diseasesExams = [{
+  id: "builtin_exam_diseases",
+  title: "Medical Sciences Exam",
+  icon: "CheckSquare",
+  color: "#06b6d4",
+  isBuiltIn: true,
+  isBuiltin: true,
+  questions: [
+  {
+    "id": "diseases_ex_0",
+    "q": "First-line antihypertensive drug classes include all EXCEPT:",
+    "options": [
+      "Digoxin",
+      "Thiazide diuretics",
+      "ACE inhibitors",
+      "Calcium channel blockers"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_1",
+    "q": "Which is TRUE about heart failure with reduced ejection fraction (HFrEF)?",
+    "options": [
+      "EF is <40% and requires ACE inhibitors + beta-blockers + MRA",
+      "EF is >50% and treated only with diuretics",
+      "It is caused exclusively by valvular disease",
+      "Digoxin is the first-line agent"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_2",
+    "q": "The CHA₂DS₂-VASc score is used to assess:",
+    "options": [
+      "Stroke risk in atrial fibrillation",
+      "Heart failure severity",
+      "Coronary artery disease risk",
+      "DVT risk after surgery"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_3",
+    "q": "A patient with a STEMI should receive emergent:",
+    "options": [
+      "Primary percutaneous coronary intervention (PCI) or thrombolytics",
+      "IV heparin infusion alone",
+      "Oral aspirin dose and discharge",
+      "Beta-blocker only"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_4",
+    "q": "Which statin mechanism best explains its cardiovascular protective effects?",
+    "options": [
+      "Inhibits HMG-CoA reductase → ↓ LDL + plaque stabilization",
+      "Blocks PCSK9 receptors directly",
+      "Inhibits bile acid absorption",
+      "Activates lipoprotein lipase"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_5",
+    "q": "Which medication is the rescue inhaler in asthma?",
+    "options": [
+      "Albuterol (SABA)",
+      "Salmeterol (LABA)",
+      "Fluticasone (ICS)",
+      "Tiotropium (LAMA)"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_6",
+    "q": "COPD is confirmed by spirometry showing:",
+    "options": [
+      "FEV1/FVC < 0.70 post-bronchodilator",
+      "FEV1/FVC >0.85 with air trapping",
+      "Reversible airflow obstruction",
+      "Reduced TLC and FRC"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_7",
+    "q": "The most common organism causing community-acquired pneumonia (CAP) is:",
+    "options": [
+      "Streptococcus pneumoniae",
+      "Klebsiella pneumoniae",
+      "Pseudomonas aeruginosa",
+      "Staphylococcus aureus"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_8",
+    "q": "Which antibiotic combination is recommended for outpatient mild CAP?",
+    "options": [
+      "Amoxicillin or azithromycin",
+      "Vancomycin + piperacillin-tazobactam",
+      "Metronidazole + ciprofloxacin",
+      "Ceftriaxone + gentamicin"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_9",
+    "q": "Metformin works primarily by:",
+    "options": [
+      "Decreasing hepatic glucose production",
+      "Stimulating insulin secretion from beta-cells",
+      "Blocking glucagon receptors",
+      "Increasing urinary glucose excretion"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_10",
+    "q": "DKA is characterized by:",
+    "options": [
+      "Anion gap metabolic acidosis + ketones + hyperglycemia",
+      "Hyperosmolar state without ketosis",
+      "Hypoglycemia and respiratory alkalosis",
+      "Normal anion gap acidosis"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_11",
+    "q": "First-line treatment for hypothyroidism is:",
+    "options": [
+      "Levothyroxine (T4 replacement)",
+      "Propylthiouracil (PTU)",
+      "Methimazole",
+      "Radioactive iodine (RAI)"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_12",
+    "q": "Cushing's syndrome is caused by:",
+    "options": [
+      "Excess cortisol (most commonly from exogenous steroids)",
+      "Deficiency of cortisol and aldosterone",
+      "Excess aldosterone secretion",
+      "Low thyroid hormone levels"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_13",
+    "q": "Allopurinol is used for gout because it:",
+    "options": [
+      "Inhibits xanthine oxidase → reduces uric acid synthesis",
+      "Increases renal excretion of uric acid",
+      "Neutralizes urate crystals in joints",
+      "Blocks COX-2 to reduce joint pain"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_14",
+    "q": "Levodopa/carbidopa is first-line for Parkinson's disease because:",
+    "options": [
+      "It is the most effective at replacing dopamine in substantia nigra",
+      "It has no side effects",
+      "It reverses disease progression",
+      "It works by blocking acetylcholine"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_15",
+    "q": "Cholinesterase inhibitors are used in Alzheimer's disease because:",
+    "options": [
+      "They increase acetylcholine levels in the brain",
+      "They slow amyloid plaque formation",
+      "They restore dopamine signaling",
+      "They reduce tau protein buildup"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_16",
+    "q": "The time window for IV tPA in ischemic stroke is:",
+    "options": [
+      "Within 4.5 hours of symptom onset",
+      "Within 24 hours of symptom onset",
+      "Within 1 hour of symptom onset",
+      "Within 12 hours for all patients"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_17",
+    "q": "First-line treatment for absence seizures is:",
+    "options": [
+      "Ethosuximide",
+      "Phenytoin",
+      "Carbamazepine",
+      "Topiramate"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_18",
+    "q": "Which drug is contraindicated in migraines with basilar aura?",
+    "options": [
+      "Triptans (relative contraindication)",
+      "Acetaminophen",
+      "NSAIDs",
+      "Antiemetics"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_19",
+    "q": "PPIs work by:",
+    "options": [
+      "Irreversibly blocking H⁺/K⁺-ATPase (proton pump) in gastric parietal cells",
+      "Blocking H2 histamine receptors",
+      "Neutralizing stomach acid",
+      "Stimulating bicarbonate secretion"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_20",
+    "q": "H. pylori eradication standard of care is:",
+    "options": [
+      "Triple therapy: PPI + clarithromycin + amoxicillin × 14 days",
+      "Single antibiotic monotherapy for 7 days",
+      "PPI alone for 8 weeks",
+      "Bismuth quadruple therapy only"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_21",
+    "q": "Crohn's disease differs from ulcerative colitis in that:",
+    "options": [
+      "It can affect the entire GI tract with transmural inflammation and skip lesions",
+      "It is limited to the colon and rectum only",
+      "It never causes fistulas",
+      "It only affects the stomach"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_22",
+    "q": "A complication of cirrhosis that requires lactulose or rifaximin treatment is:",
+    "options": [
+      "Hepatic encephalopathy",
+      "Esophageal varices",
+      "Spontaneous bacterial peritonitis",
+      "Hepatorenal syndrome"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_23",
+    "q": "The most common causes of CKD are:",
+    "options": [
+      "Diabetes mellitus and hypertension",
+      "Glomerulonephritis and lupus",
+      "Polycystic kidney disease and recurrent UTIs",
+      "NSAIDs and contrast dye"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_24",
+    "q": "In a patient with CKD stage 4 (GFR 15–29), which drug should be dose-adjusted or avoided?",
+    "options": [
+      "Metformin (hold when GFR <30)",
+      "Amlodipine",
+      "Atorvastatin",
+      "Lisinopril"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_25",
+    "q": "First-line treatment for uncomplicated cystitis in a non-pregnant woman:",
+    "options": [
+      "Nitrofurantoin × 5 days OR TMP-SMX × 3 days",
+      "Ciprofloxacin × 7 days",
+      "Amoxicillin × 10 days",
+      "Cephalexin × 14 days"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_26",
+    "q": "The Surviving Sepsis Campaign Hour-1 Bundle includes:",
+    "options": [
+      "Blood cultures → broad-spectrum antibiotics → 30 mL/kg IV crystaloid",
+      "Narrow-spectrum antibiotics after diagnosis",
+      "Vasopressors as first intervention",
+      "Antipyretics only"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_27",
+    "q": "MRSA bacteremia is best treated with:",
+    "options": [
+      "Vancomycin IV",
+      "Amoxicillin-clavulanate",
+      "Cefazolin",
+      "Azithromycin"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_28",
+    "q": "C. difficile colitis is best treated with:",
+    "options": [
+      "Fidaxomicin or oral vancomycin + stop offending antibiotic",
+      "IV metronidazole",
+      "IV vancomycin",
+      "Oral ciprofloxacin"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_29",
+    "q": "HIV antiretroviral therapy backbone typically consists of:",
+    "options": [
+      "2 NRTIs + 1 integrase inhibitor (INSTI)",
+      "1 NNRTI + 2 protease inhibitors",
+      "3 NRTIs alone",
+      "1 entry inhibitor + 1 fusion inhibitor"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_30",
+    "q": "Hepatitis C is now curable with:",
+    "options": [
+      "Direct-acting antivirals (DAAs) with >95% cure rates",
+      "Pegylated interferon + ribavirin",
+      "Sofosbuvir alone for 4 weeks",
+      "Liver transplant only"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_31",
+    "q": "SSRIs are first-line for major depression because:",
+    "options": [
+      "They selectively inhibit serotonin reuptake with favorable side effect profile",
+      "They have no drug interactions",
+      "They work faster than other antidepressants",
+      "They also block dopamine reuptake"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_32",
+    "q": "Lithium is used in bipolar disorder and requires monitoring of:",
+    "options": [
+      "Serum lithium levels, renal function, and thyroid function",
+      "Liver enzymes and CBC only",
+      "Blood pressure and heart rate",
+      "Blood glucose and HbA1c"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_33",
+    "q": "Second-generation (atypical) antipsychotics differ from first-generation in that:",
+    "options": [
+      "They have lower EPS risk but higher metabolic side effects (weight gain, diabetes)",
+      "They cause more QT prolongation",
+      "They are less effective for positive symptoms",
+      "They have no dopamine activity"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_34",
+    "q": "First-line pharmacotherapy for ADHD is:",
+    "options": [
+      "Stimulants: methylphenidate or amphetamine salts",
+      "SSRIs",
+      "Benzodiazepines",
+      "Mood stabilizers"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_35",
+    "q": "A narrow therapeutic index drug requires close monitoring because:",
+    "options": [
+      "Small dose changes can cause toxicity or subtherapeutic effects",
+      "It has complex renal excretion only",
+      "Patients metabolize it differently based on diet",
+      "It is always a controlled substance"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_36",
+    "q": "Rifampin is a potent CYP450 inducer. Taking it with warfarin will:",
+    "options": [
+      "Decrease warfarin levels → ↓ anticoagulant effect → need higher dose",
+      "Increase warfarin levels → bleeding risk",
+      "Have no effect on warfarin",
+      "Cause immediate drug toxicity"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_37",
+    "q": "Serotonin syndrome is caused by:",
+    "options": [
+      "Excess serotonergic activity (e.g., SSRI + MAOI combination)",
+      "Excess dopamine activity",
+      "Deficiency of serotonin receptors",
+      "Anticholinergic drug overdose"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_38",
+    "q": "The antidote for opioid overdose is:",
+    "options": [
+      "Naloxone (Narcan) — competitive opioid receptor antagonist",
+      "Flumazenil — benzodiazepine antagonist",
+      "N-acetylcysteine — acetaminophen antidote",
+      "Atropine — anticholinergic antidote"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_39",
+    "q": "Loop diuretics work by blocking which transporter?",
+    "options": [
+      "Na-K-2Cl cotransporter in the thick ascending loop of Henle",
+      "Na-Cl cotransporter in the distal convoluted tubule",
+      "Na-H exchanger in the proximal tubule",
+      "Aquaporin channels in the collecting duct"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_40",
+    "q": "The reversal agent for direct thrombin inhibitor dabigatran is:",
+    "options": [
+      "Idarucizumab (Praxbind)",
+      "Andexanet alfa (factor Xa reversal)",
+      "Vitamin K",
+      "Fresh frozen plasma only"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_41",
+    "q": "Which drug is the antidote for acetaminophen overdose?",
+    "options": [
+      "N-acetylcysteine (NAC)",
+      "Naloxone",
+      "Flumazenil",
+      "Activated charcoal alone"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_42",
+    "q": "Digoxin toxicity is worsened by hypokalemia because:",
+    "options": [
+      "K⁺ and digoxin compete for the same Na/K-ATPase binding site; low K⁺ → more digoxin binding → toxicity",
+      "Hypokalemia slows digoxin metabolism",
+      "Low K⁺ directly increases digoxin renal absorption",
+      "Hypokalemia causes digoxin protein binding changes"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_43",
+    "q": "Which antibiotic class has concentration-dependent killing?",
+    "options": [
+      "Aminoglycosides and fluoroquinolones — once-daily dosing maximizes Cmax/MIC",
+      "Beta-lactams — time-above-MIC matters",
+      "Tetracyclines — AUC/MIC is key",
+      "Clindamycin — requires continuous infusion"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_44",
+    "q": "QT prolongation is a concern with which drug class?",
+    "options": [
+      "Fluoroquinolones, macrolides, antipsychotics, antiarrhythmics",
+      "ACE inhibitors and ARBs",
+      "Beta-blockers and calcium channel blockers",
+      "Diuretics and statins"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_45",
+    "q": "The Beers Criteria lists medications potentially inappropriate in:",
+    "options": [
+      "Adults ≥65 years (associated with falls, delirium, ADRs)",
+      "Pediatric patients under 12 years",
+      "Patients with CKD stage 3+",
+      "Pregnant women in all trimesters"
+    ],
+    "correct": 0
+  },
+  {
+    "id": "diseases_ex_46",
+    "q": "Anaphylaxis first-line treatment is:",
+    "options": [
+      "Epinephrine IM (0.3 mg in lateral thigh)",
+      "IV diphenhydramine",
+      "IV corticosteroids",
+      "Inhaled albuterol"
+    ],
+    "correct": 0
+  }
+]
+}];
 export const diseasesCases = [];

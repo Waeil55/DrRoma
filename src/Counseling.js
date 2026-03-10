@@ -1822,9 +1822,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Acetaminophen?",
     "options": [
       "Relief of mild to moderate pain and reduction of fever.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and suppression of herpes simplex and varicella zoster infections.",
+      "Prevention of gout flares and management of hyperuricemia.",
+      "Management of hypertension and chronic stable angina."
     ],
     "correct": 0
   },
@@ -1833,9 +1833,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Acetaminophen/Codeine?",
     "options": [
       "Short-term treatment of moderate pain when non-opioid therapy is inadequate.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of depression and chronic neuropathic pain syndromes.",
+      "Schizophrenia, bipolar disorder, adjunctive treatment for major depressive disorder, and irritability in autism.",
+      "Treatment of susceptible respiratory, skin, and sexually transmitted infections."
     ],
     "correct": 0
   },
@@ -1844,9 +1844,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Acyclovir?",
     "options": [
       "Treatment and suppression of herpes simplex and varicella zoster infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of stroke in atrial fibrillation and treatment or prevention of venous thromboembolism.",
+      "Relief of cough due to colds or bronchitis.",
+      "Edema associated with heart failure, liver disease, or kidney disease."
     ],
     "correct": 0
   },
@@ -1855,9 +1855,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Adalimumab?",
     "options": [
       "Autoimmune conditions such as rheumatoid arthritis, psoriasis, and inflammatory bowel disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible respiratory, skin, and sexually transmitted infections.",
+      "Treatment of major depressive disorder and seasonal affective disorder; smoking cessation adjunct (other formulation).",
+      "Treatment of susceptible skin, respiratory, urinary, and bone infections."
     ],
     "correct": 0
   },
@@ -1866,9 +1866,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Albuterol sulfate (HFA)?",
     "options": [
       "Rapid relief of bronchospasm in asthma or chronic obstructive pulmonary disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term relief of occasional constipation.",
+      "Relief of pain and inflammation in osteoarthritis, rheumatoid arthritis, and dysmenorrhea.",
+      "Hypertension and off-label use for withdrawal symptoms or ADHD."
     ],
     "correct": 0
   },
@@ -1877,9 +1877,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Alendronate?",
     "options": [
       "Treatment and prevention of osteoporosis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medication-assisted treatment of opioid use disorder and chronic pain in select cases.",
+      "Seizure disorders and panic disorder.",
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease."
     ],
     "correct": 0
   },
@@ -1888,9 +1888,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Allopurinol?",
     "options": [
       "Prevention of gout flares and management of hyperuricemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension not controlled with single-agent therapy.",
+      "Type 2 diabetes mellitus when dual therapy is appropriate.",
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections."
     ],
     "correct": 0
   },
@@ -1899,9 +1899,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Alprazolam?",
     "options": [
       "Short-term management of anxiety and panic disorders.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of allergic rhinitis and chronic urticaria symptoms.",
+      "Adjunctive treatment of acute diarrhea.",
+      "Heart failure post-myocardial infarction and resistant hypertension."
     ],
     "correct": 0
   },
@@ -1910,9 +1910,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amiodarone?",
     "options": [
       "Management of life-threatening ventricular and atrial arrhythmias.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible skin, soft tissue, and anaerobic infections.",
+      "Treatment of benign prostatic hyperplasia.",
+      "Reduction of triglycerides and improvement of HDL cholesterol."
     ],
     "correct": 0
   },
@@ -1921,9 +1921,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amitriptyline?",
     "options": [
       "Treatment of depression and chronic neuropathic pain syndromes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of gout flares and familial Mediterranean fever.",
+      "Management of menopausal vasomotor symptoms and hypoestrogenism.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -1932,9 +1932,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amlodipine?",
     "options": [
       "Management of hypertension and chronic stable angina.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus when dual therapy is appropriate.",
+      "Treatment and prevention of iron deficiency anemia.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -1943,9 +1943,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amlodipine/Benazepril?",
     "options": [
       "Treatment of hypertension when monotherapy is insufficient.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of joint pain associated with osteoarthritis in hands, wrists, elbows, knees, ankles, or feet.",
+      "Reduction of triglycerides in severe hypertriglyceridemia.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -1954,9 +1954,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amoxicillin?",
     "options": [
       "Treatment of susceptible bacterial infections including ear, sinus, and lower respiratory infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of mild to severe Alzheimer's dementia.",
+      "Short-term management of moderate pain.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -1965,9 +1965,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amoxicillin/Clavulanate?",
     "options": [
       "Treatment of infections caused by beta-lactamase producing bacteria, such as sinusitis and otitis media.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Major depressive disorder, generalized anxiety, diabetic neuropathy, fibromyalgia, and chronic musculoskeletal pain.",
+      "Basal insulin therapy for type 1 and type 2 diabetes.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -1976,9 +1976,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Amphetamine/Dextroamphetamine?",
     "options": [
       "Attention-deficit/hyperactivity disorder and narcolepsy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes.",
+      "Systemic fungal infections and onychomycosis.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -1987,9 +1987,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Anastrozole?",
     "options": [
       "Adjuvant therapy for hormone receptor positive breast cancer in postmenopausal individuals.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy and cycle regulation.",
+      "Treatment of chronic hepatitis C virus infection.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -1998,9 +1998,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Apixaban?",
     "options": [
       "Prevention of stroke in atrial fibrillation and treatment or prevention of venous thromboembolism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of triglycerides and improvement of HDL cholesterol.",
+      "Type 2 diabetes and chronic weight management (Saxenda formulation).",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -2009,9 +2009,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Aripiprazole?",
     "options": [
       "Schizophrenia, bipolar disorder, adjunctive treatment for major depressive disorder, and irritability in autism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance treatment of persistent asthma.",
+      "Oral: abnormal uterine bleeding and amenorrhea; injectable: contraception and endometriosis.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -2020,9 +2020,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Aspirin 81 mg?",
     "options": [
       "Secondary prevention of cardiovascular events and certain post-stent regimens.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Procedural sedation, seizure clusters, and anesthesia induction.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -2031,9 +2031,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Atenolol?",
     "options": [
       "Hypertension, post-myocardial infarction care, and chronic angina.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia, acute psychosis, and Tourette disorder.",
+      "Chronic severe pain requiring continuous opioid therapy.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -2042,9 +2042,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Atenolol/Chlorthalidone?",
     "options": [
       "Management of hypertension requiring dual therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of postmenopausal osteoporosis.",
+      "Antiretroviral therapy for HIV infection.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -2053,9 +2053,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Atorvastatin?",
     "options": [
       "Reduction of LDL cholesterol and cardiovascular risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Basal insulin therapy for type 1 and type 2 diabetes.",
+      "Depression and off-label for neuropathic pain.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -2064,9 +2064,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Azelastine nasal?",
     "options": [
       "Relief of allergic rhinitis symptoms.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and diabetic nephropathy.",
+      "Chronic severe pain requiring continuous opioid therapy.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -2075,9 +2075,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Azithromycin?",
     "options": [
       "Treatment of susceptible respiratory, skin, and sexually transmitted infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of fungal skin infections and seborrheic dermatitis.",
+      "Short-term management of obesity in conjunction with diet and exercise.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -2086,9 +2086,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Baclofen?",
     "options": [
       "Relief of spasticity due to multiple sclerosis, spinal cord injury, or other neurologic conditions.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of intraocular pressure in glaucoma and ocular hypertension.",
+      "Chronic management of gout by increasing uric acid excretion.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -2097,9 +2097,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Beclomethasone inhalation?",
     "options": [
       "Maintenance therapy for persistent asthma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypothyroidism in selected patients.",
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Edema associated with heart failure, liver disease, or kidney disease."
     ],
     "correct": 0
   },
@@ -2108,9 +2108,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Benazepril?",
     "options": [
       "Management of hypertension and adjunct in heart failure.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, heart failure, and post-myocardial infarction management.",
+      "Treatment of urinary, respiratory, and skin infections, as well as Pneumocystis prophylaxis.",
+      "Treatment of susceptible skin, respiratory, urinary, and bone infections."
     ],
     "correct": 0
   },
@@ -2119,9 +2119,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Benazepril/Hydrochlorothiazide?",
     "options": [
       "Treatment of hypertension when monotherapy is inadequate.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pulmonary arterial hypertension.",
+      "Autoimmune conditions such as rheumatoid arthritis, psoriasis, and inflammatory bowel disease.",
+      "Hypertension and off-label use for withdrawal symptoms or ADHD."
     ],
     "correct": 0
   },
@@ -2130,9 +2130,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Benzonatate?",
     "options": [
       "Relief of cough due to colds or bronchitis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Edema in heart failure and kidney disease, often combined with loop diuretics.",
+      "Attention-deficit/hyperactivity disorder and narcolepsy.",
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease."
     ],
     "correct": 0
   },
@@ -2141,9 +2141,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Betamethasone dipropionate topical?",
     "options": [
       "Inflammatory and pruritic dermatoses responsive to steroids.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Orthostatic hypotension.",
+      "Maintenance therapy for persistent asthma.",
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections."
     ],
     "correct": 0
   },
@@ -2152,9 +2152,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Bisacodyl?",
     "options": [
       "Short-term relief of occasional constipation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of NSAID-induced gastric ulcers and medical termination of pregnancy with mifepristone.",
+      "Medication-assisted treatment of opioid use disorder and chronic pain in select cases.",
+      "Heart failure post-myocardial infarction and resistant hypertension."
     ],
     "correct": 0
   },
@@ -2163,9 +2163,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Bisoprolol?",
     "options": [
       "Hypertension and chronic heart failure (often with other agents).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Osteoarthritis and rheumatoid arthritis pain.",
+      "Treatment of susceptible respiratory and skin infections.",
+      "Reduction of triglycerides and improvement of HDL cholesterol."
     ],
     "correct": 0
   },
@@ -2174,9 +2174,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Bisoprolol/Hydrochlorothiazide?",
     "options": [
       "Treatment of hypertension requiring combination therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Antiretroviral therapy for HIV infection.",
+      "Management of acne vulgaris.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -2185,9 +2185,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Brimonidine ophthalmic?",
     "options": [
       "Lowering intraocular pressure in open-angle glaucoma or ocular hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Acute relief of angina pectoris.",
+      "Prevention of stroke in nonvalvular atrial fibrillation and treatment/prevention of venous thromboembolism.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -2196,9 +2196,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Budesonide inhalation?",
     "options": [
       "Maintenance therapy for persistent asthma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia and bipolar disorder.",
+      "Heart failure with reduced ejection fraction and rate control in atrial fibrillation.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -2207,9 +2207,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Budesonide/Formoterol?",
     "options": [
       "Maintenance treatment of asthma and COPD.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Overactive bladder with urge urinary incontinence and urgency.",
+      "Type 2 diabetes mellitus and cardiovascular risk reduction in select patients.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -2218,9 +2218,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Bumetanide?",
     "options": [
       "Edema associated with heart failure, liver disease, or kidney disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of streptococcal pharyngitis and other susceptible infections.",
+      "Treatment of major depressive disorder and generalized anxiety disorder.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -2229,9 +2229,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Buprenorphine sublingual?",
     "options": [
       "Medication-assisted treatment of opioid use disorder and chronic pain in select cases.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Reduction of triglycerides and improvement of HDL cholesterol.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -2240,9 +2240,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Buprenorphine/Naloxone?",
     "options": [
       "Maintenance therapy for opioid use disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Inflammatory and autoimmune conditions, asthma exacerbations, and allergic reactions.",
+      "Edema due to heart failure, liver disease, or kidney disease; hypertension.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -2251,9 +2251,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Bupropion XL?",
     "options": [
       "Treatment of major depressive disorder and seasonal affective disorder; smoking cessation adjunct (other formulation).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and heart failure.",
+      "Hypertension and heart failure (often with nitrates).",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -2262,9 +2262,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Buspirone?",
     "options": [
       "Management of generalized anxiety disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heart failure with reduced ejection fraction.",
+      "Postprandial glucose control in diabetes mellitus.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -2273,9 +2273,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Butalbital/Acetaminophen/Caffeine?",
     "options": [
       "Tension headaches when other options fail.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of chronic hepatitis C virus infection across all major genotypes.",
+      "Prevention of angina pectoris.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -2284,9 +2284,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Canagliflozin?",
     "options": [
       "Type 2 diabetes mellitus and cardiovascular/renal risk reduction in select patients.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Benign prostatic hyperplasia.",
+      "GERD, peptic ulcer disease, and erosive esophagitis.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -2295,9 +2295,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Candesartan?",
     "options": [
       "Treatment of hypertension and heart failure.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Autoimmune conditions such as rheumatoid arthritis, psoriasis, and inflammatory bowel disease.",
+      "Treatment of resistant Gram-positive infections including MRSA and VRE.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -2306,9 +2306,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Candesartan/Hydrochlorothiazide?",
     "options": [
       "Hypertension not controlled with single-agent therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of hypertension and chronic stable angina.",
+      "Pulmonary arterial hypertension.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -2317,9 +2317,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Carbidopa/Levodopa?",
     "options": [
       "Management of Parkinson's disease symptoms.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia, bipolar disorder, adjunctive treatment for major depressive disorder, and irritability in autism.",
+      "Treatment of ventricular arrhythmias.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -2328,9 +2328,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tamsulosin?",
     "options": [
       "Lower urinary tract symptoms due to benign prostatic hyperplasia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of spasticity due to multiple sclerosis, spinal cord injury, or other neurologic conditions.",
+      "Maintenance treatment of asthma.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -2339,9 +2339,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Carvedilol?",
     "options": [
       "Heart failure with reduced ejection fraction, hypertension, and post-MI management.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and chronic heart failure (often with other agents).",
+      "Treatment of hypertension.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -2350,9 +2350,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cefdinir?",
     "options": [
       "Treatment of susceptible respiratory and skin infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance therapy for opioid use disorder.",
+      "Treatment of various advanced cancers including melanoma, lung, and renal cell carcinoma.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -2361,9 +2361,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cephalexin?",
     "options": [
       "Treatment of susceptible skin, respiratory, urinary, and bone infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of Parkinson's disease symptoms.",
+      "Partial seizures in epilepsy.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -2372,9 +2372,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Celecoxib?",
     "options": [
       "Relief of pain and inflammation in osteoarthritis, rheumatoid arthritis, and dysmenorrhea.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension and edema.",
+      "Symptomatic relief of dysuria associated with urinary tract infections.",
+      "Hypertension and off-label use for withdrawal symptoms or ADHD."
     ],
     "correct": 0
   },
@@ -2383,9 +2383,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cetirizine?",
     "options": [
       "Relief of allergic rhinitis and chronic urticaria symptoms.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term treatment of inflammatory and pruritic dermatoses.",
+      "Inflammatory and autoimmune conditions, asthma exacerbations, and allergic reactions.",
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease."
     ],
     "correct": 0
   },
@@ -2394,9 +2394,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Chlorhexidine oral rinse?",
     "options": [
       "Management of gingivitis and reduction of oral bacterial load.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of vitamin B12 deficiency and pernicious anemia.",
+      "Treatment of non-Hodgkin lymphoma, chronic lymphocytic leukemia, and autoimmune diseases such as rheumatoid arthritis.",
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections."
     ],
     "correct": 0
   },
@@ -2405,9 +2405,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Chlorthalidone?",
     "options": [
       "Treatment of hypertension and edema.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of major depressive disorder.",
+      "Heart failure, resistant hypertension, primary hyperaldosteronism, and acne/hirsutism off-label.",
+      "Heart failure post-myocardial infarction and resistant hypertension."
     ],
     "correct": 0
   },
@@ -2416,9 +2416,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cholecalciferol high-dose?",
     "options": [
       "Correction of vitamin D deficiency.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heart failure with reduced ejection fraction and rate control in atrial fibrillation.",
+      "Short-term treatment of moderate pain when non-opioid therapy is inadequate.",
+      "Reduction of triglycerides and improvement of HDL cholesterol."
     ],
     "correct": 0
   },
@@ -2427,9 +2427,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ciprofloxacin?",
     "options": [
       "Treatment of susceptible urinary, gastrointestinal, and respiratory infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections.",
+      "Treatment of susceptible bacterial infections including ear, sinus, and lower respiratory infections.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -2438,9 +2438,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Citalopram?",
     "options": [
       "Treatment of major depressive disorder and anxiety disorders.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of stroke in atrial fibrillation and treatment of venous thromboembolism after initial parenteral therapy.",
+      "Treatment of susceptible respiratory, skin, and sexually transmitted infections.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -2449,9 +2449,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clarithromycin?",
     "options": [
       "Treatment of susceptible respiratory and Helicobacter pylori infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Preventive treatment of migraine in adults.",
+      "Maintenance therapy for persistent asthma.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -2460,9 +2460,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clindamycin oral?",
     "options": [
       "Treatment of susceptible skin, soft tissue, and anaerobic infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy.",
+      "Management of Parkinson's disease symptoms.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -2471,9 +2471,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clindamycin topical?",
     "options": [
       "Management of acne vulgaris.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of iron deficiency anemia.",
+      "Treatment of major depressive disorder and anxiety disorders.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -2482,9 +2482,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clobetasol topical?",
     "options": [
       "Short-term treatment of inflammatory and pruritic dermatoses.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Once-daily maintenance therapy for asthma and COPD.",
+      "Short-term treatment of muscle spasm associated with acute musculoskeletal conditions.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -2493,9 +2493,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clonazepam?",
     "options": [
       "Seizure disorders and panic disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of severe hypoglycemia when the patient cannot take oral carbohydrates.",
+      "Relief of joint pain associated with osteoarthritis in hands, wrists, elbows, knees, ankles, or feet.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -2504,9 +2504,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clonidine?",
     "options": [
       "Hypertension and off-label use for withdrawal symptoms or ADHD.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and edema.",
+      "Treatment of benign prostatic hyperplasia and hypertension.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -2515,9 +2515,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clopidogrel?",
     "options": [
       "Prevention of thrombotic events after myocardial infarction, stroke, or stent placement.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of triglycerides and cardiovascular risk in select patients.",
+      "Heart failure post-myocardial infarction and resistant hypertension.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -2526,9 +2526,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Clotrimazole/Betamethasone?",
     "options": [
       "Inflammatory tinea infections responsive to topical therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Mealtime insulin for type 1 and type 2 diabetes.",
+      "Reduction of LDL cholesterol, often in combination with statins.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -2537,9 +2537,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Colchicine?",
     "options": [
       "Treatment and prevention of gout flares and familial Mediterranean fever.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of angina pectoris.",
+      "Once-daily maintenance therapy for asthma and COPD.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -2548,9 +2548,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Conjugated estrogens?",
     "options": [
       "Management of moderate to severe vasomotor symptoms of menopause and hypoestrogenism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV).",
+      "Treatment of attention-deficit/hyperactivity disorder.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -2559,9 +2559,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cyanocobalamin injection?",
     "options": [
       "Treatment of vitamin B12 deficiency and pernicious anemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypothyroidism.",
+      "Short-term treatment of moderate pain.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -2570,9 +2570,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cyclobenzaprine?",
     "options": [
       "Short-term treatment of muscle spasm associated with acute musculoskeletal conditions.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation.",
+      "Hypertension and diabetic nephropathy.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -2581,9 +2581,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Cyclosporine ophthalmic?",
     "options": [
       "Increase tear production in chronic dry eye disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Control of acute nonspecific diarrhea and chronic diarrhea associated with inflammatory bowel disease.",
+      "Treatment of chronic constipation and hepatic encephalopathy.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -2592,9 +2592,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dabigatran?",
     "options": [
       "Prevention of stroke in nonvalvular atrial fibrillation and treatment/prevention of venous thromboembolism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Oral: abnormal uterine bleeding and amenorrhea; injectable: contraception and endometriosis.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -2603,9 +2603,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dapagliflozin?",
     "options": [
       "Type 2 diabetes, heart failure with reduced ejection fraction, and chronic kidney disease risk reduction.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, angina, arrhythmias, and rate control.",
+      "Reduction of LDL cholesterol and prevention of cardiovascular events.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -2614,9 +2614,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dapagliflozin/Metformin ER?",
     "options": [
       "Type 2 diabetes mellitus when dual therapy is appropriate.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of fibromyalgia.",
+      "Hypertension, angina, arrhythmias, and rate control.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -2625,9 +2625,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tolterodine LA?",
     "options": [
       "Overactive bladder with urinary urgency, frequency, or urge incontinence.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Asthma maintenance and allergic rhinitis.",
+      "Overactive bladder with urge urinary incontinence and frequency.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -2636,9 +2636,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Desvenlafaxine?",
     "options": [
       "Treatment of major depressive disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Emergency reversal of opioid overdose.",
+      "Treatment of opioid and alcohol dependence.",
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease."
     ],
     "correct": 0
   },
@@ -2647,9 +2647,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dexlansoprazole?",
     "options": [
       "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Myasthenia gravis and reversal of nondepolarizing neuromuscular blockade.",
+      "Acute relief of angina pectoris.",
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections."
     ],
     "correct": 0
   },
@@ -2658,9 +2658,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dexmethylphenidate ER?",
     "options": [
       "Treatment of attention-deficit/hyperactivity disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of various advanced cancers including melanoma, lung, and renal cell carcinoma.",
+      "Prevention and treatment of nausea and vomiting.",
+      "Heart failure post-myocardial infarction and resistant hypertension."
     ],
     "correct": 0
   },
@@ -2669,9 +2669,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Diazepam?",
     "options": [
       "Anxiety, muscle spasm, seizure adjunct, and acute alcohol withdrawal.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Severe hypertriglyceridemia.",
+      "Intermittent claudication due to peripheral artery disease.",
+      "Reduction of triglycerides and improvement of HDL cholesterol."
     ],
     "correct": 0
   },
@@ -2680,9 +2680,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Diclofenac oral?",
     "options": [
       "Pain and inflammation due to arthritis or acute injury.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term management of moderate to severe pain.",
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -2691,9 +2691,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Diclofenac topical gel?",
     "options": [
       "Relief of joint pain associated with osteoarthritis in hands, wrists, elbows, knees, ankles, or feet.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of scabies and head lice.",
+      "Prevention and treatment of venous thromboembolism and stroke prevention in atrial fibrillation.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -2702,9 +2702,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dicyclomine?",
     "options": [
       "Irritable bowel syndrome symptom relief.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Occasional constipation.",
+      "Type 2 diabetes mellitus.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -2713,9 +2713,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Digoxin?",
     "options": [
       "Heart failure with reduced ejection fraction and rate control in atrial fibrillation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Chronic management of gout by increasing uric acid excretion.",
+      "Prevention and treatment of thromboembolism in atrial fibrillation, DVT/PE, and mechanical heart valves.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -2724,9 +2724,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Diltiazem ER?",
     "options": [
       "Hypertension, angina, and certain arrhythmias.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of venous thromboembolism and stroke prevention in atrial fibrillation.",
+      "Management of hypertension and chronic stable angina.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -2735,9 +2735,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Diphenoxylate/Atropine?",
     "options": [
       "Adjunctive treatment of acute diarrhea.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Moderate to severe plaque psoriasis, psoriatic arthritis, and ankylosing spondylitis.",
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -2746,9 +2746,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dipyridamole/Aspirin?",
     "options": [
       "Stroke prophylaxis in patients with a history of transient ischemic attack or completed ischemic stroke.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of duodenal ulcers.",
+      "Treatment of hypertension requiring combination therapy.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -2757,9 +2757,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Divalproex ER?",
     "options": [
       "Seizure disorders, bipolar disorder, and migraine prophylaxis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance therapy for COPD and asthma (Respimat).",
+      "Treatment of hypertension and heart failure.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -2768,9 +2768,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Donepezil?",
     "options": [
       "Management of mild to severe Alzheimer's dementia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of osteoporosis.",
+      "Correction of vitamin D deficiency.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -2779,9 +2779,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dorzolamide/Timolol?",
     "options": [
       "Reduction of intraocular pressure in glaucoma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible bacterial infections including ear, sinus, and lower respiratory infections.",
+      "Treatment and prevention of gout flares and familial Mediterranean fever.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -2790,9 +2790,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Doxycycline?",
     "options": [
       "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, post-myocardial infarction care, and chronic angina.",
+      "Treatment of attention-deficit/hyperactivity disorder.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -2801,9 +2801,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Trazodone?",
     "options": [
       "Major depressive disorder and off-label for insomnia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of hypertension and adjunct in heart failure.",
+      "Reduction of intraocular pressure in glaucoma.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -2812,9 +2812,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Doxazosin?",
     "options": [
       "Treatment of benign prostatic hyperplasia and hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Lowering intraocular pressure in open-angle glaucoma or ocular hypertension.",
+      "Hypertension and symptomatic heart failure.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -2823,9 +2823,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Topiramate?",
     "options": [
       "Seizure control and migraine prophylaxis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of generalized anxiety disorder.",
+      "Contraception and acne treatment.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -2834,9 +2834,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dulaglutide?",
     "options": [
       "Type 2 diabetes mellitus and cardiovascular risk reduction in select patients.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heart failure with reduced ejection fraction, hypertension, and post-MI management.",
+      "Maintenance treatment of persistent asthma.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -2845,9 +2845,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Duloxetine?",
     "options": [
       "Major depressive disorder, generalized anxiety, diabetic neuropathy, fibromyalgia, and chronic musculoskeletal pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Correction of vitamin D deficiency.",
+      "Relief of chest congestion by loosening mucus.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -2856,9 +2856,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Dutasteride?",
     "options": [
       "Treatment of benign prostatic hyperplasia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Seizure disorders and panic disorder.",
+      "Relief of pain, fever, and inflammation.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -2867,9 +2867,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Edoxaban?",
     "options": [
       "Prevention of stroke in atrial fibrillation and treatment of venous thromboembolism after initial parenteral therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term treatment of muscle spasm associated with acute musculoskeletal conditions.",
+      "Treatment of metastatic melanoma and other advanced cancers.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -2878,9 +2878,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Emtricitabine/Tenofovir disoproxil fumarate?",
     "options": [
       "Treatment of HIV infection in combination therapy and pre-exposure prophylaxis (PrEP).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV).",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -2889,9 +2889,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Empagliflozin?",
     "options": [
       "Type 2 diabetes and cardiovascular/renal risk reduction.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, angina, and certain arrhythmias.",
+      "Long-term contraception and heavy menstrual bleeding (Mirena).",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -2900,9 +2900,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Empagliflozin/Metformin?",
     "options": [
       "Type 2 diabetes mellitus when dual therapy is needed.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Major depressive disorder and off-label for insomnia.",
+      "Anxiety disorders, sedation, and status epilepticus (IV).",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -2911,9 +2911,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Enalapril?",
     "options": [
       "Hypertension and symptomatic heart failure.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of HIV infection in combination therapy and pre-exposure prophylaxis (PrEP).",
+      "Edema in heart failure and kidney disease, often combined with loop diuretics.",
+      "Heart failure post-myocardial infarction and resistant hypertension."
     ],
     "correct": 0
   },
@@ -2922,9 +2922,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Enoxaparin?",
     "options": [
       "Prevention and treatment of venous thromboembolism and acute coronary syndromes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Gastroesophageal reflux disease, erosive esophagitis, and peptic ulcer disease.",
+      "Resistant hypertension.",
+      "Reduction of triglycerides and improvement of HDL cholesterol."
     ],
     "correct": 0
   },
@@ -2933,9 +2933,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Eplerenone?",
     "options": [
       "Heart failure post-myocardial infarction and resistant hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy.",
+      "Hypertension, angina, and arrhythmias; prophylaxis of variceal bleeding.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -2944,9 +2944,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Erenumab?",
     "options": [
       "Preventive treatment of migraine in adults.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of candidiasis, cryptococcal meningitis, and antifungal prophylaxis.",
+      "Chronic hypertension and angina.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -2955,9 +2955,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Escitalopram?",
     "options": [
       "Treatment of major depressive disorder and generalized anxiety disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Edema due to heart failure, liver disease, or kidney disease; hypertension.",
+      "Severe hypertriglyceridemia.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -2966,9 +2966,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Esomeprazole?",
     "options": [
       "Gastroesophageal reflux disease, erosive esophagitis, and peptic ulcer disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of chest congestion by loosening mucus.",
+      "Depression, anxiety disorders, OCD, and PTSD.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -2977,9 +2977,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Estradiol oral?",
     "options": [
       "Management of menopausal vasomotor symptoms and hypoestrogenism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids.",
+      "Treatment or prevention of hypokalemia.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -2988,9 +2988,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Estradiol transdermal patch?",
     "options": [
       "Menopausal symptom management and hypoestrogenism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of acute gout, ankylosing spondylitis, and other inflammatory conditions.",
+      "Hypertension and heart failure.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -2999,9 +2999,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ethinyl estradiol/Desogestrel?",
     "options": [
       "Prevention of pregnancy and cycle regulation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Mealtime insulin for type 1 and type 2 diabetes.",
+      "Erectile dysfunction (Viagra) and pulmonary arterial hypertension (Revatio).",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -3010,9 +3010,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ethinyl estradiol/Drospirenone?",
     "options": [
       "Contraception and treatment of premenstrual dysphoric disorder or acne.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Systemic fungal infections and onychomycosis.",
+      "Onychomycosis and fungal skin infections.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -3021,9 +3021,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ethinyl estradiol/Levonorgestrel?",
     "options": [
       "Prevention of pregnancy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of chronic constipation and hepatic encephalopathy.",
+      "Management of life-threatening ventricular and atrial arrhythmias.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -3032,9 +3032,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ethinyl estradiol/Norgestimate?",
     "options": [
       "Contraception and acne treatment.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of bacterial infections including pneumonia and urinary tract infections.",
+      "Hypertension, post-myocardial infarction care, and chronic angina.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -3043,9 +3043,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Etonogestrel/Ethinyl estradiol vaginal ring?",
     "options": [
       "Prevention of pregnancy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Short-term relief of occasional constipation.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -3054,9 +3054,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ezetimibe?",
     "options": [
       "Reduction of LDL cholesterol, often in combination with statins.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and diabetic nephropathy.",
+      "Tension headaches when other options fail.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -3065,9 +3065,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Famotidine?",
     "options": [
       "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Osteoarthritis and rheumatoid arthritis pain and inflammation.",
+      "Management of gingivitis and reduction of oral bacterial load.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -3076,9 +3076,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fenofibrate?",
     "options": [
       "Reduction of triglycerides and improvement of HDL cholesterol.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of ventricular arrhythmias.",
+      "Prevention of thrombotic events after myocardial infarction, stroke, or stent placement.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -3087,9 +3087,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fentanyl transdermal patch?",
     "options": [
       "Chronic severe pain in opioid-tolerant patients.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Resistant hypertension.",
+      "Treatment of major depressive disorder.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -3098,9 +3098,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ferrous sulfate?",
     "options": [
       "Treatment and prevention of iron deficiency anemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of respiratory and skin infections.",
+      "Seizure disorders, bipolar disorder, and migraine prophylaxis.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -3109,9 +3109,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Finasteride?",
     "options": [
       "Treatment of benign prostatic hyperplasia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pain, inflammation, and fever.",
+      "Treatment of HIV infection in combination therapy and pre-exposure prophylaxis (PrEP).",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -3120,9 +3120,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluconazole?",
     "options": [
       "Treatment of candidiasis, cryptococcal meningitis, and antifungal prophylaxis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Nicotine replacement therapy for smoking cessation.",
+      "Prevention of pregnancy and cycle regulation.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -3131,9 +3131,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluoxetine?",
     "options": [
       "Depression, obsessive-compulsive disorder, panic disorder, bulimia nervosa, and PMDD.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Depression and off-label for neuropathic pain.",
+      "Treatment of candidiasis, cryptococcal meningitis, and antifungal prophylaxis.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -3142,9 +3142,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluticasone nasal spray?",
     "options": [
       "Allergic rhinitis and non-allergic nasal inflammation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of nausea and vomiting.",
+      "Treatment of severe hypoglycemia when the patient cannot take oral carbohydrates.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -3153,9 +3153,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluticasone propionate HFA?",
     "options": [
       "Maintenance treatment of persistent asthma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Exocrine pancreatic insufficiency due to cystic fibrosis, chronic pancreatitis, or pancreatectomy.",
+      "Anxiety, pruritus, and adjunct anesthesia.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -3164,9 +3164,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluticasone/Salmeterol?",
     "options": [
       "Maintenance treatment of asthma and COPD (Diskus).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Seizure disorders and sedation.",
+      "Control of post-meal blood glucose in diabetes.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -3175,9 +3175,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Fluticasone/Vilanterol?",
     "options": [
       "Once-daily maintenance therapy for asthma and COPD.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Parkinson disease and restless legs syndrome.",
+      "Treatment of fungal skin infections and seborrheic dermatitis.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -3186,9 +3186,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Folic acid?",
     "options": [
       "Prevention and treatment of folate deficiency and during pregnancy to prevent neural tube defects.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of nausea, vomiting, allergies, and motion sickness.",
+      "Treatment of bacterial infections including pneumonia and urinary tract infections.",
+      "Reduction of triglycerides in severe hypertriglyceridemia."
     ],
     "correct": 0
   },
@@ -3197,9 +3197,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Furosemide?",
     "options": [
       "Edema due to heart failure, liver disease, or kidney disease; hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of non-Hodgkin lymphoma, chronic lymphocytic leukemia, and autoimmune diseases such as rheumatoid arthritis.",
+      "Treatment of bipolar disorder.",
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment."
     ],
     "correct": 0
   },
@@ -3208,9 +3208,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Gabapentin?",
     "options": [
       "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Erectile dysfunction (Viagra) and pulmonary arterial hypertension (Revatio).",
+      "First-line therapy for type 2 diabetes mellitus.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -3219,9 +3219,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Gemfibrozil?",
     "options": [
       "Reduction of triglycerides in severe hypertriglyceridemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Acute treatment of migraine and cluster headaches.",
+      "Management of fibromyalgia.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -3230,9 +3230,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Glimepiride?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of mild to moderate pain and reduction of fever.",
+      "Prevention of organ transplant rejection.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -3241,9 +3241,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Glipizide?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term management of anxiety and panic disorders.",
+      "Hypertension and angina; IV form for hypertensive emergencies.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -3252,9 +3252,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Glucagon emergency kit?",
     "options": [
       "Treatment of severe hypoglycemia when the patient cannot take oral carbohydrates.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Attention-deficit/hyperactivity disorder and narcolepsy.",
+      "Schizophrenia and bipolar disorder.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -3263,9 +3263,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Glyburide?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Exocrine pancreatic insufficiency due to cystic fibrosis, chronic pancreatitis, or pancreatectomy.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -3274,9 +3274,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Guaifenesin?",
     "options": [
       "Relief of chest congestion by loosening mucus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of cough due to colds or bronchitis.",
+      "Serious intra-abdominal, skin, and pulmonary infections in hospital settings.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -3285,9 +3285,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Triamterene/Hydrochlorothiazide?",
     "options": [
       "Treatment of hypertension and edema while minimizing potassium loss.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance treatment of asthma and COPD.",
+      "Hypertension, arrhythmias, migraine prophylaxis, and performance anxiety.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -3296,9 +3296,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Guanfacine ER?",
     "options": [
       "Treatment of attention-deficit/hyperactivity disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus and cardiovascular/renal risk reduction in select patients.",
+      "Moderate to severe plaque psoriasis, psoriatic arthritis, and ankylosing spondylitis.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -3307,9 +3307,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Haloperidol?",
     "options": [
       "Schizophrenia, acute psychosis, and Tourette disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible skin, respiratory, urinary, and bone infections.",
+      "Treatment and prevention of estrogen receptor-positive breast cancer.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -3318,9 +3318,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydralazine?",
     "options": [
       "Hypertension and heart failure (often with nitrates).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of major depressive disorder and anxiety disorders.",
+      "Prevention of gout flares and management of hyperuricemia.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -3329,9 +3329,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydrochlorothiazide?",
     "options": [
       "Hypertension and edema.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of thrombotic events after myocardial infarction, stroke, or stent placement.",
+      "Schizophrenia, bipolar disorder, adjunctive treatment for major depressive disorder, and irritability in autism.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -3340,9 +3340,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydrocodone/Acetaminophen?",
     "options": [
       "Short-term management of moderate pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of stroke in nonvalvular atrial fibrillation and treatment/prevention of venous thromboembolism.",
+      "Relief of cough due to colds or bronchitis.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -3351,9 +3351,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydrocortisone rectal?",
     "options": [
       "Inflammatory conditions of the distal colon and rectum, including hemorrhoids.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Anxiety, muscle spasm, seizure adjunct, and acute alcohol withdrawal.",
+      "Treatment of major depressive disorder and seasonal affective disorder; smoking cessation adjunct (other formulation).",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -3362,9 +3362,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydroxychloroquine?",
     "options": [
       "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Stroke prophylaxis in patients with a history of transient ischemic attack or completed ischemic stroke.",
+      "Relief of pain and inflammation in osteoarthritis, rheumatoid arthritis, and dysmenorrhea.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -3373,9 +3373,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Hydroxyzine?",
     "options": [
       "Anxiety, pruritus, and adjunct anesthesia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Seizure control and migraine prophylaxis.",
+      "Seizure disorders and panic disorder.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -3384,9 +3384,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ibandronate?",
     "options": [
       "Treatment and prevention of postmenopausal osteoporosis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus when dual therapy is needed.",
+      "Type 2 diabetes mellitus when dual therapy is appropriate.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -3395,9 +3395,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ibuprofen?",
     "options": [
       "Relief of pain, fever, and inflammation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of menopausal vasomotor symptoms and hypoestrogenism.",
+      "Adjunctive treatment of acute diarrhea.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -3406,9 +3406,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Icosapent ethyl?",
     "options": [
       "Reduction of triglycerides and cardiovascular risk in select patients.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of LDL cholesterol, often in combination with statins.",
+      "Treatment of benign prostatic hyperplasia.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -3417,9 +3417,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tramadol?",
     "options": [
       "Short-term treatment of moderate pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Depression, obsessive-compulsive disorder, panic disorder, bulimia nervosa, and PMDD.",
+      "Management of menopausal vasomotor symptoms and hypoestrogenism.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -3428,9 +3428,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Indomethacin?",
     "options": [
       "Treatment of acute gout, ankylosing spondylitis, and other inflammatory conditions.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations).",
+      "Treatment and prevention of iron deficiency anemia.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -3439,9 +3439,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin aspart?",
     "options": [
       "Postprandial glucose control in diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension and edema while minimizing potassium loss.",
+      "Reduction of triglycerides in severe hypertriglyceridemia.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -3450,9 +3450,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin degludec?",
     "options": [
       "Basal insulin therapy for type 1 and type 2 diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Rheumatoid arthritis, lupus, and malaria prophylaxis/treatment.",
+      "Short-term management of moderate pain.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -3461,9 +3461,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin detemir?",
     "options": [
       "Basal insulin therapy for type 1 and type 2 diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Postprandial glucose control in diabetes mellitus.",
+      "Basal insulin coverage for type 1 and type 2 diabetes.",
+      "Mealtime insulin for type 1 and type 2 diabetes."
     ],
     "correct": 0
   },
@@ -3472,9 +3472,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin glargine?",
     "options": [
       "Basal insulin coverage for type 1 and type 2 diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance treatment of COPD and adjunct for acute asthma.",
+      "Chronic heart failure with reduced ejection fraction to reduce hospitalization risk.",
+      "Partial-onset seizures in epilepsy."
     ],
     "correct": 0
   },
@@ -3483,9 +3483,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin glulisine?",
     "options": [
       "Mealtime insulin for type 1 and type 2 diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Moderate to severe plaque psoriasis and psoriatic arthritis.",
+      "Hypothyroidism.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -3494,9 +3494,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin lispro?",
     "options": [
       "Control of post-meal blood glucose in diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "GERD, peptic ulcer disease, and erosive esophagitis.",
+      "Attention-deficit/hyperactivity disorder and binge eating disorder.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -3505,9 +3505,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Insulin regular?",
     "options": [
       "Mealtime insulin for type 1 and type 2 diabetes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Long-term contraception and heavy menstrual bleeding (Mirena).",
+      "Management of insomnia and circadian rhythm disorders.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -3516,9 +3516,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ipilimumab?",
     "options": [
       "Treatment of metastatic melanoma and other advanced cancers.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Attention-deficit/hyperactivity disorder and binge eating disorder.",
+      "Orthostatic hypotension.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -3527,9 +3527,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ipratropium bromide?",
     "options": [
       "Maintenance treatment of COPD and adjunct for acute asthma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia and bipolar depression.",
+      "Treatment of respiratory and skin infections.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -3538,9 +3538,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Irbesartan?",
     "options": [
       "Hypertension and diabetic nephropathy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Gastroparesis and short-term relief of nausea/vomiting.",
+      "Treatment of external otitis (swimmer's ear).",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -3549,9 +3549,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Isosorbide dinitrate?",
     "options": [
       "Prevention of angina pectoris; adjunct in heart failure.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Procedural sedation, seizure clusters, and anesthesia induction.",
+      "Treatment of oral candidiasis (thrush).",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -3560,9 +3560,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Isosorbide mononitrate?",
     "options": [
       "Prevention of angina pectoris.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Overactive bladder with urge urinary incontinence and frequency.",
+      "Short-term management of moderate to severe pain.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -3571,9 +3571,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Isotretinoin?",
     "options": [
       "Severe recalcitrant nodular acne.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of organ transplant rejection.",
+      "Control of tonic-clonic and focal seizures and prevention of seizures post-neurosurgery.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -3582,9 +3582,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Itraconazole?",
     "options": [
       "Systemic fungal infections and onychomycosis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Major depressive disorder (limited use due to hepatotoxicity).",
+      "Management of ventricular and supraventricular arrhythmias.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -3593,9 +3593,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ivabradine?",
     "options": [
       "Chronic heart failure with reduced ejection fraction to reduce hospitalization risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prophylaxis of uncomplicated urinary tract infections.",
+      "Heart failure with reduced ejection fraction.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -3604,9 +3604,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ixekizumab?",
     "options": [
       "Moderate to severe plaque psoriasis and psoriatic arthritis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of acromegaly and severe diarrhea/flushing from carcinoid tumors.",
+      "Acute treatment of migraine and cluster headaches.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -3615,9 +3615,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ketoconazole topical?",
     "options": [
       "Treatment of fungal skin infections and seborrheic dermatitis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Partial seizures in epilepsy.",
+      "Rapid relief of bronchospasm in asthma or chronic obstructive pulmonary disease.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -3626,9 +3626,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ketorolac?",
     "options": [
       "Short-term management of moderate to severe acute pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Depression, anxiety disorders, OCD, and PTSD.",
+      "Adjuvant therapy for hormone receptor positive breast cancer in postmenopausal individuals.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -3637,9 +3637,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Labetalol?",
     "options": [
       "Hypertension, including during pregnancy, and hypertensive emergencies (IV).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Control of tonic-clonic and focal seizures and prevention of seizures post-neurosurgery.",
+      "Management of hypertension and adjunct in heart failure.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -3648,9 +3648,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lacosamide?",
     "options": [
       "Partial-onset seizures in epilepsy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and off-label for PTSD-related nightmares.",
+      "Medication-assisted treatment of opioid use disorder and chronic pain in select cases.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -3659,9 +3659,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lactulose?",
     "options": [
       "Treatment of chronic constipation and hepatic encephalopathy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia, bipolar disorder, and adjunctive treatment of major depressive disorder.",
+      "Treatment of susceptible respiratory and skin infections.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -3670,9 +3670,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lamotrigine?",
     "options": [
       "Seizure disorders and maintenance treatment of bipolar disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Management of acne vulgaris.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -3681,9 +3681,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lansoprazole?",
     "options": [
       "GERD, peptic ulcer disease, and erosive esophagitis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Prevention of stroke in nonvalvular atrial fibrillation and treatment/prevention of venous thromboembolism.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -3692,9 +3692,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Latanoprost?",
     "options": [
       "Reduction of intraocular pressure in glaucoma and ocular hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of estrogen receptor-positive breast cancer.",
+      "Heart failure with reduced ejection fraction and rate control in atrial fibrillation.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -3703,9 +3703,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ledipasvir/Sofosbuvir?",
     "options": [
       "Treatment of chronic hepatitis C virus infection.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and suppression of herpes simplex and varicella zoster infections.",
+      "Type 2 diabetes mellitus and cardiovascular risk reduction in select patients.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -3714,9 +3714,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levothyroxine?",
     "options": [
       "Hypothyroidism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of depression and chronic neuropathic pain syndromes.",
+      "Treatment of major depressive disorder and generalized anxiety disorder.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -3725,9 +3725,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levetiracetam?",
     "options": [
       "Adjunct therapy for seizure disorders.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of stroke in atrial fibrillation and treatment or prevention of venous thromboembolism.",
+      "Reduction of triglycerides and improvement of HDL cholesterol.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -3736,9 +3736,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levofloxacin?",
     "options": [
       "Treatment of bacterial infections including pneumonia and urinary tract infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible respiratory, skin, and sexually transmitted infections.",
+      "Edema due to heart failure, liver disease, or kidney disease; hypertension.",
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation."
     ],
     "correct": 0
   },
@@ -3747,9 +3747,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levonorgestrel emergency contraception?",
     "options": [
       "Emergency contraception within 72 hours of unprotected intercourse.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term relief of occasional constipation.",
+      "Hypertension and heart failure (often with nitrates).",
+      "Magnesium deficiency, indigestion, and constipation (higher doses)."
     ],
     "correct": 0
   },
@@ -3758,9 +3758,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levonorgestrel intrauterine system?",
     "options": [
       "Long-term contraception and heavy menstrual bleeding (Mirena).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Medication-assisted treatment of opioid use disorder and chronic pain in select cases.",
+      "Postprandial glucose control in diabetes mellitus.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -3769,9 +3769,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Levothyroxine/Liothyronine?",
     "options": [
       "Hypothyroidism in selected patients.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension not controlled with single-agent therapy.",
+      "Prevention of angina pectoris.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -3780,9 +3780,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lidocaine patch?",
     "options": [
       "Relief of postherpetic neuralgia pain and localized neuropathic pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of allergic rhinitis and chronic urticaria symptoms.",
+      "GERD, peptic ulcer disease, and erosive esophagitis.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -3791,9 +3791,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Linaclotide?",
     "options": [
       "Irritable bowel syndrome with constipation and chronic idiopathic constipation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible skin, soft tissue, and anaerobic infections.",
+      "Type 2 diabetes mellitus.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -3802,9 +3802,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Linezolid?",
     "options": [
       "Treatment of resistant Gram-positive infections including MRSA and VRE.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of gout flares and familial Mediterranean fever.",
+      "Magnesium deficiency, indigestion, and constipation (higher doses).",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -3813,9 +3813,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Linagliptin?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus when dual therapy is appropriate.",
+      "Vulvovaginal candidiasis and other cutaneous fungal infections.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -3824,9 +3824,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Liraglutide?",
     "options": [
       "Type 2 diabetes and chronic weight management (Saxenda formulation).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of joint pain associated with osteoarthritis in hands, wrists, elbows, knees, ankles, or feet.",
+      "Asthma maintenance and allergic rhinitis.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -3835,9 +3835,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lisdexamfetamine?",
     "options": [
       "Attention-deficit/hyperactivity disorder and binge eating disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of mild to severe Alzheimer's dementia.",
+      "Major depressive disorder (limited use due to hepatotoxicity).",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -3846,9 +3846,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lisinopril?",
     "options": [
       "Hypertension, heart failure, and post-myocardial infarction management.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Major depressive disorder, generalized anxiety, diabetic neuropathy, fibromyalgia, and chronic musculoskeletal pain.",
+      "Prevention of pregnancy in individuals who cannot take estrogen.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -3857,9 +3857,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lithium carbonate?",
     "options": [
       "Treatment of bipolar disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes.",
+      "Overactive bladder with urge urinary incontinence and urgency.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -3868,9 +3868,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Loperamide?",
     "options": [
       "Control of acute nonspecific diarrhea and chronic diarrhea associated with inflammatory bowel disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy and cycle regulation.",
+      "Seizure disorders and sedation.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -3879,9 +3879,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lorazepam?",
     "options": [
       "Anxiety disorders, sedation, and status epilepticus (IV).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of triglycerides and improvement of HDL cholesterol.",
+      "Neuropathic pain, fibromyalgia, and adjunctive therapy for partial seizures.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -3890,9 +3890,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Losartan?",
     "options": [
       "Hypertension and diabetic nephropathy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance treatment of persistent asthma.",
+      "Parkinson disease and restless legs syndrome.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -3901,9 +3901,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lovastatin?",
     "options": [
       "Reduction of LDL cholesterol and prevention of cardiovascular events.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Treatment and prevention of duodenal ulcers.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -3912,9 +3912,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Lurasidone?",
     "options": [
       "Schizophrenia and bipolar depression.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia, acute psychosis, and Tourette disorder.",
+      "Treatment and suppression of herpes simplex and varicella zoster infections.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -3923,9 +3923,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Macitentan?",
     "options": [
       "Pulmonary arterial hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of postmenopausal osteoporosis.",
+      "Treatment of infections caused by beta-lactamase producing bacteria, such as sinusitis and otitis media.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -3934,9 +3934,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Magnesium oxide?",
     "options": [
       "Magnesium deficiency, indigestion, and constipation (higher doses).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Basal insulin therapy for type 1 and type 2 diabetes.",
+      "Relief of spasticity due to multiple sclerosis, spinal cord injury, or other neurologic conditions.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -3945,9 +3945,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Medroxyprogesterone acetate?",
     "options": [
       "Oral: abnormal uterine bleeding and amenorrhea; injectable: contraception and endometriosis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and diabetic nephropathy.",
+      "Maintenance treatment of asthma and COPD.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -3956,9 +3956,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Melatonin?",
     "options": [
       "Management of insomnia and circadian rhythm disorders.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of fungal skin infections and seborrheic dermatitis.",
+      "Lower urinary tract symptoms due to benign prostatic hyperplasia.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -3967,9 +3967,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Meloxicam?",
     "options": [
       "Osteoarthritis and rheumatoid arthritis pain and inflammation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of intraocular pressure in glaucoma and ocular hypertension.",
+      "Treatment of susceptible respiratory and Helicobacter pylori infections.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -3978,9 +3978,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metformin?",
     "options": [
       "First-line therapy for type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypothyroidism in selected patients.",
+      "Short-term treatment of muscle spasm associated with acute musculoskeletal conditions.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -3989,9 +3989,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metoclopramide?",
     "options": [
       "Gastroparesis and short-term relief of nausea/vomiting.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, heart failure, and post-myocardial infarction management.",
+      "Relief of joint pain associated with osteoarthritis in hands, wrists, elbows, knees, ankles, or feet.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain."
     ],
     "correct": 0
   },
@@ -4000,9 +4000,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metolazone?",
     "options": [
       "Edema in heart failure and kidney disease, often combined with loop diuretics.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pulmonary arterial hypertension.",
+      "Treatment of benign prostatic hyperplasia and hypertension.",
+      "Oral: abnormal uterine bleeding and amenorrhea; injectable: contraception and endometriosis."
     ],
     "correct": 0
   },
@@ -4011,9 +4011,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metoprolol succinate?",
     "options": [
       "Hypertension, angina, and heart failure with reduced ejection fraction.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Edema in heart failure and kidney disease, often combined with loop diuretics.",
+      "Heart failure post-myocardial infarction and resistant hypertension.",
+      "Orthostatic hypotension."
     ],
     "correct": 0
   },
@@ -4022,9 +4022,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metoprolol tartrate?",
     "options": [
       "Hypertension, angina, arrhythmias, and rate control.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus (postprandial glucose control).",
+      "Reduction of LDL cholesterol, often in combination with statins.",
+      "Prevention of organ transplant rejection."
     ],
     "correct": 0
   },
@@ -4033,9 +4033,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Metronidazole?",
     "options": [
       "Treatment of anaerobic bacterial infections and protozoal infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance treatment of asthma.",
+      "Once-daily maintenance therapy for asthma and COPD.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -4044,9 +4044,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mexiletine?",
     "options": [
       "Treatment of ventricular arrhythmias.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, angina, and arrhythmias; prophylaxis of variceal bleeding.",
+      "Treatment of attention-deficit/hyperactivity disorder.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -4055,9 +4055,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Miconazole topical?",
     "options": [
       "Vulvovaginal candidiasis and other cutaneous fungal infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of external otitis (swimmer's ear).",
+      "Short-term treatment of moderate pain.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -4066,9 +4066,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Midazolam?",
     "options": [
       "Procedural sedation, seizure clusters, and anesthesia induction.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of chronic angina.",
+      "Hypertension and diabetic nephropathy.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -4077,9 +4077,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Midodrine?",
     "options": [
       "Orthostatic hypotension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension.",
+      "Treatment of chronic constipation and hepatic encephalopathy.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -4088,9 +4088,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Miglitol?",
     "options": [
       "Type 2 diabetes mellitus (postprandial glucose control).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Chronic severe pain requiring continuous opioid therapy.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -4099,9 +4099,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Milnacipran?",
     "options": [
       "Management of fibromyalgia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Intermittent claudication due to peripheral artery disease.",
+      "Reduction of LDL cholesterol and prevention of cardiovascular events.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -4110,9 +4110,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Minocycline?",
     "options": [
       "Treatment of acne and various bacterial infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Serious intra-abdominal, skin, and pulmonary infections in hospital settings.",
+      "Hypertension, angina, arrhythmias, and rate control.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -4121,9 +4121,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Minoxidil oral?",
     "options": [
       "Resistant hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Neuropathic pain, fibromyalgia, and adjunctive therapy for partial seizures.",
+      "Prevention of NSAID-induced gastric ulcers and medical termination of pregnancy with mifepristone.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -4132,9 +4132,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mirtazapine?",
     "options": [
       "Major depressive disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of osteoporosis in postmenopausal women and reduction of invasive breast cancer risk.",
+      "Pain, inflammation, and fever.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -4143,9 +4143,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mirabegron?",
     "options": [
       "Overactive bladder with urge urinary incontinence and frequency.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Prevention of chronic angina.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -4154,9 +4154,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Misoprostol?",
     "options": [
       "Prevention of NSAID-induced gastric ulcers and medical termination of pregnancy with mifepristone.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heart failure, resistant hypertension, primary hyperaldosteronism, and acne/hirsutism off-label.",
+      "Treatment and prophylaxis of influenza A and B.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -4165,9 +4165,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mometasone inhalation?",
     "options": [
       "Maintenance treatment of asthma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Onychomycosis and fungal skin infections.",
+      "Treatment of scabies and head lice.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -4176,9 +4176,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Montelukast?",
     "options": [
       "Asthma maintenance and allergic rhinitis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Rapid relief of bronchospasm in asthma or chronic obstructive pulmonary disease.",
+      "Hypertension and off-label for PTSD-related nightmares.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -4187,9 +4187,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Morphine extended-release?",
     "options": [
       "Chronic severe pain requiring continuous opioid therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension when monotherapy is insufficient.",
+      "Schizophrenia, bipolar disorder, and irritability associated with autism.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -4198,9 +4198,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Moxifloxacin?",
     "options": [
       "Treatment of respiratory and skin infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Secondary prevention of cardiovascular events and certain post-stent regimens.",
+      "Treatment of chronic hepatitis C virus infection across all major genotypes.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -4209,9 +4209,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mupirocin topical?",
     "options": [
       "Treatment of impetigo and nasal MRSA colonization (intranasal ointment).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance therapy for persistent asthma.",
+      "Relief of mild to moderate pain and reduction of fever.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -4220,9 +4220,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Mycophenolate mofetil?",
     "options": [
       "Prevention of organ transplant rejection.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension requiring combination therapy.",
+      "Treatment of hypertension when monotherapy is insufficient.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -4231,9 +4231,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nabumetone?",
     "options": [
       "Osteoarthritis and rheumatoid arthritis pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of major depressive disorder and seasonal affective disorder; smoking cessation adjunct (other formulation).",
+      "Relief of allergic rhinitis symptoms.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -4242,9 +4242,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nadolol?",
     "options": [
       "Hypertension, angina, and arrhythmias; prophylaxis of variceal bleeding.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Lower urinary tract symptoms due to benign prostatic hyperplasia.",
+      "Lowering intraocular pressure in open-angle glaucoma or ocular hypertension.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain."
     ],
     "correct": 0
   },
@@ -4253,9 +4253,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Naloxone nasal spray?",
     "options": [
       "Emergency reversal of opioid overdose.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension and edema.",
+      "Hypertension not controlled with single-agent therapy.",
+      "Pulmonary arterial hypertension."
     ],
     "correct": 0
   },
@@ -4264,9 +4264,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Naltrexone?",
     "options": [
       "Treatment of opioid and alcohol dependence.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term treatment of inflammatory and pruritic dermatoses.",
+      "Treatment of susceptible urinary, gastrointestinal, and respiratory infections.",
+      "Procedural sedation, seizure clusters, and anesthesia induction."
     ],
     "correct": 0
   },
@@ -4275,9 +4275,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Naproxen?",
     "options": [
       "Pain, inflammation, and fever.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of vitamin B12 deficiency and pernicious anemia.",
+      "Management of moderate to severe vasomotor symptoms of menopause and hypoestrogenism.",
+      "Treatment of impetigo and nasal MRSA colonization (intranasal ointment)."
     ],
     "correct": 0
   },
@@ -4286,9 +4286,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nebivolol?",
     "options": [
       "Treatment of hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of major depressive disorder.",
+      "Anxiety, muscle spasm, seizure adjunct, and acute alcohol withdrawal.",
+      "Chronic hypertension and angina."
     ],
     "correct": 0
   },
@@ -4297,9 +4297,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nefazodone?",
     "options": [
       "Major depressive disorder (limited use due to hepatotoxicity).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Heart failure with reduced ejection fraction and rate control in atrial fibrillation.",
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections.",
+      "Prevention and treatment of nausea and vomiting."
     ],
     "correct": 0
   },
@@ -4308,9 +4308,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nelfinavir?",
     "options": [
       "Antiretroviral therapy for HIV infection.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of acne, respiratory infections, Lyme disease, and other susceptible infections.",
+      "Hypertension and symptomatic heart failure.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -4319,9 +4319,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Neomycin/Polymyxin B/Hydrocortisone otic?",
     "options": [
       "Treatment of external otitis (swimmer's ear).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of stroke in atrial fibrillation and treatment of venous thromboembolism after initial parenteral therapy.",
+      "Contraception and acne treatment.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -4330,9 +4330,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Neostigmine?",
     "options": [
       "Myasthenia gravis and reversal of nondepolarizing neuromuscular blockade.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Preventive treatment of migraine in adults.",
+      "Maintenance treatment of persistent asthma.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -4341,9 +4341,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nicardipine?",
     "options": [
       "Hypertension and angina; IV form for hypertensive emergencies.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy.",
+      "Relief of chest congestion by loosening mucus.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -4352,9 +4352,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nicotine transdermal patch?",
     "options": [
       "Nicotine replacement therapy for smoking cessation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment and prevention of iron deficiency anemia.",
+      "Relief of pain, fever, and inflammation.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -4363,9 +4363,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nifedipine extended-release?",
     "options": [
       "Chronic hypertension and angina.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Once-daily maintenance therapy for asthma and COPD.",
+      "Treatment of metastatic melanoma and other advanced cancers.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -4374,9 +4374,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nitrofurantoin?",
     "options": [
       "Treatment and prophylaxis of uncomplicated urinary tract infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of severe hypoglycemia when the patient cannot take oral carbohydrates.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV).",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -4385,9 +4385,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nitroglycerin sublingual?",
     "options": [
       "Acute relief of angina pectoris.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and edema.",
+      "Long-term contraception and heavy menstrual bleeding (Mirena).",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -4396,9 +4396,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nitroglycerin transdermal?",
     "options": [
       "Prevention of chronic angina.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Reduction of triglycerides and cardiovascular risk in select patients.",
+      "Anxiety disorders, sedation, and status epilepticus (IV).",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -4407,9 +4407,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nivolumab?",
     "options": [
       "Treatment of various advanced cancers including melanoma, lung, and renal cell carcinoma.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Mealtime insulin for type 1 and type 2 diabetes.",
+      "Edema in heart failure and kidney disease, often combined with loop diuretics.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -4418,9 +4418,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Norethindrone?",
     "options": [
       "Prevention of pregnancy in individuals who cannot take estrogen.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of angina pectoris.",
+      "Resistant hypertension.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -4429,9 +4429,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nortriptyline?",
     "options": [
       "Depression and off-label for neuropathic pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV).",
+      "Hypertension, angina, and arrhythmias; prophylaxis of variceal bleeding.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -4440,9 +4440,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Nystatin oral suspension?",
     "options": [
       "Treatment of oral candidiasis (thrush).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypothyroidism.",
+      "Chronic hypertension and angina.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -4451,9 +4451,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Octreotide?",
     "options": [
       "Management of acromegaly and severe diarrhea/flushing from carcinoid tumors.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Irritable bowel syndrome with constipation and chronic idiopathic constipation.",
+      "GERD, erosive esophagitis, and peptic ulcer disease.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -4462,9 +4462,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Olanzapine?",
     "options": [
       "Schizophrenia and bipolar disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Control of acute nonspecific diarrhea and chronic diarrhea associated with inflammatory bowel disease.",
+      "Treatment of streptococcal pharyngitis and other susceptible infections.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -4473,9 +4473,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Olmesartan?",
     "options": [
       "Hypertension.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Oral: abnormal uterine bleeding and amenorrhea; injectable: contraception and endometriosis.",
+      "Parkinson disease and restless legs syndrome.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -4484,9 +4484,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Omega-3-acid ethyl esters?",
     "options": [
       "Severe hypertriglyceridemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension, angina, arrhythmias, and rate control.",
+      "Prevention and treatment of osteoporosis in postmenopausal women and reduction of invasive breast cancer risk.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -4495,9 +4495,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Omeprazole?",
     "options": [
       "GERD, erosive esophagitis, and peptic ulcer disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of fibromyalgia.",
+      "Reduction of LDL cholesterol and cardiovascular risk.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain."
     ],
     "correct": 0
   },
@@ -4506,9 +4506,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ondansetron?",
     "options": [
       "Prevention and treatment of nausea and vomiting.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Asthma maintenance and allergic rhinitis.",
+      "Maintenance therapy for COPD and asthma (Respimat).",
+      "Pulmonary arterial hypertension."
     ],
     "correct": 0
   },
@@ -4517,9 +4517,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Oseltamivir?",
     "options": [
       "Treatment and prophylaxis of influenza A and B.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Emergency reversal of opioid overdose.",
+      "Treatment of depression and chronic neuropathic pain syndromes.",
+      "Procedural sedation, seizure clusters, and anesthesia induction."
     ],
     "correct": 0
   },
@@ -4528,9 +4528,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Oxcarbazepine?",
     "options": [
       "Partial seizures in epilepsy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Myasthenia gravis and reversal of nondepolarizing neuromuscular blockade.",
+      "Management of hypertension requiring dual therapy.",
+      "Treatment of impetigo and nasal MRSA colonization (intranasal ointment)."
     ],
     "correct": 0
   },
@@ -4539,9 +4539,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Oxybutynin?",
     "options": [
       "Overactive bladder with urge urinary incontinence and urgency.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of various advanced cancers including melanoma, lung, and renal cell carcinoma.",
+      "Hypertension and chronic heart failure (often with other agents).",
+      "Nicotine replacement therapy for smoking cessation."
     ],
     "correct": 0
   },
@@ -4550,9 +4550,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Oxycodone extended-release?",
     "options": [
       "Chronic severe pain requiring continuous opioid therapy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Severe hypertriglyceridemia.",
+      "Type 2 diabetes mellitus and cardiovascular/renal risk reduction in select patients.",
+      "GERD, erosive esophagitis, and peptic ulcer disease."
     ],
     "correct": 0
   },
@@ -4561,9 +4561,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Oxycodone/Acetaminophen?",
     "options": [
       "Short-term management of moderate to severe pain.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia and schizoaffective disorder.",
+      "Treatment of hypertension and edema.",
+      "Symptomatic relief of dysuria associated with urinary tract infections."
     ],
     "correct": 0
   },
@@ -4572,9 +4572,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Paliperidone?",
     "options": [
       "Schizophrenia and schizoaffective disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Symptomatic relief of dysuria associated with urinary tract infections.",
+      "Inflammatory tinea infections responsive to topical therapy.",
+      "Chronic management of gout by increasing uric acid excretion."
     ],
     "correct": 0
   },
@@ -4583,9 +4583,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pancrelipase?",
     "options": [
       "Exocrine pancreatic insufficiency due to cystic fibrosis, chronic pancreatitis, or pancreatectomy.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment or prevention of hypokalemia.",
+      "Treatment of erosive esophagitis and symptomatic gastroesophageal reflux disease.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -4594,9 +4594,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pantoprazole?",
     "options": [
       "GERD, erosive esophagitis, and Zollinger-Ellison syndrome.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of ventricular and supraventricular arrhythmias.",
+      "Management of mild to severe Alzheimer's dementia.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -4605,9 +4605,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Paroxetine?",
     "options": [
       "Depression, anxiety disorders, OCD, and PTSD.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Schizophrenia, bipolar disorder, and irritability associated with autism.",
+      "Type 2 diabetes and cardiovascular/renal risk reduction.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -4616,9 +4616,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Penicillin V potassium?",
     "options": [
       "Treatment of streptococcal pharyngitis and other susceptible infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes (Ozempic, Rybelsus) and chronic weight management (Wegovy).",
+      "Contraception and treatment of premenstrual dysphoric disorder or acne.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -4627,9 +4627,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pentoxifylline?",
     "options": [
       "Intermittent claudication due to peripheral artery disease.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of urinary, respiratory, and skin infections, as well as Pneumocystis prophylaxis.",
+      "Depression, obsessive-compulsive disorder, panic disorder, bulimia nervosa, and PMDD.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -4638,9 +4638,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Permethrin topical?",
     "options": [
       "Treatment of scabies and head lice.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of thromboembolism in atrial fibrillation, DVT/PE, and mechanical heart valves.",
+      "Treatment of severe hypoglycemia when the patient cannot take oral carbohydrates.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -4649,9 +4649,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Phenazopyridine?",
     "options": [
       "Symptomatic relief of dysuria associated with urinary tract infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of gout flares and management of hyperuricemia.",
+      "Anxiety, pruritus, and adjunct anesthesia.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -4660,9 +4660,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Phenobarbital?",
     "options": [
       "Seizure disorders and sedation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of infections caused by beta-lactamase producing bacteria, such as sinusitis and otitis media.",
+      "Control of post-meal blood glucose in diabetes.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -4671,9 +4671,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Phentermine?",
     "options": [
       "Short-term management of obesity in conjunction with diet and exercise.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Management of hypertension requiring dual therapy.",
+      "Treatment of fungal skin infections and seborrheic dermatitis.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -4682,9 +4682,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Phenytoin?",
     "options": [
       "Control of tonic-clonic and focal seizures and prevention of seizures post-neurosurgery.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of hypertension when monotherapy is inadequate.",
+      "Treatment of bacterial infections including pneumonia and urinary tract infections.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -4693,9 +4693,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pioglitazone?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Maintenance therapy for persistent asthma.",
+      "Treatment of bipolar disorder.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -4704,9 +4704,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Piperacillin/Tazobactam?",
     "options": [
       "Serious intra-abdominal, skin, and pulmonary infections in hospital settings.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Tension headaches when other options fail.",
+      "First-line therapy for type 2 diabetes mellitus.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -4715,9 +4715,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Polyethylene glycol 3350?",
     "options": [
       "Occasional constipation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible respiratory and skin infections.",
+      "Management of fibromyalgia.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -4726,9 +4726,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Potassium chloride?",
     "options": [
       "Treatment or prevention of hypokalemia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of susceptible urinary, gastrointestinal, and respiratory infections.",
+      "Prevention of organ transplant rejection.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -4737,9 +4737,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pramipexole?",
     "options": [
       "Parkinson disease and restless legs syndrome.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and off-label use for withdrawal symptoms or ADHD.",
+      "Hypertension and angina; IV form for hypertensive emergencies.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -4748,9 +4748,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pravastatin?",
     "options": [
       "Reduction of LDL cholesterol and cardiovascular risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Increase tear production in chronic dry eye disease.",
+      "Schizophrenia and bipolar disorder.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain."
     ],
     "correct": 0
   },
@@ -4759,9 +4759,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Prazosin?",
     "options": [
       "Hypertension and off-label for PTSD-related nightmares.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of attention-deficit/hyperactivity disorder.",
+      "Exocrine pancreatic insufficiency due to cystic fibrosis, chronic pancreatitis, or pancreatectomy.",
+      "Pulmonary arterial hypertension."
     ],
     "correct": 0
   },
@@ -4770,9 +4770,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Prednisone?",
     "options": [
       "Inflammatory and autoimmune conditions, asthma exacerbations, and allergic reactions.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Adjunctive treatment of acute diarrhea.",
+      "Serious intra-abdominal, skin, and pulmonary infections in hospital settings.",
+      "Procedural sedation, seizure clusters, and anesthesia induction."
     ],
     "correct": 0
   },
@@ -4781,9 +4781,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Pregabalin?",
     "options": [
       "Neuropathic pain, fibromyalgia, and adjunctive therapy for partial seizures.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of benign prostatic hyperplasia and hypertension.",
+      "Schizophrenia, bipolar disorder, and adjunctive treatment of major depressive disorder.",
+      "Treatment of impetigo and nasal MRSA colonization (intranasal ointment)."
     ],
     "correct": 0
   },
@@ -4792,9 +4792,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Probenecid?",
     "options": [
       "Chronic management of gout by increasing uric acid excretion.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes and cardiovascular/renal risk reduction.",
+      "Type 2 diabetes (Ozempic, Rybelsus) and chronic weight management (Wegovy).",
+      "Nicotine replacement therapy for smoking cessation."
     ],
     "correct": 0
   },
@@ -4803,9 +4803,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Procainamide?",
     "options": [
       "Management of ventricular and supraventricular arrhythmias.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Gastroesophageal reflux disease, erosive esophagitis, and peptic ulcer disease.",
+      "Benign prostatic hyperplasia.",
+      "GERD, erosive esophagitis, and peptic ulcer disease."
     ],
     "correct": 0
   },
@@ -4814,9 +4814,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Promethazine?",
     "options": [
       "Treatment of nausea, vomiting, allergies, and motion sickness.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention of pregnancy.",
+      "Short-term management of anxiety and panic disorders.",
+      "Treatment of scabies and head lice."
     ],
     "correct": 0
   },
@@ -4825,9 +4825,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Propranolol?",
     "options": [
       "Hypertension, arrhythmias, migraine prophylaxis, and performance anxiety.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of candidiasis, cryptococcal meningitis, and antifungal prophylaxis.",
+      "Secondary prevention of cardiovascular events and certain post-stent regimens.",
+      "Neuropathic pain, fibromyalgia, and adjunctive therapy for partial seizures."
     ],
     "correct": 0
   },
@@ -4836,9 +4836,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Quetiapine?",
     "options": [
       "Schizophrenia, bipolar disorder, and adjunctive treatment of major depressive disorder.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Edema due to heart failure, liver disease, or kidney disease; hypertension.",
+      "Inflammatory and pruritic dermatoses responsive to steroids.",
+      "Type 2 diabetes mellitus."
     ],
     "correct": 0
   },
@@ -4847,9 +4847,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Quinapril?",
     "options": [
       "Hypertension and heart failure.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Relief of chest congestion by loosening mucus.",
+      "Management of generalized anxiety disorder.",
+      "Benign prostatic hyperplasia."
     ],
     "correct": 0
   },
@@ -4858,9 +4858,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Raloxifene?",
     "options": [
       "Prevention and treatment of osteoporosis in postmenopausal women and reduction of invasive breast cancer risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids.",
+      "Relief of allergic rhinitis and chronic urticaria symptoms.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   },
@@ -4869,9 +4869,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Rivaroxaban?",
     "options": [
       "Prevention and treatment of venous thromboembolism and stroke prevention in atrial fibrillation.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of acute gout, ankylosing spondylitis, and other inflammatory conditions.",
+      "Hypertension and off-label use for withdrawal symptoms or ADHD.",
+      "Relief of allergic rhinitis symptoms."
     ],
     "correct": 0
   },
@@ -4880,9 +4880,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Risperidone?",
     "options": [
       "Schizophrenia, bipolar disorder, and irritability associated with autism.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Mealtime insulin for type 1 and type 2 diabetes.",
+      "Overactive bladder with urinary urgency, frequency, or urge incontinence.",
+      "Maintenance treatment of asthma and COPD."
     ],
     "correct": 0
   },
@@ -4891,9 +4891,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Rituximab?",
     "options": [
       "Treatment of non-Hodgkin lymphoma, chronic lymphocytic leukemia, and autoimmune diseases such as rheumatoid arthritis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Systemic fungal infections and onychomycosis.",
+      "Stroke prophylaxis in patients with a history of transient ischemic attack or completed ischemic stroke.",
+      "Treatment of susceptible respiratory and skin infections."
     ],
     "correct": 0
   },
@@ -4902,9 +4902,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Ropinirole?",
     "options": [
       "Parkinson disease and restless legs syndrome.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of chronic constipation and hepatic encephalopathy.",
+      "Prevention of stroke in atrial fibrillation and treatment of venous thromboembolism after initial parenteral therapy.",
+      "Seizure disorders and panic disorder."
     ],
     "correct": 0
   },
@@ -4913,9 +4913,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Rosuvastatin?",
     "options": [
       "Reduction of LDL cholesterol and cardiovascular risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of bacterial infections including pneumonia and urinary tract infections.",
+      "Menopausal symptom management and hypoestrogenism.",
+      "Treatment of major depressive disorder."
     ],
     "correct": 0
   },
@@ -4924,9 +4924,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sacubitril/Valsartan?",
     "options": [
       "Heart failure with reduced ejection fraction.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Type 2 diabetes mellitus.",
+      "Treatment of benign prostatic hyperplasia.",
+      "Reduction of intraocular pressure in glaucoma."
     ],
     "correct": 0
   },
@@ -4935,9 +4935,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Saxagliptin?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Hypertension and diabetic nephropathy.",
+      "Type 2 diabetes mellitus.",
+      "Prevention and treatment of venous thromboembolism and acute coronary syndromes."
     ],
     "correct": 0
   },
@@ -4946,9 +4946,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Secukinumab?",
     "options": [
       "Moderate to severe plaque psoriasis, psoriatic arthritis, and ankylosing spondylitis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Osteoarthritis and rheumatoid arthritis pain and inflammation.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids.",
+      "Relief of heartburn, gastroesophageal reflux, and prevention of ulcers."
     ],
     "correct": 0
   },
@@ -4957,9 +4957,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Semaglutide?",
     "options": [
       "Type 2 diabetes (Ozempic, Rybelsus) and chronic weight management (Wegovy).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of ventricular arrhythmias.",
+      "Basal insulin coverage for type 1 and type 2 diabetes.",
+      "Seizure adjunct therapy, neuropathic pain, and restless legs syndrome (other formulations)."
     ],
     "correct": 0
   },
@@ -4968,9 +4968,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sildenafil?",
     "options": [
       "Erectile dysfunction (Viagra) and pulmonary arterial hypertension (Revatio).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Resistant hypertension.",
+      "Chronic heart failure with reduced ejection fraction to reduce hospitalization risk.",
+      "Inflammatory conditions of the distal colon and rectum, including hemorrhoids."
     ],
     "correct": 0
   },
@@ -4979,9 +4979,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Simvastatin?",
     "options": [
       "Reduction of LDL cholesterol and cardiovascular risk.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of respiratory and skin infections.",
+      "Hypothyroidism.",
+      "Control of post-meal blood glucose in diabetes."
     ],
     "correct": 0
   },
@@ -4990,9 +4990,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sitagliptin?",
     "options": [
       "Type 2 diabetes mellitus.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Pain, inflammation, and fever.",
+      "Attention-deficit/hyperactivity disorder and binge eating disorder.",
+      "Hypertension, including during pregnancy, and hypertensive emergencies (IV)."
     ],
     "correct": 0
   },
@@ -5001,9 +5001,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sofosbuvir/Velpatasvir?",
     "options": [
       "Treatment of chronic hepatitis C virus infection across all major genotypes.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Nicotine replacement therapy for smoking cessation.",
+      "Management of insomnia and circadian rhythm disorders.",
+      "Relief of postherpetic neuralgia pain and localized neuropathic pain."
     ],
     "correct": 0
   },
@@ -5012,9 +5012,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Spironolactone?",
     "options": [
       "Heart failure, resistant hypertension, primary hyperaldosteronism, and acne/hirsutism off-label.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Depression and off-label for neuropathic pain.",
+      "Orthostatic hypotension.",
+      "Pulmonary arterial hypertension."
     ],
     "correct": 0
   },
@@ -5023,9 +5023,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sucralfate?",
     "options": [
       "Treatment and prevention of duodenal ulcers.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Prevention and treatment of nausea and vomiting.",
+      "Treatment of respiratory and skin infections.",
+      "Procedural sedation, seizure clusters, and anesthesia induction."
     ],
     "correct": 0
   },
@@ -5034,9 +5034,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sulfamethoxazole/Trimethoprim?",
     "options": [
       "Treatment of urinary, respiratory, and skin infections, as well as Pneumocystis prophylaxis.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Exocrine pancreatic insufficiency due to cystic fibrosis, chronic pancreatitis, or pancreatectomy.",
+      "Treatment of external otitis (swimmer's ear).",
+      "Treatment of impetigo and nasal MRSA colonization (intranasal ointment)."
     ],
     "correct": 0
   },
@@ -5045,9 +5045,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Sumatriptan?",
     "options": [
       "Acute treatment of migraine and cluster headaches.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Seizure disorders and sedation.",
+      "Treatment of oral candidiasis (thrush).",
+      "Nicotine replacement therapy for smoking cessation."
     ],
     "correct": 0
   },
@@ -5056,9 +5056,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tacrolimus?",
     "options": [
       "Prevention of organ transplant rejection and treatment of atopic dermatitis (topical).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Parkinson disease and restless legs syndrome.",
+      "Short-term management of moderate to severe pain.",
+      "GERD, erosive esophagitis, and peptic ulcer disease."
     ],
     "correct": 0
   },
@@ -5067,9 +5067,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tamoxifen?",
     "options": [
       "Treatment and prevention of estrogen receptor-positive breast cancer.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of nausea, vomiting, allergies, and motion sickness.",
+      "Control of tonic-clonic and focal seizures and prevention of seizures post-neurosurgery.",
+      "Treatment of scabies and head lice."
     ],
     "correct": 0
   },
@@ -5078,9 +5078,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tamsulosin?",
     "options": [
       "Benign prostatic hyperplasia.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Treatment of non-Hodgkin lymphoma, chronic lymphocytic leukemia, and autoimmune diseases such as rheumatoid arthritis.",
+      "Management of ventricular and supraventricular arrhythmias.",
+      "Neuropathic pain, fibromyalgia, and adjunctive therapy for partial seizures."
     ],
     "correct": 0
   },
@@ -5089,9 +5089,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Terbinafine?",
     "options": [
       "Onychomycosis and fungal skin infections.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Erectile dysfunction (Viagra) and pulmonary arterial hypertension (Revatio).",
+      "Heart failure with reduced ejection fraction.",
+      "Moderate to severe plaque psoriasis, psoriatic arthritis, and ankylosing spondylitis."
     ],
     "correct": 0
   },
@@ -5100,9 +5100,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Tiotropium?",
     "options": [
       "Maintenance therapy for COPD and asthma (Respimat).",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Acute treatment of migraine and cluster headaches.",
+      "Prevention of organ transplant rejection and treatment of atopic dermatitis (topical).",
+      "Treatment and prevention of estrogen receptor-positive breast cancer."
     ],
     "correct": 0
   },
@@ -5111,9 +5111,9 @@ export const counselingExams = [{
     "q": "What is a key point regarding Warfarin?",
     "options": [
       "Prevention and treatment of thromboembolism in atrial fibrillation, DVT/PE, and mechanical heart valves.",
-      "Incorrect Option A",
-      "Incorrect Option B",
-      "Incorrect Option C"
+      "Short-term treatment of moderate pain when non-opioid therapy is inadequate.",
+      "Treatment and prevention of osteoporosis.",
+      "Treatment of depression and chronic neuropathic pain syndromes."
     ],
     "correct": 0
   }
