@@ -3021,13 +3021,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
             {mobileTutorOpen && (
               <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setMobileTutorOpen(false)}>
                 <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                    <button onClick={() => setMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                    <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                  </div>
+                  <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setMobileTutorOpen(false)} width={window.innerWidth} />
                 </div>
               </div>
             )}
@@ -3116,28 +3110,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
             </div>
           </div>
         )))}
-        {createPortal(
-          <>
-            <button onClick={() => setMobileTutorOpen(true)}
-              className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-              style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-              <MessageSquare size={24} />
-            </button>
-            {mobileTutorOpen && (
-              <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setMobileTutorOpen(false)}>
-                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                    <button onClick={() => setMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                    <AiTutorPanel settings={settings} context="Flashcards main view. User is browsing decks." onClose={() => setMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </>, document.body
-        )}
+
       </div>
     </div>
   );
@@ -3270,13 +3243,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
               {examMobileOpen && (
                 <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setExamMobileOpen(false)}>
                   <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                      <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                      <button onClick={() => setExamMobileOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                    </div>
-                    <div className="flex-1 min-h-0 overflow-hidden">
-                      <AiTutorPanel settings={settings} context={`Exam: ${selEx?.title}\nQ${qi + 1}: ${selEx?.questions?.[qi]?.q}\nOptions: ${selEx?.questions?.[qi]?.options?.join(' | ')}\nCorrect: ${selEx?.questions?.[qi]?.options?.[selEx?.questions?.[qi]?.correct]}`} onClose={() => setExamMobileOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                    </div>
+                    <AiTutorPanel settings={settings} context={`Exam: ${selEx?.title}\nQ${qi + 1}: ${selEx?.questions?.[qi]?.q}\nOptions: ${selEx?.questions?.[qi]?.options?.join(' | ')}\nCorrect: ${selEx?.questions?.[qi]?.options?.[selEx?.questions?.[qi]?.correct]}`} onClose={() => setExamMobileOpen(false)} width={window.innerWidth} />
                   </div>
                 </div>
               )}
@@ -3429,28 +3396,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             </div>
           </div>
         )))}
-        {createPortal(
-          <>
-            <button onClick={() => setExamMobileOpen(true)}
-              className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-              style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-              <MessageSquare size={24} />
-            </button>
-            {examMobileOpen && (
-              <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setExamMobileOpen(false)}>
-                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                    <button onClick={() => setExamMobileOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                    <AiTutorPanel settings={settings} context="Exams main view. User is browsing exams." onClose={() => setExamMobileOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </>, document.body
-        )}
+
       </div>
     </div>
   );
@@ -3689,13 +3635,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
             {casesMobileTutorOpen && (
               <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setCasesMobileTutorOpen(false)}>
                 <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                    <button onClick={() => setCasesMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                    <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setCasesMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                  </div>
+                  <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setCasesMobileTutorOpen(false)} width={window.innerWidth} />
                 </div>
               </div>
             )}
@@ -3763,28 +3703,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
             </div>
           </div>
         )))}
-        {createPortal(
-          <>
-            <button onClick={() => setCasesMobileTutorOpen(true)}
-              className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-              style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-              <MessageSquare size={24} />
-            </button>
-            {casesMobileTutorOpen && (
-              <div className="lg:hidden fixed inset-0 z-[99999] flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)' }} onClick={e => e.target === e.currentTarget && setCasesMobileTutorOpen(false)}>
-                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-[color:var(--border2,var(--border))]">
-                    <span className="font-black text-sm flex items-center gap-2"><MessageSquare size={16} className="text-[var(--accent)]" />AI Tutor</span>
-                    <button onClick={() => setCasesMobileTutorOpen(false)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-hidden">
-                    <AiTutorPanel settings={settings} context="Clinical cases main view. User is browsing cases." onClose={() => setCasesMobileTutorOpen(false)} alwaysOpen={true} width={window.innerWidth} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </>, document.body
-        )}
+
       </div>
     </div>
   );
@@ -5421,8 +5340,9 @@ function App() {
       {isMobile && (
         <div style={{
           position: 'fixed',
-          bottom: 'env(safe-area-inset-bottom)',
-          left: 12, right: 12,
+          bottom: 0,
+          left: 0, right: 0,
+          padding: '0 12px calc(8px + env(safe-area-inset-bottom)) 12px',
           zIndex: 9999,
           display: 'flex',
           justifyContent: 'center',
