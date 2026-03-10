@@ -2953,7 +2953,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                 minHeight: 220,
                 transformStyle: 'preserve-3d',
                 transition: 'transform 0.55s cubic-bezier(0.45,0.05,0.55,0.95)',
-                transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                transform: flipped ? 'rotateX(180deg)' : 'rotateX(0deg)',
               }}>
                 {/* FRONT — Question */}
                 <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', position: 'absolute', inset: 0 }}
@@ -2966,7 +2966,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                   <p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-1"><RefreshCw size={11} />Tap to flip</p>
                 </div>
                 {/* BACK — Answer (rotated 180deg so it faces forward when card flips) */}
-                <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', position: 'absolute', inset: 0, transform: 'rotateY(180deg)' }}
+                <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', position: 'absolute', inset: 0, transform: 'rotateX(180deg)' }}
                   className="glass rounded-3xl p-8 flex flex-col justify-between border border-[var(--accent)]/30 bg-[var(--accent)]/4 transition-colors">
                   <div className="flex items-start justify-between mb-4">
                     <span className="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border border-[var(--accent)]/40 text-[var(--accent)] bg-[var(--accent)]/10">Answer</span>
