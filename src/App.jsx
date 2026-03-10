@@ -4265,6 +4265,19 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
   );
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   NAVIGATION ITEMS — used by both desktop sidebar and mobile bottom nav
+═══════════════════════════════════════════════════════════════════ */
+const NAV_ITEMS = [
+  { icon: LayoutDashboard, label: 'Home',      v: 'dashboard', dis: false },
+  { icon: FolderOpen,      label: 'Library',   v: 'library',   dis: false },
+  { icon: Layers,          label: 'Cards',     v: 'flashcards',dis: false },
+  { icon: CheckSquare,     label: 'Exams',     v: 'exams',     dis: false },
+  { icon: Activity,        label: 'Cases',     v: 'cases',     dis: false },
+  { icon: MessageSquare,   label: 'Tutor',     v: 'chat',      dis: false },
+];
+
 /* ═══════════════════════════════════════════════════════════════════
    MAIN APP
 ═══════════════════════════════════════════════════════════════════ */
