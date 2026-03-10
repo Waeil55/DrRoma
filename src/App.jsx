@@ -1840,7 +1840,7 @@ const PROVIDERS = {
   ollama: { label: 'Ollama (Local)', note: 'Local inference — no API key needed.', needsKey: false, defaultModel: 'llama3', baseUrl: 'http://localhost:11434/v1' },
   custom: { label: 'Custom API', note: 'Any OpenAI-compatible endpoint.', needsKey: true, defaultModel: '', baseUrl: '' },
 };
-const DEFAULT_SETTINGS = { provider: 'anthropic', apiKey: '', baseUrl: '', model: '', strictMode: false, theme: 'pure-white', fontSize: 'medium', accentColor: 'indigo' };
+const DEFAULT_SETTINGS = { provider: 'anthropic', apiKey: '', baseUrl: '', model: '', strictMode: false, theme: 'pure-white', fontSize: 'large', accentColor: 'indigo', lineSpacing: 'normal', cardStyle: 'comfortable', animations: true, compactSidebar: false };
 
 /* ═══════════════════════════════════════════════════════════════════
    BUILT-IN SETS — generated from imported data files.
@@ -4151,7 +4151,7 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
     { id: 'cyan', hex: '#0891b2', label: 'Cyan' },
     { id: 'teal', hex: '#0d9488', label: 'Teal' },
   ];
-  const sizes = [{ id: 'small', label: 'S', px: 15 }, { id: 'medium', label: 'M', px: 18 }, { id: 'large', label: 'L', px: 20 }, { id: 'xl', label: 'XL', px: 22 }];
+  const sizes = [{ id: 'small', label: 'S', px: 14 }, { id: 'medium', label: 'M', px: 16 }, { id: 'large', label: 'L', px: 20 }, { id: 'xl', label: 'XL', px: 23 }, { id: 'xxl', label: 'XXL', px: 26 }];
   const changeProvider = p => { const pr = PROVIDERS[p]; setSettings(s => ({ ...s, provider: p, baseUrl: pr.baseUrl, model: pr.defaultModel })); };
 
   return (
@@ -4242,15 +4242,74 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
           </div>
           <div>
             <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{ color: 'var(--text3)', opacity: .7 }}>Font Size</span>
-            <div className="flex gap-2 glass rounded-xl p-1.5">
+            <div className="flex gap-1.5 glass rounded-xl p-1.5">
               {sizes.map(sz => (
                 <button key={sz.id} onClick={() => setSettings({ ...settings, fontSize: sz.id })}
-                  className={`flex-1 py-2 rounded-lg font-black transition-all`}
+                  className={`flex-1 py-2 rounded-lg font-black transition-all text-sm`}
                   style={settings.fontSize === sz.id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
-                >{sz.label}</button>
+                >{sz.label}<span style={{ fontSize: 9, display: 'block', opacity: .7 }}>{sz.px}px</span></button>
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Display Settings */}
+        <section className="glass rounded-2xl p-5">
+          <h2 className="font-black text-sm mb-4 flex items-center gap-2 opacity-70"><Layout size={16} /> Display &amp; Layout</h2>
+
+          {/* Line Spacing */}
+          <div className="mb-5">
+            <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{ color: 'var(--text3)', opacity: .7 }}>Line Spacing</span>
+            <div className="flex gap-1.5 glass rounded-xl p-1.5">
+              {[['compact','Compact',1.4],['normal','Normal',1.7],['relaxed','Relaxed',2.0],['loose','Loose',2.4]].map(([id,label,lh]) => (
+                <button key={id} onClick={() => setSettings(s => ({ ...s, lineSpacing: id }))}
+                  className="flex-1 py-2 rounded-lg font-black transition-all text-xs"
+                  style={(settings.lineSpacing||'normal') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
+                >{label}<span style={{ fontSize: 8, display: 'block', opacity: .7 }}>×{lh}</span></button>
+              ))}
+            </div>
+          </div>
+
+          {/* Card Style */}
+          <div className="mb-5">
+            <span className="text-xs font-black uppercase tracking-widest block mb-2" style={{ color: 'var(--text3)', opacity: .7 }}>Card / Panel Density</span>
+            <div className="flex gap-1.5 glass rounded-xl p-1.5">
+              {[['compact','Compact'],['comfortable','Comfortable'],['spacious','Spacious']].map(([id,label]) => (
+                <button key={id} onClick={() => setSettings(s => ({ ...s, cardStyle: id }))}
+                  className="flex-1 py-2.5 rounded-lg font-black transition-all text-xs"
+                  style={(settings.cardStyle||'comfortable') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}
+                >{label}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Animations */}
+          <label className="flex items-center justify-between cursor-pointer mb-5">
+            <div>
+              <p className="text-xs font-black">Animations &amp; Transitions</p>
+              <p className="text-xs opacity-40 mt-0.5">Smooth motion effects throughout the app</p>
+            </div>
+            <div onClick={() => setSettings(s => ({ ...s, animations: !s.animations }))}
+              className={`w-12 h-6 rounded-full transition-all cursor-pointer relative flex items-center px-1`}
+              style={{ background: settings.animations !== false ? 'var(--accent)' : 'var(--border)' }}>
+              <div className="w-4 h-4 bg-white rounded-full shadow transition-all"
+                style={{ transform: settings.animations !== false ? 'translateX(24px)' : 'translateX(0)' }} />
+            </div>
+          </label>
+
+          {/* Compact Sidebar */}
+          <label className="flex items-center justify-between cursor-pointer">
+            <div>
+              <p className="text-xs font-black">Compact Sidebar</p>
+              <p className="text-xs opacity-40 mt-0.5">Show icons only, hide labels</p>
+            </div>
+            <div onClick={() => setSettings(s => ({ ...s, compactSidebar: !s.compactSidebar }))}
+              className="w-12 h-6 rounded-full transition-all cursor-pointer relative flex items-center px-1"
+              style={{ background: settings.compactSidebar ? 'var(--accent)' : 'var(--border)' }}>
+              <div className="w-4 h-4 bg-white rounded-full shadow transition-all"
+                style={{ transform: settings.compactSidebar ? 'translateX(24px)' : 'translateX(0)' }} />
+            </div>
+          </label>
         </section>
 
         {/* Generation */}
@@ -4423,7 +4482,9 @@ function App() {
     if (th === 'system') th = window.matchMedia?.('(prefers-color-scheme:dark)').matches ? 'dark' : 'pure-white';
     root.classList.add(th);
     root.style.setProperty('color-scheme', (th === 'dark' || th === 'oled') ? 'dark' : 'light');
-    root.style.fontSize = { small: '15px', medium: '18px', large: '20px', xl: '22px' }[settings.fontSize] || '18px';
+    root.style.fontSize = { small: '14px', medium: '16px', large: '20px', xl: '23px', xxl: '26px' }[settings.fontSize] || '20px';
+    root.style.setProperty('--line-height', { compact: '1.4', normal: '1.7', relaxed: '2.0', loose: '2.4' }[settings.lineSpacing || 'normal'] || '1.7');
+    root.style.setProperty('--transition-speed', settings.animations === false ? '0s' : '0.2s');
     const clrs = {
       indigo: { hex: '#6366f1', rgb: '99,102,241', soft: '#4f46e5' },
       purple: { hex: '#a855f7', rgb: '168,85,247', soft: '#9333ea' },
