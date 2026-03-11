@@ -2998,6 +2998,12 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                 Show Answer
               </button>
             )}
+            {/* Inline AI Tutor Trigger */}
+            <div className="lg:hidden mt-2 flex-shrink-0">
+              <button onClick={() => setMobileTutorOpen(true)} className="w-full glass py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/10 transition-colors">
+                <MessageSquare size={18} /> Ask AI Tutor
+              </button>
+            </div>
           </div>
           {/* Drag handle */}
           <div onMouseDown={startFcTutorDrag} onTouchStart={startFcTutorDrag}
@@ -3224,6 +3230,13 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                   <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question →</button> :
                   <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
               }
+            </div>
+
+            {/* Inline AI Tutor Trigger */}
+            <div className="lg:hidden mt-4 flex-shrink-0">
+              <button onClick={() => setExamMobileOpen(true)} className="w-full glass py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/10 transition-colors">
+                <MessageSquare size={18} /> Ask AI Tutor
+              </button>
             </div>
           </div>
           {/* Drag handle */}
@@ -3576,6 +3589,13 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                   <p className="text-sm font-bold">No lab data</p>
                 </div>
               )}
+            </div>
+
+            {/* Inline AI Tutor Trigger */}
+            <div className="lg:hidden mt-4 flex-shrink-0">
+              <button onClick={() => setCasesMobileTutorOpen(true)} className="w-full glass py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/10 transition-colors">
+                <MessageSquare size={18} /> Ask AI Tutor
+              </button>
             </div>
           </div>
 
@@ -5342,7 +5362,7 @@ function App() {
           position: 'fixed',
           bottom: 0,
           left: 0, right: 0,
-          padding: '0 12px calc(8px + env(safe-area-inset-bottom)) 12px',
+          padding: '0 0 calc(env(safe-area-inset-bottom)) 0',
           zIndex: 9999,
           display: 'flex',
           justifyContent: 'center',
@@ -5352,15 +5372,13 @@ function App() {
             pointerEvents: 'all',
             display: 'flex',
             width: '100%',
-            maxWidth: 540,
-            padding: '6px',
-            borderRadius: 999,
+            maxWidth: '100%', padding: '8px 6px', borderRadius: '16px 16px 0 0',
             justifyContent: 'space-around',
             background: 'rgba(37, 99, 235, 0.15)',
             backdropFilter: 'saturate(200%) blur(24px)',
             WebkitBackdropFilter: 'saturate(200%) blur(24px)',
             border: '1.5px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(37, 99, 235, 0.2)',
+            borderBottom: 'none', boxShadow: '0 -4px 24px rgba(0,0,0,0.1)',
           }}>
             {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
               <button key={v} disabled={dis}
