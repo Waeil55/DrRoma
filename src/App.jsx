@@ -4874,7 +4874,7 @@ function App() {
           box-shadow: 0 4px 18px rgba(var(--acc-rgb,99,102,241),.32),inset 0 1px 0 rgba(255,255,255,.14);
           position:relative; overflow:hidden;
         }
-        .btn-accent::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.1),transparent); }
+        @media (min-width: 1024px) { .btn-accent::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.1),transparent); } }
         .btn-accent:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.44); }
         .btn-accent:active { transform:scale(.97); }
 
@@ -5077,7 +5077,7 @@ function App() {
         .card-lined{background:var(--surface,var(--card));border:1px solid var(--border2,var(--border));border-top:1.5px solid rgba(var(--acc-rgb,99,102,241),.25);box-shadow:0 4px 20px rgba(0,0,0,.12);}
         .card-glow{background:linear-gradient(145deg,rgba(var(--acc-rgb,99,102,241),.08),rgba(var(--acc-rgb,99,102,241),.02));border:1px solid rgba(var(--acc-rgb,99,102,241),.22);box-shadow:0 0 28px rgba(var(--acc-rgb,99,102,241),.07);}
         .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;border:none;cursor:pointer;font-weight:800;letter-spacing:.01em;transition:all .18s cubic-bezier(.34,1.4,.64,1);box-shadow:0 4px 18px rgba(var(--acc-rgb,99,102,241),.3),inset 0 1px 0 rgba(255,255,255,.13);position:relative;overflow:hidden;}
-        .btn-accent::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);}
+        @media (min-width: 1024px) { .btn-accent::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);} }
         .btn-accent:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.42);}
         .btn-accent:active{transform:scale(.97);}
         .gradient-text{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
@@ -5356,13 +5356,13 @@ function App() {
         )}
       </div>
 
-      {/* MOBILE BOTTOM NAV — Floating Blue Glass Pill */}
+      {/* MOBILE BOTTOM NAV — Flush to bottom with safe area padding */}
       {isMobile && (
         <div style={{
           position: 'fixed',
           bottom: 0,
           left: 0, right: 0,
-          padding: '0 0 calc(env(safe-area-inset-bottom)) 0',
+          padding: 0,
           zIndex: 9999,
           display: 'flex',
           justifyContent: 'center',
@@ -5372,7 +5372,9 @@ function App() {
             pointerEvents: 'all',
             display: 'flex',
             width: '100%',
-            maxWidth: '100%', padding: '8px 6px', borderRadius: '16px 16px 0 0',
+            maxWidth: '100%',
+            padding: '8px 6px calc(8px + env(safe-area-inset-bottom)) 6px',
+            borderRadius: '16px 16px 0 0',
             justifyContent: 'space-around',
             background: 'rgba(37, 99, 235, 0.15)',
             backdropFilter: 'saturate(200%) blur(24px)',
