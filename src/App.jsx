@@ -4498,12 +4498,7 @@ function App() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  // Viewport
-  useEffect(() => {
-    let m = document.querySelector('meta[name="viewport"]');
-    if (!m) { m = document.createElement('meta'); m.name = 'viewport'; document.head.appendChild(m); }
-    m.content = 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover';
-  }, []);
+  // Viewport setup removed: handled statically in index.html to prevent iOS layout thrash
 
   // Load persisted state — show a clear error if IndexedDB is unavailable
   useEffect(() => {
@@ -5031,13 +5026,7 @@ function App() {
       }}>
       <style>{`
         /* ── ROOT RESET ── */
-        html, body {
-          margin: 0; padding: 0;
-          width: 100%; height: 100%;
-          overflow: hidden;
-          overscroll-behavior: none;
-          background-color: var(--bg) !important; /* Fixes the white flash at the bottom */
-        }
+        /* Handled natively and at EOF of this block to enforce position: absolute */
         /* ── LIGHT THEMES ── */
         .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(255,255,255,0.70);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
         .light{--bg:#eef2ff;--bg2:#e4eaff;--surface:#ffffff;--surface2:#eef2ff;--text:#050f2a;--text2:#334070;--text3:#6a7ba0;--border:rgba(40,70,220,.09);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(238,242,255,0.70);--sidebar-bg:linear-gradient(180deg,#e4eaff 0%,#d8e2ff 100%);--card:#fff;--border-old:#e2e8f0;}
@@ -5060,9 +5049,10 @@ function App() {
         .accent-teal{--accent:#0d9488;--accent2:#059669;--acc-rgb:13,148,136;}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
         /* ── ROOT RESET ── */
-        html, body {
+        html, body, #root {
           margin: 0; padding: 0;
-          width: 100%; height: 100dvh;
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
           overflow: hidden;
           overscroll-behavior: none;
           background-color: var(--bg) !important; /* Fixes the white flash at the bottom */
