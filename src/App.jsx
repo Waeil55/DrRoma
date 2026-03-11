@@ -1438,7 +1438,7 @@ const setupPWA = () => {
   const manifest = {
     name: 'MARIAM PRO', short_name: 'MARIAM', description: 'Universal AI Document Intelligence',
     start_url: '/', display: 'standalone', orientation: 'any',
-    background_color: '#ffffff', theme_color: '#6366f1',
+    background_color: '#0a0a14', theme_color: '#0a0a14',
     icons: [
       { src: MARIAM_IMG, sizes: '192x192', type: 'image/jpeg', purpose: 'any maskable' },
       { src: MARIAM_IMG, sizes: '512x512', type: 'image/jpeg', purpose: 'any maskable' },
@@ -5067,6 +5067,7 @@ function App() {
           overscroll-behavior: none;
           background-color: var(--bg) !important; /* Fixes the white flash at the bottom */
         }
+        #root { width: 100%; height: 100%; }
         input,textarea,select{font-size:16px!important;}
         .custom-scrollbar{-webkit-overflow-scrolling:touch;}
         .custom-scrollbar::-webkit-scrollbar{width:2px;height:2px;}
@@ -5360,8 +5361,8 @@ function App() {
       {isMobile && (
         <div style={{
           position: 'fixed',
-          bottom: 0,
-          left: 0, right: 0,
+          bottom: 'calc(12px + env(safe-area-inset-bottom))',
+          left: 16, right: 16,
           padding: 0,
           zIndex: 9999,
           display: 'flex',
@@ -5373,14 +5374,14 @@ function App() {
             display: 'flex',
             width: '100%',
             maxWidth: '100%',
-            padding: '8px 6px calc(8px + env(safe-area-inset-bottom)) 6px',
-            borderRadius: '16px 16px 0 0',
+            padding: '8px 6px',
+            borderRadius: '999px',
             justifyContent: 'space-around',
-            background: 'rgba(37, 99, 235, 0.15)',
-            backdropFilter: 'saturate(200%) blur(24px)',
-            WebkitBackdropFilter: 'saturate(200%) blur(24px)',
-            border: '1.5px solid rgba(255,255,255,0.1)',
-            borderBottom: 'none', boxShadow: '0 -4px 24px rgba(0,0,0,0.1)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'saturate(250%) blur(40px)',
+            WebkitBackdropFilter: 'saturate(250%) blur(40px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.3)',
           }}>
             {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
               <button key={v} disabled={dis}
