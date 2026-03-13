@@ -509,11 +509,28 @@ const callAIWithVision = async (prompt, imageBase64, imageType, settings = {}, m
   return callAI(`[Image file provided. Describe based on filename context]\n${prompt}`, false, false, settings, maxTokens);
 };
 
+const streamTextAsTyping = async (fullText, onChunk, speedMs = 12) => {
+  const text = String(fullText || '');
+  if (!text) { onChunk(''); return ''; }
+  let rendered = '';
+  let i = 0;
+  while (i < text.length) {
+    const chunkLen = text[i] === '\n' ? 1 : Math.max(2, Math.min(8, Math.floor(Math.random() * 6) + 2));
+    rendered += text.slice(i, i + chunkLen);
+    i += chunkLen;
+    onChunk(rendered);
+    // Keep a visible typing effect similar to chat apps.
+    await new Promise(r => setTimeout(r, speedMs));
+  }
+  return rendered;
+};
+
 const callAIStreaming = async (prompt, onChunk, settings = {}, maxTokens = 4000) => {
   const { provider = 'anthropic', apiKey = '', model = '' } = settings;
   if (provider !== 'anthropic') {
     const full = await callAI(prompt, false, false, settings, maxTokens);
-    onChunk(full); return full;
+    await streamTextAsTyping(full, onChunk, 10);
+    return full;
   }
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -2745,7 +2762,10 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
         const result = await callAIWithVision(
           `Document context: ${activeDoc.name}\nUser question: ${msg}`,
           fileData.imageBase64, fileData.imageType || 'image/jpeg', settings, 3000);
-        setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: result }]); setLoading(false); return;
+        await streamTextAsTyping(result, chunk => {
+          setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]);
+        }, 10);
+        setLoading(false); return;
       }
       if (mode === 'page') {
         textContext = fileData?.pagesText?.[currentPage] || 'No text on this page.';

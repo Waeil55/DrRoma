@@ -285,3 +285,53 @@ html.dark .design-btn-secondary:hover,
   font-size: 0.875rem;
   font-weight: 500;
 }
+
+/* Small phones: compact spacing and guaranteed 5-tab fit */
+@media (max-width: 480px) {
+  .app-view {
+    padding: 8px;
+  }
+  .design-header {
+    font-size: 1.25rem;
+    padding-bottom: 12px;
+  }
+  .design-nav {
+    width: 99%;
+    bottom: calc(2px + env(safe-area-inset-bottom));
+  }
+  .design-nav-inner {
+    border-radius: 20px;
+    padding: 3px 4px;
+  }
+  .design-nav-btn {
+    padding: 4px 2px;
+    gap: 1px;
+  }
+  .design-nav-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .design-nav-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* Tablets: balanced spacing */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-view {
+    max-width: 980px;
+    padding: 16px 18px;
+  }
+}
+
+/* Large desktop/wide monitors */
+@media (min-width: 1440px) {
+  .app-view {
+    max-width: 1480px;
+    padding-left: 34px;
+    padding-right: 34px;
+  }
+  .design-main {
+    margin-left: 136px;
+  }
+}
