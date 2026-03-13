@@ -519,10 +519,52 @@ const streamTextAsTyping = async (fullText, onChunk, speedMs = 12) => {
     rendered += text.slice(i, i + chunkLen);
     i += chunkLen;
     onChunk(rendered);
-    // Keep a visible typing effect similar to chat apps.
     await new Promise(r => setTimeout(r, speedMs));
   }
   return rendered;
+};
+
+/* ── Inline markdown → React elements (bold, italic, code) ── */
+const renderMdInline = (text) => {
+  if (!text) return [];
+  const parts = [];
+  const re = /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`/g;
+  let last = 0, k = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[1]) parts.push(<b key={k++}><i>{m[1]}</i></b>);
+    else if (m[2]) parts.push(<b key={k++}>{m[2]}</b>);
+    else if (m[3]) parts.push(<i key={k++}>{m[3]}</i>);
+    else if (m[4]) parts.push(<code key={k++} style={{ background: 'rgba(0,0,0,0.1)', padding: '1px 5px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.88em' }}>{m[4]}</code>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length ? parts : [text];
+};
+
+/* ── Block markdown → React elements ── */
+const renderMarkdown = (text) => {
+  if (!text) return null;
+  const lines = text.split('\n');
+  const out = [];
+  let listItems = [];
+  const flushList = () => {
+    if (!listItems.length) return;
+    out.push(<ul key={`ul${out.length}`} style={{ paddingLeft: 18, margin: '4px 0', listStyle: 'disc' }}>{listItems.splice(0)}</ul>);
+  };
+  lines.forEach((line, idx) => {
+    const h3 = line.match(/^### (.+)$/); if (h3) { flushList(); out.push(<p key={idx} style={{ fontWeight: 800, margin: '10px 0 2px' }}>{renderMdInline(h3[1])}</p>); return; }
+    const h2 = line.match(/^## (.+)$/); if (h2) { flushList(); out.push(<p key={idx} style={{ fontWeight: 800, fontSize: '1.05em', margin: '10px 0 3px' }}>{renderMdInline(h2[1])}</p>); return; }
+    const h1 = line.match(/^# (.+)$/); if (h1) { flushList(); out.push(<p key={idx} style={{ fontWeight: 900, fontSize: '1.1em', margin: '12px 0 4px' }}>{renderMdInline(h1[1])}</p>); return; }
+    const li = line.match(/^\s*[-*•+] (.+)$/) || line.match(/^\s*\d+\.\s+(.+)$/);
+    if (li) { listItems.push(<li key={idx} style={{ marginBottom: 2, lineHeight: 1.5 }}>{renderMdInline(li[1])}</li>); return; }
+    if (/^---+$/.test(line.trim())) { flushList(); out.push(<hr key={idx} style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.15)', margin: '8px 0' }} />); return; }
+    if (!line.trim()) { flushList(); if (out.length) out.push(<div key={idx} style={{ height: 6 }} />); return; }
+    flushList();
+    out.push(<div key={idx} style={{ lineHeight: 1.6 }}>{renderMdInline(line)}</div>);
+  });
+  flushList();
+  return <>{out}</>;
 };
 
 const callAIStreaming = async (prompt, onChunk, settings = {}, maxTokens = 4000) => {
@@ -1772,6 +1814,7 @@ function TutorChat({ context, settings, contextLabel = '' }) {
   const [listening, setListening] = useState(false);
   const endRef = useRef(null); const prevCtx = useRef(null);
   const recogRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     const key = JSON.stringify(context);
@@ -1781,7 +1824,10 @@ function TutorChat({ context, settings, contextLabel = '' }) {
     }
   }, [context, contextLabel]);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, loading]);
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs, loading]);
 
   const toggleVoice = () => {
     if (listening) { recogRef.current?.stop(); setListening(false); return; }
@@ -1813,16 +1859,16 @@ function TutorChat({ context, settings, contextLabel = '' }) {
         <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)]">AI Tutor</span>
         {loading && <div className="ml-auto flex gap-1">{[0, 1, 2].map(i => <div key={i} className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />)}</div>}
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3" ref={scrollContainerRef}>
         {msgs.length === 0 && <div className="flex flex-col items-center justify-center h-full opacity-40 text-center"><Brain size={32} className="mb-2" /><p className="text-xs font-bold">Ask me anything</p></div>}
         {msgs.map((m, i) => (
           <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-[var(--accent)]' : 'overflow-hidden'}`}>
               {m.role === 'user' ? <UserCircle2 size={16} className="text-white" /> : <img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI" />}
             </div>
-            <div className={`px-3 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl whitespace-pre-wrap
+            <div className={`px-3 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'bg-[var(--surface,var(--card))] border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
-              {m.content || <span className="opacity-40">thinking…</span>}
+              {m.content ? renderMarkdown(m.content) : <span className="opacity-40">thinking…</span>}
             </div>
           </div>
         ))}
@@ -2733,7 +2779,11 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
   const [listening, setListening] = useState(false);
   const endRef = useRef(null);
   const recogRef = useRef(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, loading]);
+  const scrollContainerRef = useRef(null);
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs, loading]);
 
   const toggleVoice = () => {
     if (listening) {
@@ -2790,15 +2840,15 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
           </button>
         ))}
       </div>
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3 min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3" ref={scrollContainerRef}>
         {msgs.map((m, i) => (
           <div key={i} className={`flex gap-2.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${m.role === 'user' ? 'bg-[var(--accent)]' : 'overflow-hidden glass'}`}>
               {m.role === 'user' ? <UserCircle2 size={16} className="text-white" /> : <img src={MARIAM_IMG} className="w-full h-full object-cover" alt="AI" />}
             </div>
-            <div className={`px-3.5 py-2.5 text-xs leading-relaxed max-w-[84%] whitespace-pre-wrap rounded-2xl
+            <div className={`px-3.5 py-2.5 text-xs leading-relaxed max-w-[84%] rounded-2xl
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'glass rounded-tl-sm'}`}>
-              {m.content || <span className="opacity-30">▊</span>}
+              {m.content ? renderMarkdown(m.content) : <span className="opacity-30">▊</span>}
             </div>
           </div>
         ))}
@@ -2942,13 +2992,18 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
   const [msgs, setMsgs] = useState([{ role: 'assistant', content: "Hi! I'm your AI Tutor 🎓\nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!" }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showQuicks, setShowQuicks] = useState(true);
   const endRef = useRef(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, loading]);
+  const scrollContainerRef = useRef(null);
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs, loading]);
 
   const send = async (override) => {
     const msg = override || input;
     if (!msg.trim() || loading) return;
-    setInput('');
+    setInput(''); setShowQuicks(false);
     const newMsgs = [...msgs, { role: 'user', content: msg }, { role: 'assistant', content: '' }];
     setMsgs(newMsgs); setLoading(true);
     try {
@@ -2980,15 +3035,15 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
         {!alwaysOpen && onClose && <button onClick={onClose} className="w-9 h-9 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors"><X size={18} /></button>}
       </div>
       {/* Messages */}
-      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3" ref={scrollContainerRef}>
         {msgs.map((m, i) => (
           <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-black ${m.role === 'user' ? 'bg-[var(--accent)] text-white' : 'bg-gradient-to-br from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white'}`}>
               {m.role === 'user' ? 'You' : 'AI'}
             </div>
-            <div className={`px-3 py-2.5 text-sm leading-relaxed rounded-2xl max-w-[85%] whitespace-pre-wrap
+            <div className={`px-3 py-2.5 text-sm leading-relaxed rounded-2xl max-w-[85%]
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'glass border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
-              {m.content || <span className="opacity-30 animate-pulse">▊</span>}
+              {m.content ? renderMarkdown(m.content) : <span className="opacity-30 animate-pulse">▊</span>}
             </div>
           </div>
         ))}
@@ -3002,15 +3057,17 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
         )}
         <div ref={endRef} />
       </div>
-      {/* Quick prompts */}
-      <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[color:var(--border2,var(--border))]">
-        {QUICK.map(q => (
-          <button key={q} onClick={() => send(q)}
-            className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[color:var(--border2,var(--border))] leading-tight text-left">
-            {q}
-          </button>
-        ))}
-      </div>
+      {/* Quick prompts — hidden once user sends any message */}
+      {showQuicks && (
+        <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[color:var(--border2,var(--border))]">
+          {QUICK.map(q => (
+            <button key={q} onClick={() => send(q)}
+              className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[color:var(--border2,var(--border))] leading-tight text-left">
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
       {/* Input */}
       <div className="shrink-0 p-3 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
         <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/50">
@@ -3931,7 +3988,7 @@ function ChatView({ settings, sessions, setSessions }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024);
   const [sessSearch, setSessSearch] = useState('');
   const [pinnedIds, setPinnedIds] = useState([]);
   const [contextMenu, setContextMenu] = useState(null);
@@ -3941,8 +3998,13 @@ function ChatView({ settings, sessions, setSessions }) {
   const [newProjectName, setNewProjectName] = useState('');
   const [sidebarTab, setSidebarTab] = useState('chats'); // 'chats'|'projects'
   const [inputRows, setInputRows] = useState(1);
+  const [hasStarted, setHasStarted] = useState(false);
   const endRef = useRef(null); const recogRef = useRef(null); const inputRef = useRef(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, loading]);
+  const scrollContainerRef = useRef(null);
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs, loading]);
 
   const STARTERS = [
     { icon: '🧬', text: 'Explain a complex topic' },
@@ -3966,6 +4028,7 @@ function ChatView({ settings, sessions, setSessions }) {
   const newSession = () => {
     setSelSess(null);
     setMsgs([]);
+    setHasStarted(false);
     inputRef.current?.focus();
   };
 
@@ -3978,7 +4041,11 @@ function ChatView({ settings, sessions, setSessions }) {
     setSelSess(sessId);
   }, [selSess, setSessions, selProject]);
 
-  const loadSession = sess => { setSelSess(sess.id); setMsgs(sess.messages || []); };
+  const loadSession = sess => {
+    setSelSess(sess.id); setMsgs(sess.messages || []); setHasStarted(true);
+    // Close sidebar on mobile after selecting a chat
+    if (window.innerWidth < 1024) setSidebarOpen(false);
+  };
 
   const deleteSession = id => {
     setSessions(p => p.filter(s => s.id !== id));
@@ -4006,7 +4073,7 @@ function ChatView({ settings, sessions, setSessions }) {
   const send = async (overrideMsg) => {
     const msg = overrideMsg || input;
     if (!msg.trim() || loading) return;
-    setInput(''); setInputRows(1);
+    setInput(''); setInputRows(1); setHasStarted(true);
     const sessId = selSess || Date.now().toString();
     if (!selSess) setSelSess(sessId);
     const newMsgs = [...msgs, { role: 'user', content: msg, timestamp: Date.now() }, { role: 'assistant', content: '', timestamp: Date.now() }];
@@ -4065,23 +4132,6 @@ function ChatView({ settings, sessions, setSessions }) {
       </button>
     </button>
   );
-
-  const formatMsg = (text) => {
-    // Simple markdown-like formatting
-    return text.split('\n').map((line, i) => {
-      if (line.startsWith('## ')) return <h3 key={i} className="text-base font-black mt-3 mb-1">{line.slice(3)}</h3>;
-      if (line.startsWith('# ')) return <h2 key={i} className="text-lg font-black mt-4 mb-1">{line.slice(2)}</h2>;
-      if (line.startsWith('- ') || line.startsWith('• ')) return <li key={i} className="ml-4 list-disc text-sm leading-relaxed">{formatInline(line.slice(2))}</li>;
-      if (/^\d+\. /.test(line)) return <li key={i} className="ml-4 list-decimal text-sm leading-relaxed">{formatInline(line.replace(/^\d+\. /, ''))}</li>;
-      if (line === '' && i > 0) return <div key={i} className="h-2" />;
-      return <p key={i} className="text-sm leading-relaxed">{formatInline(line)}</p>;
-    });
-  };
-
-  const formatInline = (text) => {
-    const parts = text.split(/(\*\*[^*]+\*\*)/g);
-    return parts.map((p, i) => p.startsWith('**') && p.endsWith('**') ? <strong key={i} className="font-black">{p.slice(2, -2)}</strong> : p);
-  };
 
   const curSessData = sessions.find(s => s.id === selSess);
 
@@ -4277,8 +4327,8 @@ function ChatView({ settings, sessions, setSessions }) {
         </div>
 
         {/* Messages area */}
-        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-          {msgs.length === 0 ? (
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar" ref={scrollContainerRef}>
+          {!hasStarted ? (
             <div className="flex flex-col items-center justify-center min-h-full p-6 gap-8">
               <div className="text-center space-y-3">
                 <div className="relative inline-block">
@@ -4318,11 +4368,10 @@ function ChatView({ settings, sessions, setSessions }) {
                     <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed
                       ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm max-w-[80%]' : 'rounded-tl-sm'}`}>
                       {m.role === 'assistant' ? (
-                        <div className="prose-custom space-y-1">{formatMsg(m.content || '')}</div>
+                        <div className="prose-custom">{m.content ? renderMarkdown(m.content) : <span className="opacity-30 animate-pulse">▊</span>}</div>
                       ) : (
                         <p className="whitespace-pre-wrap">{m.content}</p>
                       )}
-                      {!m.content && m.role === 'assistant' && <span className="opacity-30 animate-pulse">▊</span>}
                     </div>
                     <div className="flex items-center gap-2 px-1">
                       <button onClick={() => navigator.clipboard?.writeText(m.content)}
@@ -4680,13 +4729,20 @@ function App() {
     const updateKeyboardState = () => {
       const viewportHeight = vv?.height || window.innerHeight;
       const delta = window.innerHeight - viewportHeight;
-      const tag = (document.activeElement?.tagName || '').toLowerCase();
-      const focusedInput = tag === 'input' || tag === 'textarea' || tag === 'select';
-      setIsKeyboardOpen(delta > 120 && focusedInput);
+      const el = document.activeElement;
+      const tag = (el?.tagName || '').toLowerCase();
+      const isEditable = tag === 'input' || tag === 'textarea' || tag === 'select'
+        || el?.isContentEditable || el?.getAttribute?.('contenteditable') === 'true';
+      setIsKeyboardOpen(delta > 100 && isEditable);
     };
 
-    const onFocusIn = () => setTimeout(updateKeyboardState, 40);
-    const onFocusOut = () => setTimeout(updateKeyboardState, 120);
+    // iOS keyboard animation takes ~300ms; wait long enough after focus
+    const onFocusIn = () => {
+      setTimeout(updateKeyboardState, 100);
+      setTimeout(updateKeyboardState, 350);
+      setTimeout(updateKeyboardState, 600);
+    };
+    const onFocusOut = () => setTimeout(updateKeyboardState, 200);
 
     vv?.addEventListener('resize', updateKeyboardState);
     window.addEventListener('resize', updateKeyboardState);
