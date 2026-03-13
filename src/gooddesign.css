@@ -78,6 +78,26 @@ html.dark .design-header,
   transform: translateY(-50%);
 }
 
+/* Dedicated top strip so everything above header is clearly glassy */
+.design-top-glass {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top) + 14px);
+  z-index: 49;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: saturate(170%) blur(42px);
+  -webkit-backdrop-filter: saturate(170%) blur(42px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+html.dark .design-top-glass,
+.dark .design-top-glass {
+  background: rgba(2, 6, 23, 0.6);
+}
+
 /* Fill the safe-area above header with the same glass effect */
 .design-header::before {
   content: '';
@@ -125,6 +145,13 @@ html.dark .design-header::before,
   width: 98%;
   max-width: 600px;
   z-index: 1000;
+}
+
+.design-nav.keyboard-open-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 24px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 .design-nav-inner {

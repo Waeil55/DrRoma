@@ -4658,6 +4658,7 @@ function App() {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const { toasts, addToast } = useToast();
 
   useEffect(() => {
@@ -4667,6 +4668,39 @@ function App() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+
+  // Hide bottom nav when virtual keyboard is visible on mobile.
+  useEffect(() => {
+    if (!isMobile) {
+      setIsKeyboardOpen(false);
+      return;
+    }
+
+    const vv = window.visualViewport;
+    const updateKeyboardState = () => {
+      const viewportHeight = vv?.height || window.innerHeight;
+      const delta = window.innerHeight - viewportHeight;
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      const focusedInput = tag === 'input' || tag === 'textarea' || tag === 'select';
+      setIsKeyboardOpen(delta > 120 && focusedInput);
+    };
+
+    const onFocusIn = () => setTimeout(updateKeyboardState, 40);
+    const onFocusOut = () => setTimeout(updateKeyboardState, 120);
+
+    vv?.addEventListener('resize', updateKeyboardState);
+    window.addEventListener('resize', updateKeyboardState);
+    window.addEventListener('focusin', onFocusIn);
+    window.addEventListener('focusout', onFocusOut);
+    updateKeyboardState();
+
+    return () => {
+      vv?.removeEventListener('resize', updateKeyboardState);
+      window.removeEventListener('resize', updateKeyboardState);
+      window.removeEventListener('focusin', onFocusIn);
+      window.removeEventListener('focusout', onFocusOut);
+    };
+  }, [isMobile]);
 
   // (body background kept transparent — app div covers full screen)
 
@@ -5348,6 +5382,8 @@ function App() {
         </div>
       )}
 
+      <div className="design-top-glass" aria-hidden="true" />
+
       {/* HEADER — gooddesign: centered, frosted glass */}
       <header className="design-header shrink-0 relative">
         <div className="flex items-center justify-center gap-2">
@@ -5448,7 +5484,7 @@ function App() {
       </div>
 
       {/* BOTTOM NAV — gooddesign pill nav, all viewports */}
-      <nav className="design-nav">
+      <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}>
         <div className="design-nav-inner">
           {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
             <button key={v} disabled={dis}
