@@ -55,10 +55,15 @@ html.dark,
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--card-bg);
+  background: rgba(255, 255, 255, 0.38);
   backdrop-filter: saturate(140%) blur(34px);
   -webkit-backdrop-filter: saturate(140%) blur(34px);
   border-bottom: 1px solid var(--card-border);
+}
+
+html.dark .design-header,
+.dark .design-header {
+  background: rgba(2, 6, 23, 0.52);
 }
 
 /* ensure header respects right safe area and keeps action buttons onscreen */
@@ -80,17 +85,41 @@ html.dark,
   top: calc(-1 * env(safe-area-inset-top));
   left: 0;
   right: 0;
-  height: calc(env(safe-area-inset-top) + 2px);
-  background: var(--card-bg);
-  backdrop-filter: saturate(140%) blur(34px);
-  -webkit-backdrop-filter: saturate(140%) blur(34px);
+  height: calc(env(safe-area-inset-top) + 10px);
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: saturate(165%) blur(40px);
+  -webkit-backdrop-filter: saturate(165%) blur(40px);
   border-bottom: 1px solid var(--card-border);
   pointer-events: none;
 }
 
+/* Always render a thin top glass strip, even when safe-area inset is 0 */
+.design-header::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: saturate(165%) blur(40px);
+  -webkit-backdrop-filter: saturate(165%) blur(40px);
+  pointer-events: none;
+}
+
+html.dark .design-header::after,
+.dark .design-header::after {
+  background: rgba(2, 6, 23, 0.52);
+}
+
+html.dark .design-header::before,
+.dark .design-header::before {
+  background: rgba(2, 6, 23, 0.58);
+}
+
 .design-nav {
   position: fixed;
-  bottom: calc(8px + env(safe-area-inset-bottom));
+  bottom: calc(3px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: 98%;
@@ -177,12 +206,26 @@ html.dark .design-nav-btn.active,
   .design-nav-btn { flex: none; padding: 10px 8px; border-radius: 12px; width: 100%; }
 
   /* Wider content area on desktop */
-  .app-view { max-width: 1260px; padding: 22px 26px; }
+  .app-view { max-width: 1360px; padding: 24px 30px; }
 
   /* Desktop shell: push content to the right so sidebar never overlays it */
   .design-main {
     margin-left: 128px;
     padding-bottom: 24px !important;
+    font-size: 1.04rem;
+    line-height: 1.58;
+  }
+
+  .design-main h1 { font-size: 2.1rem; }
+  .design-main h2 { font-size: 1.75rem; }
+  .design-main h3 { font-size: 1.35rem; }
+  .design-main h4 { font-size: 1.12rem; }
+  .design-main p,
+  .design-main button,
+  .design-main input,
+  .design-main select,
+  .design-main textarea {
+    font-size: 1.02rem;
   }
 }
 
