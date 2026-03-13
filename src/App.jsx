@@ -5340,9 +5340,9 @@ function App() {
       </header>
 
       {/* BODY — no sidebar, bottom nav for all */}
-      <div className="flex flex-1 min-h-0 overflow-hidden">
+      <div className="design-body flex flex-1 min-h-0 overflow-hidden">
         {/* MAIN CONTENT — gooddesign: padding-bottom for bottom nav */}
-        <main className="flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative" style={{ paddingBottom: 120 }}>
+        <main className="design-main flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative" style={{ paddingBottom: 120 }}>
           {uploading && (
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--border)] z-50">
               <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] transition-all duration-300 animate-pulse" style={{ width: `${uploadPct}%` }} />
