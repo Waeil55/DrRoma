@@ -56,8 +56,8 @@ html.dark,
   top: 0;
   z-index: 50;
   background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: saturate(140%) blur(34px);
+  -webkit-backdrop-filter: saturate(140%) blur(34px);
   border-bottom: 1px solid var(--card-border);
 }
 
@@ -73,26 +73,41 @@ html.dark,
   transform: translateY(-50%);
 }
 
+/* Fill the safe-area above header with the same glass effect */
+.design-header::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top) + 2px);
+  background: var(--card-bg);
+  backdrop-filter: saturate(140%) blur(34px);
+  -webkit-backdrop-filter: saturate(140%) blur(34px);
+  border-bottom: 1px solid var(--card-border);
+  pointer-events: none;
+}
+
 .design-nav {
   position: fixed;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(8px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  width: 96%;
+  width: 98%;
   max-width: 600px;
   z-index: 1000;
 }
 
 .design-nav-inner {
   background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: saturate(160%) blur(36px);
+  -webkit-backdrop-filter: saturate(160%) blur(36px);
   border: 1px solid var(--card-border);
-  border-radius: 30px;
-  padding: 6px 8px;
+  border-radius: 24px;
+  padding: 4px 6px;
   display: flex;
   justify-content: space-between;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
 }
 
 .design-nav-btn {
@@ -102,12 +117,13 @@ html.dark,
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 20px;
+  padding: 5px 6px;
+  border-radius: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex: 1;
+  min-width: 0;
 }
 
 .design-nav-btn.active {
@@ -122,8 +138,21 @@ html.dark .design-nav-btn.active,
 }
 
 .design-nav-label {
-  font-size: 0.75rem;
+  font-size: 0.66rem;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Library should use the full desktop workspace width */
+@media (min-width: 1024px) {
+  .library-view {
+    max-width: none;
+    width: 100%;
+    padding-right: 20px;
+  }
 }
 
 /* Desktop: convert bottom nav to a compact left sidebar */

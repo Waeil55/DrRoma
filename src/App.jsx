@@ -1990,7 +1990,7 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
   }, [onUpload]);
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content app-view" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
+    <div className="library-view flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content app-view" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
       onDragOver={e => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}>
@@ -2087,7 +2087,7 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
             {!search && <button className="design-btn design-btn-feature" style={{ marginTop: 16 }}>Browse Files</button>}
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {filtered.map(doc => (
               <div key={doc.id} onClick={() => onOpen(doc.id)} className="design-card cursor-pointer">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black mb-2" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
