@@ -1,36 +1,37 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import * as counselingDataModule from './Counseling.js';
+import * as diseasesDataModule from './Diseases.js';
+import * as drugDataModule from './drugData.js';
+import * as lawDataModule from './lawData.js';
+
 let counselingFlashcards = [], counselingExams = [], counselingCases = [];
 let diseasesFlashcards = [], diseasesExams = [], diseasesCases = [];
 let drugFlashcards = [], drugExams = [], drugCases = [];
 let lawFlashcards = [], lawExams = [], lawCases = [];
 
 try {
-  const m = await import('./Counseling.js');
-  counselingFlashcards = m.counselingFlashcards || [];
-  counselingExams = m.counselingExams || [];
-  counselingCases = m.counselingCases || [];
+  counselingFlashcards = counselingDataModule.counselingFlashcards || [];
+  counselingExams = counselingDataModule.counselingExams || [];
+  counselingCases = counselingDataModule.counselingCases || [];
 } catch (e) { console.warn('[MARIAM] Counseling data failed to load:', e.message); }
 
 try {
-  const m = await import('./Diseases.js');
-  diseasesFlashcards = m.diseasesFlashcards || [];
-  diseasesExams = m.diseasesExams || [];
-  diseasesCases = m.diseasesCases || [];
+  diseasesFlashcards = diseasesDataModule.diseasesFlashcards || [];
+  diseasesExams = diseasesDataModule.diseasesExams || [];
+  diseasesCases = diseasesDataModule.diseasesCases || [];
 } catch (e) { console.warn('[MARIAM] Diseases data failed to load:', e.message); }
 
 try {
-  const m = await import('./drugData.js');
-  drugFlashcards = m.drugFlashcards || [];
-  drugExams = m.drugExams || [];
-  drugCases = m.drugCases || [];
+  drugFlashcards = drugDataModule.drugFlashcards || [];
+  drugExams = drugDataModule.drugExams || [];
+  drugCases = drugDataModule.drugCases || [];
 } catch (e) { console.warn('[MARIAM] Drug data failed to load:', e.message); }
 
 try {
-  const m = await import('./lawData.js');
-  lawFlashcards = m.lawFlashcards || [];
-  lawExams = m.lawExams || [];
-  lawCases = m.lawCases || [];
+  lawFlashcards = lawDataModule.lawFlashcards || [];
+  lawExams = lawDataModule.lawExams || [];
+  lawCases = lawDataModule.lawCases || [];
 } catch (e) { console.warn('[MARIAM] Law data failed to load:', e.message); }
 /*
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -1948,7 +1949,179 @@ const ViewWrapper = ({ active, children }) => (
 );
 
 /* ═══════════════════════════════════════════════════════════════════
-   LIBRARY VIEW — with drag-drop, file types, stats
+   LIBRARY MERGED VIEW — Home + Library in one beautiful page (gooddesign)
+═══════════════════════════════════════════════════════════════════ */
+function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, exams, cases, notes, setView, setActiveId, addToast, settings }) {
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [viewMode, setViewMode] = useState('grid');
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef(null);
+
+  const totalCards = flashcards.reduce((s, f) => s + (f.cards?.length || 0), 0);
+  const totalQ = exams.reduce((s, e) => s + (e.questions?.length || 0), 0);
+  const totalCases = cases.reduce((s, c) => s + (c.questions?.length || 0), 0);
+  const dueCards = flashcards.reduce((s, f) => s + (f.cards?.filter(c => c.nextReview <= Date.now()).length || 0), 0);
+  const recentScores = ANALYTICS.scores.slice(-7);
+  const avgScore = recentScores.length ? Math.round(recentScores.reduce((s, r) => s + r.pct, 0) / recentScores.length) : 0;
+  const streak = ANALYTICS.streak || 0;
+  const recentDocs = docs.slice(-4).reverse();
+  const bgTaskList = Object.values(window.__MARIAM_BG__?.tasks || {});
+
+  const allStats = useMemo(() => ({
+    docs: docs.length,
+    cards: totalCards,
+    exams: totalQ,
+    cases: totalCases,
+  }), [docs.length, totalCards, totalQ, totalCases]);
+
+  const filtered = useMemo(() => {
+    let d = docs.filter(doc => doc.name.toLowerCase().includes(search.toLowerCase()));
+    if (sortBy === 'date') d = [...d].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+    else if (sortBy === 'name') d = [...d].sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === 'type') d = [...d].sort((a, b) => (a.fileCategory || 'pdf').localeCompare(b.fileCategory || 'pdf'));
+    return d;
+  }, [docs, search, sortBy]);
+
+  const handleDrop = useCallback(e => {
+    e.preventDefault(); setDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length) onUpload({ target: { files } });
+  }, [onUpload]);
+
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content app-view" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
+      onDragOver={e => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={handleDrop}>
+      {dragging && (
+        <div className="fixed inset-0 z-[9998] bg-[var(--accent)]/20 border-4 border-dashed border-[var(--accent)] flex items-center justify-center pointer-events-none">
+          <div className="design-btn rounded-3xl px-8 py-6 text-center shadow-2xl"><FileUp size={48} className="mx-auto mb-3 animate-bounce" />
+            <p className="text-xl font-black">Drop files here!</p><p className="text-sm opacity-80 mt-1">PDF, Word, Excel, Images</p>
+          </div>
+        </div>
+      )}
+
+      {/* Hero / AI Briefing */}
+      <div className="design-card" style={{ background: 'linear-gradient(135deg, hsl(var(--primary-hue, 220), 80%, 50%), hsl(var(--primary-hue, 220), 70%, 40%))', color: 'white', border: 'none' }}>
+        <h3 style={{ color: 'white' }}>AI Study Hub</h3>
+        <p style={{ opacity: 0.9 }}>
+          {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'} — {docs.length === 0 ? 'Upload a document to get started' : 'Your AI-powered study command center'}
+        </p>
+        <p style={{ marginTop: 8 }}>Today&apos;s Plan:</p>
+        <ul style={{ listStyle: 'disc', paddingLeft: 20, opacity: 0.9, fontSize: '0.9rem' }}>
+          <li>Practice <strong>{dueCards}</strong> due flashcards</li>
+          <li>Review exam topics</li>
+          <li>Study {totalCards} total cards</li>
+        </ul>
+        <button onClick={() => setView('flashcards')} className="design-btn design-btn-secondary" style={{ marginTop: 16, background: 'rgba(255,255,255,0.2)', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}>
+          Start Study Session
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="design-card">
+        <h4>Performance Snapshot</h4>
+        <p className="text-label" style={{ color: 'var(--text-muted, var(--text3))' }}>Your study stats.</p>
+        <div className="button-grid" style={{ marginTop: 12 }}>
+          {[
+            { label: 'Documents', val: allStats.docs, col: '#6366f1' },
+            { label: 'Flashcards', val: allStats.cards, col: '#8b5cf6' },
+            { label: 'Exam Qs', val: allStats.exams, col: '#3b82f6' },
+            { label: 'Cases', val: allStats.cases, col: '#06b6d4' },
+          ].map(({ label, val, col }) => (
+            <div key={label} className="design-card" style={{ padding: 12, marginBottom: 0, textAlign: 'center' }}>
+              <p style={{ fontSize: '1.5rem', fontWeight: 800, color: col }}>{val}</p>
+              <p className="text-label" style={{ fontSize: '0.75rem' }}>{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="design-card">
+        <h4>Quick Actions</h4>
+        <div className="button-grid">
+          {[
+            { lbl: 'Study Cards', Icon: Layers, v: 'flashcards' },
+            { lbl: 'Exams', Icon: CheckSquare, v: 'exams' },
+            { lbl: 'Cases', Icon: Activity, v: 'cases' },
+            { lbl: 'AI Tutor', Icon: MessageSquare, v: 'chat' },
+          ].map(({ lbl, Icon, v }) => (
+            <button key={v} onClick={() => setView(v)} className="design-btn design-btn-secondary">
+              <Icon size={18} />{lbl}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Docs + Upload */}
+      <div className="design-card">
+        <h4>My Documents</h4>
+        <div className="flex flex-wrap gap-3 items-center" style={{ marginBottom: 16 }}>
+          <div className="flex-1 min-w-[140px] relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={14} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
+              className="design-card" style={{ padding: '10px 10px 10px 36px', marginBottom: 0 }} />
+          </div>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="design-card" style={{ padding: '10px 14px', marginBottom: 0, width: 'auto' }}>
+            <option value="date">Newest</option>
+            <option value="name">Name</option>
+          </select>
+          <div className="flex rounded-xl overflow-hidden border border-[var(--card-border)]">
+            <button onClick={() => setViewMode('grid')} className={`p-2.5 ${viewMode === 'grid' ? 'bg-[var(--accent)] text-white' : 'opacity-50'}`}><Grid size={18} /></button>
+            <button onClick={() => setViewMode('list')} className={`p-2.5 ${viewMode === 'list' ? 'bg-[var(--accent)] text-white' : 'opacity-50'}`}><List size={18} /></button>
+          </div>
+          <label className={`design-btn cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
+            {uploading ? <Loader2 size={16} className="animate-spin" /> : <FileUp size={16} />}
+            {uploading ? 'Uploading…' : 'Import'}
+            <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
+          </label>
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="design-card text-center" style={{ padding: 32 }} onClick={() => inputRef.current?.click()}>
+            <FileUp size={40} className="mx-auto mb-3 opacity-50" style={{ color: 'var(--accent)' }} />
+            <p style={{ color: 'var(--text-muted, var(--text3))' }}>{search ? 'No results' : 'Drop or browse files'}</p>
+            {!search && <button className="design-btn design-btn-feature" style={{ marginTop: 16 }}>Browse Files</button>}
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {filtered.map(doc => (
+              <div key={doc.id} onClick={() => onOpen(doc.id)} className="design-card cursor-pointer">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black mb-2" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
+                  {doc.name.slice(0, 2).toUpperCase()}
+                </div>
+                <p className="font-bold text-sm truncate">{doc.name}</p>
+                <p className="text-label text-xs">{doc.totalPages} pages</p>
+                <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }} className="design-btn design-btn-secondary mt-2" style={{ padding: '6px 12px', fontSize: 12 }}>Remove</button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filtered.map(doc => (
+              <div key={doc.id} onClick={() => onOpen(doc.id)} className="design-card flex items-center gap-3 cursor-pointer">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black shrink-0" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>
+                  {doc.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold truncate">{doc.name}</p>
+                  <p className="text-label text-xs">{doc.totalPages} pages</p>
+                </div>
+                <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }} className="design-btn design-btn-secondary" style={{ padding: '6px 12px', fontSize: 12 }}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIBRARY VIEW — with drag-drop, file types, stats (legacy, kept for ref)
 ═══════════════════════════════════════════════════════════════════ */
 function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, exams, cases, notes }) {
   const [search, setSearch] = useState('');
@@ -4457,7 +4630,7 @@ function App() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [uploading, setUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState(0);
-  const [view, setView] = useState('dashboard');
+  const [view, setView] = useState('library');
   const [rpTab, setRpTab] = useState('generate');
   const [rpOpen, setRpOpen] = useState(false);
   const [rpW, setRpW] = useState(420);
@@ -4481,8 +4654,7 @@ function App() {
     ['ctrl+k', () => setShowGlobalSearch(true)],
     ['ctrl+/', () => setShowGlobalSearch(true)],
     ['Escape', () => setShowGlobalSearch(false)],
-    ['ctrl+1', () => setView('dashboard')],
-    ['ctrl+2', () => setView('library')],
+    ['ctrl+1', () => setView('library')],
     ['ctrl+3', () => setView('flashcards')],
     ['ctrl+4', () => setView('exams')],
     ['ctrl+5', () => setView('cases')],
@@ -5006,8 +5178,7 @@ function App() {
   const showReader = view === 'reader' && !!activeId && !!activeDoc;
 
   const NAV_ITEMS = [
-    { icon: LayoutDashboard, label: 'Home', v: 'dashboard' },
-    { icon: BookOpen, label: 'Library', v: 'library' },
+    { icon: FolderOpen, label: 'Library', v: 'library' },
     { icon: BookMarked, label: 'Reader', v: 'reader', dis: !activeId },
     { icon: Layers, label: 'Cards', v: 'flashcards' },
     { icon: Activity, label: 'Cases', v: 'cases' },
@@ -5028,16 +5199,16 @@ function App() {
         /* ── ROOT RESET ── */
         /* Handled natively and at EOF of this block to enforce position: absolute */
         /* ── LIGHT THEMES ── */
-        .pure-white{--bg:#f5f7ff;--bg2:#ecf0ff;--surface:#ffffff;--surface2:#f0f4ff;--text:#05102c;--text2:#3a4870;--text3:#7e8fb0;--border:rgba(60,80,220,.07);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(255,255,255,0.70);--sidebar-bg:linear-gradient(180deg,#eef2ff 0%,#e6ecff 100%);--card:#fff;--border-old:#e2e8f0;}
-        .light{--bg:#eef2ff;--bg2:#e4eaff;--surface:#ffffff;--surface2:#eef2ff;--text:#050f2a;--text2:#334070;--text3:#6a7ba0;--border:rgba(40,70,220,.09);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(238,242,255,0.70);--sidebar-bg:linear-gradient(180deg,#e4eaff 0%,#d8e2ff 100%);--card:#fff;--border-old:#e2e8f0;}
-        .warm{--bg:#fffbf5;--bg2:#fff5e8;--surface:#ffffff;--surface2:#fff8f0;--text:#1a0f05;--text2:#5c3d1e;--text3:#9e7555;--border:rgba(180,100,20,.08);--border2:rgba(180,100,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,0.70);--sidebar-bg:linear-gradient(180deg,#fff5e8 0%,#ffefd6 100%);--card:#fff;--border-old:#fde8cc;}
-        .rose{--bg:#fff5f7;--bg2:#ffe8ed;--surface:#ffffff;--surface2:#fff0f4;--text:#1a0508;--text2:#5c1a28;--text3:#a05070;--border:rgba(200,30,80,.08);--border2:rgba(200,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,0.70);--sidebar-bg:linear-gradient(180deg,#ffe8ed 0%,#ffd6e0 100%);--card:#fff;--border-old:#ffc0cb;}
-        .forest{--bg:#f0faf5;--bg2:#e0f5ea;--surface:#ffffff;--surface2:#eef9f3;--text:#031a0a;--text2:#1a4a28;--text3:#4a8060;--border:rgba(20,130,60,.08);--border2:rgba(20,130,60,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,250,245,0.70);--sidebar-bg:linear-gradient(180deg,#e0f5ea 0%,#cff0dc 100%);--card:#fff;--border-old:#b7f5d0;}
+        .pure-white{--bg:#f8fafc;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#e0e7ff,transparent 45%),radial-gradient(circle at 50% 80%,#fef08a,transparent 45%),#f8fafc;--bg2:#ecf0ff;--surface:rgba(255,255,255,0.6);--surface2:rgba(255,255,255,0.5);--text:#1e293b;--text2:#475569;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(255,255,255,0.4);--sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(238,242,255,.6) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,255,255,0.6);}
+        .light{--bg:#f8fafc;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#e0e7ff,transparent 45%),#f8fafc;--bg2:#e4eaff;--surface:rgba(255,255,255,0.6);--surface2:rgba(238,242,255,0.6);--text:#1e293b;--text2:#334155;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(255,255,255,0.4);--sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(232,240,255,.55) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,255,255,0.6);}
+        .warm{--bg:#fffbf5;--bg-gradient:radial-gradient(circle at 15% 50%,#fffbeb,transparent 45%),radial-gradient(circle at 85% 30%,#fef3c7,transparent 45%),#fffbf5;--bg2:#fff5e8;--surface:rgba(255,255,255,0.6);--surface2:rgba(255,248,240,0.7);--text:#1c1917;--text2:#57534e;--text3:#78716c;--border:rgba(255,251,235,0.7);--border2:rgba(180,110,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,0.5);--sidebar-bg:linear-gradient(180deg,rgba(255,248,234,.6) 0%,rgba(255,243,218,.5) 100%);--card:rgba(255,255,255,0.55);--card-border:rgba(255,251,235,0.7);}
+        .rose{--bg:#fff5f7;--bg-gradient:radial-gradient(circle at 15% 50%,#ffe4e6,transparent 45%),radial-gradient(circle at 85% 30%,#fce7f3,transparent 45%),#fff5f7;--bg2:#ffe8ed;--surface:rgba(255,255,255,0.55);--surface2:rgba(255,240,246,0.6);--text:#1c1917;--text2:#4c0519;--text3:#9d174d;--border:rgba(255,255,255,0.55);--border2:rgba(220,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,0.5);--sidebar-bg:linear-gradient(180deg,rgba(255,228,230,.5) 0%,rgba(254,226,226,.5) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,228,230,0.6);}
+        .forest{--bg:#f0fdf4;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#bbf7d0,transparent 45%),#f0fdf4;--bg2:#e0f5ea;--surface:rgba(255,255,255,0.55);--surface2:rgba(236,253,245,0.6);--text:#052e16;--text2:#166534;--text3:#15803d;--border:rgba(220,252,231,0.6);--border2:rgba(20,130,55,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,253,244,0.5);--sidebar-bg:linear-gradient(180deg,rgba(220,252,231,.5) 0%,rgba(187,247,208,.4) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(187,247,208,0.5);}
         /* ── DARK THEMES ── */
-        .dark{--bg:#04080f;--bg2:#070c18;--surface:#0c1220;--surface2:#101828;--text:#ccd8f8;--text2:#5c6e98;--text3:#384562;--border:rgba(100,130,255,.08);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(12,18,32,0.70);--sidebar-bg:linear-gradient(180deg,#06090f 0%,#040810 100%);--card:#0c1220;--border-old:#252840;}
-        .oled{--bg:#000000;--bg2:#030610;--surface:#060c18;--surface2:#0a1020;--text:#c0d0f0;--text2:#404e70;--text3:#28344c;--border:rgba(80,120,255,.07);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.70);--sidebar-bg:linear-gradient(180deg,#020408 0%,#000000 100%);--card:#060c18;--border-old:#1a1a1a;}
-        .midnight{--bg:#0a0a14;--bg2:#0e0e1e;--surface:#12122a;--surface2:#18183a;--text:#e0e0ff;--text2:#6060a0;--text3:#404080;--border:rgba(140,140,255,.08);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(18,18,42,0.70);--sidebar-bg:linear-gradient(180deg,#0e0e1e 0%,#0a0a14 100%);--card:#12122a;--border-old:#1e1e40;}
-        .slate{--bg:#0f1117;--bg2:#161820;--surface:#1e2130;--surface2:#252840;--text:#dce8f8;--text2:#5a6a88;--text3:#384558;--border:rgba(100,130,180,.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,17,23,0.70);--sidebar-bg:linear-gradient(180deg,#161820 0%,#0f1117 100%);--card:#1e2130;--border-old:#2a2d40;}
+        .dark{--bg:#020617;--bg-gradient:radial-gradient(circle at 15% 20%,#1e1b4b,transparent 40%),radial-gradient(circle at 85% 60%,#0f172a,transparent 40%),radial-gradient(circle at 50% 90%,#312e81,transparent 40%),#020617;--bg2:#0f172a;--surface:rgba(15,23,42,0.5);--surface2:rgba(15,23,42,0.4);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.1);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(15,23,42,0.5);--sidebar-bg:linear-gradient(180deg,rgba(15,23,42,.6) 0%,rgba(2,6,23,.9) 100%);--card:rgba(15,23,42,0.5);--card-border:rgba(255,255,255,0.1);}
+        .oled{--bg:#000000;--bg-gradient:radial-gradient(circle at 15% 20%,#0f172a,transparent 45%),radial-gradient(circle at 85% 60%,#0a0a14,transparent 45%),#000;--bg2:#030610;--surface:rgba(7,12,24,0.7);--surface2:rgba(11,16,32,0.6);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.08);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.7);--sidebar-bg:linear-gradient(180deg,rgba(2,6,16,.95) 0%,#000 100%);--card:rgba(7,12,24,0.8);--card-border:rgba(255,255,255,0.08);}
+        .midnight{--bg:#020617;--bg-gradient:radial-gradient(circle at 15% 20%,#1e1b4b,transparent 40%),radial-gradient(circle at 85% 60%,#312e81,transparent 40%),#020617;--bg2:#0e0e24;--surface:rgba(18,18,42,0.5);--surface2:rgba(24,24,58,0.45);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.1);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(18,18,42,0.5);--sidebar-bg:linear-gradient(180deg,rgba(14,14,36,.7) 0%,rgba(10,10,23,.95) 100%);--card:rgba(18,18,42,0.5);--card-border:rgba(255,255,255,0.1);}
+        .slate{--bg:#0f172a;--bg-gradient:radial-gradient(circle at 15% 20%,#1e293b,transparent 40%),radial-gradient(circle at 85% 60%,#0f172a,transparent 40%),#0f172a;--bg2:#161820;--surface:rgba(30,33,48,0.55);--surface2:rgba(37,40,64,0.5);--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,23,42,0.55);--sidebar-bg:linear-gradient(180deg,rgba(22,24,32,.7) 0%,rgba(15,23,42,.95) 100%);--card:rgba(30,33,48,0.55);--card-border:rgba(255,255,255,0.1);}
         /* ── ACCENT OVERRIDES (when user picks accent color) ── */
         .accent-indigo{--accent:#5046e5;--accent2:#7c3aed;--acc-rgb:80,70,229;}
         .accent-purple{--accent:#9333ea;--accent2:#7c3aed;--acc-rgb:147,51,234;}
@@ -5063,9 +5234,9 @@ function App() {
         .custom-scrollbar::-webkit-scrollbar{width:2px;height:2px;}
         .custom-scrollbar::-webkit-scrollbar-track{background:transparent;}
         .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(var(--acc-rgb,99,102,241),.22);border-radius:4px;}
-        .glass{background:var(--surface,var(--card));border:1px solid var(--border);}
-        .glass-2{background:var(--surface2,var(--card));border:1px solid var(--border2,var(--border));}
-        .card-lined{background:var(--surface,var(--card));border:1px solid var(--border2,var(--border));border-top:1.5px solid rgba(var(--acc-rgb,99,102,241),.25);box-shadow:0 4px 20px rgba(0,0,0,.12);}
+        .glass{background:var(--surface,var(--card));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border,var(--border));border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.05);}
+        .glass-2{background:var(--surface2,var(--card));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-border,var(--border2,var(--border)));border-radius:20px;}
+        .card-lined{background:var(--surface,var(--card));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border,var(--border2,var(--border)));border-top:1.5px solid rgba(var(--acc-rgb,99,102,241),.25);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.08);}
         .card-glow{background:linear-gradient(145deg,rgba(var(--acc-rgb,99,102,241),.08),rgba(var(--acc-rgb,99,102,241),.02));border:1px solid rgba(var(--acc-rgb,99,102,241),.22);box-shadow:0 0 28px rgba(var(--acc-rgb,99,102,241),.07);}
         .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;border:none;cursor:pointer;font-weight:800;letter-spacing:.01em;transition:all .18s cubic-bezier(.34,1.4,.64,1);box-shadow:0 4px 18px rgba(var(--acc-rgb,99,102,241),.3),inset 0 1px 0 rgba(255,255,255,.13);position:relative;overflow:hidden;}
         @media (min-width: 1024px) { .btn-accent::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);} }
@@ -5093,9 +5264,9 @@ function App() {
         .sidebar-nav{background:var(--sidebar-bg);border-right:1px solid var(--border);}
         .nav-item-active{position:relative;}
         .nav-item-active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));}
-        .mobile-nav{background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--border);}
-        .main-header{background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);}
-        .bg-mesh{background:radial-gradient(ellipse 800px 600px at 0% 0%,rgba(var(--acc-rgb,99,102,241),.06) 0%,transparent 60%),radial-gradient(ellipse 600px 800px at 100% 100%,rgba(167,139,250,.04) 0%,transparent 60%),var(--bg);}
+        .mobile-nav{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--card-border,var(--border));border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,.15);}
+        .main-header{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--card-border,var(--border));}
+        .bg-mesh{background:var(--bg-gradient,radial-gradient(ellipse 800px 600px at 0% 0%,rgba(var(--acc-rgb,99,102,241),.06) 0%,transparent 60%),radial-gradient(ellipse 600px 800px at 100% 100%,rgba(167,139,250,.04) 0%,transparent 60%),var(--bg));background-attachment:fixed;}
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
@@ -5157,123 +5328,32 @@ function App() {
         </div>
       )}
 
-      {/* HEADER */}
-      <header className="main-header shrink-0 z-40"
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          height: 'calc(64px + env(safe-area-inset-top))',
-          boxSizing: 'border-box',
-        }}>
-        <div className="flex items-center justify-between h-full px-4 lg:px-6 gap-4" style={{ height: 64 }}>
-
-          {/* Logo */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="relative">
-              <img src={MARIAM_IMG} className="w-10 h-10 rounded-2xl object-cover" alt=""
-                style={{ boxShadow: '0 0 0 2px rgba(var(--acc-rgb,99,102,241),0.3),0 4px 12px rgba(0,0,0,0.25)' }} />
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-[var(--bg)] bg-emerald-500 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-white" />
-              </div>
-            </div>
-            <div className="hidden sm:block">
-              <p className="text-xl font-black tracking-tight leading-none gradient-text">MARIAM</p>
-              <p className="text-xs opacity-30 font-bold tracking-widest uppercase leading-none mt-0.5">{APP_VER}</p>
-            </div>
-            {Object.values(window.__MARIAM_BG__?.tasks || {}).filter(t => t.status === 'running').length > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black text-amber-400 border border-amber-500/30 bg-amber-500/10">
-                <Loader2 size={10} className="animate-spin" />{Object.values(window.__MARIAM_BG__.tasks).filter(t => t.status === 'running').length} running
-              </div>
-            )}
-          </div>
-
-          {/* Search */}
-          <div className="flex-1 max-w-sm hidden md:flex">
-            <button onClick={() => setShowGlobalSearch(true)} className="relative w-full group">
-              <div className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all cursor-pointer"
-                style={{ background: 'var(--surface2,var(--card))', border: '1px solid var(--border)' }}>
-                <Search size={15} className="opacity-30 shrink-0 group-hover:opacity-60 transition-opacity" />
-                <span className="opacity-35 flex-1 text-left font-medium">Search everything…</span>
-                <kbd className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-black opacity-25"
-                  style={{ background: 'var(--border)', border: '1px solid var(--border2)' }}>⌘K</kbd>
-              </div>
-            </button>
-          </div>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setShowGlobalSearch(true)} className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-              style={{ background: 'var(--surface2,var(--card))', border: '1px solid var(--border)' }}>
-              <Search size={16} className="opacity-60" />
-            </button>
-            {installPrompt && (
-              <button onClick={onInstall} className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black transition-all"
-                style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.1)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,99,102,241),0.2)' }}>
-                <Download size={14} /> Install App
-              </button>
-            )}
-            {activeDoc && (
-              <button onClick={() => { setRpOpen(o => !o); if (view !== 'reader') setView('reader'); }}
-                className={`hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all`}
-                style={rpOpen ? {
-                  background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))',
-                  color: '#fff', boxShadow: '0 4px 16px rgba(var(--acc-rgb,99,102,241),0.35)'
-                } : {
-                  background: 'rgba(var(--acc-rgb,99,102,241),0.1)',
-                  color: 'var(--accent)',
-                  border: '1px solid rgba(var(--acc-rgb,99,102,241),0.2)'
-                }}>
-                <Sparkles size={15} /> AI Studio
-              </button>
-            )}
-            <button onClick={() => setView('settings')}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all opacity-50 hover:opacity-100"
-              style={{ background: 'var(--surface2,var(--card))', border: '1px solid var(--border)' }}>
-              <Settings size={16} />
-            </button>
-          </div>
+      {/* HEADER — gooddesign: centered, frosted glass */}
+      <header className="design-header shrink-0 relative">
+        <div className="flex items-center justify-center gap-2">
+          <img src={MARIAM_IMG} alt="" className="w-9 h-9 rounded-xl object-cover" />
+          <span className="font-bold text-[1.5rem]">MARIAM</span>
         </div>
+        <button onClick={() => setShowGlobalSearch(true)} className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
+          <Search size={18} />
+        </button>
       </header>
 
-      {/* BODY */}
+      {/* BODY — no sidebar, bottom nav for all */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* DESKTOP SIDEBAR — only rendered when not mobile */}
-        {!isMobile && (
-          <nav style={{ width: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, zIndex: 30, paddingTop: 16, paddingBottom: 16, gap: 2, background: 'var(--sidebar-bg,var(--surface2))', borderRight: '1px solid var(--border)' }}>
-            {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
-              <button key={v} onClick={() => { if (!dis) { if (v === 'reader' && activeId) setView('reader'); else if (v !== 'reader') setView(v); } }}
-                disabled={dis} title={label}
-                style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: '100%', padding: '10px 4px', border: 'none', background: 'none', cursor: dis ? 'not-allowed' : 'pointer', opacity: dis ? 0.2 : 1, transition: 'all .15s' }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16, width: 56, height: 56, transition: 'all .15s',
-                  ...(view === v ? { background: 'linear-gradient(135deg,rgba(var(--acc-rgb,99,102,241),.18),rgba(var(--acc-rgb,99,102,241),.08))', border: '1.5px solid rgba(var(--acc-rgb,99,102,241),.28)', color: 'var(--accent)', boxShadow: '0 4px 16px rgba(var(--acc-rgb,99,102,241),.2)' } :
-                    dis ? { color: 'var(--text3,var(--text))' } : { color: 'var(--text2,var(--text))', opacity: .6 })
-                }}>
-                  <Icon size={24} strokeWidth={view === v ? 2.5 : 1.8} />
-                </div>
-                <span style={{ fontSize: 10, color: view === v ? 'var(--accent)' : 'var(--text3,var(--text))', opacity: dis ? 0.3 : view === v ? 1 : .7, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  {label}
-                </span>
-              </button>
-            ))}
-          </nav>
-        )}
-
-        {/* MAIN CONTENT */}
-        <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+        {/* MAIN CONTENT — gooddesign: padding-bottom for bottom nav */}
+        <main className="flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative" style={{ paddingBottom: 120 }}>
           {uploading && (
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--border)] z-50">
               <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] transition-all duration-300 animate-pulse" style={{ width: `${uploadPct}%` }} />
             </div>
           )}
 
-          <ViewWrapper active={view === 'dashboard'}>
-            <DashboardView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions}
-              setView={setView} setActiveId={id => { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); }} addToast={addToast} settings={settings} />
-          </ViewWrapper>
           <ViewWrapper active={view === 'library'}>
-            <LibraryView docs={docs} uploading={uploading} onUpload={handleUpload}
+            <LibraryMergedView docs={docs} uploading={uploading} onUpload={handleUpload}
               onOpen={id => { setOpenDocs(p => p.includes(id) ? p : [...p, id]); setActiveId(id); setView('reader'); }}
-              onDelete={deleteDoc} flashcards={flashcards} exams={exams} cases={cases} notes={notes} />
+              onDelete={deleteDoc} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
+              setView={setView} setActiveId={id => { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); }} addToast={addToast} settings={settings} />
           </ViewWrapper>
           <ViewWrapper active={view === 'flashcards'}>
             <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast} docs={docs} setExams={setExams} setCases={setCases} />
@@ -5347,57 +5427,21 @@ function App() {
         )}
       </div>
 
-      {/* MOBILE BOTTOM NAV — Flush to bottom with safe area padding */}
-      {isMobile && (
-        <div style={{
-          position: 'fixed',
-          bottom: 'calc(12px + env(safe-area-inset-bottom))',
-          left: 16, right: 16,
-          padding: 0,
-          zIndex: 9999,
-          display: 'flex',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-        }}>
-          <nav style={{
-            pointerEvents: 'all',
-            display: 'flex',
-            width: '100%',
-            maxWidth: '100%',
-            padding: '8px 6px',
-            borderRadius: '999px',
-            justifyContent: 'space-around',
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'saturate(250%) blur(40px)',
-            WebkitBackdropFilter: 'saturate(250%) blur(40px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.3)',
-          }}>
-            {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
-              <button key={v} disabled={dis}
-                onClick={() => { if (!dis) { if (v === 'reader' && activeId) setView('reader'); else if (v !== 'reader') setView(v); } }}
-                style={{
-                  position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, padding: '6px 4px', borderRadius: 999, border: 'none',
-                  background: view === v ? 'rgba(37, 99, 235, 0.25)' : 'transparent', cursor: dis ? 'not-allowed' : 'pointer', opacity: dis ? 0.3 : 1, WebkitTapHighlightColor: 'transparent',
-                  transition: 'all .25s cubic-bezier(.34, 1.56, .64, 1)'
-                }}>
-                <div style={{
-                  color: view === v ? '#3b82f6' : 'var(--text2,#555)',
-                  opacity: view === v ? 1 : 0.6,
-                  transform: view === v ? 'scale(1.15) translateY(-2px)' : 'scale(1)',
-                  transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                }}>
-                  <Icon size={22} strokeWidth={view === v ? 2.5 : 2} />
-                </div>
-                <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: view === v ? '#3b82f6' : 'var(--text3,#888)', opacity: view === v ? 1 : 0.6 }}>
-                  {label}
-                </span>
-                {view === v && <div style={{ position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)', height: 3, width: 3, borderRadius: 999, background: '#3b82f6' }} />}
-              </button>
-            ))}
-          </nav>
+      {/* BOTTOM NAV — gooddesign pill nav, all viewports */}
+      <nav className="design-nav">
+        <div className="design-nav-inner">
+          {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
+            <button key={v} disabled={dis}
+              onClick={() => { if (!dis) { if (v === 'reader' && activeId) setView('reader'); else if (v !== 'reader') setView(v); } }}
+              className={`design-nav-btn ${view === v ? 'active' : ''}`}
+              title={label}>
+              <Icon size={22} strokeWidth={view === v ? 2.5 : 2} />
+              <span className="design-nav-label">{label}</span>
+            </button>
+          ))}
         </div>
-      )}
+      </nav>
+
     </div>
   );
 }
