@@ -1,0 +1,212 @@
+/* 100% GoodDesign aesthetic - exact match */
+:root {
+  --primary-hue: 220;
+  --primary: hsl(var(--primary-hue), 80%, 50%);
+  --feature-hue: 280;
+  --card-bg: rgba(255, 255, 255, 0.4);
+  --card-border: rgba(255, 255, 255, 0.6);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
+
+html.dark,
+.dark {
+  --card-bg: rgba(15, 23, 42, 0.5);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+.app-view {
+  padding: 10px;
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.design-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.design-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+.design-header {
+  padding: max(16px, env(safe-area-inset-top)) 16px 16px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* ensure header respects right safe area and keeps action buttons onscreen */
+.design-header {
+  padding-right: calc(16px + env(safe-area-inset-right));
+  padding-left: calc(16px + env(safe-area-inset-left));
+}
+
+.design-header > button {
+  right: calc(12px + env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.design-nav {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96%;
+  max-width: 600px;
+  z-index: 1000;
+}
+
+.design-nav-inner {
+  background: var(--card-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--card-border);
+  border-radius: 30px;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.design-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1;
+}
+
+.design-nav-btn.active {
+  color: var(--primary, var(--accent));
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+html.dark .design-nav-btn.active,
+.dark .design-nav-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.design-nav-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Desktop: convert bottom nav to a compact left sidebar */
+@media (min-width: 1024px) {
+  .design-nav {
+    bottom: auto;
+    top: 88px;
+    left: 18px;
+    transform: none;
+    width: 88px;
+    max-width: none;
+    height: calc(100% - 176px);
+  }
+  .design-nav-inner {
+    flex-direction: column;
+    padding: 12px;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 16px;
+  }
+  .design-nav-btn { flex: none; padding: 10px; border-radius: 12px; }
+
+  /* Wider content area on desktop */
+  .app-view { max-width: 1100px; padding: 20px; }
+
+  /* reduce bottom padding because nav is now a sidebar */
+  main { padding-bottom: 24px !important; }
+}
+
+.design-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  background: var(--primary, var(--accent));
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.design-btn:active { transform: scale(0.98); }
+
+.design-btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  box-shadow: none;
+}
+
+html.dark .design-btn-secondary,
+.dark .design-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.design-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+html.dark .design-btn-secondary:hover,
+.dark .design-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.design-btn-feature {
+  background: linear-gradient(135deg, hsl(var(--feature-hue), 80%, 60%), hsl(var(--feature-hue), 70%, 50%));
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.text-label {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
