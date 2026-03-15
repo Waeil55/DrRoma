@@ -1623,24 +1623,41 @@ function ToastContainer({ toasts }) {
 ═══════════════════════════════════════════════════════════════════ */
 function useDrag(onDrag, deps = []) {
   const dragging = useRef(false);
+  // Keep latest onDrag in a ref so start() never captures a stale closure
+  const live = useRef(onDrag); live.current = onDrag;
   const start = useCallback(e => {
-    e.preventDefault(); dragging.current = true;
+    // cancelable guard lets this work whether called from passive or non-passive context
+    if (e.cancelable) e.preventDefault();
+    dragging.current = true;
     document.body.style.userSelect = 'none'; document.body.style.webkitUserSelect = 'none';
     const move = ev => {
       if (!dragging.current) return;
       const x = ev.touches?.[0]?.clientX ?? ev.clientX;
       const y = ev.touches?.[0]?.clientY ?? ev.clientY;
-      if (x !== undefined) onDrag(x, y);
+      if (x !== undefined) live.current(x, y);
     };
     const up = () => {
       dragging.current = false;
       document.body.style.userSelect = ''; document.body.style.webkitUserSelect = '';
       document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up);
       document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up);
+      document.removeEventListener('touchcancel', up); // iOS: clean up on interrupted touch
     };
     document.addEventListener('mousemove', move, { passive: false }); document.addEventListener('mouseup', up);
     document.addEventListener('touchmove', move, { passive: false }); document.addEventListener('touchend', up);
-  }, [onDrag, ...deps]);
+    document.addEventListener('touchcancel', up);
+  }, []); // empty deps — always reads live.current, never stale
+
+  // Attach a non-passive native touchstart listener to the element.
+  // React 17+ registers onTouchStart as passive (can't preventDefault),
+  // so we bypass React's event system for the initial touch-start.
+  // Usage: <div ref={startDrag.ref} onMouseDown={startDrag} ...>
+  const nativeTouchRef = useCallback(el => {
+    if (!el || el._dragBound) return; // idempotent — one listener per element
+    el._dragBound = true;
+    el.addEventListener('touchstart', start, { passive: false });
+  }, [start]);
+  start.ref = nativeTouchRef;
   return start;
 }
 
@@ -1811,9 +1828,9 @@ function SplitPane({ left, right, defaultSplit = 60, minLeft = 30, maxLeft = 85,
   if (direction === 'vertical') return (
     <div ref={containerRef} className="flex flex-row w-full h-full overflow-hidden">
       <div style={{ width: `${split}%` }} className="flex flex-col h-full overflow-hidden min-w-0">{left}</div>
-      <div onMouseDown={startDrag} onTouchStart={startDrag}
-        className="w-2 shrink-0 cursor-col-resize flex items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/30 transition-colors group touch-none select-none z-10">
-        <GripVertical size={16} className="text-[var(--text)] opacity-40 group-hover:opacity-100" />
+      <div ref={startDrag.ref} onMouseDown={startDrag}
+        className="w-5 shrink-0 cursor-col-resize flex items-center justify-center hover:bg-[var(--accent)]/10 transition-colors group touch-none select-none z-10">
+        <GripVertical size={16} className="text-[var(--text)] opacity-30 group-hover:opacity-100" />
       </div>
       <div style={{ width: `${100 - split}%` }} className="flex flex-col h-full overflow-hidden min-w-0">{right}</div>
     </div>
@@ -1821,8 +1838,8 @@ function SplitPane({ left, right, defaultSplit = 60, minLeft = 30, maxLeft = 85,
   return (
     <div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden">
       <div style={{ height: `${split}%` }} className="w-full overflow-hidden min-h-0">{left}</div>
-      <div onMouseDown={startDrag} onTouchStart={startDrag}
-        className="h-2 shrink-0 cursor-row-resize flex items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/30 transition-colors group touch-none select-none">
+      <div ref={startDrag.ref} onMouseDown={startDrag}
+        className="h-5 shrink-0 cursor-row-resize flex items-center justify-center hover:bg-[var(--accent)]/10 transition-colors group touch-none select-none">
         <div className="w-16 h-1 bg-[var(--text)] opacity-20 rounded-full group-hover:opacity-60" />
       </div>
       <div style={{ height: `${100 - split}%` }} className="w-full overflow-hidden min-h-0">{right}</div>
@@ -3165,8 +3182,8 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
   return (
     <div className="flex flex-col h-full min-h-0 bg-[var(--surface,var(--card))] border-l border-[color:var(--border2,var(--border))]" style={{ width: width || 360 }}>
       {/* Header - draggable */}
-      <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-between px-4 py-3 shrink-0 cursor-grab select-none"
-        onMouseDown={onDragStart} onTouchStart={onDragStart}>
+      <div ref={onDragStart?.ref} className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-between px-4 py-3 shrink-0 cursor-grab select-none touch-none"
+        onMouseDown={onDragStart}>
         <div>
           <span className="font-black flex items-center gap-2 text-base"><GraduationCap size={20} /> AI Tutor</span>
           <p className="text-xs opacity-70 mt-0.5">Ask about anything you're studying</p>
@@ -3247,8 +3264,8 @@ function WithAiTutor({ settings, context, children }) {
       )}
       {open && (
         <>
-          <div onMouseDown={startDrag} onTouchStart={startDrag}
-            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/40 hover:bg-[var(--accent)]/40 shrink-0 z-50 touch-none transition-colors group">
+          <div ref={startDrag.ref} onMouseDown={startDrag}
+            className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 z-50 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-60 text-[var(--text)]" />
           </div>
           <div className={isMobile ? "fixed inset-y-0 right-0 z-[49] shadow-2xl" : "h-full"}
@@ -3395,8 +3412,8 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
             </div>
           </div>
           {/* Drag handle */}
-          <div onMouseDown={startFcTutorDrag} onTouchStart={startFcTutorDrag}
-            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 touch-none transition-colors group">
+          <div ref={startFcTutorDrag.ref} onMouseDown={startFcTutorDrag}
+            className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
           {/* RIGHT: AI Tutor always open */}
@@ -3629,8 +3646,8 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             </div>
           </div>
           {/* Drag handle */}
-          <div onMouseDown={startExamTutorDrag} onTouchStart={startExamTutorDrag}
-            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 touch-none transition-colors group">
+          <div ref={startExamTutorDrag.ref} onMouseDown={startExamTutorDrag}
+            className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
           {/* RIGHT: AI Tutor always open */}
@@ -3933,8 +3950,8 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
           </div>
 
           {/* ═══ DRAG HANDLE: left ↔ lab ═══ */}
-          <div onMouseDown={startLabDrag} onTouchStart={startLabDrag}
-            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 z-10 touch-none transition-colors group">
+          <div ref={startLabDrag.ref} onMouseDown={startLabDrag}
+            className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 z-10 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
 
@@ -3942,8 +3959,8 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
           <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))] overflow-hidden shrink-0"
             style={{ width: labW }}>
             {/* Lab header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0 cursor-grab select-none"
-              onMouseDown={startLabDrag} onTouchStart={startLabDrag}>
+            <div ref={startLabDrag.ref} className="flex items-center gap-2 px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0 cursor-grab select-none touch-none"
+              onMouseDown={startLabDrag}>
               <Thermometer size={15} className="text-[var(--accent)] shrink-0" />
               <span className="text-sm font-black uppercase tracking-widest text-[var(--accent)]">Laboratory Results</span>
               <GripVertical size={13} className="ml-auto opacity-20" />
@@ -3995,8 +4012,8 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
           </div>
 
           {/* ═══ DRAG HANDLE: lab ↔ tutor ═══ */}
-          <div onMouseDown={startTutorDrag} onTouchStart={startTutorDrag}
-            className="hidden lg:flex w-1.5 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/40 shrink-0 z-10 touch-none transition-colors group">
+          <div ref={startTutorDrag.ref} onMouseDown={startTutorDrag}
+            className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 z-10 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
 
@@ -6342,8 +6359,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         {/* AI STUDIO PANEL — reference: fixed right sidebar with deep blur */}
         {showReader && rpOpen && (
           <>
-            <div onMouseDown={startRpDrag} onTouchStart={startRpDrag}
-              className="hidden lg:flex w-2 cursor-col-resize items-center justify-center shrink-0 z-[120] touch-none transition-colors group"
+            <div ref={startRpDrag.ref} onMouseDown={startRpDrag}
+              className="hidden lg:flex w-5 cursor-col-resize items-center justify-center shrink-0 z-[120] touch-none transition-colors group"
               style={{ background: 'rgba(255,255,255,0.03)' }}>
               <div className="w-1.5 h-16 rounded-full transition-all"
                 style={{ background: 'rgba(255,255,255,0.15)' }} />
