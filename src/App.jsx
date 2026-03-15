@@ -439,7 +439,7 @@ const extractUniversal = async (file, onProgress) => {
  * @param {boolean} expectJson  — appends a strict "return only JSON" instruction
  * @param {boolean} strictMode  — tells the model to cite only the document text
  */
-const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens = 8000) => {
+const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens = 5120) => {
   const { provider = 'anthropic', apiKey = '', baseUrl = '', model = '' } = settings;
   const sys = `CRITICAL INSTRUCTION: You are an expert AI that generates EXCLUSIVELY from the provided PDF/document content below. You must NEVER use outside knowledge, general facts, or information not present in the document. Every question, answer, explanation, and vignette must be directly traceable to the document text. If a concept is not in the document, do not include it. Generate long, detailed, comprehensive content — questions should be multi-sentence with rich clinical/academic context. Explanations must be thorough (3-5 sentences minimum). ${strictMode ? 'STRICT MODE: Cite [Page X] for every single item.' : 'Always reference the source material explicitly.'}\n\nMEDICINE RULE — CRITICAL: Whenever any explanation, answer, flashcard, exam question, or clinical case involves a medication or drug, you MUST begin that explanation/answer/description by stating the brand name first, followed by the generic name in parentheses. Example: "Tylenol (acetaminophen)" or "Lipitor (atorvastatin)". If only the generic name is mentioned in the document, look it up from pharmacological knowledge and always present as: "BrandName (generic name) — [explanation]". This rule applies to ALL content types: flashcards, exams, clinical cases, summaries, and chat responses.`;
   const jsonSuffix = expectJson ? '\n\nRETURN ONLY RAW JSON. No markdown. No explanation. No backticks.' : '';
@@ -450,7 +450,7 @@ const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens =
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'x-api-key': apiKey } : {}) },
       body: JSON.stringify({
-        model: model || 'claude-sonnet-4-20250514', max_tokens: Math.min(maxTokens, 8192),
+        model: model || 'claude-haiku-4-20250514', max_tokens: Math.min(maxTokens, 8192),
         system: sys, messages: [{ role: 'user', content: finalPrompt }]
       })
     });
@@ -459,7 +459,7 @@ const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens =
   }
   if (provider === 'gemini') {
     if (!apiKey) throw new Error('Gemini API key required.');
-    const mdl = model || 'gemini-2.0-flash';
+    const mdl = model || 'gemini-2.0-flash-lite';
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${mdl}:generateContent?key=${apiKey}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -5115,7 +5115,7 @@ function App() {
       const diff = params.difficultyLevel || 'Expert';
       const targetLang = params.targetLang || 'Spanish';
 
-      const batchSize = taskType === 'cases' ? 5 : taskType === 'flashcards' ? 30 : 15;
+      const batchSize = taskType === 'cases' ? 8 : taskType === 'flashcards' ? 50 : 25;
       const isBatch = ['flashcards', 'exam', 'cases'].includes(taskType);
       const numBatches = isBatch ? Math.ceil(count / batchSize) : 1;
       setBgTask(p => ({ ...p, total: numBatches, msg: `Launching ${numBatches} parallel AI requests…` }));
@@ -5210,11 +5210,12 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
       const tasks = isBatch ? Array.from({ length: numBatches }, (_, i) => {
         // Exact batch size: last batch gets remainder, all others get batchSize
         const bc = i === numBatches - 1 ? (count % batchSize === 0 ? batchSize : count % batchSize) : batchSize;
-        return () => callAI(makePrompt(bc), isJson, settings.strictMode, settings, 8000);
-      }) : [() => callAI(makePrompt(count), isJson, settings.strictMode, settings, 8000)];
+        return () => callAI(makePrompt(bc), isJson, settings.strictMode, settings, 5120);
+      }) : [() => callAI(makePrompt(count), isJson, settings.strictMode, settings, 5120)];
 
       let all = [];
-      const exRes = await runParallel(tasks, 50, (done, total) => {
+      // Fire ALL batches simultaneously — no concurrency cap for maximum speed
+      const exRes = await runParallel(tasks, 999, (done, total) => {
         setBgTask(p => ({ ...p, done, msg: `${done}/${total} batches complete…` }));
       });
 
@@ -5536,6 +5537,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           display:flex; flex:1; min-height:0; overflow:hidden;
           margin-top:0;
         }
+        @media(min-width:1024px){ .design-body { margin-top:var(--header-h); } }
 
         .design-main {
           flex:1; display:flex; flex-direction:column;
@@ -5957,10 +5959,12 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           }
         }
         .design-body{display:flex;flex:1;min-height:0;overflow:hidden;margin-top:0;}
+        /* Desktop: body starts below the slim fixed header */
+        @media(min-width:1024px){.design-body{margin-top:var(--header-h);}}
         /* Mobile padding-top clears the floating pill (~80px) */
         .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(var(--header-h) + 52px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
-        /* Desktop: only clear the slim bar */
-        @media(min-width:1024px){.design-main{padding-top:calc(var(--header-h) + 20px)!important;padding-bottom:0!important;}}
+        /* Desktop: just a small top gap since body already clears header */
+        @media(min-width:1024px){.design-main{padding-top:20px!important;padding-bottom:0!important;}}
 
         /* ══ FLOATING PILL HEADER — iOS 26 / mobile ══ */
         .mariam-pill-nav{
