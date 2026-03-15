@@ -5122,10 +5122,73 @@ function App() {
 
       const MEDICINE_RULE_GEN = `\n\nMEDICINE RULE — MANDATORY: For every medication/drug, ALWAYS write brand name first then generic in parentheses. e.g. "Lasix (furosemide)", "Tylenol (acetaminophen)". Apply to ALL items.`;
 
+      // Rotating style seeds to guarantee varied generation every time
+      const styleSeed = Math.floor(Math.random() * 1000);
+      const questionStyles = [
+        'single-best-answer (SBA)', 'negative lead ("Which is NOT…")', 'EXCEPT format',
+        'ranked-order (what to do FIRST/NEXT)', 'cause-and-effect mechanism',
+        'interpretation of lab/imaging findings', 'clinical vignette with 3-sentence stem',
+        'pharmacology mechanism of action', 'pathophysiology explanation',
+        'complication or adverse-effect identification', 'diagnosis vs differential',
+        'management/treatment decision', 'dosing or monitoring question',
+        'prognostic or risk-factor question', 'applied ethics or consent scenario',
+        'data/stat interpretation', 'comparison between two conditions',
+        'multi-step reasoning (2+ logical hops required)', 'chart/table interpretation',
+        'extended matching (one answer from large option list)'
+      ];
+      const pickStyles = (n) => {
+        const s = [...questionStyles];
+        const out = [];
+        for (let i = 0; i < n; i++) out.push(s[i % s.length]);
+        // shuffle deterministically using styleSeed
+        for (let i = out.length - 1; i > 0; i--) {
+          const j = (styleSeed + i * 37) % (i + 1);
+          [out[i], out[j]] = [out[j], out[i]];
+        }
+        return out;
+      };
+
+      const flashcardVariants = [
+        'concept-definition', 'fill-in-the-blank mechanism',
+        'comparison (A vs B)', 'clinical pearl / high-yield fact',
+        'cause → effect chain', 'drug/dose/monitoring', 'mnemonic-based recall',
+        'pathophysiology step', 'diagnostic criteria', 'complication/adverse effect'
+      ];
+      const pickFCVariants = (n) => {
+        const s = [...flashcardVariants];
+        const out = [];
+        for (let i = 0; i < n; i++) out.push(s[i % s.length]);
+        for (let i = out.length - 1; i > 0; i--) {
+          const j = (styleSeed + i * 53) % (i + 1);
+          [out[i], out[j]] = [out[j], out[i]];
+        }
+        return out;
+      };
+
       const makePrompt = (bc) => {
-        const base = `Difficulty: ${diff}. USE ONLY provided text.${MEDICINE_RULE_GEN}\nDOCUMENT:\n${textContext}`;
-        if (taskType === 'flashcards') return `${base}\nYOU MUST generate EXACTLY ${bc} expert flashcards — count carefully, the "items" array must have EXACTLY ${bc} entries.\nJSON: {"items":[{"q":"...","a":"...","evidence":"...","sourcePage":1}]}`;
-        if (taskType === 'exam') return `${base}\nYOU MUST generate EXACTLY ${bc} exam questions — count carefully, the "items" array must have EXACTLY ${bc} entries.\nJSON: {"items":[{"q":"...","options":["A","B","C","D"],"correct":0,"explanation":"...","evidence":"...","sourcePage":1}]}`;
+        const base = `Difficulty: ${diff}. Seed: ${styleSeed}. USE ONLY provided text.${MEDICINE_RULE_GEN}\nDOCUMENT:\n${textContext}`;
+        const styles = pickStyles(bc).join(', ');
+        const fcVariants = pickFCVariants(bc).join(', ');
+        if (taskType === 'flashcards') return `${base}\nGenerate EXACTLY ${bc} expert-level flashcards from the document.
+IMPORTANT VARIETY RULES:
+- Use these card types in order (cycle if needed): ${fcVariants}
+- NO two consecutive cards may test the same concept or use the same sentence structure
+- Questions must vary in phrasing: definition, mechanism, cause→effect, comparison, clinical application, adverse effect, diagnosis criteria
+- Answers must be substantive (2-5 sentences), not one-word
+- Include evidence quote from the exact source text
+- Items array MUST contain EXACTLY ${bc} entries — count carefully
+JSON: {"items":[{"q":"...","a":"...","evidence":"...","sourcePage":1}]}`;
+        if (taskType === 'exam') return `${base}\nGenerate EXACTLY ${bc} exam questions from the document.
+CRITICAL RULES FOR MAXIMUM VARIETY AND DEPTH:
+- Use THESE specific question styles in order: ${styles}
+- Each question MUST test a DIFFERENT concept — no overlap allowed
+- Difficulty must be ${diff}: require multi-step reasoning, clinical application, or mechanism understanding — NOT simple recall
+- Distractors must be clinically plausible (not obviously wrong)
+- Wrong answers need brief explanations in the main explanation field
+- Explanation must be 3-5 sentences: correct reasoning + why distractors are wrong
+- NO two questions may start with the same first 5 words
+- items array MUST contain EXACTLY ${bc} entries
+JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"...","evidence":"...","sourcePage":1}]}`;
         if (taskType === 'cases') return `${base}\nGenerate exactly ${bc} richly detailed clinical cases from ONLY the document content. EACH case MUST have:\n- vignette: 6-10 sentences with demographics, chief complaint, HPI, PMH, meds, vitals, physical exam\n- labPanels: MINIMUM 3 panels (CBC, BMP, LFTs, others) with 5+ rows each (12-20 total lab values), flag abnormals H/L\n- examQuestion with 5 answer options (A-E), long stem, thorough explanation\nThe "cases" array MUST contain EXACTLY ${bc} entries.\nJSON ONLY: {"cases":[{"title":"descriptive title","vignette":"6-10 sentence detailed vignette","diagnosis":"specific ICD diagnosis","labPanels":[{"panelName":"COMPLETE BLOOD COUNT","rows":[{"test":"WBC","result":"15.2","flag":"H","range":"4.5-11.0","units":"K/uL"},{"test":"Hemoglobin","result":"11.5","flag":"L","range":"12.0-16.0","units":"g/dL"},{"test":"Hematocrit","result":"34.5","flag":"L","range":"36-46","units":"%"},{"test":"Platelets","result":"250","flag":"","range":"150-400","units":"K/uL"},{"test":"MCV","result":"80","flag":"","range":"80-100","units":"fL"},{"test":"Neutrophils","result":"85","flag":"H","range":"50-70","units":"%"}]},{"panelName":"BASIC METABOLIC PANEL","rows":[{"test":"Na","result":"138","flag":"","range":"135-145","units":"mEq/L"},{"test":"K","result":"3.2","flag":"L","range":"3.5-5.0","units":"mEq/L"},{"test":"Cl","result":"100","flag":"","range":"98-107","units":"mEq/L"},{"test":"CO2","result":"24","flag":"","range":"22-28","units":"mEq/L"},{"test":"BUN","result":"28","flag":"H","range":"7-20","units":"mg/dL"},{"test":"Creatinine","result":"1.5","flag":"H","range":"0.6-1.2","units":"mg/dL"}]},{"panelName":"LIVER FUNCTION TESTS","rows":[{"test":"AST","result":"150","flag":"H","range":"10-40","units":"U/L"},{"test":"ALT","result":"175","flag":"H","range":"7-56","units":"U/L"},{"test":"ALP","result":"90","flag":"","range":"44-147","units":"U/L"},{"test":"Total Bilirubin","result":"1.2","flag":"","range":"0.1-1.2","units":"mg/dL"},{"test":"Albumin","result":"3.0","flag":"L","range":"3.5-5.0","units":"g/dL"}]}],"examQuestion":{"q":"Detailed 2-3 sentence question stem about the case","options":["A) specific option","B) specific option","C) specific option","D) specific option","E) specific option"],"correct":0,"explanation":"Thorough 4-5 sentence explanation","evidence":"document quote","sourcePage":1}}]}`;
         if (taskType === 'mindmap') return `${base}\nCreate a comprehensive mind map.\nJSON: {"topic":"Central Topic","branches":[{"label":"Branch Name","subtopics":["sub1","sub2","sub3"]}]}`;
         if (taskType === 'concepts') return `${base}\nExtract key concepts with definitions.\nJSON: {"items":[{"concept":"...","definition":"...","example":"...","sourcePage":1}]}`;
@@ -5448,7 +5511,7 @@ function App() {
           --info:#0ea5e9;    --info-bg:rgba(14,165,233,.08);   --info-border:rgba(14,165,233,.25);
           --lab-high:#ef4444; --lab-low:#3b82f6; --lab-critical:#dc2626;
           --nav-h-actual: 72px;
-          --header-h: 48px;
+          --header-h: 54px;
           --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-2xl:24px; --radius-3xl:32px;
           --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
           --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -5735,7 +5798,7 @@ function App() {
           --warning:#f59e0b;--warning-bg:rgba(245,158,11,.08);--warning-border:rgba(245,158,11,.25);
           --info:#0ea5e9;--info-bg:rgba(14,165,233,.08);--info-border:rgba(14,165,233,.25);
           --lab-high:#ef4444;--lab-low:#3b82f6;--lab-critical:#dc2626;
-          --header-h:48px;--nav-h-actual:72px;
+          --header-h:54px;--nav-h-actual:72px;
           --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-2xl:24px;--radius-3xl:32px;
           --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
           --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -6293,11 +6356,11 @@ function App() {
                   </div>
                   <div>
                     <span className="font-bold text-[15px] block" style={{ color: 'var(--text)' }}>AI Studio</span>
-                    <span className="text-[11px] opacity-50 block mt-0.5">
-                      {view === 'flashcards' ? 'Explaining current card' :
+                    <span className="text-[11px] opacity-50 block mt-0.5 truncate max-w-[180px]" title={activeDoc?.name}>
+                      {activeDoc ? `📄 ${activeDoc.name.length > 26 ? activeDoc.name.slice(0,26)+'…' : activeDoc.name}` :
+                       view === 'flashcards' ? 'Explaining current card' :
                        view === 'exams' ? 'Helping with question' :
-                       view === 'cases' ? 'Analyzing case' :
-                       activeDoc ? activeDoc.name.slice(0, 28) : 'No document open'}
+                       view === 'cases' ? 'Analyzing case' : 'No document open'}
                     </span>
                   </div>
                 </div>
