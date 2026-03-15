@@ -4844,8 +4844,7 @@ const NAV_ITEMS = [
 
 // Secondary views reachable from the "More" drawer
 const MORE_ITEMS = [
-  { icon: BookOpen,      label: 'Library',   v: 'library' },
-  { icon: Layers,        label: 'Flashcards',v: 'flashcards' },
+  { icon: Layers,        label: 'Cards',     v: 'flashcards' },
   { icon: CheckSquare,   label: 'Exams',     v: 'exams' },
   { icon: Activity,      label: 'Cases',     v: 'cases' },
   { icon: Brain,         label: 'Graph',     v: 'knowledge' },
@@ -5954,6 +5953,14 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           transition:background .3s ease,box-shadow .3s ease,backdrop-filter .3s ease;
         }
         .design-header > *{pointer-events:auto;}
+        /* Mobile: hide the floating pill header entirely — bottom nav is the only nav */
+        @media(max-width:1023px){
+          .design-header{display:none!important;}
+        }
+        /* Force-hide tab pills on mobile even though CSS specificity battle with Tailwind hidden */
+        @media(max-width:1023px){
+          .mariam-tab-pills{display:none!important;}
+        }
         /* Desktop: Apple-style slim full-width glass bar (always on) */
         @media(min-width:1024px){
           .design-header{
@@ -5978,8 +5985,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .design-body{display:flex;flex:1;min-height:0;overflow:hidden;margin-top:0;}
         /* Desktop: body starts below the slim fixed header */
         @media(min-width:1024px){.design-body{margin-top:var(--header-h);}}
-        /* Mobile padding-top clears the floating pill (~80px) */
-        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(var(--header-h) + 52px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
+        /* Mobile: no header → start at safe area, leave space for floating bottom pill */
+        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:max(env(safe-area-inset-top),12px);padding-bottom:calc(120px + env(safe-area-inset-bottom));}
         /* Desktop: just a small top gap since body already clears header */
         @media(min-width:1024px){.design-main{padding-top:20px!important;padding-bottom:0!important;}}
 
@@ -6092,9 +6099,9 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .dark .design-nav-btn,.midnight .design-nav-btn,.oled .design-nav-btn,.slate .design-nav-btn{color:rgba(255,255,255,0.5);}
         .pure-white .design-nav-btn,.light .design-nav-btn,.warm .design-nav-btn,.rose .design-nav-btn,.forest .design-nav-btn{color:#94a3b8;}
         .design-nav-btn:active{transform:scale(.93);}
-        .design-nav-btn.active{opacity:1;color:#3b82f6;}
+        .design-nav-btn.active{opacity:1;color:var(--accent);}
         .dark .design-nav-btn.active,.midnight .design-nav-btn.active,.oled .design-nav-btn.active,.slate .design-nav-btn.active{background:rgba(255,255,255,0.08);}
-        .pure-white .design-nav-btn.active,.light .design-nav-btn.active,.warm .design-nav-btn.active,.rose .design-nav-btn.active,.forest .design-nav-btn.active{background:rgba(0,0,0,0.04);}
+        .pure-white .design-nav-btn.active,.light .design-nav-btn.active,.warm .design-nav-btn.active,.rose .design-nav-btn.active,.forest .design-nav-btn.active{background:rgba(var(--acc-rgb,59,130,246),0.08);}
         .design-nav-btn:disabled{opacity:.2;cursor:not-allowed;}
         .design-nav-label{font-size:11px;font-weight:600;letter-spacing:.01em;line-height:1;}
 
@@ -6466,15 +6473,31 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
 
         {/* More drawer — slides up above nav */}
         {moreOpen && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 px-4 animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="glass rounded-2xl p-3 shadow-2xl" style={{ border: '1px solid var(--border2,var(--border))' }}>
-              <div className="grid grid-cols-4 gap-2">
+          <div className="absolute bottom-full left-0 right-0 mb-3 px-3 animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="rounded-3xl p-3 shadow-2xl" style={{ border: '1px solid var(--border2,var(--border))', background: 'var(--nav-bg)', backdropFilter: 'saturate(180%) blur(60px)', WebkitBackdropFilter: 'saturate(180%) blur(60px)' }}>
+              {/* Quick action strip */}
+              <div className="flex gap-2 mb-3">
+                <button onClick={() => { setShowGlobalSearch(true); setMoreOpen(false); }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95"
+                  style={{ background: 'rgba(var(--acc-rgb,59,130,246),.1)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,59,130,246),.2)' }}>
+                  <Search size={16} />
+                  <span>Search</span>
+                </button>
+                <button onClick={() => { setRpOpen(p => !p); setMoreOpen(false); }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95"
+                  style={{ background: rpOpen ? 'rgba(var(--acc-rgb,59,130,246),.18)' : 'rgba(var(--acc-rgb,59,130,246),.1)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,59,130,246),.2)' }}>
+                  <Sparkles size={16} />
+                  <span>AI Studio</span>
+                </button>
+              </div>
+              {/* Nav grid — 3 columns, bigger touch targets */}
+              <div className="grid grid-cols-3 gap-2">
                 {MORE_ITEMS.map(({ icon: Icon, label, v }) => (
                   <button key={v} onClick={() => { setView(v); setMoreOpen(false); }}
-                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all hover:bg-[var(--accent)]/8 active:scale-95"
-                    style={{ color: view === v ? 'var(--accent)' : 'var(--text3)', background: view === v ? 'var(--accent)/10' : 'transparent' }}>
-                    <Icon size={20} strokeWidth={view === v ? 2.5 : 1.8} />
-                    <span className="text-[10px] font-black uppercase tracking-wider leading-none">{label}</span>
+                    className="flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all active:scale-95"
+                    style={{ color: view === v ? 'var(--accent)' : 'var(--text3)', background: view === v ? 'rgba(var(--acc-rgb,59,130,246),.12)' : 'transparent' }}>
+                    <Icon size={22} strokeWidth={view === v ? 2.5 : 1.8} />
+                    <span className="text-[11px] font-bold leading-none">{label}</span>
                   </button>
                 ))}
               </div>
