@@ -6056,14 +6056,13 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .dark .mariam-tab-pill.active,.midnight .mariam-tab-pill.active,.oled .mariam-tab-pill.active,.slate .mariam-tab-pill.active{color:#fff!important;background:rgba(255,255,255,0.1);}
         .pure-white .mariam-tab-pill.active,.light .mariam-tab-pill.active,.warm .mariam-tab-pill.active,.rose .mariam-tab-pill.active,.forest .mariam-tab-pill.active{color:#000!important;background:rgba(0,0,0,0.06);}
 
-        /* ══ MOBILE FLOATING PILL NAV — exact reference: bottom-6 left-4 right-4 rounded-[2.5rem] ══ */
+        /* ══ MOBILE FLOATING PILL NAV ══ */
         .design-nav{
           position:fixed;
-          bottom:24px;left:16px;right:16px;
+          bottom:24px;left:8px;right:8px;
           height:auto;
           display:flex;align-items:center;justify-content:center;
           z-index:200;overflow:visible;
-          /* no background on the outer element — it's on the inner pill */
           background:transparent;border:none;
         }
         @media (min-width:1024px){
@@ -6071,9 +6070,9 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         }
         .design-nav.keyboard-open-hidden{transform:translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
         .design-nav-inner{
-          display:flex;align-items:center;justify-content:center;
-          width:100%;padding:6px;
-          gap:2px;
+          display:flex;align-items:center;justify-content:space-evenly;
+          width:100%;padding:5px;
+          gap:0;
           border-radius:2.5rem;
           backdrop-filter:saturate(150%) blur(100px);
           -webkit-backdrop-filter:saturate(150%) blur(100px);
@@ -6090,12 +6089,12 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           box-shadow:0 20px 50px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,1);
         }
         .design-nav-btn{
-          flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-          gap:2px;padding:5px 2px;border-radius:1.6rem;
+          flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:2px;padding:5px 1px;border-radius:1.6rem;
           border:none;background:transparent;cursor:pointer;
           opacity:.5;
           transition:all .4s cubic-bezier(.16,1,.3,1);
-          min-height:56px;min-width:44px;max-width:62px;position:relative;
+          min-height:56px;position:relative;
         }
         .dark .design-nav-btn,.midnight .design-nav-btn,.oled .design-nav-btn,.slate .design-nav-btn{color:rgba(255,255,255,0.5);}
         .pure-white .design-nav-btn,.light .design-nav-btn,.warm .design-nav-btn,.rose .design-nav-btn,.forest .design-nav-btn{color:#94a3b8;}
@@ -6104,7 +6103,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .dark .design-nav-btn.active,.midnight .design-nav-btn.active,.oled .design-nav-btn.active,.slate .design-nav-btn.active{background:rgba(255,255,255,0.08);}
         .pure-white .design-nav-btn.active,.light .design-nav-btn.active,.warm .design-nav-btn.active,.rose .design-nav-btn.active,.forest .design-nav-btn.active{background:rgba(var(--acc-rgb,59,130,246),0.08);}
         .design-nav-btn:disabled{opacity:.2;cursor:not-allowed;}
-        .design-nav-label{font-size:10px;font-weight:600;letter-spacing:.01em;line-height:1;}
+        .design-nav-label{font-size:9px;font-weight:700;letter-spacing:.005em;line-height:1;}
 
         /* ══ SIDEBAR ══ */
         .sidebar-nav{background:var(--sidebar-bg);border-right:1px solid var(--border);}
