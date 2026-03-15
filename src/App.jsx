@@ -5448,7 +5448,7 @@ function App() {
           --info:#0ea5e9;    --info-bg:rgba(14,165,233,.08);   --info-border:rgba(14,165,233,.25);
           --lab-high:#ef4444; --lab-low:#3b82f6; --lab-critical:#dc2626;
           --nav-h-actual: 72px;
-          --header-h: 56px;
+          --header-h: 48px;
           --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-2xl:24px; --radius-3xl:32px;
           --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
           --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -5458,25 +5458,20 @@ function App() {
 
         /* ══ DESIGN SYSTEM — layout shells ══ */
         .design-top-glass {
-          position:fixed; top:0; left:0; right:0; height:var(--header-h);
-          background:var(--nav-bg); backdrop-filter:saturate(180%) blur(24px);
-          -webkit-backdrop-filter:saturate(180%) blur(24px);
-          border-bottom:1px solid var(--border2,var(--border));
-          z-index:100; pointer-events:none;
+          display:none;
         }
 
         .design-header {
           position:fixed; top:0; left:0; right:0;
-          height:var(--header-h);
-          display:flex; align-items:center; justify-content:space-between;
-          padding:0 16px;
-          padding-top:env(safe-area-inset-top);
-          z-index:101;
+          display:flex; align-items:flex-start; justify-content:center;
+          padding-top:max(env(safe-area-inset-top),16px);
+          padding-left:12px; padding-right:12px;
+          z-index:101; pointer-events:none;
         }
 
         .design-body {
           display:flex; flex:1; min-height:0; overflow:hidden;
-          margin-top:var(--header-h);
+          margin-top:0;
         }
 
         .design-main {
@@ -5740,7 +5735,7 @@ function App() {
           --warning:#f59e0b;--warning-bg:rgba(245,158,11,.08);--warning-border:rgba(245,158,11,.25);
           --info:#0ea5e9;--info-bg:rgba(14,165,233,.08);--info-border:rgba(14,165,233,.25);
           --lab-high:#ef4444;--lab-low:#3b82f6;--lab-critical:#dc2626;
-          --header-h:56px;--nav-h-actual:72px;
+          --header-h:48px;--nav-h-actual:72px;
           --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-2xl:24px;--radius-3xl:32px;
           --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
           --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
@@ -5865,42 +5860,73 @@ function App() {
         .skeleton-line{height:14px;border-radius:7px;margin-bottom:8px;}
         .skeleton-line:last-child{width:60%;margin-bottom:0;}
 
-        /* ══ LAYOUT SHELLS — floating pill header, full-screen body ══ */
-        .design-top-glass{display:none;} /* replaced by floating pill nav */
+        /* ══ LAYOUT SHELLS ══ */
+        .design-top-glass{display:none;}
+        /* Mobile: floating pill header */
         .design-header{
           position:fixed;top:0;left:0;right:0;z-index:101;
           display:flex;align-items:flex-start;justify-content:center;
-          padding-top:max(env(safe-area-inset-top),24px);
-          padding-left:16px;padding-right:16px;
+          padding-top:max(env(safe-area-inset-top),16px);
+          padding-left:12px;padding-right:12px;
           pointer-events:none;
-          transition:padding-top .3s ease;
+          transition:background .3s ease,box-shadow .3s ease,backdrop-filter .3s ease;
         }
         .design-header > *{pointer-events:auto;}
+        /* Desktop: Apple-style slim full-width glass bar (always on) */
+        @media(min-width:1024px){
+          .design-header{
+            padding-top:env(safe-area-inset-top,0px);
+            padding-left:28px;padding-right:28px;
+            height:var(--header-h);
+            align-items:center;
+            backdrop-filter:saturate(180%) blur(24px);
+            -webkit-backdrop-filter:saturate(180%) blur(24px);
+          }
+          .dark .design-header,.midnight .design-header,.oled .design-header,.slate .design-header{
+            background:rgba(10,10,20,0.72);
+            border-bottom:1px solid rgba(255,255,255,0.07);
+            box-shadow:0 1px 0 rgba(255,255,255,0.04);
+          }
+          .pure-white .design-header,.light .design-header,.warm .design-header,.rose .design-header,.forest .design-header{
+            background:rgba(255,255,255,0.78);
+            border-bottom:1px solid rgba(0,0,0,0.06);
+            box-shadow:0 1px 0 rgba(255,255,255,0.9);
+          }
+        }
         .design-body{display:flex;flex:1;min-height:0;overflow:hidden;margin-top:0;}
-        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(var(--header-h) + 48px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
-        @media(min-width:1024px){.design-main{padding-bottom:0!important;}}
+        /* Mobile padding-top clears the floating pill (~80px) */
+        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(var(--header-h) + 52px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
+        /* Desktop: only clear the slim bar */
+        @media(min-width:1024px){.design-main{padding-top:calc(var(--header-h) + 20px)!important;padding-bottom:0!important;}}
 
-        /* ══ FLOATING PILL HEADER — iOS 26 reference exact ══ */
+        /* ══ FLOATING PILL HEADER — iOS 26 / mobile ══ */
         .mariam-pill-nav{
-          width:100%;max-width:1200px;
+          width:100%;max-width:680px;
           display:flex;align-items:center;justify-content:space-between;
-          transition:all .5s cubic-bezier(.16,1,.3,1);
-          border-radius:9999px;padding:8px 8px 8px 16px;
+          transition:all .45s cubic-bezier(.16,1,.3,1);
+          border-radius:9999px;padding:6px 6px 6px 14px;
         }
         .mariam-pill-nav.scrolled{
-          padding:6px 6px 6px 20px;
-          backdrop-filter:saturate(150%) blur(100px);
-          -webkit-backdrop-filter:saturate(150%) blur(100px);
+          padding:5px 5px 5px 16px;
+          backdrop-filter:saturate(180%) blur(80px);
+          -webkit-backdrop-filter:saturate(180%) blur(80px);
         }
-        /* dark scrolled */
         .dark .mariam-pill-nav.scrolled,.midnight .mariam-pill-nav.scrolled,.oled .mariam-pill-nav.scrolled,.slate .mariam-pill-nav.scrolled{
-          background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.15);
-          box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.1);
+          background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);
+          box-shadow:0 12px 48px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
         }
-        /* light scrolled */
         .pure-white .mariam-pill-nav.scrolled,.light .mariam-pill-nav.scrolled,.warm .mariam-pill-nav.scrolled,.rose .mariam-pill-nav.scrolled,.forest .mariam-pill-nav.scrolled{
-          background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);
-          box-shadow:0 8px 32px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,1);
+          background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.95);
+          box-shadow:0 8px 40px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,1);
+        }
+        /* Desktop: full-width flat — pill appearance replaced by the glass bar */
+        @media(min-width:1024px){
+          .mariam-pill-nav,.mariam-pill-nav.scrolled{
+            max-width:none;border-radius:0;padding:0;
+            backdrop-filter:none;-webkit-backdrop-filter:none;
+            background:transparent!important;border:none!important;box-shadow:none!important;
+            height:100%;align-items:center;
+          }
         }
 
         /* ── Tab pills container ── */
@@ -5915,18 +5941,29 @@ function App() {
           background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);
           box-shadow:inset 0 1px 3px rgba(0,0,0,.04);
         }
-        .mariam-tab-pill{
-          padding:8px 20px;border-radius:9999px;font-size:14px;font-weight:500;
-          border:none;background:transparent;cursor:pointer;
-          transition:all .3s cubic-bezier(.16,1,.3,1);white-space:nowrap;
+        /* Desktop: remove pill bg from tabs container — just spaced flat links like Apple */
+        @media(min-width:1024px){
+          .mariam-tab-pills{
+            background:transparent!important;border:none!important;box-shadow:none!important;
+            backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+            padding:0;gap:0;
+          }
         }
-        .dark .mariam-tab-pill,.midnight .mariam-tab-pill,.oled .mariam-tab-pill,.slate .mariam-tab-pill{color:rgba(255,255,255,0.7);}
-        .pure-white .mariam-tab-pill,.light .mariam-tab-pill,.warm .mariam-tab-pill,.rose .mariam-tab-pill,.forest .mariam-tab-pill{color:#475569;}
-        .dark .mariam-tab-pill:hover,.midnight .mariam-tab-pill:hover,.oled .mariam-tab-pill:hover,.slate .mariam-tab-pill:hover{color:#fff;background:rgba(255,255,255,0.08);}
-        .pure-white .mariam-tab-pill:hover,.light .mariam-tab-pill:hover,.warm .mariam-tab-pill:hover{color:#0f172a;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.05);}
-        .mariam-tab-pill.active{color:var(--text)!important;box-shadow:0 2px 8px rgba(0,0,0,.12);}
-        .dark .mariam-tab-pill.active,.midnight .mariam-tab-pill.active,.oled .mariam-tab-pill.active,.slate .mariam-tab-pill.active{background:rgba(255,255,255,0.1);}
-        .pure-white .mariam-tab-pill.active,.light .mariam-tab-pill.active,.warm .mariam-tab-pill.active,.rose .mariam-tab-pill.active,.forest .mariam-tab-pill.active{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+        .mariam-tab-pill{
+          padding:8px 18px;border-radius:9999px;font-size:13px;font-weight:500;letter-spacing:-.01em;
+          border:none;background:transparent;cursor:pointer;
+          transition:all .25s cubic-bezier(.16,1,.3,1);white-space:nowrap;
+        }
+        @media(min-width:1024px){
+          .mariam-tab-pill{padding:6px 14px;border-radius:8px;font-size:13px;}
+        }
+        .dark .mariam-tab-pill,.midnight .mariam-tab-pill,.oled .mariam-tab-pill,.slate .mariam-tab-pill{color:rgba(255,255,255,0.65);}
+        .pure-white .mariam-tab-pill,.light .mariam-tab-pill,.warm .mariam-tab-pill,.rose .mariam-tab-pill,.forest .mariam-tab-pill{color:rgba(0,0,0,0.55);}
+        .dark .mariam-tab-pill:hover,.midnight .mariam-tab-pill:hover,.oled .mariam-tab-pill:hover,.slate .mariam-tab-pill:hover{color:#fff;background:rgba(255,255,255,0.07);}
+        .pure-white .mariam-tab-pill:hover,.light .mariam-tab-pill:hover,.warm .mariam-tab-pill:hover,.rose .mariam-tab-pill:hover,.forest .mariam-tab-pill:hover{color:#000;background:rgba(0,0,0,0.05);}
+        .mariam-tab-pill.active{color:var(--text)!important;}
+        .dark .mariam-tab-pill.active,.midnight .mariam-tab-pill.active,.oled .mariam-tab-pill.active,.slate .mariam-tab-pill.active{color:#fff!important;background:rgba(255,255,255,0.1);}
+        .pure-white .mariam-tab-pill.active,.light .mariam-tab-pill.active,.warm .mariam-tab-pill.active,.rose .mariam-tab-pill.active,.forest .mariam-tab-pill.active{color:#000!important;background:rgba(0,0,0,0.06);}
 
         /* ══ MOBILE FLOATING PILL NAV — exact reference: bottom-6 left-4 right-4 rounded-[2.5rem] ══ */
         .design-nav{
@@ -6186,7 +6223,7 @@ function App() {
       <div className="design-body flex flex-1 min-h-0 overflow-hidden">
         {/* MAIN CONTENT */}
         <main className="design-main flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative"
-          style={{ paddingTop: 'calc(var(--header-h, 56px) + 56px)' }}
+          style={{}}
           onScroll={e => setHeaderScrolled(e.currentTarget.scrollTop > 20)}>
           {uploading && (
             <div className="absolute top-0 left-0 right-0 z-50 progress-bar" style={{ borderRadius: 0 }}>
