@@ -6071,8 +6071,9 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         }
         .design-nav.keyboard-open-hidden{transform:translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
         .design-nav-inner{
-          display:flex;align-items:center;justify-content:space-between;
-          width:100%;padding:8px;
+          display:flex;align-items:center;justify-content:center;
+          width:100%;padding:6px;
+          gap:2px;
           border-radius:2.5rem;
           backdrop-filter:saturate(150%) blur(100px);
           -webkit-backdrop-filter:saturate(150%) blur(100px);
@@ -6090,11 +6091,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         }
         .design-nav-btn{
           flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-          gap:3px;padding:6px 2px;border-radius:1.8rem;
+          gap:2px;padding:5px 2px;border-radius:1.6rem;
           border:none;background:transparent;cursor:pointer;
           opacity:.5;
           transition:all .4s cubic-bezier(.16,1,.3,1);
-          min-height:64px;position:relative;
+          min-height:56px;min-width:44px;max-width:62px;position:relative;
         }
         .dark .design-nav-btn,.midnight .design-nav-btn,.oled .design-nav-btn,.slate .design-nav-btn{color:rgba(255,255,255,0.5);}
         .pure-white .design-nav-btn,.light .design-nav-btn,.warm .design-nav-btn,.rose .design-nav-btn,.forest .design-nav-btn{color:#94a3b8;}
@@ -6103,7 +6104,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .dark .design-nav-btn.active,.midnight .design-nav-btn.active,.oled .design-nav-btn.active,.slate .design-nav-btn.active{background:rgba(255,255,255,0.08);}
         .pure-white .design-nav-btn.active,.light .design-nav-btn.active,.warm .design-nav-btn.active,.rose .design-nav-btn.active,.forest .design-nav-btn.active{background:rgba(var(--acc-rgb,59,130,246),0.08);}
         .design-nav-btn:disabled{opacity:.2;cursor:not-allowed;}
-        .design-nav-label{font-size:11px;font-weight:600;letter-spacing:.01em;line-height:1;}
+        .design-nav-label{font-size:10px;font-weight:600;letter-spacing:.01em;line-height:1;}
 
         /* ══ SIDEBAR ══ */
         .sidebar-nav{background:var(--sidebar-bg);border-right:1px solid var(--border);}
@@ -6434,76 +6435,65 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         )}
       </div>
 
-      {/* BOTTOM NAV — 4 core tabs (WCAG AAA min 44px touch targets) */}
-      <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}
-        onClick={() => moreOpen && setMoreOpen(false)}>
+      {/* BOTTOM NAV — all 7 pages visible, centered */}
+      <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}>
         <div className="design-nav-inner">
-          {/* Tab 1: Home/Library */}
-          <button onClick={() => { setMoreOpen(false); setView('library'); }}
-            className={`design-nav-btn ${['library','dashboard','reader'].includes(view) && !moreOpen ? 'active' : ''}`}
-            title="Library">
-            <LayoutDashboard size={22} strokeWidth={['library','dashboard','reader'].includes(view) && !moreOpen ? 2.5 : 2} />
+          {/* Home */}
+          <button onClick={() => setView('library')}
+            className={`design-nav-btn ${['library','dashboard','reader'].includes(view) ? 'active' : ''}`}
+            title="Home">
+            <LayoutDashboard size={20} strokeWidth={['library','dashboard','reader'].includes(view) ? 2.5 : 2} />
             <span className="design-nav-label">Home</span>
           </button>
 
-          {/* Tab 2: Smart Study — hub for cards/exams/cases */}
-          <button onClick={() => { setMoreOpen(false); setView('study'); }}
-            className={`design-nav-btn ${['study','flashcards','exams','cases','knowledge','analytics'].includes(view) && !moreOpen ? 'active' : ''}`}
+          {/* Study */}
+          <button onClick={() => setView('study')}
+            className={`design-nav-btn ${view === 'study' ? 'active' : ''}`}
             title="Study">
-            <GraduationCap size={22} strokeWidth={['study','flashcards','exams','cases','knowledge','analytics'].includes(view) && !moreOpen ? 2.5 : 2} />
+            <GraduationCap size={20} strokeWidth={view === 'study' ? 2.5 : 2} />
             <span className="design-nav-label">Study</span>
           </button>
 
-          {/* Tab 3: AI Tutor / Chat */}
-          <button onClick={() => { setMoreOpen(false); setView('chat'); }}
-            className={`design-nav-btn ${view === 'chat' && !moreOpen ? 'active' : ''}`}
+          {/* Cards */}
+          <button onClick={() => setView('flashcards')}
+            className={`design-nav-btn ${view === 'flashcards' ? 'active' : ''}`}
+            title="Flashcards">
+            <Layers size={20} strokeWidth={view === 'flashcards' ? 2.5 : 2} />
+            <span className="design-nav-label">Cards</span>
+          </button>
+
+          {/* Exams */}
+          <button onClick={() => setView('exams')}
+            className={`design-nav-btn ${view === 'exams' ? 'active' : ''}`}
+            title="Exams">
+            <CheckSquare size={20} strokeWidth={view === 'exams' ? 2.5 : 2} />
+            <span className="design-nav-label">Exams</span>
+          </button>
+
+          {/* Cases */}
+          <button onClick={() => setView('cases')}
+            className={`design-nav-btn ${view === 'cases' ? 'active' : ''}`}
+            title="Cases">
+            <Activity size={20} strokeWidth={view === 'cases' ? 2.5 : 2} />
+            <span className="design-nav-label">Cases</span>
+          </button>
+
+          {/* Tutor */}
+          <button onClick={() => setView('chat')}
+            className={`design-nav-btn ${view === 'chat' ? 'active' : ''}`}
             title="AI Tutor">
-            <MessageSquare size={22} strokeWidth={view === 'chat' && !moreOpen ? 2.5 : 2} />
+            <MessageSquare size={20} strokeWidth={view === 'chat' ? 2.5 : 2} />
             <span className="design-nav-label">Tutor</span>
           </button>
 
-          {/* Tab 4: More — opens drawer */}
-          <button onClick={e => { e.stopPropagation(); setMoreOpen(p => !p); }}
-            className={`design-nav-btn ${moreOpen || view === 'settings' ? 'active' : ''}`}
-            title="More">
-            <Grid size={22} strokeWidth={moreOpen || view === 'settings' ? 2.5 : 2} />
-            <span className="design-nav-label">More</span>
+          {/* Settings */}
+          <button onClick={() => setView('settings')}
+            className={`design-nav-btn ${view === 'settings' ? 'active' : ''}`}
+            title="Settings">
+            <Settings size={20} strokeWidth={view === 'settings' ? 2.5 : 2} />
+            <span className="design-nav-label">Settings</span>
           </button>
         </div>
-
-        {/* More drawer — slides up above nav */}
-        {moreOpen && (
-          <div className="absolute bottom-full left-0 right-0 mb-3 px-3 animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="rounded-3xl p-3 shadow-2xl" style={{ border: '1px solid var(--border2,var(--border))', background: 'var(--nav-bg)', backdropFilter: 'saturate(180%) blur(60px)', WebkitBackdropFilter: 'saturate(180%) blur(60px)' }}>
-              {/* Quick action strip */}
-              <div className="flex gap-2 mb-3">
-                <button onClick={() => { setShowGlobalSearch(true); setMoreOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95"
-                  style={{ background: 'rgba(var(--acc-rgb,59,130,246),.1)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,59,130,246),.2)' }}>
-                  <Search size={16} />
-                  <span>Search</span>
-                </button>
-                <button onClick={() => { setRpOpen(p => !p); setMoreOpen(false); }}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm transition-all active:scale-95"
-                  style={{ background: rpOpen ? 'rgba(var(--acc-rgb,59,130,246),.18)' : 'rgba(var(--acc-rgb,59,130,246),.1)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,59,130,246),.2)' }}>
-                  <Sparkles size={16} />
-                  <span>AI Studio</span>
-                </button>
-              </div>
-              {/* Nav grid — 3 columns, bigger touch targets */}
-              <div className="grid grid-cols-3 gap-2">
-                {MORE_ITEMS.map(({ icon: Icon, label, v }) => (
-                  <button key={v} onClick={() => { setView(v); setMoreOpen(false); }}
-                    className="flex flex-col items-center gap-2 py-3.5 px-2 rounded-2xl transition-all active:scale-95"
-                    style={{ color: view === v ? 'var(--accent)' : 'var(--text3)', background: view === v ? 'rgba(var(--acc-rgb,59,130,246),.12)' : 'transparent' }}>
-                    <Icon size={22} strokeWidth={view === v ? 2.5 : 1.8} />
-                    <span className="text-[11px] font-bold leading-none">{label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Deep Focus overlay */}
