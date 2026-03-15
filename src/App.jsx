@@ -72,6 +72,7 @@ import {
   Trophy, Percent, PenLine, Scissors, Bookmark, History, Plus,
   MoreVertical, CheckCheck, CircleDot, Flame, Heart, Leaf,
   Layout, LayoutGrid, BotMessageSquare,
+  GitBranch, Volume2, Square, Pause, RotateCcw, Focus, Paperclip,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -888,7 +889,7 @@ function DashboardView({ docs, flashcards, exams, cases, notes, chatSessions, se
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}>
-      <div className="max-w-6xl mx-auto p-5 lg:p-8 space-y-6">
+      <div className="w-full p-5 lg:p-10 space-y-6">
 
         {/* ── HERO ── */}
         <div className="flex items-start justify-between gap-4 animate-slide-in">
@@ -973,18 +974,20 @@ function DashboardView({ docs, flashcards, exams, cases, notes, chatSessions, se
               <button onClick={() => setView('library')} className="text-xs font-bold transition-all" style={{ color: 'var(--accent)', opacity: .7 }}>View all →</button>
             </div>
             {recentDocs.length === 0 ? (
-              <div className="flex flex-col items-center py-10 gap-3">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(var(--acc-rgb,99,102,241),.08)', border: '1px solid rgba(var(--acc-rgb,99,102,241),.15)' }}>
-                  <FileText size={22} style={{ color: 'var(--accent)', opacity: .5 }} />
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <FileText size={24} style={{ color: 'var(--accent)', opacity: .6 }} />
                 </div>
                 <p className="text-sm font-bold" style={{ color: 'var(--text3)' }}>No documents yet</p>
-                <button onClick={() => setView('library')} className="btn-accent px-4 py-2 rounded-xl text-sm font-black">Upload Document</button>
+                <p className="text-xs" style={{ color: 'var(--text3)', opacity: .7 }}>Upload a PDF, Word doc, or image to get started</p>
+                <button onClick={() => setView('library')} className="btn-accent px-5 py-2.5 rounded-xl text-sm font-black mt-1">Upload Document</button>
               </div>
             ) : recentDocs.map((doc, i) => (
               <button key={doc.id} onClick={() => { setActiveId(doc.id); setView('reader'); }}
-                className="w-full flex items-center gap-3.5 p-3 rounded-xl transition-all group hover:bg-[rgba(var(--acc-rgb,99,102,241),0.05)] mb-1">
+                className="w-full flex items-center gap-3.5 p-3 rounded-xl transition-all group card-interactive mb-1"
+                style={{ border: '1px solid transparent' }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white text-sm font-black"
-                  style={{ background: `linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))` }}>
+                  style={{ background: `linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))`, boxShadow: '0 4px 12px rgba(var(--acc-rgb,99,102,241),.25)' }}>
                   {doc.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1 text-left">
@@ -1186,33 +1189,35 @@ function GlobalTaskIndicator({ onViewResult }) {
             <p className="text-xs font-black uppercase tracking-widest text-[var(--accent)] truncate">{t.type} · {t.docName?.slice(0, 22) || '…'}</p>
             <p className="text-xs opacity-50 font-bold">{t.msg || 'Generating…'}</p>
             {t.total > 1 && (
-              <div className="mt-1 w-32 h-1 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-[var(--accent)] rounded-full transition-all duration-500" style={{ width: `${t.total ? ((t.done || 0) / t.total) * 100 : 10}%` }} />
+              <div className="progress-bar mt-1 w-32">
+                <div className="progress-fill" style={{ width: `${t.total ? ((t.done || 0) / t.total) * 100 : 10}%` }} />
               </div>
             )}
           </div>
         </div>
       ))}
       {done.map(([id, t]) => (
-        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl border border-emerald-500/30 flex items-center gap-3 animate-slide-in cursor-pointer hover:border-emerald-500/60 transition-colors"
+        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl flex items-center gap-3 animate-slide-in cursor-pointer transition-colors"
+          style={{ border: '1px solid var(--success-border)', background: 'var(--success-bg)' }}
           onClick={() => onViewResult && onViewResult(id, t)}>
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
-            <CheckCircle2 size={15} className="text-emerald-500" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--success-bg)', border: '1px solid var(--success-border)' }}>
+            <CheckCircle2 size={15} style={{ color: 'var(--success)' }} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-black uppercase tracking-widest text-emerald-500">{t.type} ready!</p>
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--success)' }}>{t.type} ready!</p>
             <p className="text-xs opacity-50 font-bold">{t.result?.count || 0} items · {t.docName?.slice(0, 20) || '…'} · tap to save</p>
           </div>
           <button onClick={e => { e.stopPropagation(); bgClear(id); }} className="text-xs opacity-40 hover:opacity-80 ml-1 shrink-0"><X size={16} /></button>
         </div>
       ))}
       {errors.map(([id, t]) => (
-        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl border border-red-500/30 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
-            <AlertCircle size={18} className="text-red-500" />
+        <div key={id} className="pointer-events-auto glass rounded-2xl px-4 py-3 shadow-2xl flex items-center gap-3"
+          style={{ border: '1px solid var(--danger-border)', background: 'var(--danger-bg)' }}>
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--danger-bg)', border: '1px solid var(--danger-border)' }}>
+            <AlertCircle size={18} style={{ color: 'var(--danger)' }} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-black uppercase tracking-widest text-red-500">Failed</p>
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: 'var(--danger)' }}>Failed</p>
             <p className="text-xs opacity-50 font-bold truncate">{t.error?.slice(0, 40) || 'Unknown error'}</p>
           </div>
           <button onClick={() => bgClear(id)} className="text-xs opacity-40 hover:opacity-80 ml-1 shrink-0"><X size={16} /></button>
@@ -1383,9 +1388,9 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
                   className="border-2 border-dashed border-[color:var(--border2,var(--border))] rounded-2xl p-8 text-center cursor-pointer hover:border-[var(--accent)]/50 transition-colors">
                   {uploading ? (
                     <div className="space-y-3">
-                      <Loader2 size={28} className="mx-auto text-[var(--accent)] animate-spin" />
+                      <Loader2 size={28} className="mx-auto animate-spin" style={{ color: 'var(--accent)' }} />
                       <p className="text-xs font-bold">Processing…</p>
-                      <div className="w-full bg-black/10 rounded-full h-1.5"><div className="h-full bg-[var(--accent)] rounded-full transition-all" style={{ width: `${uploadPct}%` }} /></div>
+                      <div className="progress-bar"><div className="progress-fill" style={{ width: `${uploadPct}%` }} /></div>
                     </div>
                   ) : (
                     <>
@@ -1398,8 +1403,8 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
                     onChange={e => handleFileUpload(e.target.files)} />
                 </div>
               ) : (
-                <div className="flex items-center gap-3 p-3 glass rounded-2xl border border-emerald-500/30">
-                  <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+                <div className="flex items-center gap-3 p-3 glass rounded-2xl" style={{ border: '1px solid var(--success-border)', background: 'var(--success-bg)' }}>
+                  <CheckCircle2 size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold truncate">{uploadedDoc.name}</p>
                     <p className="text-xs opacity-40">{uploadedDoc.totalPages} pages extracted</p>
@@ -1457,7 +1462,7 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
                   className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${count === n ? 'bg-[var(--accent)] text-white' : 'glass opacity-60 hover:opacity-100'}`}>{n}</button>
               ))}
             </div>
-            {count > 50 && <p className="text-xs text-amber-500 font-bold flex items-center gap-1.5"><AlertCircle size={10} />Parallel AI — runs fully in background</p>}
+            {count > 50 && <p className="text-xs font-bold flex items-center gap-1.5" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI — runs fully in background</p>}
           </div>
 
           {/* Difficulty */}
@@ -1579,15 +1584,36 @@ function useToast() {
 }
 
 function ToastContainer({ toasts }) {
+  const TOAST_MAP = {
+    success: { Icon: CheckCircle2, cls: 'toast-success', iconColor: 'var(--success)' },
+    error:   { Icon: AlertCircle,  cls: 'toast-error',   iconColor: 'var(--danger)' },
+    warn:    { Icon: AlertCircle,  cls: 'toast-warning',  iconColor: 'var(--warning)' },
+    info:    { Icon: Info,         cls: 'toast-info',     iconColor: 'var(--info)' },
+  };
   return (
-    <div className="fixed top-20 right-3 z-[9999] flex flex-col gap-2 pointer-events-none max-w-[calc(100vw-24px)]">
-      {toasts.map(t => (
-        <div key={t.id} className={`px-4 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2.5 animate-slide-in pointer-events-auto
-          ${t.type === 'success' ? 'bg-emerald-500 text-white' : t.type === 'error' ? 'bg-red-500 text-white' : t.type === 'warn' ? 'bg-amber-500 text-white' : 'bg-[var(--surface,var(--card))] border border-[color:var(--border2,var(--border))] text-[var(--text)]'}`}>
-          {t.type === 'success' ? <CheckCircle2 size={15} /> : t.type === 'error' ? <AlertCircle size={18} /> : <Info size={18} />}
-          <span className="truncate max-w-[280px]">{t.msg}</span>
-        </div>
-      ))}
+    <div className="fixed top-24 right-4 z-[9999] flex flex-col gap-2.5 pointer-events-none max-w-[calc(100vw-32px)]" role="region" aria-live="polite" aria-label="Notifications">
+      {toasts.map(t => {
+        const { Icon, cls, iconColor } = TOAST_MAP[t.type] || TOAST_MAP.info;
+        return (
+          <div key={t.id}
+            className={`px-4 py-3.5 text-sm font-medium shadow-2xl flex items-center gap-3 animate-slide-in pointer-events-auto ${cls}`}
+            style={{
+              background: 'rgba(26,27,54,0.85)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '1rem',
+              color: '#fff',
+              backdropFilter: 'saturate(150%) blur(60px)',
+              WebkitBackdropFilter: 'saturate(150%) blur(60px)',
+              minWidth: 240,
+              boxShadow: '0 20px 40px rgba(0,0,0,.35)',
+            }}
+            role="alert"
+          >
+            <Icon size={16} style={{ color: iconColor, flexShrink: 0 }} />
+            <span className="truncate max-w-[300px] leading-snug">{t.msg}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -1744,7 +1770,7 @@ function LabTable({ rows }) {
   return (
     <div className="rounded-xl overflow-hidden border border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))] mb-4 text-xs">
       <table className="w-full border-collapse">
-        <thead><tr className="bg-black/5 dark:bg-white/5 border-b border-[color:var(--border2,var(--border))]">
+        <thead><tr className="border-b border-[color:var(--border2,var(--border))]" style={{ background: 'var(--surface,var(--card))' }}>
           {['Test', 'Result', 'Range', 'Units'].map(h => (
             <th key={h} className="py-1.5 px-3 text-xs font-black uppercase tracking-wider text-left opacity-50">{h}</th>
           ))}
@@ -1754,9 +1780,9 @@ function LabTable({ rows }) {
             <tr key={i} className="border-b border-[color:var(--border2,var(--border))]/50 last:border-0">
               <td className="py-2 px-3 font-semibold">{r.test}</td>
               <td className="py-2 px-3 text-center">
-                <span className={`font-black inline-flex items-center gap-1 ${r.flag === 'L' ? 'text-blue-500' : r.flag === 'H' ? 'text-red-500' : ''}`}>
+                <span className={`font-black inline-flex items-center gap-1 ${r.flag === 'L' ? 'lab-low' : r.flag === 'H' ? 'lab-high' : r.flag === 'C' ? 'lab-crit' : ''}`}>
                   {r.result}
-                  {r.flag && <span className={`text-xs font-black px-1 py-0.5 rounded ${r.flag === 'L' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600' : 'bg-red-100 dark:bg-red-900/40 text-red-600'}`}>{r.flag}</span>}
+                  {r.flag && <span className={`text-xs font-black px-1.5 py-0.5 rounded-md ${r.flag === 'L' ? 'badge-info' : r.flag === 'C' ? 'lab-crit' : 'badge-danger'} badge`} style={{ padding: '1px 5px' }}>{r.flag}</span>}
                 </span>
               </td>
               <td className="py-2 px-3 text-center opacity-50 font-mono">{r.range}</td>
@@ -1881,7 +1907,9 @@ function TutorChat({ context, settings, contextLabel = '' }) {
             placeholder="Ask tutor…" disabled={loading} rows={1}
             className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24" />
           <button onClick={toggleVoice}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${listening ? 'bg-red-500 text-white animate-pulse' : 'glass text-[var(--accent)] hover:bg-[var(--accent)]/10'}`}>
+            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all`}
+            style={listening ? { background: 'var(--danger)', color: '#fff', animation: 'glow-ring 1s ease infinite' } : { color: 'var(--accent)' }}
+            title={listening ? 'Stop voice' : 'Voice input'}>
             {listening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
           <button onClick={send} disabled={loading || !input.trim()}
@@ -1906,7 +1934,7 @@ const PROVIDERS = {
   ollama: { label: 'Ollama (Local)', note: 'Local inference — no API key needed.', needsKey: false, defaultModel: 'llama3', baseUrl: 'http://localhost:11434/v1' },
   custom: { label: 'Custom API', note: 'Any OpenAI-compatible endpoint.', needsKey: true, defaultModel: '', baseUrl: '' },
 };
-const DEFAULT_SETTINGS = { provider: 'anthropic', apiKey: '', baseUrl: '', model: '', strictMode: false, theme: 'pure-white', fontSize: 'large', accentColor: 'indigo', lineSpacing: 'normal', cardStyle: 'comfortable', animations: true, compactSidebar: false };
+const DEFAULT_SETTINGS = { provider: 'anthropic', apiKey: '', baseUrl: '', model: '', strictMode: false, theme: 'dark', fontSize: 'medium', accentColor: 'blue', lineSpacing: 'normal', cardStyle: 'comfortable', animations: true, compactSidebar: false };
 
 /* ═══════════════════════════════════════════════════════════════════
    BUILT-IN SETS — generated from imported data files.
@@ -2053,131 +2081,234 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
   }, [onUpload]);
 
   return (
-    <div className="library-view flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content app-view" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content bg-mesh" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
       onDragOver={e => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}>
+
+      {/* Drag overlay */}
       {dragging && (
-        <div className="fixed inset-0 z-[9998] bg-[var(--accent)]/20 border-4 border-dashed border-[var(--accent)] flex items-center justify-center pointer-events-none">
-          <div className="design-btn rounded-3xl px-8 py-6 text-center shadow-2xl"><FileUp size={48} className="mx-auto mb-3 animate-bounce" />
-            <p className="text-xl font-black">Drop files here!</p><p className="text-sm opacity-80 mt-1">PDF, Word, Excel, Images</p>
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none"
+          style={{ background: 'rgba(var(--acc-rgb,99,102,241),.15)', backdropFilter: 'blur(4px)' }}>
+          <div className="glass rounded-3xl px-10 py-8 text-center shadow-2xl border-2 border-dashed border-[var(--accent)] animate-scale-in">
+            <FileUp size={48} className="mx-auto mb-3 animate-bounce" style={{ color: 'var(--accent)' }} />
+            <p className="text-xl font-black">Drop files here!</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>PDF, Word, Excel, Images</p>
           </div>
         </div>
       )}
 
-      {/* Hero / AI Briefing */}
-      <div className="design-card" style={{ background: 'linear-gradient(135deg, hsl(var(--primary-hue, 220), 80%, 50%), hsl(var(--primary-hue, 220), 70%, 40%))', color: 'white', border: 'none' }}>
-        <h3 style={{ color: 'white' }}>AI Study Hub</h3>
-        <p style={{ opacity: 0.9 }}>
-          {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'} — {docs.length === 0 ? 'Upload a document to get started' : 'Your AI-powered study command center'}
-        </p>
-        <p style={{ marginTop: 8 }}>Today&apos;s Plan:</p>
-        <ul style={{ listStyle: 'disc', paddingLeft: 20, opacity: 0.9, fontSize: '0.9rem' }}>
-          <li>Practice <strong>{dueCards}</strong> due flashcards</li>
-          <li>Review exam topics</li>
-          <li>Study {totalCards} total cards</li>
-        </ul>
-        <button onClick={() => setView('flashcards')} className="design-btn design-btn-secondary" style={{ marginTop: 16, background: 'rgba(255,255,255,0.2)', color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}>
-          Start Study Session
-        </button>
-      </div>
+      <div className="w-full p-5 lg:p-10 space-y-6">
 
-      {/* Stats */}
-      <div className="design-card">
-        <h4>Performance Snapshot</h4>
-        <p className="text-label" style={{ color: 'var(--text-muted, var(--text3))' }}>Your study stats.</p>
-        <div className="button-grid" style={{ marginTop: 12 }}>
+        {/* ── HERO ── */}
+        <div className="relative overflow-hidden rounded-3xl animate-slide-in"
+          style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', boxShadow: '0 16px 56px rgba(var(--acc-rgb,99,102,241),.4)' }}>
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, white 0%, transparent 60%)' }} />
+          <div className="relative p-6 lg:p-8 flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-[.15em] px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'rgba(255,255,255,.9)' }}>
+                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                </span>
+                {streak >= 3 && <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}>🔥 {streak} day streak</span>}
+              </div>
+              <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans,system-ui' }}>
+                {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'}
+              </h1>
+              <p className="text-sm mt-1 text-white/70 font-medium">
+                {dueCards > 0 ? `${dueCards} flashcards due · ${docs.length} documents` : docs.length === 0 ? 'Upload your first document to get started' : `${totalCards} cards · ${totalQ} exam questions · ${totalCases} cases`}
+              </p>
+              <div className="flex gap-2 mt-4 flex-wrap">
+                <button onClick={() => setView('flashcards')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black text-white transition-all hover:scale-105 active:scale-95"
+                  style={{ background: 'rgba(255,255,255,.2)', border: '1px solid rgba(255,255,255,.3)' }}>
+                  <Layers size={15} /> Study Cards {dueCards > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(255,255,255,.3)' }}>{dueCards}</span>}
+                </button>
+                <button onClick={() => setView('exams')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black text-white transition-all hover:scale-105 active:scale-95"
+                  style={{ background: 'rgba(255,255,255,.15)', border: '1px solid rgba(255,255,255,.2)' }}>
+                  <CheckSquare size={15} /> Take Exam
+                </button>
+                <button onClick={() => setView('cases')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black text-white transition-all hover:scale-105 active:scale-95"
+                  style={{ background: 'rgba(255,255,255,.15)', border: '1px solid rgba(255,255,255,.2)' }}>
+                  <Activity size={15} /> Cases
+                </button>
+              </div>
+            </div>
+            <div className="shrink-0 hidden sm:block">
+              <img src={MARIAM_IMG} alt="MARIAM" className="w-20 h-20 rounded-2xl object-cover"
+                style={{ boxShadow: '0 0 0 3px rgba(255,255,255,.3),0 8px 24px rgba(0,0,0,.2)' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* ── STATS ROW ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'Documents', val: allStats.docs, col: '#6366f1' },
-            { label: 'Flashcards', val: allStats.cards, col: '#8b5cf6' },
-            { label: 'Exam Qs', val: allStats.exams, col: '#3b82f6' },
-            { label: 'Cases', val: allStats.cases, col: '#06b6d4' },
-          ].map(({ label, val, col }) => (
-            <div key={label} className="design-card" style={{ padding: 12, marginBottom: 0, textAlign: 'center' }}>
-              <p style={{ fontSize: '1.5rem', fontWeight: 800, color: col }}>{val}</p>
-              <p className="text-label" style={{ fontSize: '0.75rem' }}>{label}</p>
+            { label: 'Documents', value: allStats.docs, icon: FileText, color: '#6366f1', sub: 'uploaded' },
+            { label: 'Flashcards', value: allStats.cards, icon: Layers, color: '#8b5cf6', sub: dueCards > 0 ? `${dueCards} due` : 'total', urgent: dueCards > 0 },
+            { label: 'Exam Qs', value: allStats.exams, icon: CheckSquare, color: '#3b82f6', sub: `${exams.length} sets` },
+            { label: 'Cases', value: allStats.cases, icon: Activity, color: '#06b6d4', sub: `${cases.length} sets` },
+          ].map(({ label, value, icon: Icon, color, sub, urgent }, i) => (
+            <div key={label} className={`card-lined rounded-2xl p-4 animate-slide-up stagger-${i + 1}`}
+              style={urgent ? { borderTopColor: color + 'cc' } : {}}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: color + '18' }}>
+                  <Icon size={17} style={{ color }} />
+                </div>
+                {urgent && <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: color }} />}
+              </div>
+              <p className="text-3xl font-black leading-none" style={{ color, fontFamily: 'Plus Jakarta Sans,system-ui' }}>{value}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest mt-1.5" style={{ color: 'var(--text3)' }}>{label}</p>
+              <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{sub}</p>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="design-card">
-        <h4>Quick Actions</h4>
-        <div className="button-grid">
+        {/* ── BG TASKS ── */}
+        {bgTaskList.filter(t => t.status === 'running' || t.status === 'done').length > 0 && (
+          <div className="card-lined rounded-2xl p-5 animate-fade-in">
+            <h2 className="section-label mb-3 flex items-center gap-2"><Zap size={12} style={{ color: 'var(--accent)' }} />Active Generation</h2>
+            <div className="space-y-2">
+              {bgTaskList.map((t, i) => (
+                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl border transition-all"
+                  style={t.status === 'done' ? { borderColor: 'var(--success-border)', background: 'var(--success-bg)' } : { borderColor: 'var(--border2,var(--border))', background: 'var(--surface2,var(--card))' }}>
+                  {t.status === 'running' ? <Loader2 size={14} className="animate-spin shrink-0" style={{ color: 'var(--accent)' }} /> : <CheckCircle2 size={14} className="shrink-0" style={{ color: 'var(--success)' }} />}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold truncate capitalize">{t.type} · {t.docName?.slice(0, 28)}</p>
+                    {t.status === 'running' && t.total > 1 && (
+                      <div className="progress-bar mt-1.5">
+                        <div className="progress-fill" style={{ width: `${((t.done || 0) / t.total) * 100}%` }} />
+                      </div>
+                    )}
+                    {t.status === 'done' && <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{t.result?.count} items ready</p>}
+                  </div>
+                  <span className={`text-xs font-black px-2.5 py-1 rounded-lg ${t.status === 'done' ? 'badge-success' : ''} badge`}>
+                    {t.status === 'done' ? 'Done' : 'Running'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── DOCUMENTS ── */}
+        <div className="card-lined rounded-2xl p-5 animate-slide-up stagger-3">
+          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <h2 className="section-label flex items-center gap-2"><FileText size={12} />My Documents</h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={13} />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search docs…"
+                  className="glass-input rounded-xl pl-9 pr-3 py-2 text-sm w-44 focus:w-56 transition-all" />
+              </div>
+              {/* Sort */}
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+                className="glass-input rounded-xl px-3 py-2 text-sm font-semibold cursor-pointer">
+                <option value="date">Newest</option>
+                <option value="name">Name A–Z</option>
+                <option value="type">Type</option>
+              </select>
+              {/* View toggle */}
+              <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border2,var(--border))' }}>
+                <button onClick={() => setViewMode('grid')}
+                  className="p-2 transition-colors"
+                  style={viewMode === 'grid' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
+                  <Grid size={16} />
+                </button>
+                <button onClick={() => setViewMode('list')}
+                  className="p-2 transition-colors"
+                  style={viewMode === 'list' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
+                  <List size={16} />
+                </button>
+              </div>
+              {/* Upload */}
+              <label className={`btn-accent flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black cursor-pointer ${uploading ? 'opacity-60' : ''}`}>
+                {uploading ? <Loader2 size={15} className="animate-spin" /> : <FileUp size={15} />}
+                {uploading ? 'Uploading…' : 'Import'}
+                <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
+              </label>
+            </div>
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="empty-state cursor-pointer" onClick={() => inputRef.current?.click()}>
+              <div className="empty-icon">
+                <FileUp size={26} style={{ color: 'var(--accent)', opacity: .7 }} />
+              </div>
+              <p className="font-black text-base">{search ? 'No documents found' : 'No documents yet'}</p>
+              <p className="text-sm" style={{ color: 'var(--text3)' }}>{search ? 'Try a different search' : 'Drop files here or click Import above'}</p>
+              {!search && <button className="btn-accent px-5 py-2.5 rounded-xl text-sm font-black mt-2">Browse Files</button>}
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+              {filtered.map((doc, i) => (
+                <div key={doc.id} onClick={() => onOpen(doc.id)}
+                  className={`glass rounded-2xl p-4 cursor-pointer card-hover group animate-scale-in stagger-${Math.min(i + 1, 6)}`}>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-black mb-3"
+                    style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', boxShadow: '0 4px 14px rgba(var(--acc-rgb,99,102,241),.3)' }}>
+                    {doc.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <p className="font-bold text-sm truncate leading-tight">{doc.name}</p>
+                  <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{doc.totalPages} pages</p>
+                  <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }}
+                    className="mt-3 w-full py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map((doc, i) => (
+                <div key={doc.id} onClick={() => onOpen(doc.id)}
+                  className={`flex items-center gap-3 p-3 rounded-xl card-hover cursor-pointer group animate-slide-in stagger-${Math.min(i + 1, 6)}`}
+                  style={{ border: '1px solid var(--border2,var(--border))', background: 'var(--surface,var(--card))' }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black shrink-0"
+                    style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
+                    {doc.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold truncate">{doc.name}</p>
+                    <p className="text-xs" style={{ color: 'var(--text3)' }}>{doc.totalPages} pages · {new Date(doc.addedAt || 0).toLocaleDateString()}</p>
+                  </div>
+                  <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }}
+                    className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>
+                    Remove
+                  </button>
+                  <ChevronRight size={14} className="shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" style={{ color: 'var(--accent)' }} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── QUICK ACTIONS ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-slide-up stagger-4">
           {[
-            { lbl: 'Study Cards', Icon: Layers, v: 'flashcards' },
-            { lbl: 'Exams', Icon: CheckSquare, v: 'exams' },
-            { lbl: 'Cases', Icon: Activity, v: 'cases' },
-            { lbl: 'AI Tutor', Icon: MessageSquare, v: 'chat' },
-          ].map(({ lbl, Icon, v }) => (
-            <button key={v} onClick={() => setView(v)} className="design-btn design-btn-secondary">
-              <Icon size={18} />{lbl}
+            { lbl: 'Study Cards', Icon: Layers, v: 'flashcards', color: '#8b5cf6', count: totalCards },
+            { lbl: 'Take Exam', Icon: CheckSquare, v: 'exams', color: '#3b82f6', count: totalQ },
+            { lbl: 'Cases', Icon: Activity, v: 'cases', color: '#06b6d4', count: totalCases },
+            { lbl: 'AI Tutor', Icon: MessageSquare, v: 'chat', color: 'var(--accent)', count: null },
+          ].map(({ lbl, Icon, v, color, count }) => (
+            <button key={v} onClick={() => setView(v)}
+              className="glass card-hover rounded-2xl p-4 flex flex-col items-start gap-2 text-left group">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: color + '18' }}>
+                <Icon size={18} style={{ color }} />
+              </div>
+              <div>
+                <p className="font-black text-sm">{lbl}</p>
+                {count !== null && <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{count} items</p>}
+              </div>
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Recent Docs + Upload */}
-      <div className="design-card">
-        <h4>My Documents</h4>
-        <div className="flex flex-wrap gap-3 items-center" style={{ marginBottom: 16 }}>
-          <div className="flex-1 min-w-[140px] relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={14} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
-              className="design-card" style={{ padding: '10px 10px 10px 36px', marginBottom: 0 }} />
-          </div>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="design-card" style={{ padding: '10px 14px', marginBottom: 0, width: 'auto' }}>
-            <option value="date">Newest</option>
-            <option value="name">Name</option>
-          </select>
-          <div className="flex rounded-xl overflow-hidden border border-[var(--card-border)]">
-            <button onClick={() => setViewMode('grid')} className={`p-2.5 ${viewMode === 'grid' ? 'bg-[var(--accent)] text-white' : 'opacity-50'}`}><Grid size={18} /></button>
-            <button onClick={() => setViewMode('list')} className={`p-2.5 ${viewMode === 'list' ? 'bg-[var(--accent)] text-white' : 'opacity-50'}`}><List size={18} /></button>
-          </div>
-          <label className={`design-btn cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
-            {uploading ? <Loader2 size={16} className="animate-spin" /> : <FileUp size={16} />}
-            {uploading ? 'Uploading…' : 'Import'}
-            <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
-          </label>
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="design-card text-center" style={{ padding: 32 }} onClick={() => inputRef.current?.click()}>
-            <FileUp size={40} className="mx-auto mb-3 opacity-50" style={{ color: 'var(--accent)' }} />
-            <p style={{ color: 'var(--text-muted, var(--text3))' }}>{search ? 'No results' : 'Drop or browse files'}</p>
-            {!search && <button className="design-btn design-btn-feature" style={{ marginTop: 16 }}>Browse Files</button>}
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {filtered.map(doc => (
-              <div key={doc.id} onClick={() => onOpen(doc.id)} className="design-card cursor-pointer">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black mb-2" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
-                  {doc.name.slice(0, 2).toUpperCase()}
-                </div>
-                <p className="font-bold text-sm truncate">{doc.name}</p>
-                <p className="text-label text-xs">{doc.totalPages} pages</p>
-                <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }} className="design-btn design-btn-secondary mt-2" style={{ padding: '6px 12px', fontSize: 12 }}>Remove</button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filtered.map(doc => (
-              <div key={doc.id} onClick={() => onOpen(doc.id)} className="design-card flex items-center gap-3 cursor-pointer">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-black shrink-0" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>
-                  {doc.name.slice(0, 2).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold truncate">{doc.name}</p>
-                  <p className="text-label text-xs">{doc.totalPages} pages</p>
-                </div>
-                <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }} className="design-btn design-btn-secondary" style={{ padding: '6px 12px', fontSize: 12 }}>Remove</button>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -2234,14 +2365,14 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
         {docs.length > 0 && (
           <div className="grid grid-cols-4 gap-3">
             {[
-              { label: 'Documents', val: allStats.docs, icon: BookOpen, color: 'text-[var(--accent)]' },
-              { label: 'Flashcards', val: allStats.cards, icon: Layers, color: 'text-emerald-500' },
-              { label: 'Questions', val: allStats.exams, icon: CheckSquare, color: 'text-blue-500' },
-              { label: 'Cases', val: allStats.cases, icon: Activity, color: 'text-purple-500' },
-            ].map(({ label, val, icon: Icon, color }) => (
+              { label: 'Documents', val: allStats.docs, icon: BookOpen, hex: undefined },
+              { label: 'Flashcards', val: allStats.cards, icon: Layers, hex: '#8b5cf6' },
+              { label: 'Questions', val: allStats.exams, icon: CheckSquare, hex: '#3b82f6' },
+              { label: 'Cases', val: allStats.cases, icon: Activity, hex: '#06b6d4' },
+            ].map(({ label, val, icon: Icon, hex }) => (
               <div key={label} className="glass rounded-2xl p-3 text-center">
-                <Icon size={18} className={`mx-auto mb-1 ${color}`} />
-                <div className={`text-xl font-black ${color}`}>{val}</div>
+                <Icon size={18} className="mx-auto mb-1" style={{ color: hex || 'var(--accent)' }} />
+                <div className="text-xl font-black" style={{ color: hex || 'var(--accent)' }}>{val}</div>
                 <div className="text-xs font-black uppercase tracking-widest opacity-40">{label}</div>
               </div>
             ))}
@@ -2253,7 +2384,7 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
           <h1 className="text-2xl lg:text-3xl font-black tracking-tight flex-none">Library</h1>
           <div className="flex-1 min-w-[160px] relative">
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search files…"
-              className="w-full bg-black/5 dark:bg-white/5 rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none border border-[color:var(--border2,var(--border))] focus:border-[var(--accent)]/50 text-[var(--text)]" />
+              className="w-full glass-input rounded-xl py-2.5 pl-9 pr-3 text-sm outline-none" />
             <Search className="absolute left-2.5 top-3 opacity-30" size={14} />
           </div>
           <div className="flex items-center gap-2">
@@ -2302,7 +2433,10 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
               return (
                 <div key={doc.id} onClick={() => onOpen(doc.id)} className="card-hover glass rounded-2xl overflow-hidden flex flex-col relative group cursor-pointer">
                   <button onClick={ev => onDelete(doc.id, ev)}
-                    className="absolute top-2 right-2 z-10 w-7 h-7 bg-black/60 hover:bg-red-500 rounded-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                    className="absolute top-2 right-2 z-10 w-7 h-7 rounded-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                    style={{ background: 'rgba(0,0,0,.55)' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--danger)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,.55)'}>
                     <Trash2 size={16} />
                   </button>
                   {cat === 'image' && doc.imagePreview
@@ -2317,8 +2451,8 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
                     </div>
                     <div className="flex gap-1 flex-wrap">
                       {nCards > 0 && <span className="text-xs font-bold px-1.5 py-0.5 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md">{nCards} Cards</span>}
-                      {nExams > 0 && <span className="text-xs font-bold px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-md">{nExams} Exams</span>}
-                      {nCases > 0 && <span className="text-xs font-bold px-1.5 py-0.5 bg-blue-500/10 text-blue-500 rounded-md">{nCases} Cases</span>}
+                      {nExams > 0 && <span className="badge badge-success" style={{ fontSize: 10, padding: '2px 6px' }}>{nExams} Exams</span>}
+                      {nCases > 0 && <span className="badge badge-info" style={{ fontSize: 10, padding: '2px 6px' }}>{nCases} Cases</span>}
                     </div>
                   </div>
                 </div>
@@ -2346,7 +2480,7 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {nCards > 0 && <span className="text-xs font-bold px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">{nCards} cards</span>}
-                    <button onClick={ev => onDelete(doc.id, ev)} className="w-8 h-8 hover:bg-red-500/10 hover:text-red-500 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                    <button onClick={ev => onDelete(doc.id, ev)} className="w-8 h-8 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)' }}>
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -2460,7 +2594,7 @@ function DocWorkspace({ activeDoc, setDocs, currentPage, setCurrentPage, openDoc
     <div className="flex-1 flex flex-col h-full min-h-0">
       {/* Top bar */}
       <div className="h-12 glass flex items-center gap-2 px-3 shrink-0 border-t-0 border-x-0">
-        <button onClick={onBack} className="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 shrink-0"><ChevronLeft size={16} /></button>
+        <button onClick={onBack} className="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-[var(--accent)]/10 shrink-0"><ChevronLeft size={16} /></button>
         <div className={`w-5 h-5 rounded-md bg-gradient-to-br ${cfg.from} ${cfg.to} flex items-center justify-center shrink-0`}>
           <cfg.Icon size={11} className="text-white" />
         </div>
@@ -2483,7 +2617,7 @@ function DocWorkspace({ activeDoc, setDocs, currentPage, setCurrentPage, openDoc
             return (
               <div key={id} onClick={() => setActiveId(id)}
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg cursor-pointer text-xs font-bold shrink-0 transition-colors
-                  ${id === activeDoc.id ? 'bg-[var(--accent)] text-white' : 'glass hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                  ${id === activeDoc.id ? 'bg-[var(--accent)] text-white' : 'glass hover:bg-[var(--accent)]/8'}`}>
                 <dc.Icon size={10} />
                 <span className="truncate max-w-[80px]">{doc.name}</span>
                 <button onClick={e => { e.stopPropagation(); closeTab(id); }} className="opacity-60 hover:opacity-100 ml-0.5"><X size={10} /></button>
@@ -2595,13 +2729,15 @@ function GeneratePanel({ activeDoc, bgTask, onStart, onClear, setFlashcards, set
   /* ── RESULTS VIEW ── */
   if (bgTask?.isFinished) return (
     <div className="flex-1 min-h-0 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 bg-emerald-500/10 border-b border-emerald-500/20 shrink-0">
-        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+      <div className="flex items-center justify-between px-4 py-3 border-b shrink-0"
+        style={{ background: 'var(--success-bg)', borderColor: 'var(--success-border)' }}>
+        <span className="text-xs font-black flex items-center gap-2" style={{ color: 'var(--success)' }}>
           <CheckCircle2 size={15} />{Array.isArray(bgTask.result?.data) ? `${bgTask.result.data.length} items ready` : 'Done!'}
         </span>
         <div className="flex gap-2">
           <button onClick={onClear} className="px-3 py-1.5 glass rounded-xl text-xs font-black uppercase opacity-60 hover:opacity-100">Discard</button>
-          <button onClick={save} className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase flex items-center gap-1.5 shadow-md">
+          <button onClick={save} className="px-3 py-1.5 rounded-xl text-xs font-black uppercase flex items-center gap-1.5 shadow-md text-white"
+            style={{ background: 'var(--success)' }}>
             <Save size={16} /> Save
           </button>
         </div>
@@ -2623,7 +2759,8 @@ function GeneratePanel({ activeDoc, bgTask, onStart, onClear, setFlashcards, set
               <p className="font-bold text-xs mb-3"><span className="opacity-30 mr-1.5 text-xs">Q{i + 1}</span>{item.vignette || q.q}</p>
               <div className="space-y-1.5">
                 {(q.options || []).map((opt, oi) => (
-                  <div key={oi} className={`px-3 py-2 rounded-xl text-xs font-medium border ${oi === q.correct ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold' : 'glass border-transparent'}`}>
+                  <div key={oi} className="px-3 py-2 rounded-xl text-xs font-medium border"
+                    style={oi === q.correct ? { background: 'var(--success-bg)', borderColor: 'var(--success-border)', color: 'var(--success)', fontWeight: 700 } : { opacity: .5, border: '1px solid transparent' }}>
                     <span className="font-black opacity-50 mr-2">{String.fromCharCode(65 + oi)}.</span>{opt}
                   </div>
                 ))}
@@ -2728,7 +2865,7 @@ function GeneratePanel({ activeDoc, bgTask, onStart, onClear, setFlashcards, set
                 className={`px-2 py-1 rounded-lg text-xs font-black transition-colors ${count === n ? 'bg-[var(--accent)] text-white' : 'glass opacity-60 hover:opacity-100'}`}>{n}</button>
             ))}
           </div>
-          {count > 50 && <p className="text-xs text-amber-500 font-bold mt-2 flex items-center gap-1"><AlertCircle size={10} />Parallel AI — {count}+ items in ~30-120s</p>}
+          {count > 50 && <p className="text-xs font-bold mt-2 flex items-center gap-1" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI — {count}+ items in ~30-120s</p>}
         </div>
       )}
 
@@ -2758,8 +2895,8 @@ function GeneratePanel({ activeDoc, bgTask, onStart, onClear, setFlashcards, set
             <span className="text-xs font-black opacity-60">{bgTask.msg}</span>
             <span className="text-xs font-black text-[var(--accent)]">{bgTask.done || 0}/{bgTask.total || 1}</span>
           </div>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full rounded-full transition-all duration-300 animate-pulse"
+          <div className="progress-bar" style={{ height: 8, borderRadius: 8 }}>
+            <div className="progress-fill animate-pulse"
               style={{ width: `${bgTask.total ? ((bgTask.done || 0) / bgTask.total) * 100 : 10}%` }} />
           </div>
         </div>
@@ -2863,7 +3000,9 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
             placeholder="Ask about this document…" disabled={loading} rows={1}
             className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24" />
           <button onClick={toggleVoice}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${listening ? 'bg-red-500 text-white animate-pulse' : 'glass text-[var(--accent)]'}`}>
+            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all glass"
+            style={listening ? { background: 'var(--danger)', color: '#fff', animation: 'glow-ring 1s ease infinite', border: 'none' } : { color: 'var(--accent)' }}
+            title={listening ? 'Stop voice' : 'Voice input'}>
             {listening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
           <button onClick={send} disabled={loading || !input.trim()}
@@ -2889,7 +3028,7 @@ function VaultPanel({ activeDocId, flashcards, setFlashcards, exams, setExams, c
 
   const Section = ({ title, count, colorClass, children, id }) => (
     <div className="glass rounded-2xl overflow-hidden">
-      <button onClick={() => toggle(id)} className="w-full flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+      <button onClick={() => toggle(id)} className="w-full flex items-center justify-between p-4 hover:bg-[var(--accent)]/5 transition-colors rounded-t-2xl">
         <div className="flex items-center gap-2">
           <span className={`text-xs font-black uppercase tracking-widest ${colorClass}`}>{title}</span>
           <span className={`text-xs font-black px-2 py-0.5 rounded-full ${colorClass} bg-current/10`}>{count}</span>
@@ -2910,46 +3049,46 @@ function VaultPanel({ activeDocId, flashcards, setFlashcards, exams, setExams, c
               <p className="text-xs opacity-40">{set.cards?.length} cards · {new Date(set.createdAt).toLocaleDateString()}</p>
             </div>
             <div className="flex gap-1.5">
-              <button onClick={() => setView('flashcards')} className="text-xs font-black px-2 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg">Study</button>
-              <button onClick={() => setFlashcards(p => p.filter(f => f.id !== set.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{ display: set.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
+              <button onClick={() => setView('flashcards')} className="text-xs font-black px-2 py-1 rounded-lg badge">Study</button>
+              <button onClick={() => setFlashcards(p => p.filter(f => f.id !== set.id))} className="text-xs font-black px-2 py-1 rounded-lg badge badge-danger" style={{ display: set.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
             </div>
           </div>
         ))}
         {!docFc.length && <p className="text-center text-xs opacity-40 py-2 font-bold">No flashcards yet</p>}
       </Section>
 
-      <Section id="ex" title="Exams" count={docEx.reduce((s, e) => s + (e.questions?.length || 0), 0)} colorClass="text-emerald-500">
+      <Section id="ex" title="Exams" count={docEx.reduce((s, e) => s + (e.questions?.length || 0), 0)} colorClass="text-[var(--accent)]">
         {docEx.map(ex => (
           <div key={ex.id} className="flex items-center justify-between p-3 glass rounded-xl">
             <div><p className="text-xs font-bold">{ex.title}</p><p className="text-xs opacity-40">{ex.questions?.length} Qs</p></div>
             <div className="flex gap-1.5">
-              <button onClick={() => setView('exams')} className="text-xs font-black px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg">Take</button>
-              <button onClick={() => setExams(p => p.filter(e => e.id !== ex.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{ display: ex.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
+              <button onClick={() => setView('exams')} className="text-xs font-black px-2 py-1 rounded-lg badge badge-success">Take</button>
+              <button onClick={() => setExams(p => p.filter(e => e.id !== ex.id))} className="text-xs font-black px-2 py-1 rounded-lg badge badge-danger" style={{ display: ex.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
             </div>
           </div>
         ))}
         {!docEx.length && <p className="text-center text-xs opacity-40 py-2 font-bold">No exams yet</p>}
       </Section>
 
-      <Section id="ca" title="Cases" count={docCa.reduce((s, c) => s + (c.questions?.length || 0), 0)} colorClass="text-blue-500">
+      <Section id="ca" title="Cases" count={docCa.reduce((s, c) => s + (c.questions?.length || 0), 0)} colorClass="text-[var(--accent)]">
         {docCa.map(c => (
           <div key={c.id} className="flex items-center justify-between p-3 glass rounded-xl">
             <div><p className="text-xs font-bold">{c.title}</p><p className="text-xs opacity-40">{c.questions?.length} cases</p></div>
             <div className="flex gap-1.5">
-              <button onClick={() => setView('cases')} className="text-xs font-black px-2 py-1 bg-blue-500/10 text-blue-500 rounded-lg">Start</button>
-              <button onClick={() => setCases(p => p.filter(x => x.id !== c.id))} className="text-xs font-black px-2 py-1 bg-red-500/10 text-red-500 rounded-lg" style={{ display: c.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
+              <button onClick={() => setView('cases')} className="text-xs font-black px-2 py-1 rounded-lg badge badge-info">Start</button>
+              <button onClick={() => setCases(p => p.filter(x => x.id !== c.id))} className="text-xs font-black px-2 py-1 rounded-lg badge badge-danger" style={{ display: c.isBuiltin ? 'none' : 'inline-flex' }}>Del</button>
             </div>
           </div>
         ))}
         {!docCa.length && <p className="text-center text-xs opacity-40 py-2 font-bold">No cases yet</p>}
       </Section>
 
-      <Section id="no" title="Notes" count={docNo.length} colorClass="text-amber-500">
+      <Section id="no" title="Notes" count={docNo.length} colorClass="text-[var(--accent)]">
         {docNo.map(n => (
           <div key={n.id} className="p-3 glass rounded-xl">
             <div className="flex justify-between items-start mb-2">
               <p className="text-xs font-bold">{n.title}</p>
-              <button onClick={() => setNotes(p => p.filter(x => x.id !== n.id))} className="text-xs px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-lg font-black">Del</button>
+              <button onClick={() => setNotes(p => p.filter(x => x.id !== n.id))} className="text-xs px-1.5 py-0.5 badge badge-danger rounded-lg font-black">Del</button>
             </div>
             <p className="text-xs opacity-60 line-clamp-3 leading-relaxed">{n.content}</p>
           </div>
@@ -2958,7 +3097,7 @@ function VaultPanel({ activeDocId, flashcards, setFlashcards, exams, setExams, c
       </Section>
 
       {docMm.length > 0 && (
-        <Section id="mm" title="Mind Maps" count={docMm.length} colorClass="text-purple-500">
+        <Section id="mm" title="Mind Maps" count={docMm.length} colorClass="text-[var(--accent)]">
           {docMm.map((m, i) => (
             <div key={m.id} className="glass rounded-xl overflow-hidden">
               <p className="text-xs font-bold p-2 border-b border-[color:var(--border2,var(--border))] opacity-60">{m.data?.topic || `Map ${i + 1}`} · Pgs {m.pages}</p>
@@ -3032,7 +3171,7 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
           <span className="font-black flex items-center gap-2 text-base"><GraduationCap size={20} /> AI Tutor</span>
           <p className="text-xs opacity-70 mt-0.5">Ask about anything you're studying</p>
         </div>
-        {!alwaysOpen && onClose && <button onClick={onClose} className="w-9 h-9 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors"><X size={18} /></button>}
+        {!alwaysOpen && onClose && <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--accent)]/20"><X size={18} /></button>}
       </div>
       {/* Messages */}
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-3 space-y-3" ref={scrollContainerRef}>
@@ -3193,8 +3332,8 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
           </button>
         </div>
         {/* Progress bar */}
-        <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
-          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="progress-bar shrink-0" style={{ borderRadius: 0, height: 3 }}>
+          <div className="progress-fill" style={{ width: `${progress}%`, transition: 'width .5s ease' }} />
         </div>
         {/* Two-panel row */}
         <div className="flex-1 min-h-0 flex overflow-hidden">
@@ -3347,21 +3486,21 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                   <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === set.docId).name}</p>
                 )}
                 {set.cards?.some(c => !c.nextReview || c.nextReview <= Date.now()) && (
-                  <span className="text-xs font-black text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full mt-1 inline-block">
+                  <span className="badge badge-warn mt-1 inline-flex">
                     {set.cards.filter(c => !c.nextReview || c.nextReview <= Date.now()).length} due today
                   </span>
                 )}
               </div>
               <div className="flex gap-2 shrink-0">
                 <button onClick={() => handleExport(set)} disabled={exporting === set.id} title="Export PDF"
-                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors">
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--info-bg)]" style={{ color: 'var(--info)' }}>
                   {exporting === set.id ? <Loader2 size={14} className="animate-spin" /> : <Printer size={18} />}
                 </button>
                 <button onClick={() => { setSelSet(set); setIdx(0); setFlipped(false); }}
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2">
                   <Layers size={16} /> Study
                 </button>
-                {!(set.isBuiltin || set.isBuiltIn) && <button onClick={() => setFlashcards(p => p.filter(f => f.id !== set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{ display: set.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
+                {!(set.isBuiltin || set.isBuiltIn) && <button onClick={() => setFlashcards(p => p.filter(f => f.id !== set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)', display: set.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
               </div>
             </div>
           </div>
@@ -3437,8 +3576,8 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
           <button onClick={() => setReviewMode(true)} className="glass px-3 py-2 rounded-xl text-sm font-black opacity-60 hover:opacity-100">Review All</button>
         </div>
         {/* Progress */}
-        <div className="h-1.5 bg-black/10 dark:bg-white/10 shrink-0">
-          <div className="bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] h-full transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="progress-bar shrink-0" style={{ borderRadius: 0, height: 3 }}>
+          <div className="progress-fill" style={{ width: `${progress}%`, transition: 'width .5s ease' }} />
         </div>
         {/* Two-panel row */}
         <div className="flex-1 min-h-0 flex overflow-hidden">
@@ -3451,26 +3590,26 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             <div className="space-y-2.5">
               {(q.options || []).map((opt, oi) => (
                 <button key={oi} disabled={submitted} onClick={() => setSelected(oi)}
-                  className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
-                    ${submitted && oi === q.correct ? 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold' :
-                      submitted && oi === selected && oi !== q.correct ? 'bg-red-500/15 border-red-500 text-red-500' :
-                        selected === oi ? 'bg-[var(--accent)]/10 border-[var(--accent)] font-bold' : 'glass border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                  className={`answer-opt w-full text-left px-5 py-4 text-sm font-medium flex items-center gap-3 answer-revealed
+                    ${submitted && oi === q.correct ? 'correct' :
+                      submitted && oi === selected && oi !== q.correct ? 'wrong' :
+                        selected === oi ? 'selected' : ''}`}>
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
-                    ${submitted && oi === q.correct ? 'bg-emerald-500 border-emerald-500 text-white' :
-                      submitted && oi === selected && oi !== q.correct ? 'bg-red-500 border-red-500 text-white' :
+                    ${submitted && oi === q.correct ? 'bg-[var(--success)] border-[var(--success)] text-white' :
+                      submitted && oi === selected && oi !== q.correct ? 'bg-[var(--danger)] border-[var(--danger)] text-white' :
                         selected === oi ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'border-[color:var(--border2,var(--border))] opacity-50'}`}>
                     {String.fromCharCode(65 + oi)}
                   </span>
                   <span className="flex-1">{opt}</span>
-                  {submitted && oi === q.correct && <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />}
+                  {submitted && oi === q.correct && <CheckCircle2 size={15} style={{ color: 'var(--success)', flexShrink: 0 }} />}
                 </button>
               ))}
             </div>
             {submitted && q.explanation && (
-              <div className="glass p-5 rounded-2xl border-l-4 border-[var(--accent)] bg-[var(--accent)]/5">
-                <p className="text-xs font-black opacity-60 mb-2 uppercase tracking-widest">Explanation</p>
+              <div className="rounded-2xl p-5 animate-slide-up" style={{ background: 'var(--info-bg)', border: '1px solid var(--info-border)', borderLeft: '4px solid var(--info)' }}>
+                <p className="text-xs font-black mb-2 uppercase tracking-widest" style={{ color: 'var(--info)' }}>📖 Explanation</p>
                 <p className="text-sm leading-relaxed">{q.explanation}</p>
-                {q.evidence && <p className="text-xs opacity-40 italic mt-3 pt-3 border-t border-[color:var(--border2,var(--border))]">"{q.evidence}"</p>}
+                {q.evidence && <p className="text-xs italic mt-3 pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}"</p>}
               </div>
             )}
             <div className="pb-4">
@@ -3540,9 +3679,10 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                 <p className="text-sm font-bold mb-3">{q.q}</p>
                 <div className="space-y-1.5">
                   {(q.options || []).map((opt, oi) => (
-                    <div key={oi} className={`px-3 py-2 rounded-xl text-xs font-medium ${oi === q.correct ? 'bg-emerald-500/15 text-emerald-600 font-bold border border-emerald-500/30' : 'opacity-50'}`}>
-                      <span className="font-black mr-2">{String.fromCharCode(65 + oi)}.</span>{opt}
-                      {oi === q.correct && <CheckCircle2 size={16} className="inline ml-2 text-emerald-500" />}
+                    <div key={oi} className={`px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2`}
+                      style={oi === q.correct ? { background: 'var(--success-bg)', color: 'var(--success)', border: '1px solid var(--success-border)', fontWeight: 700 } : { opacity: .5 }}>
+                      <span className="font-black mr-1">{String.fromCharCode(65 + oi)}.</span>{opt}
+                      {oi === q.correct && <CheckCircle2 size={14} className="inline ml-auto shrink-0" style={{ color: 'var(--success)' }} />}
                     </div>
                   ))}
                 </div>
@@ -3558,19 +3698,21 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
   if (score !== null && selEx) {
     const pct = Math.round((score / selEx.questions.length) * 100);
     const grade = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
+    const scoreColor = pct >= 80 ? 'var(--success)' : pct >= 60 ? 'var(--warning)' : 'var(--danger)';
+    const scoreMsg = pct >= 90 ? 'Outstanding! 🏆' : pct >= 80 ? 'Excellent work! 🎉' : pct >= 70 ? 'Good effort! 📚' : pct >= 60 ? 'Keep studying 💪' : 'More review needed 🔁';
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full border border-[color:var(--border2,var(--border))]">
-          <div className={`text-7xl font-black mb-1 ${pct >= 80 ? 'text-emerald-500' : pct >= 60 ? 'text-amber-500' : 'text-red-500'}`}>{pct}%</div>
-          <div className={`text-3xl font-black mb-4 ${pct >= 80 ? 'text-emerald-500' : pct >= 60 ? 'text-amber-500' : 'text-red-500'}`}>Grade {grade}</div>
-          <p className="text-sm font-black opacity-60 mb-1">{score} / {selEx.questions.length} correct</p>
-          <p className="text-xs opacity-40">{pct >= 80 ? 'Outstanding! 🎉' : pct >= 60 ? 'Good effort! Keep studying 📚' : 'Need more review 💪'}</p>
-          <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-3 mt-6 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%`, background: pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444' }} />
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 bg-mesh">
+        <div className="glass rounded-3xl p-10 text-center max-w-sm w-full animate-scale-in" style={{ border: '1px solid var(--border2,var(--border))' }}>
+          <div className="text-8xl font-black mb-1" style={{ color: scoreColor, fontFamily: 'Plus Jakarta Sans,system-ui' }}>{pct}%</div>
+          <div className="text-3xl font-black mb-4" style={{ color: scoreColor }}>Grade {grade}</div>
+          <p className="text-sm font-black mb-1" style={{ color: 'var(--text3)' }}>{score} / {selEx.questions.length} correct</p>
+          <p className="text-xs mb-6" style={{ color: 'var(--text3)' }}>{scoreMsg}</p>
+          <div className="progress-bar" style={{ height: 10, borderRadius: 999 }}>
+            <div className="progress-fill" style={{ width: `${pct}%`, background: scoreColor, transition: 'width 1.2s cubic-bezier(.34,1.2,.64,1)' }} />
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => { setReviewMode(true); }} className="glass px-6 py-3 rounded-2xl font-black border border-[color:var(--border2,var(--border))]">Review Answers</button>
+          <button onClick={() => setReviewMode(true)} className="glass px-6 py-3 rounded-2xl font-black" style={{ border: '1px solid var(--border2,var(--border))' }}>Review Answers</button>
           <button onClick={() => { setSelEx(null); setScore(null); setAnswers([]); }} className="btn-accent px-6 py-3 rounded-2xl font-black shadow-xl">Back to Exams</button>
         </div>
       </div>
@@ -3632,12 +3774,13 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             </button>
           </div>
         ) : (filteredExams.map(ex => (
-          <div key={ex.id} className={`glass rounded-2xl p-5 border transition-all card-hover ${ex.isBuiltin ? 'border-emerald-500/30 bg-emerald-500/3' : 'border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/20'}`}>
+          <div key={ex.id} className={`glass rounded-2xl p-5 border transition-all card-hover`}
+            style={ex.isBuiltin ? { borderColor: 'var(--success-border)', background: 'var(--success-bg)' } : { borderColor: 'var(--border2,var(--border))' }}>
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-black text-sm truncate">{ex.title}</h3>
-                  {ex.isBuiltin && <span className="text-xs font-black px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">📚 Built-in</span>}
+                  {ex.isBuiltin && <span className="badge badge-success shrink-0">📚 Built-in</span>}
                 </div>
                 <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {ex.isBuiltin ? 'Always available' : new Date(ex.createdAt).toLocaleDateString()}</p>
                 {ex.docId && docs?.find(d => d.id === ex.docId) && (
@@ -3646,15 +3789,15 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
               </div>
               <div className="flex gap-2 shrink-0">
                 <button onClick={() => handleExport(ex)} disabled={exporting} title="Export as PDF"
-                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors" >
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--info-bg)] hover:text-[var(--info)]">
                   {exporting ? <Loader2 size={14} className="animate-spin" /> : <Printer size={18} />}
                 </button>
                 <button onClick={() => { setSelEx(ex); setReviewMode(true); }} title="Review all questions"
-                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-[var(--accent)]/10 hover:text-[var(--accent)] transition-colors">
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-[var(--accent)]/10 transition-colors" style={{ color: 'var(--accent)' }}>
                   <Eye size={18} />
                 </button>
                 <button onClick={() => startExam(ex)} className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Target size={18} /> Start</button>
-                {!(ex.isBuiltin || ex.isBuiltIn) && <button onClick={() => setExams(p => p.filter(f => f.id !== ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{ display: ex.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
+                {!(ex.isBuiltin || ex.isBuiltIn) && <button onClick={() => setExams(p => p.filter(f => f.id !== ex.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)', display: ex.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
               </div>
             </div>
           </div>
@@ -3708,7 +3851,8 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
               <p className="text-xs font-bold opacity-50">Case {ci + 1} / {selSet.questions.length}</p>
               <div className="flex gap-0.5">
                 {selSet.questions.map((_, i) => (
-                  <div key={i} className={`h-1.5 rounded-full transition-all ${i === ci ? 'w-6 bg-[var(--accent)]' : i < ci ? 'w-2 bg-emerald-500' : 'w-2 bg-black/10 dark:bg-white/10'}`} />
+                  <div key={i} className={`h-1.5 rounded-full transition-all`}
+                    style={i === ci ? { width: 24, background: 'var(--accent)' } : i < ci ? { width: 8, background: 'var(--success)' } : { width: 8, background: 'var(--border2,var(--border))' }} />
                 ))}
               </div>
             </div>
@@ -3742,28 +3886,28 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
             <div className="space-y-2.5">
               {(q.options || []).map((opt, oi) => (
                 <button key={oi} disabled={submitted} onClick={() => setSelOpt(oi)}
-                  className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-medium transition-all border flex items-center gap-3
-                    ${submitted && oi === q.correct ? 'bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold' :
-                      submitted && oi === selOpt && oi !== q.correct ? 'bg-red-500/15 border-red-500 text-red-500' :
-                        selOpt === oi ? 'bg-[var(--accent)]/10 border-[var(--accent)] font-bold' : 'glass border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/5'}`}>
+                  className={`answer-opt w-full text-left px-5 py-4 text-sm font-medium flex items-center gap-3 answer-revealed
+                    ${submitted && oi === q.correct ? 'correct' :
+                      submitted && oi === selOpt && oi !== q.correct ? 'wrong' :
+                        selOpt === oi ? 'selected' : ''}`}>
                   <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 border transition-all
-                    ${submitted && oi === q.correct ? 'bg-emerald-500 border-emerald-500 text-white' :
-                      submitted && oi === selOpt && oi !== q.correct ? 'bg-red-500 border-red-500 text-white' :
+                    ${submitted && oi === q.correct ? 'bg-[var(--success)] border-[var(--success)] text-white' :
+                      submitted && oi === selOpt && oi !== q.correct ? 'bg-[var(--danger)] border-[var(--danger)] text-white' :
                         selOpt === oi ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'border-[color:var(--border2,var(--border))] opacity-50'}`}>
                     {String.fromCharCode(65 + oi)}
                   </span>
                   <span className="flex-1">{opt}</span>
-                  {submitted && oi === q.correct && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
+                  {submitted && oi === q.correct && <CheckCircle2 size={16} style={{ color: 'var(--success)', flexShrink: 0 }} />}
                 </button>
               ))}
             </div>
 
             {/* Explanation */}
             {submitted && (
-              <div className="glass p-5 rounded-2xl border-l-4 border-emerald-500 bg-emerald-500/5 space-y-2">
-                {cas.diagnosis && <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2"><CheckCircle2 size={15} />Diagnosis: {cas.diagnosis}</p>}
+              <div className="rounded-2xl p-5 space-y-2 animate-slide-up" style={{ background: 'var(--success-bg)', border: '1px solid var(--success-border)', borderLeft: '4px solid var(--success)' }}>
+                {cas.diagnosis && <p className="text-sm font-black flex items-center gap-2" style={{ color: 'var(--success)' }}><CheckCircle2 size={15} />Diagnosis: {cas.diagnosis}</p>}
                 {q.explanation && <p className="text-sm leading-relaxed">{q.explanation}</p>}
-                {q.evidence && <p className="text-xs opacity-40 italic pt-3 border-t border-[color:var(--border2,var(--border))]">"{q.evidence}" — p.{q.sourcePage}</p>}
+                {q.evidence && <p className="text-xs italic pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}" — p.{q.sourcePage}</p>}
               </div>
             )}
 
@@ -3780,7 +3924,8 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                     <ChevronRight size={20} />Next Case
                   </button> :
                   <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! 🏆', 'success'); }}
-                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-base font-black shadow-xl">
+                    className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl"
+                    style={{ background: 'var(--success)' }}>
                     Finish Session 🎉
                   </button>
               }
@@ -3818,7 +3963,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                     </thead>
                     <tbody>
                       {(panel.rows || []).map((row, ri) => (
-                        <tr key={ri} className="border-b border-[color:var(--border2,var(--border))]/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                        <tr key={ri} className="border-b border-[color:var(--border2,var(--border))]/20 hover:bg-[var(--accent)]/4 transition-colors">
                           <td className="py-2 px-2 font-bold text-sm">{row.test}</td>
                           <td className="py-2 px-2 font-black text-sm">
                             <span className="flex items-center gap-1" style={{ color: row.flag === 'H' ? '#ef4444' : row.flag === 'L' ? '#3b82f6' : undefined }}>
@@ -3963,12 +4108,12 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
               </div>
               <div className="flex gap-2 shrink-0">
                 <button onClick={() => handleExport(set)} disabled={exporting === set.id} title="Export PDF"
-                  className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-blue-500/10 hover:text-blue-500 transition-colors">
+                  className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--info-bg)]" style={{ color: 'var(--info)' }}>
                   {exporting === set.id ? <Loader2 size={14} className="animate-spin" /> : <Printer size={18} />}
                 </button>
                 <button onClick={() => { setSelSet(set); setCi(0); setSelOpt(null); setSubmitted(false); }}
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-black shadow-md flex items-center gap-2"><Stethoscope size={18} />Practice</button>
-                {!(set.isBuiltin || set.isBuiltIn) && <button onClick={() => setCases(p => p.filter(x => x.id !== set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-colors" style={{ display: set.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
+                {!(set.isBuiltin || set.isBuiltIn) && <button onClick={() => setCases(p => p.filter(x => x.id !== set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)', display: set.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
               </div>
             </div>
           </div>
@@ -4119,14 +4264,14 @@ function ChatView({ settings, sessions, setSessions }) {
   const grouped = groupByDate(unpinned);
 
   const SessionItem = ({ s }) => (
-    <button className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left transition-all group relative ${selSess === s.id ? 'bg-[var(--accent)]/10 border border-[var(--accent)]/20' : 'hover:bg-black/5 dark:hover:bg-white/5 border border-transparent'}`}
+    <button className={`w-full flex items-start gap-2.5 px-3 py-2 rounded-xl text-left transition-all group relative ${selSess === s.id ? 'bg-[var(--accent)]/10 border border-[var(--accent)]/20' : 'hover:bg-[var(--accent)]/6 border border-transparent'}`}
       onClick={() => loadSession(s)}>
       {s.projectId && <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: projects.find(p => p.id === s.projectId)?.color || '#6366f1' }} />}
       <div className="flex-1 min-w-0">
         <p className={`text-sm truncate font-medium ${selSess === s.id ? 'text-[var(--accent)] font-bold' : ''}`}>{s.title}</p>
         <p className="text-xs opacity-40 mt-0.5">{new Date(s.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
       </div>
-      <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0 p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10"
+      <button className="opacity-0 group-hover:opacity-60 hover:!opacity-100 shrink-0 p-1 rounded-lg hover:bg-[var(--accent)]/10"
         onClick={e => { e.stopPropagation(); setContextMenu({ id: s.id, x: e.clientX, y: e.clientY }); }}>
         <MoreVertical size={14} />
       </button>
@@ -4136,7 +4281,15 @@ function ChatView({ settings, sessions, setSessions }) {
   const curSessData = sessions.find(s => s.id === selSess);
 
   return (
-    <div className="flex h-full min-h-0 overflow-hidden bg-[var(--bg)]" onClick={() => contextMenu && setContextMenu(null)}>
+    <div className="flex-1 min-h-0 px-4 pb-4 overflow-hidden" onClick={() => contextMenu && setContextMenu(null)}>
+    <div className="h-full flex rounded-[2rem] overflow-hidden animate-fade-in-up"
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        backdropFilter: 'saturate(150%) blur(60px)',
+        WebkitBackdropFilter: 'saturate(150%) blur(60px)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+      }}>
 
       {/* Context menu */}
       {contextMenu && (
@@ -4152,7 +4305,7 @@ function ChatView({ settings, sessions, setSessions }) {
           </button>
           <div className="my-1 border-t border-[color:var(--border2,var(--border))]" />
           <button onClick={() => deleteSession(contextMenu.id)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors">
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium hover:bg-[var(--danger-bg)] transition-colors" style={{ color: 'var(--danger)' }}>
             <Trash2 size={15} />Delete chat
           </button>
         </div>
@@ -4164,9 +4317,10 @@ function ChatView({ settings, sessions, setSessions }) {
         <div className="lg:hidden fixed inset-0 bg-black/40 z-[40] backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)} />
       )}
-      <div className={`flex flex-col bg-[var(--surface,var(--card))] border-r border-[color:var(--border2,var(--border))] transition-all duration-300 shrink-0 z-[41]
+      <div className={`flex flex-col transition-all duration-300 shrink-0 z-[41]
         ${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}
-        lg:relative absolute inset-y-0 left-0`}>
+        lg:relative absolute inset-y-0 left-0`}
+        style={{ borderRight: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)' }}>
 
         {/* Sidebar header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0">
@@ -4189,7 +4343,7 @@ function ChatView({ settings, sessions, setSessions }) {
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
             <input value={sessSearch} onChange={e => setSessSearch(e.target.value)}
               placeholder="Search conversations…"
-              className="w-full bg-black/5 dark:bg-white/5 rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none border border-transparent focus:border-[var(--accent)]/40 text-[var(--text)]" />
+              className="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" />
           </div>
         </div>
 
@@ -4259,7 +4413,7 @@ function ChatView({ settings, sessions, setSessions }) {
             {[{ id: null, name: 'All Chats', color: '#6366f1' }, ...projects].map(p => (
               <button key={p.id || 'all'} onClick={() => { setSelProject(p.id); setSidebarTab(p.id ? 'projects' : 'chats'); }}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all mx-0
-                  ${selProject === p.id ? 'bg-[var(--accent)]/10' : 'hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                  ${selProject === p.id ? 'bg-[var(--accent)]/10' : 'hover:bg-[var(--accent)]/6'}`}>
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{p.name}</p>
@@ -4267,8 +4421,8 @@ function ChatView({ settings, sessions, setSessions }) {
                 </div>
                 {p.id && (
                   <button onClick={e => { e.stopPropagation(); setProjects(prev => prev.filter(x => x.id !== p.id)); }}
-                    className="opacity-0 group-hover:opacity-60 hover:!opacity-100 w-6 h-6 rounded-lg hover:bg-red-500/10 flex items-center justify-center">
-                    <Trash2 size={12} className="text-red-500" />
+                    className="opacity-0 group-hover:opacity-60 hover:!opacity-100 w-6 h-6 rounded-lg hover:bg-[var(--danger-bg)] flex items-center justify-center">
+                    <Trash2 size={12} style={{ color: 'var(--danger)' }} />
                   </button>
                 )}
               </button>
@@ -4333,7 +4487,7 @@ function ChatView({ settings, sessions, setSessions }) {
               <div className="text-center space-y-3">
                 <div className="relative inline-block">
                   <img src={MARIAM_IMG} className="w-24 h-24 rounded-3xl object-cover shadow-2xl border-4 border-[color:var(--border2,var(--border))]" alt="MARIAM AI" />
-                  <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-emerald-500 rounded-full border-2 border-[var(--bg)] flex items-center justify-center">
+                  <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full border-2 border-[var(--bg)] flex items-center justify-center" style={{ background: 'var(--success)' }}>
                     <div className="w-2.5 h-2.5 bg-white rounded-full" />
                   </div>
                 </div>
@@ -4395,10 +4549,9 @@ function ChatView({ settings, sessions, setSessions }) {
           )}
         </div>
 
-        {/* Input area — ChatGPT-style */}
-        <div className="shrink-0 px-4 py-4 border-t border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]/80 backdrop-blur-sm">
+        {/* Input area — reference pill style */}
+        <div className="shrink-0 px-4 md:px-6 py-4 md:pb-6" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
           <div className="max-w-3xl mx-auto">
-            {/* Project badge if active */}
             {selProject && (
               <div className="flex items-center gap-2 mb-2 px-1">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: projects.find(p => p.id === selProject)?.color }} />
@@ -4406,39 +4559,29 @@ function ChatView({ settings, sessions, setSessions }) {
                 <button onClick={() => setSelProject(null)} className="opacity-40 hover:opacity-80 ml-1"><X size={12} /></button>
               </div>
             )}
-            <div className="glass rounded-2xl border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/60 transition-colors shadow-lg">
+            <div className="relative flex items-end p-2 rounded-3xl transition-all"
+              style={{ background: 'rgba(26,27,54,0.7)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,.3)', backdropFilter: 'blur(20px)' }}>
+              <button className="shrink-0 p-2.5 rounded-full transition-colors opacity-50 hover:opacity-100" style={{ color: 'var(--text)' }}>
+                <Paperclip size={19} />
+              </button>
               <textarea ref={inputRef} value={input}
                 onChange={e => { setInput(e.target.value); setInputRows(Math.min(8, e.target.value.split('\n').length)); }}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
                 placeholder="Message MARIAM…" disabled={loading} rows={inputRows}
-                className="w-full bg-transparent px-4 pt-4 pb-2 text-sm outline-none resize-none custom-scrollbar text-[var(--text)] min-h-[52px]" />
-              <div className="flex items-center justify-between px-3 pb-3">
-                <div className="flex items-center gap-1">
-                  <button onClick={toggleVoice}
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${listening ? 'bg-red-500 text-white animate-pulse' : 'opacity-50 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10'}`}
-                    title="Voice input">
-                    {listening ? <MicOff size={16} /> : <Mic size={16} />}
-                  </button>
-                  {projects.length > 0 && (
-                    <div className="relative group">
-                      <button className="w-8 h-8 rounded-xl flex items-center justify-center opacity-50 hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 transition-all" title="Assign to project">
-                        <FolderOpen size={16} />
-                      </button>
-                      <div className="absolute bottom-10 left-0 hidden group-hover:flex flex-col glass rounded-xl border border-[color:var(--border2,var(--border))] shadow-xl min-w-[160px] py-1 z-50">
-                        {projects.map(p => (
-                          <button key={p.id} onClick={() => setSelProject(p.id)}
-                            className="flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-[var(--accent)]/10 transition-colors">
-                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }} />
-                            {p.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <button onClick={() => send()} disabled={loading || !input.trim()}
-                  className="w-9 h-9 bg-[var(--accent)] disabled:opacity-30 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg transition-all hover:opacity-90 active:scale-95">
-                  {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={16} />}
+                className="flex-1 max-h-48 bg-transparent px-2 py-2.5 text-sm outline-none resize-none custom-scrollbar leading-relaxed"
+                style={{ color: 'var(--text)', minHeight: 44 }} />
+              <div className="shrink-0 flex items-center gap-1 p-1">
+                <button onClick={toggleVoice}
+                  className="p-2 rounded-full transition-all"
+                  style={listening ? { background: 'var(--danger)', color: '#fff' } : { opacity: .5, color: 'var(--text)' }}
+                  title={listening ? 'Stop' : 'Voice'}>
+                  <Mic size={18} />
+                </button>
+                <button onClick={() => send()}
+                  disabled={!input.trim() || loading}
+                  className="p-2.5 rounded-full transition-all shadow-lg disabled:opacity-40"
+                  style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', color: '#fff' }}>
+                  {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={17} style={{ marginLeft: 1 }} />}
                 </button>
               </div>
             </div>
@@ -4446,6 +4589,7 @@ function ChatView({ settings, sessions, setSessions }) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
@@ -4507,7 +4651,10 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
               </button>
             ))}
           </div>
-          <div className={`flex items-start gap-2 p-3 rounded-xl mb-4 text-xs font-medium ${pr.needsKey ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300' : 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'}`}>
+          <div className="flex items-start gap-2 p-3 rounded-xl mb-4 text-xs font-medium"
+            style={pr.needsKey
+              ? { background: 'var(--warning-bg)', border: '1px solid var(--warning-border)', color: 'var(--warning)' }
+              : { background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
             {pr.needsKey ? <AlertCircle size={18} className="shrink-0 mt-0.5" /> : <CheckCircle2 size={14} className="shrink-0 mt-0.5" />}
             {pr.note}
           </div>
@@ -4670,13 +4817,23 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
 /* ═══════════════════════════════════════════════════════════════════
    NAVIGATION ITEMS — used by both desktop sidebar and mobile bottom nav
 ═══════════════════════════════════════════════════════════════════ */
+// Core 4-tab nav (Gemini's valid point: mobile needs ≤4 touch targets)
 const NAV_ITEMS = [
-  { icon: LayoutDashboard, label: 'Home', v: 'dashboard', dis: false },
-  { icon: FolderOpen, label: 'Library', v: 'library', dis: false },
-  { icon: Layers, label: 'Cards', v: 'flashcards', dis: false },
-  { icon: CheckSquare, label: 'Exams', v: 'exams', dis: false },
-  { icon: Activity, label: 'Cases', v: 'cases', dis: false },
-  { icon: MessageSquare, label: 'Tutor', v: 'chat', dis: false },
+  { icon: LayoutDashboard, label: 'Home',  v: 'library',    dis: false },
+  { icon: GraduationCap,   label: 'Study', v: 'study',      dis: false },
+  { icon: MessageSquare,   label: 'Tutor', v: 'chat',        dis: false },
+  { icon: Settings,        label: 'More',  v: '__more__',   dis: false },
+];
+
+// Secondary views reachable from the "More" drawer
+const MORE_ITEMS = [
+  { icon: BookOpen,      label: 'Library',   v: 'library' },
+  { icon: Layers,        label: 'Flashcards',v: 'flashcards' },
+  { icon: CheckSquare,   label: 'Exams',     v: 'exams' },
+  { icon: Activity,      label: 'Cases',     v: 'cases' },
+  { icon: Brain,         label: 'Graph',     v: 'knowledge' },
+  { icon: BarChart2,     label: 'Analytics', v: 'analytics' },
+  { icon: Settings,      label: 'Settings',  v: 'settings' },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -4684,7 +4841,7 @@ const NAV_ITEMS = [
 ═══════════════════════════════════════════════════════════════════ */
 function App() {
   const [loaded, setLoaded] = useState(false);
-  const [bootError, setBootError] = useState(null); // Fix 9: surface DB failures to user
+  const [bootError, setBootError] = useState(null);
   const [docs, setDocs] = useState([]);
   const [openDocs, setOpenDocs] = useState([]);
   const [activeId, setActiveId] = useState(null);
@@ -4708,6 +4865,11 @@ function App() {
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 1024);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  // NEW: advanced features state
+  const [deepFocus, setDeepFocus] = useState(false);
+  const [showVoiceTutor, setShowVoiceTutor] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   const { toasts, addToast } = useToast();
 
   useEffect(() => {
@@ -5025,7 +5187,8 @@ function App() {
   };
 
   if (!loaded) return (
-    <div className="h-[100dvh] w-screen flex flex-col items-center justify-center bg-white gap-4">
+    <div className="h-[100dvh] w-screen flex flex-col items-center justify-center gap-4"
+      style={{ background: 'linear-gradient(135deg,#f0f4ff 0%,#e8eeff 100%)' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -5245,7 +5408,7 @@ function App() {
         /* ══ MISC ══ */
         /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
         .scroll-content { padding-bottom:calc(96px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
-        @media(min-width:1024px){ .scroll-content { padding-bottom:32px; } }
+        @media(min-width:1024px){ .scroll-content { padding-bottom:0; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
         .prose-custom strong { font-weight:800; }
@@ -5262,32 +5425,275 @@ function App() {
         .drag-h-row { cursor:row-resize; height:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent; transition:background .15s; }
         .drag-h-row:hover { background:rgba(var(--acc-rgb,99,102,241),.12); }
 
-        /* ══ ANSWER OPTION ══ */
-        .answer-opt { transition:all .13s ease; cursor:pointer; border:1.5px solid var(--border2,var(--border)); background:var(--surface,var(--card)); border-radius:14px; }
-        .answer-opt:not(:disabled):hover { border-color:rgba(var(--acc-rgb,99,102,241),.4); background:rgba(var(--acc-rgb,99,102,241),.05); transform:translateX(3px); }
-        .answer-opt.selected  { border-color:var(--accent); background:rgba(var(--acc-rgb,99,102,241),.1); }
-        .answer-opt.correct   { border-color:#10b981; background:rgba(16,185,129,.1); }
-        .answer-opt.wrong     { border-color:#f43f5e; background:rgba(244,63,94,.08); }
+        /* ══ ANSWER OPTION — reference rounded-2xl style ══ */
+        .answer-opt { transition:all .3s cubic-bezier(.16,1,.3,1); cursor:pointer; border:1px solid var(--border2,var(--border)); background:var(--surface,rgba(255,255,255,0.05)); border-radius:1rem; }
+        .answer-opt:not(:disabled):hover { border-color:rgba(var(--acc-rgb,59,130,246),.45); background:rgba(var(--acc-rgb,59,130,246),.08); box-shadow:0 4px 16px rgba(0,0,0,.12); }
+        .answer-opt.selected  { border-color:var(--accent); background:rgba(var(--acc-rgb,59,130,246),.15); box-shadow:0 8px 24px rgba(var(--acc-rgb,59,130,246),.2); }
+        .answer-opt.correct   { border-color:#10b981!important; background:rgba(16,185,129,.12)!important; box-shadow:0 8px 24px rgba(16,185,129,.15)!important; }
+        .answer-opt.wrong     { border-color:#f43f5e!important; background:rgba(244,63,94,.08)!important; }
+        .answer-opt:disabled  { opacity:.6; cursor:default; }
 
         /* ══ BADGE ══ */
-        .badge { display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(var(--acc-rgb,99,102,241),.1); color:var(--accent); border:1px solid rgba(var(--acc-rgb,99,102,241),.2); }
+        .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:700; background:rgba(var(--acc-rgb,99,102,241),.1); color:var(--accent); border:1px solid rgba(var(--acc-rgb,99,102,241),.2); letter-spacing:.02em; }
+        .badge-success { background:rgba(16,185,129,.1); color:#10b981; border-color:rgba(16,185,129,.2); }
+        .badge-warn    { background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2); }
+        .badge-danger  { background:rgba(244,63,94,.1);  color:#f43f5e; border-color:rgba(244,63,94,.2); }
+        .badge-info    { background:rgba(14,165,233,.1); color:#0ea5e9; border-color:rgba(14,165,233,.2); }
+
+        /* ══ SEMANTIC FEEDBACK TOKENS ══ */
+        :root {
+          --success:#10b981; --success-bg:rgba(16,185,129,.1); --success-border:rgba(16,185,129,.25);
+          --danger:#f43f5e;  --danger-bg:rgba(244,63,94,.08);  --danger-border:rgba(244,63,94,.25);
+          --warning:#f59e0b; --warning-bg:rgba(245,158,11,.08); --warning-border:rgba(245,158,11,.25);
+          --info:#0ea5e9;    --info-bg:rgba(14,165,233,.08);   --info-border:rgba(14,165,233,.25);
+          --lab-high:#ef4444; --lab-low:#3b82f6; --lab-critical:#dc2626;
+          --nav-h-actual: 72px;
+          --header-h: 56px;
+          --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-2xl:24px; --radius-3xl:32px;
+          --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+          --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
+          --shadow-lg:0 12px 40px rgba(0,0,0,.15),0 4px 12px rgba(0,0,0,.08);
+          --shadow-accent:0 8px 32px rgba(var(--acc-rgb,99,102,241),.28);
+        }
+
+        /* ══ DESIGN SYSTEM — layout shells ══ */
+        .design-top-glass {
+          position:fixed; top:0; left:0; right:0; height:var(--header-h);
+          background:var(--nav-bg); backdrop-filter:saturate(180%) blur(24px);
+          -webkit-backdrop-filter:saturate(180%) blur(24px);
+          border-bottom:1px solid var(--border2,var(--border));
+          z-index:100; pointer-events:none;
+        }
+
+        .design-header {
+          position:fixed; top:0; left:0; right:0;
+          height:var(--header-h);
+          display:flex; align-items:center; justify-content:space-between;
+          padding:0 16px;
+          padding-top:env(safe-area-inset-top);
+          z-index:101;
+        }
+
+        .design-body {
+          display:flex; flex:1; min-height:0; overflow:hidden;
+          margin-top:var(--header-h);
+        }
+
+        .design-main {
+          flex:1; display:flex; flex-direction:column;
+          min-height:0; overflow:hidden; overflow-y:auto;
+          position:relative;
+          padding-bottom:calc(140px + env(safe-area-inset-bottom));
+        }
+        @media(min-width:1024px){ .design-main { padding-bottom:0 !important; } }
+
+        /* ══ PILL NAV — production-grade ══ */
+        .design-nav {
+          position:fixed; bottom:0; left:0; right:0;
+          height:calc(var(--nav-h-actual) + env(safe-area-inset-bottom));
+          padding-bottom:env(safe-area-inset-bottom);
+          display:flex; align-items:flex-start; justify-content:center;
+          z-index:200; padding-top:8px;
+          background:var(--nav-bg);
+          backdrop-filter:saturate(200%) blur(28px);
+          -webkit-backdrop-filter:saturate(200%) blur(28px);
+          border-top:1px solid var(--border2,var(--border));
+          box-shadow:0 -8px 32px rgba(0,0,0,.08),0 -1px 0 var(--border,rgba(0,0,0,.05));
+          /* Allow More drawer to overflow upward */
+          overflow:visible;
+        }
+        @media (min-width:1024px) {
+          .design-nav { display:none !important; }
+        }
+
+        .design-nav.keyboard-open-hidden {
+          transform:translateY(calc(100% + env(safe-area-inset-bottom)));
+          opacity:0; pointer-events:none; transition:transform .28s ease,opacity .2s ease;
+        }
+
+        .design-nav-inner {
+          display:flex; align-items:center; justify-content:center;
+          gap:4px; width:100%; max-width:440px; padding:0 12px;
+        }
+
+        .design-nav-btn {
+          flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+          gap:4px; padding:6px 4px 4px; border-radius:16px;
+          border:none; background:transparent; cursor:pointer;
+          color:var(--text3,var(--text2)); opacity:.65;
+          transition:all .2s cubic-bezier(.34,1.3,.64,1);
+          /* WCAG AAA: 44×44px minimum touch target */
+          min-height:56px; min-width:72px; position:relative;
+        }
+        .design-nav-btn:not(:disabled):hover { opacity:.9; transform:translateY(-1px); }
+        .design-nav-btn:not(:disabled):active { transform:scale(.93); }
+        .design-nav-btn.active {
+          color:var(--accent); opacity:1;
+          background:rgba(var(--acc-rgb,99,102,241),.12);
+        }
+        .design-nav-btn.active::before {
+          content:''; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+          width:36px; height:3px; border-radius:0 0 5px 5px;
+          background:var(--accent); transition:width .2s ease;
+        }
+        .design-nav-btn:disabled { opacity:.25; cursor:not-allowed; }
+        .design-nav-label {
+          font-size:10px; font-weight:800; letter-spacing:.04em;
+          text-transform:uppercase; line-height:1;
+        }
+
+        /* ══ IMPROVED ANSWER REVEAL ANIMATION ══ */
+        @keyframes answer-reveal { from{opacity:0;transform:translateY(8px) scale(.97)} to{opacity:1;transform:none} }
+        .answer-revealed { animation:answer-reveal .22s cubic-bezier(.34,1.3,.64,1) both; }
+
+        /* ══ CONTEXT TAG — for AI tutor button label ══ */
+        .context-tag {
+          display:inline-flex; align-items:center; gap:5px;
+          padding:2px 8px; border-radius:999px; font-size:10px; font-weight:800;
+          text-transform:uppercase; letter-spacing:.06em;
+          background:rgba(var(--acc-rgb,99,102,241),.12); color:var(--accent);
+          border:1px solid rgba(var(--acc-rgb,99,102,241),.2);
+          white-space:nowrap;
+        }
+
+        /* ══ LAB TABLE — semantic colors ══ */
+        .lab-high  { color:var(--lab-high); font-weight:700; }
+        .lab-low   { color:var(--lab-low); font-weight:700; }
+        .lab-crit  { color:var(--lab-critical); font-weight:800; background:rgba(220,38,38,.08); border-radius:4px; padding:1px 5px; }
+
+        /* ══ TOAST — semantic states ══ */
+        .toast-success { border-left:3px solid var(--success) !important; }
+        .toast-error   { border-left:3px solid var(--danger)  !important; }
+        .toast-warning { border-left:3px solid var(--warning) !important; }
+        .toast-info    { border-left:3px solid var(--info)    !important; }
+
+        /* ══ FOCUS RINGS — accessibility ══ */
+        :focus-visible {
+          outline:2px solid var(--accent); outline-offset:2px;
+          border-radius:6px;
+        }
+        button:focus-visible, a:focus-visible { border-radius:8px; }
+
+        /* ══ REDUCED MOTION ══ */
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+        }
+
+        /* ══ IMPROVED TYPOGRAPHY ══ */
+        h1,h2,h3 { line-height:1.25; letter-spacing:-.02em; }
+        p, li, td { line-height:1.7; }
+        .clinical-text { font-size:1.05rem; line-height:1.8; letter-spacing:.005em; }
+
+        /* ══ SKELETON CARDS ══ */
+        .skeleton { border-radius:12px; overflow:hidden; }
+        .skeleton-line { height:14px; border-radius:7px; margin-bottom:8px; }
+        .skeleton-line:last-child { width:60%; margin-bottom:0; }
+
+        /* ══ IMPROVED CARD STATES ══ */
+        .card-interactive {
+          transition:all .2s cubic-bezier(.34,1.1,.64,1);
+          cursor:pointer; border-radius:var(--radius-xl,20px);
+        }
+        .card-interactive:hover {
+          transform:translateY(-3px);
+          box-shadow:0 16px 48px rgba(var(--acc-rgb,99,102,241),.12),0 4px 12px rgba(0,0,0,.1);
+          border-color:rgba(var(--acc-rgb,99,102,241),.35) !important;
+        }
+        .card-interactive:active { transform:scale(.98) translateY(0); }
+
+        /* ══ EMPTY STATE ══ */
+        .empty-state {
+          display:flex; flex-direction:column; align-items:center; justify-content:center;
+          padding:48px 24px; text-align:center; gap:12px;
+        }
+        .empty-icon {
+          width:64px; height:64px; border-radius:20px;
+          display:flex; align-items:center; justify-content:center;
+          background:rgba(var(--acc-rgb,99,102,241),.08);
+          border:1.5px dashed rgba(var(--acc-rgb,99,102,241),.25);
+          margin-bottom:4px;
+        }
+
+        /* ══ IMPROVED SCROLLBAR ══ */
+        .custom-scrollbar { scrollbar-width:thin; scrollbar-color:rgba(var(--acc-rgb,99,102,241),.2) transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width:4px; height:4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background:transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background:rgba(var(--acc-rgb,99,102,241),.22); border-radius:6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background:rgba(var(--acc-rgb,99,102,241),.4); }
+
+        /* ══ PROGRESS BAR ══ */
+        .progress-bar { height:4px; border-radius:999px; overflow:hidden; background:var(--border2,var(--border)); }
+        .progress-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2,var(--accent))); transition:width .4s ease; }
+
+        /* ══ RESPONSIVE TOUCH TARGETS ══ */
+        @media(max-width:768px) {
+          button, a, [role=button] { min-height:44px; min-width:44px; }
+          .design-nav-btn { min-height:48px; }
+        }
+
+        /* ══ HEADER BRAND ══ */
+        .brand-mark {
+          display:flex; align-items:center; gap:10px; cursor:pointer;
+          padding:6px 12px 6px 6px; border-radius:14px;
+          transition:background .15s;
+        }
+        .brand-mark:hover { background:rgba(var(--acc-rgb,99,102,241),.07); }
+
+        /* ══ HEADER SEARCH BTN ══ */
+        .header-search {
+          display:flex; align-items:center; gap:8px;
+          padding:8px 16px; border-radius:12px;
+          border:1.5px solid var(--border2,var(--border));
+          background:var(--surface2,var(--card));
+          color:var(--text3); font-size:13px; font-weight:500;
+          transition:all .15s; cursor:pointer; white-space:nowrap;
+        }
+        .header-search:hover { border-color:rgba(var(--acc-rgb,99,102,241),.4); color:var(--text); background:var(--surface,var(--card)); }
+
+        /* ══ VERSION CHIP ══ */
+        .version-chip {
+          font-size:9px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+          padding:2px 7px; border-radius:6px;
+          background:rgba(var(--acc-rgb,99,102,241),.12); color:var(--accent);
+        }
+
+        /* ══ HEADER AI BTN ══ */
+        .header-ai-btn {
+          display:flex; align-items:center; gap:6px;
+          padding:8px 14px; border-radius:12px;
+          background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));
+          color:#fff; font-weight:800; font-size:12px; letter-spacing:.03em;
+          border:none; cursor:pointer;
+          box-shadow:0 4px 20px rgba(var(--acc-rgb,99,102,241),.35),inset 0 1px 0 rgba(255,255,255,.15);
+          transition:all .18s cubic-bezier(.34,1.4,.64,1);
+          white-space:nowrap;
+        }
+        .header-ai-btn:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.5); }
+        .header-ai-btn:active { transform:scale(.96); }
       `}</style>
-      <div className="relative">
-        <img src={MARIAM_IMG} className="w-16 h-16 rounded-2xl object-cover shadow-2xl" alt="MARIAM" />
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center">
-          <Loader2 className="animate-spin text-white" size={14} />
+      <div className="relative animate-scale-in">
+        <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30 scale-110"
+          style={{ background: 'linear-gradient(135deg,#5046e5,#7c3aed)' }} />
+        <img src={MARIAM_IMG} className="relative w-20 h-20 rounded-3xl object-cover shadow-2xl" alt="MARIAM"
+          style={{ boxShadow: '0 0 0 3px rgba(80,70,229,.3),0 16px 48px rgba(80,70,229,.3)' }} />
+        <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-xl flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg,#5046e5,#7c3aed)', boxShadow: '0 4px 12px rgba(80,70,229,.4)' }}>
+          <Loader2 className="animate-spin text-white" size={15} />
         </div>
       </div>
-      <div className="text-center">
-        <p className="text-lg font-black text-indigo-500">MARIAM PRO</p>
-        <p className="text-xs font-black uppercase tracking-[0.3em] opacity-30 mt-1">{APP_VER} · Loading</p>
+      <div className="text-center animate-slide-up" style={{ animationDelay: '.1s' }}>
+        <p className="text-xl font-black" style={{ fontFamily: 'Plus Jakarta Sans,system-ui', background: 'linear-gradient(135deg,#5046e5,#7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MARIAM PRO</p>
+        <p className="text-xs font-bold uppercase tracking-[0.3em] mt-1" style={{ color: '#8494bc' }}>{APP_VER} · Loading your study hub</p>
+      </div>
+      <div className="mt-2 w-32 h-1 rounded-full overflow-hidden animate-fade-in" style={{ background: 'rgba(80,70,229,.12)', animationDelay: '.2s' }}>
+        <div className="h-full rounded-full shimmer" style={{ background: 'linear-gradient(90deg,#5046e5,#7c3aed,#5046e5)', backgroundSize: '200% 100%' }} />
       </div>
     </div>
   );
 
   const showReader = view === 'reader' && !!activeId && !!activeDoc;
 
-  const NAV_ITEMS = [
+  const NAV_ITEMS_INNER = [
     { icon: FolderOpen, label: 'Library', v: 'library' },
     { icon: BookMarked, label: 'Reader', v: 'reader', dis: !activeId },
     { icon: Layers, label: 'Cards', v: 'flashcards' },
@@ -5298,125 +5704,381 @@ function App() {
   ];
 
   return (
-    <div className={`w-screen flex flex-col overflow-hidden text-[var(--text)] bg-mesh ${settings.theme || 'pure-white'} accent-${settings.accentColor || 'indigo'}`}
+    <div className={`w-screen flex flex-col overflow-hidden text-[var(--text)] ${settings.theme || 'dark'} accent-${settings.accentColor || 'indigo'}`}
       style={{
         height: '100%',
         maxHeight: '100%',
         boxSizing: 'border-box',
-        /* safe-area-inset-top is handled by the header below */
+        background: 'var(--bg)',
+        transition: 'background .5s ease, color .5s ease',
       }}>
       <style>{`
         /* ── ROOT RESET ── */
         /* Handled natively and at EOF of this block to enforce position: absolute */
         /* ── LIGHT THEMES ── */
-        .pure-white{--bg:#f8fafc;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#e0e7ff,transparent 45%),radial-gradient(circle at 50% 80%,#fef08a,transparent 45%),#f8fafc;--bg2:#ecf0ff;--surface:rgba(255,255,255,0.6);--surface2:rgba(255,255,255,0.5);--text:#1e293b;--text2:#475569;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(60,80,220,.13);--accent:#5046e5;--accent2:#7c3aed;--accent3:#0891b2;--acc-rgb:80,70,229;--nav-bg:rgba(255,255,255,0.4);--sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.5) 0%,rgba(238,242,255,.6) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,255,255,0.6);}
-        .light{--bg:#f8fafc;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#e0e7ff,transparent 45%),#f8fafc;--bg2:#e4eaff;--surface:rgba(255,255,255,0.6);--surface2:rgba(238,242,255,0.6);--text:#1e293b;--text2:#334155;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(40,70,220,.16);--accent:#4338ca;--accent2:#6d28d9;--accent3:#0284c7;--acc-rgb:67,56,202;--nav-bg:rgba(255,255,255,0.4);--sidebar-bg:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(232,240,255,.55) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,255,255,0.6);}
-        .warm{--bg:#fffbf5;--bg-gradient:radial-gradient(circle at 15% 50%,#fffbeb,transparent 45%),radial-gradient(circle at 85% 30%,#fef3c7,transparent 45%),#fffbf5;--bg2:#fff5e8;--surface:rgba(255,255,255,0.6);--surface2:rgba(255,248,240,0.7);--text:#1c1917;--text2:#57534e;--text3:#78716c;--border:rgba(255,251,235,0.7);--border2:rgba(180,110,20,.15);--accent:#ea580c;--accent2:#d97706;--accent3:#0891b2;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,0.5);--sidebar-bg:linear-gradient(180deg,rgba(255,248,234,.6) 0%,rgba(255,243,218,.5) 100%);--card:rgba(255,255,255,0.55);--card-border:rgba(255,251,235,0.7);}
-        .rose{--bg:#fff5f7;--bg-gradient:radial-gradient(circle at 15% 50%,#ffe4e6,transparent 45%),radial-gradient(circle at 85% 30%,#fce7f3,transparent 45%),#fff5f7;--bg2:#ffe8ed;--surface:rgba(255,255,255,0.55);--surface2:rgba(255,240,246,0.6);--text:#1c1917;--text2:#4c0519;--text3:#9d174d;--border:rgba(255,255,255,0.55);--border2:rgba(220,30,80,.15);--accent:#e11d48;--accent2:#be185d;--accent3:#0891b2;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,0.5);--sidebar-bg:linear-gradient(180deg,rgba(255,228,230,.5) 0%,rgba(254,226,226,.5) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(255,228,230,0.6);}
-        .forest{--bg:#f0fdf4;--bg-gradient:radial-gradient(circle at 15% 50%,#dcfce7,transparent 45%),radial-gradient(circle at 85% 30%,#bbf7d0,transparent 45%),#f0fdf4;--bg2:#e0f5ea;--surface:rgba(255,255,255,0.55);--surface2:rgba(236,253,245,0.6);--text:#052e16;--text2:#166534;--text3:#15803d;--border:rgba(220,252,231,0.6);--border2:rgba(20,130,55,.15);--accent:#059669;--accent2:#0d9488;--accent3:#7c3aed;--acc-rgb:5,150,105;--nav-bg:rgba(240,253,244,0.5);--sidebar-bg:linear-gradient(180deg,rgba(220,252,231,.5) 0%,rgba(187,247,208,.4) 100%);--card:rgba(255,255,255,0.5);--card-border:rgba(187,247,208,0.5);}
+        .pure-white{--bg:#eef2f6;--bg2:#e2e8f0;--surface:rgba(255,255,255,0.7);--surface2:rgba(255,255,255,0.5);--text:#0f0c29;--text2:#475569;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(255,255,255,1);--accent:#3b82f6;--accent2:#8b5cf6;--acc-rgb:59,130,246;--nav-bg:rgba(255,255,255,0.7);--sidebar-bg:rgba(238,242,246,0.95);--card:rgba(255,255,255,0.8);--card-border:rgba(255,255,255,1);}
+        .light{--bg:#eef2f6;--bg2:#e2e8f0;--surface:rgba(255,255,255,0.7);--surface2:rgba(255,255,255,0.5);--text:#0f0c29;--text2:#334155;--text3:#64748b;--border:rgba(255,255,255,0.6);--border2:rgba(255,255,255,1);--accent:#3b82f6;--accent2:#8b5cf6;--acc-rgb:59,130,246;--nav-bg:rgba(255,255,255,0.7);--sidebar-bg:rgba(238,242,246,0.95);--card:rgba(255,255,255,0.8);--card-border:rgba(255,255,255,1);}
+        .warm{--bg:#fffbf5;--bg2:#fff5e8;--surface:rgba(255,255,255,0.7);--surface2:rgba(255,248,240,0.7);--text:#1c1917;--text2:#57534e;--text3:#78716c;--border:rgba(255,251,235,0.7);--border2:rgba(255,255,255,.9);--accent:#ea580c;--accent2:#d97706;--acc-rgb:234,88,12;--nav-bg:rgba(255,251,245,0.75);--sidebar-bg:rgba(255,248,234,0.95);--card:rgba(255,255,255,0.75);--card-border:rgba(255,255,255,.9);}
+        .rose{--bg:#fff5f7;--bg2:#ffe8ed;--surface:rgba(255,255,255,0.7);--surface2:rgba(255,240,246,0.6);--text:#1c1917;--text2:#4c0519;--text3:#9d174d;--border:rgba(255,255,255,0.55);--border2:rgba(255,255,255,.9);--accent:#e11d48;--accent2:#be185d;--acc-rgb:225,29,72;--nav-bg:rgba(255,245,247,0.75);--sidebar-bg:rgba(255,228,230,0.95);--card:rgba(255,255,255,0.7);--card-border:rgba(255,228,230,.9);}
+        .forest{--bg:#f0fdf4;--bg2:#e0f5ea;--surface:rgba(255,255,255,0.7);--surface2:rgba(236,253,245,0.6);--text:#052e16;--text2:#166534;--text3:#15803d;--border:rgba(220,252,231,0.6);--border2:rgba(255,255,255,.9);--accent:#059669;--accent2:#0d9488;--acc-rgb:5,150,105;--nav-bg:rgba(240,253,244,0.75);--sidebar-bg:rgba(220,252,231,0.95);--card:rgba(255,255,255,0.7);--card-border:rgba(187,247,208,.9);}
         /* ── DARK THEMES ── */
-        .dark{--bg:#020617;--bg-gradient:radial-gradient(circle at 15% 20%,#1e1b4b,transparent 40%),radial-gradient(circle at 85% 60%,#0f172a,transparent 40%),radial-gradient(circle at 50% 90%,#312e81,transparent 40%),#020617;--bg2:#0f172a;--surface:rgba(15,23,42,0.5);--surface2:rgba(15,23,42,0.4);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.1);--border2:rgba(100,130,255,.14);--accent:#818cf8;--accent2:#a78bfa;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(15,23,42,0.5);--sidebar-bg:linear-gradient(180deg,rgba(15,23,42,.6) 0%,rgba(2,6,23,.9) 100%);--card:rgba(15,23,42,0.5);--card-border:rgba(255,255,255,0.1);}
-        .oled{--bg:#000000;--bg-gradient:radial-gradient(circle at 15% 20%,#0f172a,transparent 45%),radial-gradient(circle at 85% 60%,#0a0a14,transparent 45%),#000;--bg2:#030610;--surface:rgba(7,12,24,0.7);--surface2:rgba(11,16,32,0.6);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.08);--border2:rgba(80,120,255,.12);--accent:#818cf8;--accent2:#c084fc;--accent3:#22d3ee;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.7);--sidebar-bg:linear-gradient(180deg,rgba(2,6,16,.95) 0%,#000 100%);--card:rgba(7,12,24,0.8);--card-border:rgba(255,255,255,0.08);}
-        .midnight{--bg:#020617;--bg-gradient:radial-gradient(circle at 15% 20%,#1e1b4b,transparent 40%),radial-gradient(circle at 85% 60%,#312e81,transparent 40%),#020617;--bg2:#0e0e24;--surface:rgba(18,18,42,0.5);--surface2:rgba(24,24,58,0.45);--text:#f8fafc;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.1);--border2:rgba(140,140,255,.14);--accent:#6366f1;--accent2:#8b5cf6;--accent3:#22d3ee;--acc-rgb:99,102,241;--nav-bg:rgba(18,18,42,0.5);--sidebar-bg:linear-gradient(180deg,rgba(14,14,36,.7) 0%,rgba(10,10,23,.95) 100%);--card:rgba(18,18,42,0.5);--card-border:rgba(255,255,255,0.1);}
-        .slate{--bg:#0f172a;--bg-gradient:radial-gradient(circle at 15% 20%,#1e293b,transparent 40%),radial-gradient(circle at 85% 60%,#0f172a,transparent 40%),#0f172a;--bg2:#161820;--surface:rgba(30,33,48,0.55);--surface2:rgba(37,40,64,0.5);--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:rgba(255,255,255,0.08);--border2:rgba(100,130,180,.14);--accent:#38bdf8;--accent2:#818cf8;--accent3:#34d399;--acc-rgb:56,189,248;--nav-bg:rgba(15,23,42,0.55);--sidebar-bg:linear-gradient(180deg,rgba(22,24,32,.7) 0%,rgba(15,23,42,.95) 100%);--card:rgba(30,33,48,0.55);--card-border:rgba(255,255,255,0.1);}
-        /* ── ACCENT OVERRIDES (when user picks accent color) ── */
+        .dark{--bg:#0f0c29;--bg2:#1a1b36;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.05);--text:#ffffff;--text2:rgba(255,255,255,0.8);--text3:rgba(255,255,255,0.5);--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.15);--accent:#3b82f6;--accent2:#8b5cf6;--acc-rgb:59,130,246;--nav-bg:rgba(15,12,41,0.02);--sidebar-bg:rgba(15,12,41,0.90);--card:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.1);}
+        .oled{--bg:#000000;--bg2:#030610;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.05);--text:#ffffff;--text2:rgba(255,255,255,0.8);--text3:rgba(255,255,255,0.5);--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.12);--accent:#818cf8;--accent2:#c084fc;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.7);--sidebar-bg:rgba(2,6,16,0.95);--card:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.08);}
+        .midnight{--bg:#0f0c29;--bg2:#1a1b36;--surface:rgba(255,255,255,0.03);--surface2:rgba(255,255,255,0.05);--text:#ffffff;--text2:rgba(255,255,255,0.8);--text3:rgba(255,255,255,0.5);--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.15);--accent:#6366f1;--accent2:#8b5cf6;--acc-rgb:99,102,241;--nav-bg:rgba(15,12,41,0.02);--sidebar-bg:rgba(15,12,41,0.90);--card:rgba(255,255,255,0.03);--card-border:rgba(255,255,255,0.1);}
+        .slate{--bg:#0f172a;--bg2:#161820;--surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.06);--text:#f1f5f9;--text2:rgba(255,255,255,0.7);--text3:rgba(255,255,255,0.4);--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--accent:#38bdf8;--accent2:#818cf8;--acc-rgb:56,189,248;--nav-bg:rgba(15,23,42,0.55);--sidebar-bg:rgba(22,24,32,0.95);--card:rgba(255,255,255,0.04);--card-border:rgba(255,255,255,0.1);}
+        /* ══ FONTS ══ */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        *{font-family:'DM Sans',system-ui,sans-serif;}
+        h1,h2,h3,h4,.brand,.font-black{font-family:'Plus Jakarta Sans',system-ui,sans-serif!important;}
+        .mono,code,pre{font-family:'JetBrains Mono',monospace!important;}
+
+        /* ══ SEMANTIC DESIGN TOKENS ══ */
+        :root{
+          --success:#10b981;--success-bg:rgba(16,185,129,.1);--success-border:rgba(16,185,129,.25);
+          --danger:#f43f5e;--danger-bg:rgba(244,63,94,.08);--danger-border:rgba(244,63,94,.25);
+          --warning:#f59e0b;--warning-bg:rgba(245,158,11,.08);--warning-border:rgba(245,158,11,.25);
+          --info:#0ea5e9;--info-bg:rgba(14,165,233,.08);--info-border:rgba(14,165,233,.25);
+          --lab-high:#ef4444;--lab-low:#3b82f6;--lab-critical:#dc2626;
+          --header-h:56px;--nav-h-actual:72px;
+          --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-2xl:24px;--radius-3xl:32px;
+          --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+          --shadow-md:0 4px 16px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.06);
+          --shadow-lg:0 12px 40px rgba(0,0,0,.15),0 4px 12px rgba(0,0,0,.08);
+          --shadow-accent:0 8px 32px rgba(var(--acc-rgb,99,102,241),.28);
+        }
+
+        /* ══ ACCENT OVERRIDES ══ */
         .accent-indigo{--accent:#5046e5;--accent2:#7c3aed;--acc-rgb:80,70,229;}
         .accent-purple{--accent:#9333ea;--accent2:#7c3aed;--acc-rgb:147,51,234;}
-        .accent-blue{--accent:#2563eb;--accent2:#0891b2;--acc-rgb:37,99,235;}
+        .accent-blue{--accent:#3b82f6;--accent2:#8b5cf6;--acc-rgb:59,130,246;}
         .accent-emerald{--accent:#059669;--accent2:#0d9488;--acc-rgb:5,150,105;}
         .accent-rose{--accent:#e11d48;--accent2:#be185d;--acc-rgb:225,29,72;}
         .accent-amber{--accent:#d97706;--accent2:#ea580c;--acc-rgb:217,119,6;}
         .accent-cyan{--accent:#0891b2;--accent2:#0e7490;--acc-rgb:8,145,178;}
         .accent-teal{--accent:#0d9488;--accent2:#059669;--acc-rgb:13,148,136;}
-        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-        /* ── ROOT RESET ── */
-        html, body, #root {
-          margin: 0; padding: 0;
-          position: absolute; inset: 0;
-          width: 100%; height: 100%;
-          overflow: hidden;
-          overscroll-behavior: none;
-          background-color: var(--bg) !important; /* Fixes the white flash at the bottom */
-        }
-        #root { width: 100%; height: 100%; }
+
+        /* ══ ROOT RESET ══ */
+        html,body,#root{margin:0;padding:0;position:absolute;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background-color:var(--bg)!important;}
         input,textarea,select{font-size:16px!important;}
-        .custom-scrollbar{-webkit-overflow-scrolling:touch;}
-        .custom-scrollbar::-webkit-scrollbar{width:2px;height:2px;}
+        html{scroll-behavior:smooth;}
+        canvas{display:block;max-width:100%;height:auto!important;}
+        textarea{min-height:40px;}
+        input[type=range]{accent-color:var(--accent);}
+
+        /* ══ CUSTOM SCROLLBAR ══ */
+        .custom-scrollbar{scrollbar-width:thin;scrollbar-color:rgba(var(--acc-rgb,99,102,241),.2) transparent;-webkit-overflow-scrolling:touch;}
+        .custom-scrollbar::-webkit-scrollbar{width:4px;height:4px;}
         .custom-scrollbar::-webkit-scrollbar-track{background:transparent;}
-        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(var(--acc-rgb,99,102,241),.22);border-radius:4px;}
-        .glass{background:var(--surface,var(--card));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border,var(--border));border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.05);}
-        .glass-2{background:var(--surface2,var(--card));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-border,var(--border2,var(--border)));border-radius:20px;}
-        .card-lined{background:var(--surface,var(--card));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border,var(--border2,var(--border)));border-top:1.5px solid rgba(var(--acc-rgb,99,102,241),.25);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.08);}
-        .card-glow{background:linear-gradient(145deg,rgba(var(--acc-rgb,99,102,241),.08),rgba(var(--acc-rgb,99,102,241),.02));border:1px solid rgba(var(--acc-rgb,99,102,241),.22);box-shadow:0 0 28px rgba(var(--acc-rgb,99,102,241),.07);}
-        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;border:none;cursor:pointer;font-weight:800;letter-spacing:.01em;transition:all .18s cubic-bezier(.34,1.4,.64,1);box-shadow:0 4px 18px rgba(var(--acc-rgb,99,102,241),.3),inset 0 1px 0 rgba(255,255,255,.13);position:relative;overflow:hidden;}
-        @media (min-width: 1024px) { .btn-accent::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.09),transparent);} }
-        .btn-accent:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.42);}
-        .btn-accent:active{transform:scale(.97);}
+        .custom-scrollbar::-webkit-scrollbar-thumb{background:rgba(var(--acc-rgb,99,102,241),.22);border-radius:6px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover{background:rgba(var(--acc-rgb,99,102,241),.42);}
+
+        /* ══ SURFACES — iOS 26 reference: theme-aware deep glassmorphism ══ */
+        .glass{
+          backdrop-filter:saturate(150%) blur(120px);
+          -webkit-backdrop-filter:saturate(150%) blur(120px);
+          border-radius:2.5rem;
+          transition:background .5s ease,border-color .5s ease;
+        }
+        .dark .glass,.midnight .glass,.oled .glass,.slate .glass{
+          background:rgba(255,255,255,0.02);
+          border:1px solid rgba(255,255,255,0.15);
+          box-shadow:0 30px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.15);
+        }
+        .pure-white .glass,.light .glass,.warm .glass,.rose .glass,.forest .glass{
+          background:rgba(255,255,255,0.7);
+          border:1px solid rgba(255,255,255,1);
+          box-shadow:0 30px 60px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,1);
+        }
+        .glass-2{
+          backdrop-filter:saturate(140%) blur(80px);-webkit-backdrop-filter:saturate(140%) blur(80px);
+          border-radius:2rem;
+        }
+        .dark .glass-2,.midnight .glass-2,.oled .glass-2,.slate .glass-2{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);}
+        .pure-white .glass-2,.light .glass-2,.warm .glass-2,.rose .glass-2,.forest .glass-2{background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,.8);}
+        .glass-sm{
+          backdrop-filter:saturate(150%) blur(40px);-webkit-backdrop-filter:saturate(150%) blur(40px);
+          border-radius:1rem;
+        }
+        .dark .glass-sm,.midnight .glass-sm,.oled .glass-sm,.slate .glass-sm{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.2);}
+        .pure-white .glass-sm,.light .glass-sm,.warm .glass-sm,.rose .glass-sm,.forest .glass-sm{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);box-shadow:0 4px 20px rgba(0,0,0,.05);}
+        .card-lined{
+          backdrop-filter:saturate(150%) blur(120px);-webkit-backdrop-filter:saturate(150%) blur(120px);
+          border-radius:2.5rem;
+        }
+        .dark .card-lined,.midnight .card-lined,.oled .card-lined,.slate .card-lined{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.15);border-top:2px solid rgba(var(--acc-rgb,59,130,246),.35);box-shadow:0 30px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);}
+        .pure-white .card-lined,.light .card-lined,.warm .card-lined,.rose .card-lined,.forest .card-lined{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);border-top:2px solid rgba(var(--acc-rgb,59,130,246),.28);box-shadow:0 30px 60px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,1);}
+        .card-glow{backdrop-filter:saturate(150%) blur(80px);-webkit-backdrop-filter:saturate(150%) blur(80px);border-radius:2.5rem;background:linear-gradient(145deg,rgba(var(--acc-rgb,59,130,246),.08),rgba(var(--acc-rgb,59,130,246),.02));border:1px solid rgba(var(--acc-rgb,59,130,246),.22);box-shadow:0 0 40px rgba(var(--acc-rgb,59,130,246),.1);}
+        .glass-input{
+          backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+          border-radius:9999px;transition:border-color .2s,box-shadow .2s;
+        }
+        .dark .glass-input,.midnight .glass-input,.oled .glass-input,.slate .glass-input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#fff;}
+        .pure-white .glass-input,.light .glass-input,.warm .glass-input,.rose .glass-input,.forest .glass-input{background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,.8);color:#0f172a;}
+        .glass-input:focus{outline:none;border-color:rgba(var(--acc-rgb,59,130,246),.55);box-shadow:0 0 0 3px rgba(var(--acc-rgb,59,130,246),.12);}
+        /* ══ BUTTONS ══ */
+        .btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;border:none;cursor:pointer;font-weight:700;letter-spacing:.01em;transition:all .3s cubic-bezier(.34,1.4,.64,1);box-shadow:0 10px 30px rgba(var(--acc-rgb,59,130,246),.35);border-radius:9999px;position:relative;overflow:hidden;}
+        .btn-accent:hover{transform:translateY(-1px) scale(1.01);box-shadow:0 16px 40px rgba(var(--acc-rgb,59,130,246),.45);}
+        .btn-accent:active{transform:scale(.96);}
+        .btn-accent:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+        /* ══ GRADIENT TEXT ══ */
         .gradient-text{background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-        .card-hover{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;}
-        .card-hover:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(var(--acc-rgb,99,102,241),.1),0 2px 8px rgba(0,0,0,.15);border-color:rgba(var(--acc-rgb,99,102,241),.28)!important;}
+
+        /* ══ CARD HOVER ══ */
+        .card-hover{transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s ease,border-color .3s ease;}
+        .card-hover:hover{transform:translateY(-3px) scale(1.005);box-shadow:0 24px 50px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);}
+        .card-hover:active{transform:scale(.97);}
+
+        /* ══ CARD INTERACTIVE (with press state) ══ */
+        .card-interactive{transition:all .3s cubic-bezier(.16,1,.3,1);cursor:pointer;border-radius:2.5rem;}
+        .card-interactive:hover{transform:translateY(-4px);box-shadow:0 24px 50px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.1);}
+        .card-interactive:active{transform:scale(.97) translateY(0);}
+
+        /* ══ ANIMATIONS ══ */
         @keyframes slide-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
         @keyframes slide-up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
         @keyframes scale-in{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
         @keyframes fade-in{from{opacity:0}to{opacity:1}}
+        @keyframes fade-in-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes glow-ring{0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb,99,102,241),.3)}50%{box-shadow:0 0 0 6px rgba(var(--acc-rgb,99,102,241),0)}}
+        @keyframes glow-ring{0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb,59,130,246),.3)}50%{box-shadow:0 0 0 7px rgba(var(--acc-rgb,59,130,246),0)}}
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+        @keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
+        @keyframes answer-reveal{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+        @keyframes ticker{from{transform:scaleX(0)}to{transform:scaleX(1)}}
         .animate-slide-in{animation:slide-in .24s cubic-bezier(.34,1.2,.64,1) both;}
         .animate-slide-up{animation:slide-up .3s cubic-bezier(.34,1.2,.64,1) both;}
         .animate-scale-in{animation:scale-in .22s cubic-bezier(.34,1.3,.64,1) both;}
         .animate-fade-in{animation:fade-in .2s ease both;}
+        .animate-fade-in-up{animation:fade-in-up .5s cubic-bezier(.16,1,.3,1) both;}
         .animate-spin{animation:spin 1s linear infinite;}
         .animate-pulse{animation:glow-ring 2s ease infinite;}
         .animate-bounce{animation:float .9s ease-in-out infinite;}
+        .answer-revealed{animation:answer-reveal .22s cubic-bezier(.34,1.3,.64,1) both;}
         .stagger-1{animation-delay:.06s}.stagger-2{animation-delay:.12s}.stagger-3{animation-delay:.18s}
         .stagger-4{animation-delay:.24s}.stagger-5{animation-delay:.3s}.stagger-6{animation-delay:.36s}
+
+        /* ══ SHIMMER SKELETON ══ */
+        .shimmer{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3,var(--surface)) 50%,var(--surface2) 75%);background-size:400% 100%;animation:shimmer 1.5s ease infinite;}
+        .skeleton{border-radius:12px;overflow:hidden;}
+        .skeleton-line{height:14px;border-radius:7px;margin-bottom:8px;}
+        .skeleton-line:last-child{width:60%;margin-bottom:0;}
+
+        /* ══ LAYOUT SHELLS — floating pill header, full-screen body ══ */
+        .design-top-glass{display:none;} /* replaced by floating pill nav */
+        .design-header{
+          position:fixed;top:0;left:0;right:0;z-index:101;
+          display:flex;align-items:flex-start;justify-content:center;
+          padding-top:max(env(safe-area-inset-top),24px);
+          padding-left:16px;padding-right:16px;
+          pointer-events:none;
+          transition:padding-top .3s ease;
+        }
+        .design-header > *{pointer-events:auto;}
+        .design-body{display:flex;flex:1;min-height:0;overflow:hidden;margin-top:0;}
+        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(var(--header-h) + 48px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
+        @media(min-width:1024px){.design-main{padding-bottom:0!important;}}
+
+        /* ══ FLOATING PILL HEADER — iOS 26 reference exact ══ */
+        .mariam-pill-nav{
+          width:100%;max-width:1200px;
+          display:flex;align-items:center;justify-content:space-between;
+          transition:all .5s cubic-bezier(.16,1,.3,1);
+          border-radius:9999px;padding:8px 8px 8px 16px;
+        }
+        .mariam-pill-nav.scrolled{
+          padding:6px 6px 6px 20px;
+          backdrop-filter:saturate(150%) blur(100px);
+          -webkit-backdrop-filter:saturate(150%) blur(100px);
+        }
+        /* dark scrolled */
+        .dark .mariam-pill-nav.scrolled,.midnight .mariam-pill-nav.scrolled,.oled .mariam-pill-nav.scrolled,.slate .mariam-pill-nav.scrolled{
+          background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.15);
+          box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.1);
+        }
+        /* light scrolled */
+        .pure-white .mariam-pill-nav.scrolled,.light .mariam-pill-nav.scrolled,.warm .mariam-pill-nav.scrolled,.rose .mariam-pill-nav.scrolled,.forest .mariam-pill-nav.scrolled{
+          background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);
+          box-shadow:0 8px 32px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,1);
+        }
+
+        /* ── Tab pills container ── */
+        .mariam-tab-pills{
+          display:flex;align-items:center;gap:1px;padding:4px;border-radius:9999px;
+          backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+        }
+        .dark .mariam-tab-pills,.midnight .mariam-tab-pills,.oled .mariam-tab-pills,.slate .mariam-tab-pills{
+          background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);
+        }
+        .pure-white .mariam-tab-pills,.light .mariam-tab-pills,.warm .mariam-tab-pills,.rose .mariam-tab-pills,.forest .mariam-tab-pills{
+          background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);
+          box-shadow:inset 0 1px 3px rgba(0,0,0,.04);
+        }
+        .mariam-tab-pill{
+          padding:8px 20px;border-radius:9999px;font-size:14px;font-weight:500;
+          border:none;background:transparent;cursor:pointer;
+          transition:all .3s cubic-bezier(.16,1,.3,1);white-space:nowrap;
+        }
+        .dark .mariam-tab-pill,.midnight .mariam-tab-pill,.oled .mariam-tab-pill,.slate .mariam-tab-pill{color:rgba(255,255,255,0.7);}
+        .pure-white .mariam-tab-pill,.light .mariam-tab-pill,.warm .mariam-tab-pill,.rose .mariam-tab-pill,.forest .mariam-tab-pill{color:#475569;}
+        .dark .mariam-tab-pill:hover,.midnight .mariam-tab-pill:hover,.oled .mariam-tab-pill:hover,.slate .mariam-tab-pill:hover{color:#fff;background:rgba(255,255,255,0.08);}
+        .pure-white .mariam-tab-pill:hover,.light .mariam-tab-pill:hover,.warm .mariam-tab-pill:hover{color:#0f172a;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+        .mariam-tab-pill.active{color:var(--text)!important;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+        .dark .mariam-tab-pill.active,.midnight .mariam-tab-pill.active,.oled .mariam-tab-pill.active,.slate .mariam-tab-pill.active{background:rgba(255,255,255,0.1);}
+        .pure-white .mariam-tab-pill.active,.light .mariam-tab-pill.active,.warm .mariam-tab-pill.active,.rose .mariam-tab-pill.active,.forest .mariam-tab-pill.active{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+
+        /* ══ MOBILE FLOATING PILL NAV — exact reference: bottom-6 left-4 right-4 rounded-[2.5rem] ══ */
+        .design-nav{
+          position:fixed;
+          bottom:24px;left:16px;right:16px;
+          height:auto;
+          display:flex;align-items:center;justify-content:center;
+          z-index:200;overflow:visible;
+          /* no background on the outer element — it's on the inner pill */
+          background:transparent;border:none;
+        }
+        @media (min-width:1024px){
+          .design-nav{display:none!important;}
+        }
+        .design-nav.keyboard-open-hidden{transform:translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
+        .design-nav-inner{
+          display:flex;align-items:center;justify-content:space-between;
+          width:100%;padding:8px;
+          border-radius:2.5rem;
+          backdrop-filter:saturate(150%) blur(100px);
+          -webkit-backdrop-filter:saturate(150%) blur(100px);
+          position:relative;overflow:hidden;
+        }
+        .dark .design-nav-inner,.midnight .design-nav-inner,.oled .design-nav-inner,.slate .design-nav-inner{
+          background:rgba(255,255,255,0.02);
+          border:1px solid rgba(255,255,255,0.15);
+          box-shadow:0 20px 50px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);
+        }
+        .pure-white .design-nav-inner,.light .design-nav-inner,.warm .design-nav-inner,.rose .design-nav-inner,.forest .design-nav-inner{
+          background:rgba(255,255,255,0.7);
+          border:1px solid rgba(255,255,255,1);
+          box-shadow:0 20px 50px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,1);
+        }
+        .design-nav-btn{
+          flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:3px;padding:6px 2px;border-radius:1.8rem;
+          border:none;background:transparent;cursor:pointer;
+          opacity:.5;
+          transition:all .4s cubic-bezier(.16,1,.3,1);
+          min-height:64px;position:relative;
+        }
+        .dark .design-nav-btn,.midnight .design-nav-btn,.oled .design-nav-btn,.slate .design-nav-btn{color:rgba(255,255,255,0.5);}
+        .pure-white .design-nav-btn,.light .design-nav-btn,.warm .design-nav-btn,.rose .design-nav-btn,.forest .design-nav-btn{color:#94a3b8;}
+        .design-nav-btn:active{transform:scale(.93);}
+        .design-nav-btn.active{opacity:1;color:#3b82f6;}
+        .dark .design-nav-btn.active,.midnight .design-nav-btn.active,.oled .design-nav-btn.active,.slate .design-nav-btn.active{background:rgba(255,255,255,0.08);}
+        .pure-white .design-nav-btn.active,.light .design-nav-btn.active,.warm .design-nav-btn.active,.rose .design-nav-btn.active,.forest .design-nav-btn.active{background:rgba(0,0,0,0.04);}
+        .design-nav-btn:disabled{opacity:.2;cursor:not-allowed;}
+        .design-nav-label{font-size:11px;font-weight:600;letter-spacing:.01em;line-height:1;}
+
+        /* ══ SIDEBAR ══ */
         .sidebar-nav{background:var(--sidebar-bg);border-right:1px solid var(--border);}
+        .sidebar-nav button{border-radius:12px;margin:0 8px;transition:all .18s ease;}
+        .sidebar-nav button:not(:disabled):hover .nav-icon{opacity:1!important;transform:scale(1.1);}
         .nav-item-active{position:relative;}
         .nav-item-active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));}
         .mobile-nav{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--card-border,var(--border));border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,.15);}
         .main-header{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--card-border,var(--border));}
-        .bg-mesh{background:var(--bg-gradient,radial-gradient(ellipse 800px 600px at 0% 0%,rgba(var(--acc-rgb,99,102,241),.06) 0%,transparent 60%),radial-gradient(ellipse 600px 800px at 100% 100%,rgba(167,139,250,.04) 0%,transparent 60%),var(--bg));background-attachment:fixed;}
+
+        /* ══ BG MESH — transparent, blobs handled by fixed divs ══ */
+        .bg-mesh{background:transparent;}
+
+        /* ══ INPUTS — reference rounded-full style ══ */
+        .glass-input{background:var(--surface,rgba(255,255,255,0.04));border:1px solid var(--border);color:var(--text);transition:border-color .2s,box-shadow .2s;border-radius:9999px;}
+        .glass-input:focus{outline:none;border-color:rgba(var(--acc-rgb,59,130,246),.5);box-shadow:0 0 0 3px rgba(var(--acc-rgb,59,130,246),.1);}
+
+        /* ══ ANSWER OPTIONS — reference design ══ */
+        .answer-opt{transition:all .3s cubic-bezier(.16,1,.3,1);cursor:pointer;border-radius:1rem;}
+        .dark .answer-opt,.midnight .answer-opt,.oled .answer-opt,.slate .answer-opt{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);}
+        .pure-white .answer-opt,.light .answer-opt,.warm .answer-opt,.rose .answer-opt,.forest .answer-opt{border:1px solid transparent;background:rgba(255,255,255,0.5);}
+        .answer-opt:not(:disabled):hover{border-color:rgba(var(--acc-rgb,59,130,246),.45);background:rgba(var(--acc-rgb,59,130,246),.1);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+        .answer-opt.selected{border-color:var(--accent)!important;background:rgba(var(--acc-rgb,59,130,246),.15)!important;box-shadow:0 8px 24px rgba(var(--acc-rgb,59,130,246),.2)!important;}
+        .answer-opt.correct{border-color:var(--success)!important;background:var(--success-bg)!important;box-shadow:0 8px 24px rgba(16,185,129,.15)!important;}
+        .answer-opt.wrong{border-color:var(--danger)!important;background:var(--danger-bg)!important;}
+        .answer-opt:disabled{opacity:.6;cursor:default;}
+
+        /* ══ BADGES — semantic set ══ */
+        .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(var(--acc-rgb,99,102,241),.1);color:var(--accent);border:1px solid rgba(var(--acc-rgb,99,102,241),.2);letter-spacing:.02em;}
+        .badge-success{background:var(--success-bg);color:var(--success);border-color:var(--success-border);}
+        .badge-warn{background:var(--warning-bg);color:var(--warning);border-color:var(--warning-border);}
+        .badge-danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-border);}
+        .badge-info{background:var(--info-bg);color:var(--info);border-color:var(--info-border);}
+
+        /* ══ LAB TABLE SEMANTIC COLORS ══ */
+        .lab-high{color:var(--lab-high);font-weight:700;}
+        .lab-low{color:var(--lab-low);font-weight:700;}
+        .lab-crit{color:var(--lab-critical);font-weight:800;background:rgba(220,38,38,.08);border-radius:4px;padding:1px 5px;}
+
+        /* ══ TOAST STATES ══ */
+        .toast-success{border-left:3px solid var(--success)!important;}
+        .toast-error{border-left:3px solid var(--danger)!important;}
+        .toast-warning{border-left:3px solid var(--warning)!important;}
+        .toast-info{border-left:3px solid var(--info)!important;}
+
+        /* ══ DRAG HANDLES ══ */
+        .drag-handle,.drag-h{cursor:col-resize;display:flex;align-items:center;justify-content:center;width:8px;background:transparent;transition:background .15s;flex-shrink:0;}
+        .drag-handle:hover,.drag-h:hover{background:rgba(var(--acc-rgb,99,102,241),.14);}
+        .drag-h-row{cursor:row-resize;height:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;transition:background .15s;}
+        .drag-h-row:hover{background:rgba(var(--acc-rgb,99,102,241),.14);}
+
+        /* ══ EMPTY STATES ══ */
+        .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;gap:12px;}
+        .empty-icon{width:64px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(var(--acc-rgb,99,102,241),.08);border:1.5px dashed rgba(var(--acc-rgb,99,102,241),.25);margin-bottom:4px;}
+
+        /* ══ PROGRESS BAR ══ */
+        .progress-bar{height:4px;border-radius:999px;overflow:hidden;background:var(--border2,var(--border));}
+        .progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2,var(--accent)));transition:width .4s ease;}
+
+        /* ══ TYPOGRAPHY HELPERS ══ */
+        h1,h2,h3{line-height:1.25;letter-spacing:-.02em;}
+        p,li,td{line-height:1.7;}
+        .clinical-text{font-size:1.05rem;line-height:1.8;letter-spacing:.005em;}
         .prose-custom h2,.prose-custom h3{font-weight:800;margin:14px 0 5px;}
         .prose-custom li{margin:3px 0;}
         .prose-custom strong{font-weight:800;}
-        .scroll-content{padding-bottom:calc(96px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+        .section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3,var(--text));opacity:.7;}
+
+        /* ══ HEADER COMPONENTS ══ */
+        .brand-mark{display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 12px 6px 6px;border-radius:14px;transition:background .15s;}
+        .brand-mark:hover{background:rgba(var(--acc-rgb,99,102,241),.07);}
+        .version-chip{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:rgba(var(--acc-rgb,99,102,241),.12);color:var(--accent);}
+        .header-search{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;border:1.5px solid var(--border2,var(--border));background:var(--surface2,var(--card));color:var(--text3);font-size:13px;font-weight:500;transition:all .15s;cursor:pointer;white-space:nowrap;}
+        .header-search:hover{border-color:rgba(var(--acc-rgb,99,102,241),.4);color:var(--text);background:var(--surface,var(--card));}
+        .header-ai-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)));color:#fff;font-weight:800;font-size:12px;letter-spacing:.03em;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(var(--acc-rgb,99,102,241),.35),inset 0 1px 0 rgba(255,255,255,.15);transition:all .18s cubic-bezier(.34,1.4,.64,1);white-space:nowrap;}
+        .header-ai-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(var(--acc-rgb,99,102,241),.5);}
+        .header-ai-btn:active{transform:scale(.96);}
+        .context-tag{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:rgba(var(--acc-rgb,99,102,241),.12);color:var(--accent);border:1px solid rgba(var(--acc-rgb,99,102,241),.2);white-space:nowrap;}
+
+        /* ══ FOCUS — accessibility ══ */
+        :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px;}
+        button:focus-visible,a:focus-visible{border-radius:8px;}
+
+        /* ══ REDUCED MOTION ══ */
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+        /* ══ SCROLL CONTENT ══ */
+        .scroll-content{padding-bottom:calc(120px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
         @media(min-width:1024px){.scroll-content{padding-bottom:32px;}}
 
-        /* ── PILL NAV ITEM ACTIVE ── */
-        .pill-nav-active{position:relative;}
-        .pill-nav-active::before{display:none;}
-        /* ── SIDEBAR HOVER ── */
-        .sidebar-nav button:not(:disabled):hover .nav-icon{opacity:1!important;transform:scale(1.1);}
-        .sidebar-nav button{border-radius:12px;margin:0 8px;}
-        /* ── GLASS INPUTS ── */
-        .glass-input{background:var(--surface2,var(--card));border:1px solid var(--border2,var(--border));color:var(--text);transition:border-color .15s,box-shadow .15s;}
-        .glass-input:focus{outline:none;border-color:rgba(var(--acc-rgb,99,102,241),.5);box-shadow:0 0 0 3px rgba(var(--acc-rgb,99,102,241),.1);}
-        /* ── PILL BADGE ── */
-        .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(var(--acc-rgb,99,102,241),.1);color:var(--accent);border:1px solid rgba(var(--acc-rgb,99,102,241),.2);}
-        /* ── DRAG HANDLE ── */
-        .drag-handle{cursor:col-resize;display:flex;align-items:center;justify-content:center;width:8px;background:transparent;transition:background .15s;flex-shrink:0;}
-        .drag-handle:hover{background:rgba(var(--acc-rgb,99,102,241),.15);}
-        /* ── SECTION HEADER ── */
-        .section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3,var(--text));opacity:.7;}
-        /* ── STAT CARD SHIMMER on load ── */
-        @keyframes shimmer{0%{background-position:-400% 0}100%{background-position:400% 0}}
-        .shimmer{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3,var(--surface)) 50%,var(--surface2) 75%);background-size:400% 100%;animation:shimmer 1.5s ease infinite;}
-        /* ── RESPONSIVE FIXES ── */
+        /* ══ RESPONSIVE ══ */
         @media(max-width:640px){
           .hide-mobile{display:none!important;}
           .glass{backdrop-filter:none;-webkit-backdrop-filter:none;}
+          button,[role=button]{min-height:44px;}
         }
-        @media(min-width:1024px){
-          .hide-desktop{display:none!important;}
-        }
-        /* ── CARD GRID RESPONSIVE ── */
+        @media(min-width:1024px){.hide-desktop{display:none!important;}}
         .responsive-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
         @media(max-width:640px){.responsive-grid{grid-template-columns:1fr;}}
-        canvas{display:block;max-width:100%;height:auto!important;}
-        textarea{min-height:40px;}
-        input[type=range]{accent-color:var(--accent);}
-        html{scroll-behavior:smooth;}
+        .pill-nav-active{position:relative;}
+        .pill-nav-active::before{display:none;}
+        @media(max-width:640px){.hide-sm{display:none!important;}}
+        @media(min-width:1024px){.lg-only{display:flex!important;}}
       `}</style>
       <ToastContainer toasts={toasts} />
       {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
@@ -5431,33 +6093,104 @@ function App() {
 
       {/* Boot error banner — shown when IndexedDB failed to restore saved data */}
       {bootError && (
-        <div className="shrink-0 bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300">
+        <div className="shrink-0 border-b px-4 py-2 flex items-center gap-2 text-xs font-bold"
+          style={{ background: 'var(--warning-bg)', borderColor: 'var(--warning-border)', color: 'var(--warning)' }}>
           <AlertCircle size={16} className="shrink-0" />
           <span>Could not restore your previous session — starting fresh. ({bootError})</span>
           <button onClick={() => setBootError(null)} className="ml-auto opacity-60 hover:opacity-100"><X size={16} /></button>
         </div>
       )}
 
-      <div className="design-top-glass" aria-hidden="true" />
+      {/* GRADIENT BLOBS — exact match to reference design */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden" aria-hidden="true">
+        <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full"
+          style={{ background: 'rgba(147,51,234,0.45)', filter: 'blur(130px)', mixBlendMode: 'screen' }} />
+        <div className="absolute top-[15%] right-[-15%] w-[65%] h-[65%] rounded-full"
+          style={{ background: 'rgba(59,130,246,0.38)', filter: 'blur(160px)', mixBlendMode: 'screen' }} />
+        <div className="absolute bottom-[-25%] left-[15%] w-[75%] h-[75%] rounded-full"
+          style={{ background: 'rgba(219,39,119,0.35)', filter: 'blur(140px)', mixBlendMode: 'screen' }} />
+      </div>
 
-      {/* HEADER — gooddesign: centered, frosted glass */}
-      <header className="design-header shrink-0 relative">
-        <div className="flex items-center justify-center gap-2">
-          <img src={MARIAM_IMG} alt="" className="w-9 h-9 rounded-xl object-cover" />
-          <span className="font-bold text-[1.5rem]">MARIAM</span>
+      {/* FLOATING PILL HEADER — exact reference design */}
+      <header className="design-header shrink-0">
+        <div className={`mariam-pill-nav ${headerScrolled ? 'scrolled' : ''}`}>
+          {/* Brand */}
+          <div className="flex items-center gap-3 cursor-pointer group shrink-0" onClick={() => setView('library')}>
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center border transition-transform group-hover:scale-105"
+                style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.2)' }}>
+                <img src={MARIAM_IMG} alt="MARIAM" className="w-8 h-8 rounded-full object-cover" />
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2" style={{ background: 'var(--success)', borderColor: 'var(--bg)' }} />
+            </div>
+            <span className="hidden md:block text-base font-semibold tracking-tight" style={{ color: 'var(--text)', fontFamily: 'Plus Jakarta Sans,system-ui' }}>
+              MARIAM <span className="opacity-40 text-xs font-normal">{APP_VER}</span>
+            </span>
+          </div>
+
+          {/* Center pill tabs — desktop only */}
+          <div className="hidden lg:flex mariam-tab-pills">
+            {[
+              ['library','Library'], ['study','Study'], ['flashcards','Cards'],
+              ['exams','Exams'], ['cases','Cases'], ['chat','Tutor'], ['settings','Settings']
+            ].map(([v, label]) => (
+              <button key={v} onClick={() => setView(v)}
+                className={`mariam-tab-pill ${view === v ? 'active' : ''}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Search */}
+            <button onClick={() => setShowGlobalSearch(true)}
+              className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all border"
+              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: 'var(--text3)' }}
+              aria-label="Search (Ctrl+K)">
+              <Search size={15} />
+              <span className="hidden md:inline opacity-60">Search…</span>
+              <span className="hidden md:inline text-xs opacity-30 font-mono">⌘K</span>
+            </button>
+            {/* Pomodoro */}
+            <PomodoroWidget onComplete={() => addToast('⏰ Timer complete!', 'success')} />
+            {/* Deep Focus */}
+            <button onClick={() => setDeepFocus(p => !p)}
+              className="w-10 h-10 flex items-center justify-center rounded-full border transition-all"
+              style={{ background: deepFocus ? 'rgba(var(--acc-rgb,59,130,246),.15)' : 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: deepFocus ? 'var(--accent)' : 'var(--text3)' }}
+              title="Deep Focus">
+              <Focus size={16} />
+            </button>
+            {/* Voice Tutor */}
+            <button onClick={() => setShowVoiceTutor(true)}
+              className="w-10 h-10 flex items-center justify-center rounded-full border transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: 'var(--text3)' }}
+              title="Voice Tutor">
+              <Mic size={16} />
+            </button>
+            {/* AI Studio */}
+            <button onClick={() => setRpOpen(p => !p)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all active:scale-95"
+              style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', color: '#fff', boxShadow: '0 10px 30px rgba(var(--acc-rgb,59,130,246),.35)' }}
+              aria-label="AI Studio" aria-pressed={rpOpen}>
+              <Sparkles size={15} />
+              <span className="hidden sm:inline">
+                {view === 'flashcards' ? 'Explain Card' : view === 'exams' ? 'Help Question' : view === 'cases' ? 'Analyze Case' : 'AI Studio'}
+              </span>
+            </button>
+          </div>
         </div>
-        <button onClick={() => setShowGlobalSearch(true)} className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-          <Search size={18} />
-        </button>
       </header>
 
       {/* BODY — no sidebar, bottom nav for all */}
       <div className="design-body flex flex-1 min-h-0 overflow-hidden">
-        {/* MAIN CONTENT — gooddesign: padding-bottom for bottom nav */}
-        <main className="design-main flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative" style={{ paddingBottom: 120 }}>
+        {/* MAIN CONTENT */}
+        <main className="design-main flex-1 flex flex-col min-h-0 overflow-hidden overflow-y-auto relative"
+          style={{ paddingTop: 'calc(var(--header-h, 56px) + 56px)' }}
+          onScroll={e => setHeaderScrolled(e.currentTarget.scrollTop > 20)}>
           {uploading && (
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--border)] z-50">
-              <div className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] transition-all duration-300 animate-pulse" style={{ width: `${uploadPct}%` }} />
+            <div className="absolute top-0 left-0 right-0 z-50 progress-bar" style={{ borderRadius: 0 }}>
+              <div className="progress-fill" style={{ width: `${uploadPct}%` }} />
             </div>
           )}
 
@@ -5482,6 +6215,16 @@ function App() {
           <ViewWrapper active={view === 'settings'}>
             <SettingsView settings={settings} setSettings={setSettings} installPrompt={installPrompt} onInstall={onInstall} />
           </ViewWrapper>
+          {/* NEW VIEWS */}
+          <ViewWrapper active={view === 'knowledge'}>
+            <KnowledgeGraphView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+          </ViewWrapper>
+          <ViewWrapper active={view === 'analytics'}>
+            <AnalyticsView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+          </ViewWrapper>
+          <ViewWrapper active={view === 'study'}>
+            <SmartStudyMode flashcards={flashcards} exams={exams} cases={cases} settings={settings} addToast={addToast} setFlashcards={setFlashcards} />
+          </ViewWrapper>
           <ViewWrapper active={showReader}>
             {activeDoc && (
               <DocWorkspace activeDoc={activeDoc} setDocs={setDocs}
@@ -5492,25 +6235,49 @@ function App() {
           </ViewWrapper>
         </main>
 
-        {/* AI STUDIO PANEL */}
+        {/* AI STUDIO PANEL — reference: fixed right sidebar with deep blur */}
         {showReader && rpOpen && (
           <>
             <div onMouseDown={startRpDrag} onTouchStart={startRpDrag}
-              className="hidden lg:flex w-2 cursor-col-resize items-center justify-center bg-[var(--border)]/30 hover:bg-[var(--accent)]/30 shrink-0 z-[120] touch-none transition-colors group">
-              <GripVertical size={16} className="text-[var(--text)] opacity-20 group-hover:opacity-60" />
+              className="hidden lg:flex w-2 cursor-col-resize items-center justify-center shrink-0 z-[120] touch-none transition-colors group"
+              style={{ background: 'rgba(255,255,255,0.03)' }}>
+              <div className="w-1.5 h-16 rounded-full transition-all"
+                style={{ background: 'rgba(255,255,255,0.15)' }} />
             </div>
-            <aside style={{ width: window.innerWidth >= 1024 ? `${rpW}px` : '100%' }}
-              className="glass flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto border-t-0 border-b-0 border-r-0 animate-slide-in h-full">
-              <div className="h-14 lg:h-16 bg-gradient-to-r from-[var(--accent)] to-[var(--accent2,var(--accent))] text-white flex items-center justify-between px-4 shrink-0">
-                <span className="font-black flex items-center gap-2 text-base"><Sparkles size={18} /> AI Studio</span>
-                <button onClick={() => setRpOpen(false)} className="w-8 h-8 hover:bg-white/20 rounded-xl flex items-center justify-center"><X size={18} /></button>
+            <aside
+              className="flex flex-col shrink-0 z-[100] lg:relative absolute inset-0 lg:inset-auto animate-fade-in-up h-full"
+              style={{ width: window.innerWidth >= 1024 ? `${rpW}px` : '100%', background: 'var(--sidebar-bg)', backdropFilter: 'saturate(150%) blur(100px)', WebkitBackdropFilter: 'saturate(150%) blur(100px)', borderLeft: '1px solid var(--border)', borderRadius: window.innerWidth >= 1024 ? '0 2.5rem 2.5rem 0' : 0 }}>
+              {/* Panel header */}
+              <div className="flex items-center justify-between px-6 py-5 shrink-0" style={{ borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(255,255,255,0.03)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
+                    <Sparkles size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-[15px] block" style={{ color: 'var(--text)' }}>AI Studio</span>
+                    <span className="text-[11px] opacity-50 block mt-0.5">
+                      {view === 'flashcards' ? 'Explaining current card' :
+                       view === 'exams' ? 'Helping with question' :
+                       view === 'cases' ? 'Analyzing case' :
+                       activeDoc ? activeDoc.name.slice(0, 28) : 'No document open'}
+                    </span>
+                  </div>
+                </div>
+                <button onClick={() => setRpOpen(false)} aria-label="Close AI Studio"
+                  className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text3)' }}>
+                  <X size={16} />
+                </button>
               </div>
-              <div className="flex shrink-0 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]">
+              {/* Tab bar */}
+              <div className="flex shrink-0 border-b" style={{ borderColor: 'var(--border2,var(--border))', background: 'var(--surface,var(--card))' }}>
                 {[['generate', 'Generate', Zap], ['chat', 'Chat', MessageSquare], ['vault', 'Vault', Database]].map(([id, lbl, Icon]) => (
-                  <button key={id} onClick={() => setRpTab(id)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-black uppercase tracking-widest transition-colors border-b-2
-                      ${rpTab === id ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-transparent text-[var(--text)] opacity-50 hover:opacity-80'}`}>
-                    <Icon size={16} />{lbl}
+                  <button key={id} onClick={() => setRpTab(id)} aria-pressed={rpTab === id}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-black uppercase tracking-widest transition-all border-b-2
+                      ${rpTab === id ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-transparent opacity-45 hover:opacity-70'}`}
+                    style={{ color: rpTab === id ? 'var(--accent)' : 'var(--text)' }}>
+                    <Icon size={14} />{lbl}
                   </button>
                 ))}
               </div>
@@ -5539,20 +6306,81 @@ function App() {
         )}
       </div>
 
-      {/* BOTTOM NAV — gooddesign pill nav, all viewports */}
-      <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}>
+      {/* BOTTOM NAV — 4 core tabs (WCAG AAA min 44px touch targets) */}
+      <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}
+        onClick={() => moreOpen && setMoreOpen(false)}>
         <div className="design-nav-inner">
-          {NAV_ITEMS.map(({ icon: Icon, label, v, dis }) => (
-            <button key={v} disabled={dis}
-              onClick={() => { if (!dis) { if (v === 'reader' && activeId) setView('reader'); else if (v !== 'reader') setView(v); } }}
-              className={`design-nav-btn ${view === v ? 'active' : ''}`}
-              title={label}>
-              <Icon size={22} strokeWidth={view === v ? 2.5 : 2} />
-              <span className="design-nav-label">{label}</span>
-            </button>
-          ))}
+          {/* Tab 1: Home/Library */}
+          <button onClick={() => { setMoreOpen(false); setView('library'); }}
+            className={`design-nav-btn ${['library','dashboard','reader'].includes(view) && !moreOpen ? 'active' : ''}`}
+            title="Library">
+            <LayoutDashboard size={22} strokeWidth={['library','dashboard','reader'].includes(view) && !moreOpen ? 2.5 : 2} />
+            <span className="design-nav-label">Home</span>
+          </button>
+
+          {/* Tab 2: Smart Study — hub for cards/exams/cases */}
+          <button onClick={() => { setMoreOpen(false); setView('study'); }}
+            className={`design-nav-btn ${['study','flashcards','exams','cases','knowledge','analytics'].includes(view) && !moreOpen ? 'active' : ''}`}
+            title="Study">
+            <GraduationCap size={22} strokeWidth={['study','flashcards','exams','cases','knowledge','analytics'].includes(view) && !moreOpen ? 2.5 : 2} />
+            <span className="design-nav-label">Study</span>
+          </button>
+
+          {/* Tab 3: AI Tutor / Chat */}
+          <button onClick={() => { setMoreOpen(false); setView('chat'); }}
+            className={`design-nav-btn ${view === 'chat' && !moreOpen ? 'active' : ''}`}
+            title="AI Tutor">
+            <MessageSquare size={22} strokeWidth={view === 'chat' && !moreOpen ? 2.5 : 2} />
+            <span className="design-nav-label">Tutor</span>
+          </button>
+
+          {/* Tab 4: More — opens drawer */}
+          <button onClick={e => { e.stopPropagation(); setMoreOpen(p => !p); }}
+            className={`design-nav-btn ${moreOpen || view === 'settings' ? 'active' : ''}`}
+            title="More">
+            <Grid size={22} strokeWidth={moreOpen || view === 'settings' ? 2.5 : 2} />
+            <span className="design-nav-label">More</span>
+          </button>
         </div>
+
+        {/* More drawer — slides up above nav */}
+        {moreOpen && (
+          <div className="absolute bottom-full left-0 right-0 mb-2 px-4 animate-slide-up" onClick={e => e.stopPropagation()}>
+            <div className="glass rounded-2xl p-3 shadow-2xl" style={{ border: '1px solid var(--border2,var(--border))' }}>
+              <div className="grid grid-cols-4 gap-2">
+                {MORE_ITEMS.map(({ icon: Icon, label, v }) => (
+                  <button key={v} onClick={() => { setView(v); setMoreOpen(false); }}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all hover:bg-[var(--accent)]/8 active:scale-95"
+                    style={{ color: view === v ? 'var(--accent)' : 'var(--text3)', background: view === v ? 'var(--accent)/10' : 'transparent' }}>
+                    <Icon size={20} strokeWidth={view === v ? 2.5 : 1.8} />
+                    <span className="text-[10px] font-black uppercase tracking-wider leading-none">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
+
+      {/* Deep Focus overlay */}
+      {deepFocus && (
+        <DeepFocusMode active={deepFocus} onExit={() => setDeepFocus(false)}
+          sessionLabel={view === 'flashcards' ? 'Flashcard Study' : view === 'exams' ? 'Exam Practice' : view === 'cases' ? 'Clinical Cases' : 'Study Session'}>
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+            {view === 'flashcards' && <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast} docs={docs} setExams={setExams} setCases={setCases} />}
+            {view === 'exams' && <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setCases={setCases} />}
+            {view === 'cases' && <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setExams={setExams} />}
+            {!['flashcards','exams','cases'].includes(view) && (
+              <div className="flex-1 flex items-center justify-center opacity-30">
+                <div className="text-center"><Focus size={48} className="mx-auto mb-4" /><p className="font-black">Deep Focus Active</p><p className="text-sm">Navigate to Cards, Exams, or Cases</p></div>
+              </div>
+            )}
+          </div>
+        </DeepFocusMode>
+      )}
+
+      {/* Voice Tutor modal */}
+      {showVoiceTutor && <VoiceTutorModal settings={settings} onClose={() => setShowVoiceTutor(false)} />}
 
     </div>
   );
@@ -5560,6 +6388,1222 @@ function App() {
 
 // Play icon polyfill
 const Play = ({ size = 16, ...p }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" {...p}><polygon points="5 3 19 12 5 21 5 3" /></svg>;
+
+/* ═══════════════════════════════════════════════════════════════════
+   FSRS-4.5 ALGORITHM — Advanced Spaced Repetition
+   Based on Free Spaced Repetition Scheduler (Jarrett Ye, 2022)
+   Replaces basic SM-2 with stability/difficulty decay model
+═══════════════════════════════════════════════════════════════════ */
+const FSRS = {
+  // Parameters (trained on 400M+ reviews)
+  w: [0.4072, 1.1829, 3.1262, 15.4722, 7.2102, 0.5316, 1.0651, 0.0589, 1.5330, 0.1544, 1.0070, 1.9813, 0.0953, 0.2975, 2.2042, 0.2407, 2.9466, 0.5034, 0.6567],
+  DECAY: -0.5,
+  FACTOR: 19 / 81,
+  R_TARGET: 0.9,
+
+  initStability(g) { return Math.max(0.1, [this.w[0], this.w[1], this.w[2], this.w[3]][Math.min(g, 3)]); },
+  initDifficulty(g) { return Math.min(10, Math.max(1, this.w[4] - Math.exp(this.w[5] * (g - 1)) + 1)); },
+
+  nextForgetting(s) { return s * (Math.pow(this.FACTOR, 1 / this.DECAY) - 1) / this.FACTOR; },
+
+  retrievability(t, s) { return Math.pow(1 + this.FACTOR * t / s, this.DECAY); },
+
+  nextInterval(s, r = null) {
+    const targetR = r ?? this.R_TARGET;
+    const i = (s / this.FACTOR) * (Math.pow(targetR, 1 / this.DECAY) - 1);
+    return Math.max(1, Math.round(i));
+  },
+
+  nextDifficulty(d, g) {
+    const deltaD = -this.w[6] * (g - 3);
+    const dprime = d + deltaD * ((10 - d) / 9);
+    return Math.min(10, Math.max(1, this.w[7] * this.initDifficulty(2) + (1 - this.w[7]) * dprime));
+  },
+
+  nextStability(d, s, r, g) {
+    if (g === 0) {
+      // Forgotten
+      return this.w[11] * Math.pow(d, -this.w[12]) * (Math.pow(s + 1, this.w[13]) - 1) * Math.exp(this.w[14] * (1 - r));
+    }
+    // Remembered
+    const hardPenalty = g === 1 ? this.w[15] : 1;
+    const easyBonus = g === 3 ? this.w[16] : 1;
+    return s * (Math.exp(this.w[8]) * (11 - d) * Math.pow(s, -this.w[9]) * (Math.exp(this.w[10] * (1 - r)) - 1) * hardPenalty * easyBonus + 1);
+  },
+
+  // grade: 0=Again, 1=Hard, 2=Good, 3=Easy
+  schedule(card, grade) {
+    const now = Date.now();
+    const daysSince = card.lastReview ? (now - card.lastReview) / 86400000 : 0;
+    let s, d, r;
+
+    if (!card.stability) {
+      // New card — first review
+      s = this.initStability(grade);
+      d = this.initDifficulty(grade);
+      r = 1;
+    } else {
+      s = card.stability;
+      d = card.difficulty || 5;
+      r = this.retrievability(Math.max(1, daysSince), s);
+      d = this.nextDifficulty(d, grade);
+      s = this.nextStability(d, s, r, grade);
+    }
+
+    const interval = grade === 0 ? 1 : this.nextInterval(s);
+    return {
+      ...card,
+      stability: s,
+      difficulty: d,
+      lastReview: now,
+      nextReview: now + interval * 86400000,
+      interval,
+      retrievability: r,
+      reps: (card.reps || 0) + 1,
+      lapses: grade === 0 ? (card.lapses || 0) + 1 : (card.lapses || 0),
+    };
+  },
+
+  predictedScore(cards) {
+    if (!cards?.length) return 0;
+    const now = Date.now();
+    const scores = cards.map(c => {
+      if (!c.stability) return 0;
+      const days = Math.max(0, (now - (c.lastReview || now)) / 86400000);
+      return this.retrievability(days, c.stability) * 100;
+    });
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  },
+
+  masteryLevel(card) {
+    if (!card.stability) return 'new';
+    if (card.stability >= 30) return 'mastered';
+    if (card.stability >= 10) return 'learning';
+    if (card.lapses > 2) return 'struggling';
+    return 'reviewing';
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   DEEP FOCUS MODE — immersive study overlay
+═══════════════════════════════════════════════════════════════════ */
+function DeepFocusMode({ active, onExit, children, sessionLabel = 'Study Session' }) {
+  const [elapsed, setElapsed] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const startRef = useRef(Date.now());
+  const pauseRef = useRef(0);
+
+  useEffect(() => {
+    if (!active) { setElapsed(0); setPaused(false); return; }
+    startRef.current = Date.now();
+    const id = setInterval(() => {
+      if (!paused) setElapsed(Math.floor((Date.now() - startRef.current - pauseRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [active, paused]);
+
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  if (!active) return null;
+  return (
+    <div className="fixed inset-0 z-[9999] flex flex-col" style={{ background: 'var(--bg)' }}>
+      {/* Ambient top bar */}
+      <div className="flex items-center justify-between px-6 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />
+          <span className="text-xs font-black uppercase tracking-widest opacity-50">{sessionLabel}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-lg font-black tabular-nums" style={{ color: 'var(--accent)' }}>{fmt(elapsed)}</span>
+          <button onClick={() => setPaused(p => !p)} className="w-8 h-8 glass rounded-xl flex items-center justify-center">
+            {paused ? <Play size={14} /> : <Pause size={14} />}
+          </button>
+          <button onClick={onExit} className="w-8 h-8 glass rounded-xl flex items-center justify-center" title="Exit Deep Focus">
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">{children}</div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   POMODORO TIMER WIDGET — floating study timer
+═══════════════════════════════════════════════════════════════════ */
+function PomodoroWidget({ onComplete }) {
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('work'); // work | short | long
+  const DURATIONS = { work: 25 * 60, short: 5 * 60, long: 15 * 60 };
+  const [secs, setSecs] = useState(DURATIONS.work);
+  const [running, setRunning] = useState(false);
+  const [sessions, setSessions] = useState(0);
+
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      setSecs(s => {
+        if (s <= 1) {
+          clearInterval(id);
+          setRunning(false);
+          const nextMode = mode === 'work' ? (sessions + 1) % 4 === 0 ? 'long' : 'short' : 'work';
+          if (mode === 'work') setSessions(n => n + 1);
+          setMode(nextMode);
+          setSecs(DURATIONS[nextMode]);
+          onComplete?.();
+          try { new Notification('MARIAM Timer', { body: mode === 'work' ? '🎉 Break time!' : '📚 Back to work!', icon: '/M.jpeg' }); } catch {}
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running, mode, sessions]);
+
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  const pct = (1 - secs / DURATIONS[mode]) * 100;
+  const r = 18, circ = 2 * Math.PI * r;
+
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(p => !p)} className="w-9 h-9 glass rounded-xl flex items-center justify-center relative" title="Pomodoro Timer">
+        <svg width={22} height={22} viewBox="0 0 44 44" className="-rotate-90">
+          <circle cx={22} cy={22} r={r} fill="none" strokeWidth={4} stroke="var(--border)" />
+          <circle cx={22} cy={22} r={r} fill="none" strokeWidth={4} stroke="var(--accent)"
+            strokeDasharray={circ} strokeDashoffset={circ - (circ * pct / 100)} strokeLinecap="round"
+            style={{ transition: 'stroke-dashoffset .5s linear' }} />
+        </svg>
+        {running && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />}
+      </button>
+      {open && (
+        <div className="absolute top-12 right-0 z-[9999] glass rounded-2xl shadow-2xl p-4 w-52 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
+          <div className="flex gap-1.5 mb-3">
+            {Object.keys(DURATIONS).map(m => (
+              <button key={m} onClick={() => { setMode(m); setSecs(DURATIONS[m]); setRunning(false); }}
+                className="flex-1 text-xs font-black py-1 rounded-lg transition-all"
+                style={mode === m ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
+                {m === 'work' ? '25m' : m === 'short' ? '5m' : '15m'}
+              </button>
+            ))}
+          </div>
+          <div className="text-center mb-3">
+            <div className="text-3xl font-black tabular-nums" style={{ color: 'var(--accent)', fontFamily: 'JetBrains Mono,monospace' }}>{fmt(secs)}</div>
+            <div className="text-xs opacity-40 mt-1 capitalize font-bold">{mode === 'work' ? 'Focus' : mode === 'short' ? 'Short Break' : 'Long Break'} · {sessions} sessions</div>
+          </div>
+          <div className="progress-bar mb-3"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>
+          <div className="flex gap-2">
+            <button onClick={() => setRunning(p => !p)} className="btn-accent flex-1 py-2 rounded-xl text-xs font-black">
+              {running ? <><Pause size={12} className="inline mr-1" />Pause</> : <><Play size={12} className="inline mr-1" />Start</>}
+            </button>
+            <button onClick={() => { setSecs(DURATIONS[mode]); setRunning(false); }} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100">
+              <RotateCcw size={13} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KNOWLEDGE GRAPH VIEW — Force-directed concept graph
+═══════════════════════════════════════════════════════════════════ */
+function KnowledgeGraphView({ flashcards, exams, cases, docs, settings }) {
+  const canvasRef = useRef(null);
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [hovering, setHovering] = useState(null);
+  const animRef = useRef(null);
+  const nodesRef = useRef([]);
+  const edgesRef = useRef([]);
+  const [stats, setStats] = useState({ nodes: 0, edges: 0, mastered: 0, gaps: 0 });
+
+  // Build graph from study materials
+  useEffect(() => {
+    const nodeMap = {};
+    const edgeSet = new Set();
+    const edgeList = [];
+
+    const addNode = (id, label, type, docId, masteryData) => {
+      if (!nodeMap[id]) {
+        nodeMap[id] = {
+          id, label, type, docId,
+          stability: masteryData?.stability || 0,
+          reps: masteryData?.reps || 0,
+          lapses: masteryData?.lapses || 0,
+          x: Math.random() * 600 + 100, y: Math.random() * 400 + 100,
+          vx: 0, vy: 0, r: 20,
+        };
+      }
+    };
+
+    // Add flashcard concepts
+    flashcards.forEach(set => {
+      const setId = `set_${set.id}`;
+      addNode(setId, set.title?.slice(0, 28) || 'Cards', 'deck', set.docId);
+      set.cards?.forEach((card, i) => {
+        if (i >= 20) return; // limit per deck
+        const cid = `card_${set.id}_${i}`;
+        const words = (card.q || '').split(' ').slice(0, 5).join(' ');
+        addNode(cid, words, 'card', set.docId, card);
+        const ek = `${setId}__${cid}`;
+        if (!edgeSet.has(ek)) { edgeSet.add(ek); edgeList.push({ from: setId, to: cid, strength: 0.3 }); }
+      });
+    });
+
+    // Add exam question nodes
+    exams.forEach(ex => {
+      const exId = `exam_${ex.id}`;
+      addNode(exId, ex.title?.slice(0, 28) || 'Exam', 'exam', ex.docId);
+      ex.questions?.slice(0, 10).forEach((q, i) => {
+        const qid = `q_${ex.id}_${i}`;
+        addNode(qid, q.q?.split(' ').slice(0, 5).join(' ') || `Q${i+1}`, 'question', ex.docId);
+        const ek = `${exId}__${qid}`;
+        if (!edgeSet.has(ek)) { edgeSet.add(ek); edgeList.push({ from: exId, to: qid, strength: 0.25 }); }
+      });
+    });
+
+    // Cross-link by docId
+    const nodeList = Object.values(nodeMap);
+    nodeList.forEach(a => {
+      nodeList.forEach(b => {
+        if (a.id >= b.id) return;
+        if (a.docId && a.docId === b.docId && a.type !== b.type) {
+          const ek = `${a.id}__${b.id}_cross`;
+          if (!edgeSet.has(ek) && Math.random() < 0.12) {
+            edgeSet.add(ek);
+            edgeList.push({ from: a.id, to: b.id, strength: 0.1, cross: true });
+          }
+        }
+      });
+    });
+
+    const mastered = nodeList.filter(n => n.stability >= 10).length;
+    const gaps = nodeList.filter(n => n.reps > 0 && n.lapses > 1).length;
+    setStats({ nodes: nodeList.length, edges: edgeList.length, mastered, gaps });
+    setNodes(nodeList);
+    setEdges(edgeList);
+    nodesRef.current = nodeList;
+    edgesRef.current = edgeList;
+  }, [flashcards, exams, cases]);
+
+  // Force simulation + canvas rendering
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !nodes.length) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.offsetWidth, H = canvas.offsetHeight;
+    canvas.width = W; canvas.height = H;
+
+    const ns = nodesRef.current.map(n => ({ ...n }));
+    const es = edgesRef.current;
+    const idxMap = {};
+    ns.forEach((n, i) => { idxMap[n.id] = i; n.x = n.x || W / 2 + (Math.random() - .5) * 300; n.y = n.y || H / 2 + (Math.random() - .5) * 300; });
+
+    const TYPE_COLORS = {
+      deck:     'rgba(var(--acc-rgb,99,102,241),1)',
+      card:     'rgba(var(--acc-rgb,99,102,241),.6)',
+      exam:     '#10b981',
+      question: '#06b6d4',
+      case:     '#a855f7',
+    };
+
+    let frame = 0;
+    const simulate = () => {
+      // Repulsion
+      for (let i = 0; i < ns.length; i++) {
+        for (let j = i + 1; j < ns.length; j++) {
+          const dx = ns[j].x - ns[i].x, dy = ns[j].y - ns[i].y;
+          const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+          const force = 1500 / (dist * dist);
+          const fx = force * dx / dist, fy = force * dy / dist;
+          ns[i].vx -= fx; ns[i].vy -= fy;
+          ns[j].vx += fx; ns[j].vy += fy;
+        }
+      }
+      // Attraction along edges
+      es.forEach(e => {
+        const a = ns[idxMap[e.from]], b = ns[idxMap[e.to]];
+        if (!a || !b) return;
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        const target = 100;
+        const force = (dist - target) * 0.02 * (e.strength || 0.3);
+        const fx = force * dx / dist, fy = force * dy / dist;
+        a.vx += fx; a.vy += fy;
+        b.vx -= fx; b.vy -= fy;
+      });
+      // Center pull
+      ns.forEach(n => { n.vx += (W / 2 - n.x) * 0.002; n.vy += (H / 2 - n.y) * 0.002; });
+      // Damping + integrate
+      ns.forEach(n => { n.vx *= 0.85; n.vy *= 0.85; n.x += n.vx; n.y += n.vy; n.x = Math.max(30, Math.min(W-30, n.x)); n.y = Math.max(30, Math.min(H-30, n.y)); });
+
+      // Render
+      ctx.clearRect(0, 0, W, H);
+      // Edges
+      es.forEach(e => {
+        const a = ns[idxMap[e.from]], b = ns[idxMap[e.to]];
+        if (!a || !b) return;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = e.cross ? 'rgba(var(--acc-rgb,99,102,241),.08)' : 'rgba(var(--acc-rgb,99,102,241),.18)';
+        ctx.lineWidth = e.cross ? 0.5 : 1;
+        ctx.stroke();
+      });
+      // Nodes
+      ns.forEach(n => {
+        const r = n.type === 'deck' || n.type === 'exam' ? 14 : 8;
+        const isSel = n.id === selected;
+        const isHov = n.id === hovering;
+        // Mastery glow
+        if (n.stability >= 10) {
+          ctx.beginPath(); ctx.arc(n.x, n.y, r + 5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(16,185,129,.15)'; ctx.fill();
+        } else if (n.lapses > 1) {
+          ctx.beginPath(); ctx.arc(n.x, n.y, r + 5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(239,68,68,.15)'; ctx.fill();
+        }
+        // Node
+        ctx.beginPath(); ctx.arc(n.x, n.y, isSel || isHov ? r + 3 : r, 0, Math.PI * 2);
+        ctx.fillStyle = TYPE_COLORS[n.type] || 'var(--accent)';
+        if (isSel) { ctx.shadowColor = 'var(--accent)'; ctx.shadowBlur = 15; }
+        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+        // Label
+        if (n.type === 'deck' || n.type === 'exam' || isSel || isHov) {
+          ctx.font = `${isSel ? '700' : '500'} 10px DM Sans,system-ui`;
+          ctx.fillStyle = 'var(--text)'; ctx.textAlign = 'center';
+          ctx.fillText(n.label?.slice(0, 16) || '', n.x, n.y + r + 12);
+        }
+      });
+
+      frame++;
+      if (frame < 300) animRef.current = requestAnimationFrame(simulate);
+    };
+    animRef.current = requestAnimationFrame(simulate);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [nodes, edges, selected, hovering]);
+
+  // Handle canvas clicks
+  const handleCanvasClick = e => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const hit = nodesRef.current.find(n => Math.hypot(n.x - mx, n.y - my) < 18);
+    setSelected(hit?.id || null);
+  };
+
+  const selectedNode = nodes.find(n => n.id === selected);
+
+  return (
+    <div className="flex-1 min-h-0 flex flex-col p-4 gap-4">
+      {/* Stats row */}
+      <div className="grid grid-cols-4 gap-3 shrink-0">
+        {[
+          { label: 'Concepts', val: stats.nodes, icon: Network, col: 'var(--accent)' },
+          { label: 'Links', val: stats.edges, icon: GitBranch, col: '#8b5cf6' },
+          { label: 'Mastered', val: stats.mastered, icon: CheckCircle2, col: 'var(--success)' },
+          { label: 'Gaps', val: stats.gaps, icon: AlertCircle, col: 'var(--danger)' },
+        ].map(({ label, val, icon: Icon, col }) => (
+          <div key={label} className="glass rounded-2xl p-3 text-center">
+            <Icon size={16} className="mx-auto mb-1" style={{ color: col }} />
+            <div className="text-xl font-black" style={{ color: col }}>{val}</div>
+            <div className="text-xs font-black uppercase tracking-widest opacity-40">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex-1 min-h-0 glass rounded-2xl overflow-hidden relative" style={{ border: '1px solid var(--border)' }}>
+        {nodes.length === 0 ? (
+          <div className="empty-state h-full flex flex-col items-center justify-center">
+            <div className="empty-icon"><Network size={40} /></div>
+            <p className="font-black text-lg mt-4">No knowledge graph yet</p>
+            <p className="text-sm opacity-40 mt-1">Generate flashcards or exams to build your graph</p>
+          </div>
+        ) : (
+          <>
+            <canvas ref={canvasRef} className="w-full h-full cursor-crosshair" onClick={handleCanvasClick}
+              onMouseMove={e => {
+                const r = canvasRef.current?.getBoundingClientRect();
+                if (!r) return;
+                const hit = nodesRef.current.find(n => Math.hypot(n.x - (e.clientX-r.left), n.y - (e.clientY-r.top)) < 18);
+                setHovering(hit?.id || null);
+              }}
+              style={{ display: 'block' }} />
+            {/* Legend */}
+            <div className="absolute bottom-4 left-4 glass rounded-xl p-2 flex gap-3">
+              {[['Deck', 'rgba(99,102,241,1)'], ['Cards', 'rgba(99,102,241,.6)'], ['Exam', '#10b981'], ['Question', '#06b6d4']].map(([l, c]) => (
+                <div key={l} className="flex items-center gap-1.5 text-xs opacity-70">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
+                  <span>{l}</span>
+                </div>
+              ))}
+            </div>
+            {/* Node info popup */}
+            {selectedNode && (
+              <div className="absolute top-4 right-4 glass rounded-2xl p-4 w-56 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
+                <div className="flex items-start justify-between mb-2">
+                  <p className="font-black text-sm">{selectedNode.label}</p>
+                  <button onClick={() => setSelected(null)} className="opacity-40 hover:opacity-100"><X size={12} /></button>
+                </div>
+                <p className="text-xs opacity-50 capitalize mb-3">{selectedNode.type}</p>
+                {selectedNode.stability > 0 && (
+                  <>
+                    <div className="flex justify-between text-xs mb-1"><span className="opacity-40">Stability</span><span className="font-black">{selectedNode.stability?.toFixed(1)}d</span></div>
+                    <div className="flex justify-between text-xs mb-1"><span className="opacity-40">Reviews</span><span className="font-black">{selectedNode.reps}</span></div>
+                    <div className="flex justify-between text-xs mb-3"><span className="opacity-40">Lapses</span><span className="font-black" style={{ color: selectedNode.lapses > 0 ? 'var(--danger)' : 'var(--text)' }}>{selectedNode.lapses || 0}</span></div>
+                    <div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, (selectedNode.stability / 30) * 100)}%` }} /></div>
+                    <p className="text-xs opacity-40 mt-1">{FSRS.masteryLevel(selectedNode)}</p>
+                  </>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ANALYTICS VIEW — Mastery dashboard with predicted exam score
+═══════════════════════════════════════════════════════════════════ */
+function AnalyticsView({ flashcards, exams, cases, docs, settings }) {
+  const allCards = useMemo(() => flashcards.flatMap(s => s.cards || []), [flashcards]);
+  const predictedScore = useMemo(() => FSRS.predictedScore(allCards), [allCards]);
+
+  const masteryDist = useMemo(() => {
+    const dist = { new: 0, learning: 0, reviewing: 0, mastered: 0, struggling: 0 };
+    allCards.forEach(c => { dist[FSRS.masteryLevel(c)] = (dist[FSRS.masteryLevel(c)] || 0) + 1; });
+    return dist;
+  }, [allCards]);
+
+  const dueToday = useMemo(() => allCards.filter(c => !c.nextReview || c.nextReview <= Date.now()).length, [allCards]);
+  const dueThisWeek = useMemo(() => allCards.filter(c => c.nextReview && c.nextReview <= Date.now() + 7 * 86400000).length, [allCards]);
+
+  const forecast = useMemo(() => {
+    const days = [];
+    for (let d = 0; d < 14; d++) {
+      const t = Date.now() + d * 86400000;
+      const count = allCards.filter(c => {
+        const nr = c.nextReview || 0;
+        return nr >= t && nr < t + 86400000;
+      }).length;
+      days.push({ d, count, label: d === 0 ? 'Today' : d === 1 ? 'Tom' : `D+${d}` });
+    }
+    return days;
+  }, [allCards]);
+
+  const maxForecast = Math.max(...forecast.map(d => d.count), 1);
+
+  const topSets = useMemo(() => {
+    return flashcards.map(set => ({
+      ...set,
+      score: FSRS.predictedScore(set.cards || []),
+      due: (set.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now()).length,
+    })).sort((a, b) => a.score - b.score);
+  }, [flashcards]);
+
+  const scoreColor = predictedScore >= 80 ? 'var(--success)' : predictedScore >= 60 ? 'var(--warning)' : 'var(--danger)';
+
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      {/* Hero — predicted score */}
+      <div className="glass rounded-3xl p-6 relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+        <div className="bg-mesh absolute inset-0 opacity-30" />
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Predicted Exam Score</p>
+          <div className="text-7xl font-black tabular-nums" style={{ color: scoreColor, fontFamily: 'Plus Jakarta Sans,system-ui' }}>{predictedScore}%</div>
+          <p className="text-sm opacity-50 mt-2">{allCards.length} cards tracked · {dueToday} due today</p>
+          <div className="progress-bar w-full max-w-xs mt-4" style={{ height: 10 }}>
+            <div className="progress-fill" style={{ width: `${predictedScore}%`, background: scoreColor, transition: 'width 1s ease' }} />
+          </div>
+          <div className="flex gap-6 mt-4">
+            {[['Due Today', dueToday, 'var(--warning)'], ['Due 7d', dueThisWeek, 'var(--info)'], ['Total', allCards.length, 'var(--text3)']].map(([l, v, c]) => (
+              <div key={l} className="text-center">
+                <div className="text-2xl font-black" style={{ color: c }}>{v}</div>
+                <div className="text-xs opacity-40 font-bold">{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Mastery distribution */}
+      <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
+        <h2 className="font-black text-sm mb-4 opacity-70">Mastery Distribution</h2>
+        <div className="space-y-2">
+          {[
+            { k: 'mastered', label: 'Mastered', col: 'var(--success)' },
+            { k: 'learning', label: 'Learning', col: 'var(--info)' },
+            { k: 'reviewing', label: 'Reviewing', col: 'var(--accent)' },
+            { k: 'struggling', label: 'Struggling', col: 'var(--danger)' },
+            { k: 'new', label: 'New', col: 'var(--text3)' },
+          ].map(({ k, label, col }) => {
+            const val = masteryDist[k] || 0;
+            const pct = allCards.length ? Math.round(val / allCards.length * 100) : 0;
+            return (
+              <div key={k} className="flex items-center gap-3">
+                <div className="text-xs font-black w-20 shrink-0" style={{ color: col }}>{label}</div>
+                <div className="flex-1 progress-bar h-2">
+                  <div className="progress-fill h-full" style={{ width: `${pct}%`, background: col }} />
+                </div>
+                <div className="text-xs font-black w-10 text-right opacity-60">{val}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 14-day review forecast */}
+      <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
+        <h2 className="font-black text-sm mb-4 opacity-70">14-Day Review Forecast</h2>
+        <div className="flex items-end gap-1 h-28">
+          {forecast.map(({ d, count, label }) => (
+            <div key={d} className="flex-1 flex flex-col items-center gap-1">
+              <div className="text-xs font-black tabular-nums" style={{ color: 'var(--accent)', fontSize: 9, opacity: count ? 1 : .3 }}>{count || ''}</div>
+              <div className="w-full rounded-sm transition-all"
+                style={{ height: `${Math.max(2, (count / maxForecast) * 80)}px`, background: d === 0 ? 'var(--accent)' : count > 10 ? 'var(--warning)' : 'rgba(var(--acc-rgb,99,102,241),.4)' }} />
+              <div className="text-xs opacity-40" style={{ fontSize: 9 }}>{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Per-deck scores */}
+      {topSets.length > 0 && (
+        <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
+          <h2 className="font-black text-sm mb-4 opacity-70">Deck Mastery (Weakest First)</h2>
+          <div className="space-y-3">
+            {topSets.slice(0, 8).map(set => (
+              <div key={set.id} className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-black truncate">{set.title}</div>
+                  <div className="flex-1 progress-bar mt-1 h-1.5">
+                    <div className="progress-fill" style={{ width: `${set.score}%`, background: set.score >= 80 ? 'var(--success)' : set.score >= 60 ? 'var(--warning)' : 'var(--danger)' }} />
+                  </div>
+                </div>
+                <div className="text-xs font-black shrink-0 w-10 text-right" style={{ color: set.score >= 80 ? 'var(--success)' : set.score >= 60 ? 'var(--warning)' : 'var(--danger)' }}>{set.score}%</div>
+                {set.due > 0 && <span className="badge badge-warn shrink-0" style={{ fontSize: 10 }}>{set.due} due</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {allCards.length === 0 && (
+        <div className="empty-state py-16">
+          <div className="empty-icon"><BarChart2 size={40} /></div>
+          <p className="font-black text-lg mt-4">No analytics yet</p>
+          <p className="text-sm opacity-40 mt-1">Study flashcards to start tracking mastery</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MATCH GAME — Tap-to-match flashcard pairs
+═══════════════════════════════════════════════════════════════════ */
+function MatchGame({ set, onClose }) {
+  const [tiles, setTiles] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [matched, setMatched] = useState(new Set());
+  const [wrong, setWrong] = useState(new Set());
+  const [moves, setMoves] = useState(0);
+  const [startTime] = useState(Date.now());
+  const [elapsed, setElapsed] = useState(0);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const cards = (set.cards || []).slice(0, 8);
+    const ts = [];
+    cards.forEach((c, i) => {
+      ts.push({ id: `q_${i}`, pairId: i, text: c.q, type: 'q' });
+      ts.push({ id: `a_${i}`, pairId: i, text: c.a?.slice(0, 80), type: 'a' });
+    });
+    setTiles(ts.sort(() => Math.random() - .5));
+  }, [set]);
+
+  useEffect(() => {
+    if (done) return;
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - startTime) / 1000)), 500);
+    return () => clearInterval(id);
+  }, [done]);
+
+  const handleTile = tile => {
+    if (matched.has(tile.id) || wrong.has(tile.id)) return;
+    if (selected.find(s => s.id === tile.id)) return;
+    const newSel = [...selected, tile];
+    if (newSel.length === 2) {
+      setMoves(m => m + 1);
+      if (newSel[0].pairId === newSel[1].pairId) {
+        setMatched(m => new Set([...m, newSel[0].id, newSel[1].id]));
+        setSelected([]);
+        if (matched.size + 2 >= tiles.length) setDone(true);
+      } else {
+        setWrong(new Set([newSel[0].id, newSel[1].id]));
+        setTimeout(() => { setWrong(new Set()); setSelected([]); }, 800);
+      }
+    } else {
+      setSelected(newSel);
+    }
+  };
+
+  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+  return (
+    <div className="fixed inset-0 z-[9000] flex flex-col" style={{ background: 'var(--bg)' }}>
+      <div className="flex items-center justify-between px-5 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div>
+          <h2 className="font-black">Match — {set.title}</h2>
+          <p className="text-xs opacity-40 mt-0.5">Tap a term, then its definition</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="font-mono font-black text-lg" style={{ color: 'var(--accent)' }}>{fmt(elapsed)}</span>
+          <span className="text-xs opacity-40">{moves} moves</span>
+          <button onClick={onClose} className="w-9 h-9 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
+        </div>
+      </div>
+
+      {done ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 animate-scale-in">
+          <div className="text-6xl">🎉</div>
+          <h2 className="text-3xl font-black gradient-text">Complete!</h2>
+          <p className="text-sm opacity-50">{moves} moves · {fmt(elapsed)}</p>
+          <div className="flex gap-3 mt-4">
+            <button onClick={() => { setMatched(new Set()); setSelected([]); setWrong(new Set()); setMoves(0); setDone(false); setTiles(t => [...t].sort(() => Math.random() - .5)); }} className="btn-accent px-6 py-3 rounded-2xl font-black">Play Again</button>
+            <button onClick={onClose} className="glass px-6 py-3 rounded-2xl font-black" style={{ border: '1px solid var(--border)' }}>Done</button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 min-h-0 overflow-y-auto p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+            {tiles.map(tile => {
+              const isMatched = matched.has(tile.id);
+              const isWrong = wrong.has(tile.id);
+              const isSel = !!selected.find(s => s.id === tile.id);
+              return (
+                <button key={tile.id} onClick={() => !isMatched && handleTile(tile)}
+                  className="rounded-2xl p-4 text-left text-sm font-medium transition-all min-h-[80px] flex items-center"
+                  style={{
+                    background: isMatched ? 'var(--success-bg)' : isWrong ? 'var(--danger-bg)' : isSel ? 'var(--accent)' : 'var(--surface,var(--card))',
+                    color: isMatched ? 'var(--success)' : isWrong ? 'var(--danger)' : isSel ? '#fff' : 'var(--text)',
+                    border: `2px solid ${isMatched ? 'var(--success-border)' : isWrong ? 'var(--danger-border)' : isSel ? 'var(--accent)' : 'var(--border)'}`,
+                    opacity: isMatched ? .6 : 1,
+                    transform: isSel ? 'scale(1.02)' : isWrong ? 'scale(.97)' : 'scale(1)',
+                    pointerEvents: isMatched ? 'none' : 'auto',
+                  }}>
+                  <span className="line-clamp-3">{tile.text}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <div className="text-xs opacity-40">{matched.size / 2} / {tiles.length / 2} matched</div>
+            <div className="progress-bar w-40 h-2">
+              <div className="progress-fill" style={{ width: `${(matched.size / Math.max(tiles.length, 1)) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STUDY PODCAST — AI-generated audio summaries using Web Speech API
+═══════════════════════════════════════════════════════════════════ */
+function StudyPodcastPanel({ flashcards, exams, settings, addToast }) {
+  const [scripts, setScripts] = useState([]);
+  const [generating, setGenerating] = useState(false);
+  const [playing, setPlaying] = useState(null);
+  const [speed, setSpeed] = useState(1.0);
+  const [voice, setVoice] = useState(null);
+  const [voices, setVoices] = useState([]);
+  const uttRef = useRef(null);
+  const [progress, setProgress] = useState(0);
+  const [selectedSet, setSelectedSet] = useState(null);
+
+  useEffect(() => {
+    const load = () => {
+      const vs = window.speechSynthesis?.getVoices() || [];
+      setVoices(vs);
+      setVoice(vs.find(v => v.lang.startsWith('en') && v.localService) || vs[0] || null);
+    };
+    load();
+    window.speechSynthesis?.addEventListener('voiceschanged', load);
+    return () => window.speechSynthesis?.removeEventListener('voiceschanged', load);
+  }, []);
+
+  const generateScript = async (set) => {
+    if (!set) return;
+    setGenerating(true);
+    try {
+      const topCards = (set.cards || []).slice(0, 15);
+      const content = topCards.map((c, i) => `${i+1}. ${c.q} — ${c.a}`).join('\n');
+      const prompt = `You are a medical study podcast host. Create an engaging 2-3 minute spoken audio script summarizing these flashcards for a medical student. Make it conversational, memorable, and educational. Use "you" to address the listener. Include key mnemonics if helpful. Flashcard set: "${set.title}"\n\nCards:\n${content}\n\nWrite ONLY the spoken script, no stage directions.`;
+      let script = '';
+      await callAIStreaming(prompt, chunk => { script += chunk; }, settings, 1200);
+      const newScript = { id: Date.now(), setId: set.id, title: set.title, script: script.trim(), createdAt: Date.now() };
+      setScripts(p => [newScript, ...p]);
+      addToast('Podcast script ready!', 'success');
+    } catch (e) { addToast('Generation failed: ' + e.message, 'error'); }
+    setGenerating(false);
+  };
+
+  const speak = (script) => {
+    if (!window.speechSynthesis) { addToast('Speech not supported in this browser', 'error'); return; }
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(script.script);
+    if (voice) utt.voice = voice;
+    utt.rate = speed;
+    utt.pitch = 1.0;
+    utt.onstart = () => setPlaying(script.id);
+    utt.onend = () => { setPlaying(null); setProgress(0); };
+    utt.onerror = () => { setPlaying(null); setProgress(0); };
+    utt.onboundary = e => {
+      if (script.script.length > 0) setProgress((e.charIndex / script.script.length) * 100);
+    };
+    window.speechSynthesis.speak(utt);
+    uttRef.current = utt;
+  };
+
+  const stop = () => { window.speechSynthesis?.cancel(); setPlaying(null); setProgress(0); };
+
+  return (
+    <div className="flex-1 min-h-0 flex flex-col p-4 gap-4">
+      {/* Generator */}
+      <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-2xl btn-accent flex items-center justify-center shrink-0">
+            <Mic size={18} />
+          </div>
+          <div>
+            <h2 className="font-black">AI Study Podcasts</h2>
+            <p className="text-xs opacity-40">Generate audio summaries from your flashcard decks</p>
+          </div>
+        </div>
+        <div className="flex gap-2 mb-3">
+          <select value={selectedSet?.id || ''} onChange={e => setSelectedSet(flashcards.find(s => s.id === e.target.value) || null)}
+            className="glass-input flex-1 rounded-xl px-3 py-2 text-sm outline-none">
+            <option value="">Choose a deck…</option>
+            {flashcards.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+          </select>
+          <button onClick={() => generateScript(selectedSet)} disabled={!selectedSet || generating}
+            className="btn-accent px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 shrink-0">
+            {generating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+            {generating ? 'Writing…' : 'Generate'}
+          </button>
+        </div>
+        {/* Voice & speed controls */}
+        <div className="flex gap-2">
+          <select value={voice?.name || ''} onChange={e => setVoice(voices.find(v => v.name === e.target.value))}
+            className="glass-input flex-1 rounded-xl px-3 py-2 text-xs outline-none">
+            {voices.filter(v => v.lang.startsWith('en')).slice(0, 20).map(v => (
+              <option key={v.name} value={v.name}>{v.name}</option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2 glass rounded-xl px-3">
+            <span className="text-xs opacity-40">Speed</span>
+            <input type="range" min={0.5} max={2} step={0.25} value={speed} onChange={e => setSpeed(+e.target.value)} className="w-16" />
+            <span className="text-xs font-black w-8">{speed}×</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Scripts list */}
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-3">
+        {scripts.map(script => (
+          <div key={script.id} className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <h3 className="font-black text-sm">{script.title}</h3>
+                <p className="text-xs opacity-40">{new Date(script.createdAt).toLocaleDateString()} · ~{Math.ceil(script.script.split(' ').length / 130)} min</p>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                {playing === script.id ? (
+                  <button onClick={stop} className="btn-accent px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5" style={{ background: 'var(--danger)' }}>
+                    <Square size={12} /> Stop
+                  </button>
+                ) : (
+                  <button onClick={() => speak(script)} className="btn-accent px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5">
+                    <Play size={12} /> Play
+                  </button>
+                )}
+                <button onClick={() => setScripts(p => p.filter(s => s.id !== script.id))} className="w-8 h-8 glass rounded-xl flex items-center justify-center hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)' }}>
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+            {playing === script.id && (
+              <div className="progress-bar mb-2"><div className="progress-fill" style={{ width: `${progress}%`, transition: 'width .3s linear' }} /></div>
+            )}
+            <p className="text-xs opacity-50 line-clamp-3 leading-relaxed">{script.script}</p>
+          </div>
+        ))}
+        {scripts.length === 0 && !generating && (
+          <div className="empty-state py-12">
+            <div className="empty-icon"><Volume2 size={36} /></div>
+            <p className="font-black mt-4">No podcasts yet</p>
+            <p className="text-xs opacity-40 mt-1">Select a deck and click Generate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ENHANCED FLASHCARD REVIEW with FSRS 4-Button Rating
+═══════════════════════════════════════════════════════════════════ */
+function FSRSFlashcardReview({ set, onUpdate, onClose }) {
+  const [cards, setCards] = useState(() => {
+    const due = (set.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now());
+    return due.sort(() => Math.random() - .5);
+  });
+  const [idx, setIdx] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [reviewed, setReviewed] = useState(0);
+  const [done, setDone] = useState(false);
+
+  const rate = (grade) => {
+    const card = cards[idx];
+    if (!card) return;
+    const updated = FSRS.schedule(card, grade);
+    // Update in set
+    const updSet = { ...set, cards: set.cards.map(c => c === card ? updated : c) };
+    onUpdate(updSet);
+    setReviewed(r => r + 1);
+    if (idx + 1 >= cards.length) setDone(true);
+    else { setIdx(i => i + 1); setFlipped(false); }
+  };
+
+  const card = cards[idx];
+  const pct = cards.length ? Math.round((idx / cards.length) * 100) : 100;
+
+  const RATINGS = [
+    { g: 0, label: 'Again', col: 'var(--danger)', desc: '< 1 day' },
+    { g: 1, label: 'Hard', col: 'var(--warning)', desc: '~1-2 days' },
+    { g: 2, label: 'Good', col: 'var(--success)', desc: 'Normal interval' },
+    { g: 3, label: 'Easy', col: '#3b82f6', desc: 'Longer interval' },
+  ];
+
+  if (done || !card) return (
+    <div className="fixed inset-0 z-[8000] flex flex-col items-center justify-center" style={{ background: 'var(--bg)' }}>
+      <div className="glass rounded-3xl p-10 text-center max-w-sm w-full mx-4 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
+        <div className="text-5xl mb-4">🏆</div>
+        <h2 className="text-3xl font-black gradient-text mb-2">Session Done!</h2>
+        <p className="text-sm opacity-50 mb-6">{reviewed} cards reviewed</p>
+        <button onClick={onClose} className="btn-accent px-8 py-3 rounded-2xl font-black w-full">Continue</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[8000] flex flex-col" style={{ background: 'var(--bg)' }}>
+      <div className="flex items-center justify-between px-5 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+        <button onClick={onClose} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><ChevronLeft size={16} /></button>
+        <div className="flex-1 mx-4">
+          <div className="progress-bar h-2"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>
+          <p className="text-xs opacity-40 text-center mt-1">{idx + 1} / {cards.length} due</p>
+        </div>
+        <div className="w-8" />
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+        {/* Card */}
+        <div className="w-full max-w-lg perspective-1000">
+          <div className="glass rounded-3xl p-8 min-h-48 flex flex-col items-center justify-center cursor-pointer card-hover text-center relative"
+            style={{ border: '1px solid var(--border)' }}
+            onClick={() => setFlipped(true)}>
+            <div className="text-xs font-black uppercase tracking-widest opacity-30 absolute top-4 left-4">
+              {flipped ? 'Answer' : 'Question'}
+            </div>
+            {card.stability > 0 && (
+              <div className="absolute top-4 right-4">
+                <span className="badge" style={{ background: 'var(--accent)/10', color: 'var(--accent)', fontSize: 10 }}>
+                  {FSRS.masteryLevel(card)}
+                </span>
+              </div>
+            )}
+            <p className="text-lg font-bold leading-relaxed mt-4">{flipped ? (card.a || card.back) : (card.q || card.front)}</p>
+            {!flipped && <p className="text-xs opacity-30 mt-6">Tap to reveal answer</p>}
+          </div>
+        </div>
+
+        {/* Rating buttons — only show after flip */}
+        {flipped ? (
+          <div className="grid grid-cols-4 gap-3 w-full max-w-lg animate-slide-up">
+            {RATINGS.map(({ g, label, col, desc }) => (
+              <button key={g} onClick={() => rate(g)}
+                className="glass rounded-2xl p-3 flex flex-col items-center gap-1 transition-all hover:scale-105 active:scale-95"
+                style={{ border: `2px solid ${col}20` }}
+                onMouseEnter={e => e.currentTarget.style.background = col + '18'}
+                onMouseLeave={e => e.currentTarget.style.background = ''}>
+                <span className="text-sm font-black" style={{ color: col }}>{label}</span>
+                <span className="text-xs opacity-40">{desc}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <button onClick={() => setFlipped(true)} className="btn-accent px-10 py-3 rounded-2xl font-black">
+            Show Answer
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VOICE TUTOR MODAL — Real-time AI voice conversation
+═══════════════════════════════════════════════════════════════════ */
+function VoiceTutorModal({ settings, onClose }) {
+  const [phase, setPhase] = useState('idle'); // idle | listening | thinking | speaking
+  const [transcript, setTranscript] = useState('');
+  const [response, setResponse] = useState('');
+  const [history, setHistory] = useState([]);
+  const recognRef = useRef(null);
+  const synthRef = useRef(null);
+
+  const startListening = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { alert('Speech recognition not supported in this browser'); return; }
+    const r = new SR();
+    r.continuous = false; r.interimResults = true; r.lang = 'en-US';
+    r.onresult = e => {
+      const t = Array.from(e.results).map(r => r[0].transcript).join('');
+      setTranscript(t);
+    };
+    r.onend = () => { if (transcript) handleQuery(transcript); };
+    r.start();
+    recognRef.current = r;
+    setPhase('listening');
+  };
+
+  const handleQuery = async (text) => {
+    if (!text.trim()) { setPhase('idle'); return; }
+    setPhase('thinking');
+    setHistory(h => [...h, { role: 'user', text }]);
+    setTranscript('');
+    try {
+      const sysPrompt = 'You are MARIAM, a friendly medical study AI tutor in a voice conversation. Keep answers concise (2-3 sentences max). Be encouraging and educational.';
+      const msgs = [...history.slice(-6), { role: 'user', content: text }];
+      let out = '';
+      await callAIStreaming(text, chunk => { out += chunk; }, settings, 200);
+      setResponse(out);
+      setHistory(h => [...h, { role: 'assistant', text: out }]);
+      setPhase('speaking');
+      // Speak response
+      if (window.speechSynthesis) {
+        const utt = new SpeechSynthesisUtterance(out);
+        utt.rate = 1.05; utt.pitch = 1.0;
+        const voices = window.speechSynthesis.getVoices();
+        const en = voices.find(v => v.lang.startsWith('en') && v.localService);
+        if (en) utt.voice = en;
+        utt.onend = () => setPhase('idle');
+        synthRef.current = utt;
+        window.speechSynthesis.speak(utt);
+      } else setPhase('idle');
+    } catch (e) { setResponse('Error: ' + e.message); setPhase('idle'); }
+  };
+
+  const interrupt = () => {
+    window.speechSynthesis?.cancel();
+    recognRef.current?.stop();
+    setPhase('idle');
+  };
+
+  const PHASE_CONFIG = {
+    idle: { label: 'Tap to speak', color: 'var(--accent)', icon: Mic },
+    listening: { label: 'Listening…', color: 'var(--danger)', icon: Mic },
+    thinking: { label: 'Thinking…', color: 'var(--warning)', icon: Brain },
+    speaking: { label: 'Speaking… (tap to interrupt)', color: 'var(--success)', icon: Volume2 },
+  };
+  const pc = PHASE_CONFIG[phase];
+  const PhaseIcon = pc.icon;
+
+  return (
+    <div className="fixed inset-0 z-[9500] flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(24px)' }}>
+      <div className="glass rounded-3xl p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-6 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
+        <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100" style={{ position: 'absolute', top: 16, right: 16 }}><X size={14} /></button>
+        <img src="https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg" className="w-20 h-20 rounded-2xl object-cover shadow-2xl" style={{ boxShadow: `0 0 0 4px ${pc.color}40` }} />
+        <div className="text-center">
+          <h2 className="font-black text-xl mb-1">Voice Tutor</h2>
+          <p className="text-xs opacity-40">Ask MARIAM anything about your studies</p>
+        </div>
+
+        {/* Waveform animation */}
+        <div className="flex items-center gap-1 h-10">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="rounded-full transition-all" style={{
+              width: 3, background: pc.color,
+              height: phase === 'idle' ? 8 : phase === 'listening' ? `${Math.random() * 30 + 8}px` : phase === 'speaking' ? `${Math.random() * 25 + 6}px` : `${Math.sin(i) * 10 + 12}px`,
+              animation: phase !== 'idle' ? `pulse .${3 + i}s ease infinite alternate` : 'none',
+              opacity: 0.6 + i * 0.03
+            }} />
+          ))}
+        </div>
+
+        <p className="text-sm font-bold text-center min-h-[40px]" style={{ color: pc.color }}>
+          {phase === 'listening' ? (transcript || 'Listening…') : phase === 'thinking' ? 'Processing…' : phase === 'speaking' ? response?.slice(0, 80) + (response?.length > 80 ? '…' : '') : pc.label}
+        </p>
+
+        {/* Main button */}
+        <button onClick={phase === 'idle' ? startListening : interrupt}
+          className="w-20 h-20 rounded-full flex items-center justify-center transition-all"
+          style={{ background: pc.color, boxShadow: `0 0 0 8px ${pc.color}20, 0 8px 32px ${pc.color}40`, transform: phase === 'listening' ? 'scale(1.08)' : 'scale(1)' }}>
+          <PhaseIcon size={28} color="#fff" />
+        </button>
+
+        {/* Conversation history mini */}
+        {history.length > 0 && (
+          <div className="w-full max-h-32 overflow-y-auto custom-scrollbar space-y-2">
+            {history.slice(-4).map((h, i) => (
+              <div key={i} className={`text-xs px-3 py-2 rounded-xl ${h.role === 'user' ? 'text-right' : 'text-left'}`}
+                style={{ background: h.role === 'user' ? 'var(--accent)/10' : 'var(--surface,var(--card))', color: h.role === 'user' ? 'var(--accent)' : 'var(--text)', opacity: .8 }}>
+                {h.text?.slice(0, 80)}{h.text?.length > 80 ? '…' : ''}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SMART STUDY MODE — unified adaptive study session
+═══════════════════════════════════════════════════════════════════ */
+function SmartStudyMode({ flashcards, exams, cases, settings, addToast, setFlashcards }) {
+  const [mode, setMode] = useState(null); // null | 'fsrs' | 'match' | 'podcast' | 'voice'
+  const [selectedSet, setSelectedSet] = useState(null);
+
+  const allDue = useMemo(() => {
+    let total = 0;
+    flashcards.forEach(s => { total += (s.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now()).length; });
+    return total;
+  }, [flashcards]);
+
+  if (mode === 'fsrs' && selectedSet) {
+    return <FSRSFlashcardReview set={selectedSet}
+      onUpdate={updated => setFlashcards(p => p.map(s => s.id === updated.id ? updated : s))}
+      onClose={() => { setMode(null); setSelectedSet(null); }} />;
+  }
+  if (mode === 'match' && selectedSet) {
+    return <MatchGame set={selectedSet} onClose={() => { setMode(null); setSelectedSet(null); }} />;
+  }
+  if (mode === 'podcast') {
+    return (
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex items-center gap-3 px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <button onClick={() => setMode(null)} className="w-8 h-8 glass rounded-xl flex items-center justify-center"><ChevronLeft size={16} /></button>
+          <h2 className="font-black">Study Podcasts</h2>
+        </div>
+        <StudyPodcastPanel flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+      {/* Due cards hero */}
+      {allDue > 0 && (
+        <div className="glass rounded-3xl p-6 relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+          <div className="bg-mesh absolute inset-0 opacity-20" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest opacity-40">FSRS Review Queue</p>
+                <h2 className="text-3xl font-black" style={{ color: 'var(--accent)' }}>{allDue} cards due</h2>
+              </div>
+              <div className="text-5xl">🧠</div>
+            </div>
+            <div className="flex gap-3 flex-wrap">
+              {flashcards.filter(s => (s.cards || []).some(c => !c.nextReview || c.nextReview <= Date.now())).slice(0, 4).map(set => {
+                const due = (set.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now()).length;
+                return (
+                  <button key={set.id} onClick={() => { setSelectedSet(set); setMode('fsrs'); }}
+                    className="glass rounded-2xl px-4 py-2 text-sm font-black flex items-center gap-2 transition-all hover:scale-105"
+                    style={{ border: '1px solid var(--accent)/30' }}>
+                    <span style={{ color: 'var(--accent)' }}>{due}</span> {set.title?.slice(0, 20)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Study modes */}
+      <h2 className="font-black text-sm opacity-50 uppercase tracking-widest px-1">Study Modes</h2>
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { id: 'fsrs', icon: Brain, title: 'FSRS Review', desc: 'Adaptive spaced repetition', col: 'var(--accent)', badge: allDue > 0 ? `${allDue} due` : null },
+          { id: 'match', icon: Zap, title: 'Match Game', desc: 'Speed-match terms to definitions', col: '#8b5cf6', badge: null },
+          { id: 'podcast', icon: Volume2, title: 'AI Podcast', desc: 'Listen to AI-generated summaries', col: '#06b6d4', badge: null },
+          { id: 'voice', icon: Mic, title: 'Voice Tutor', desc: 'Real-time AI voice Q&A', col: 'var(--success)', badge: null },
+        ].map(({ id, icon: Icon, title, desc, col, badge }) => (
+          <button key={id} onClick={() => {
+            if (id === 'voice') setMode('voice');
+            else if (id === 'podcast') setMode('podcast');
+            else if (flashcards.length === 0) addToast('No flashcard decks yet', 'info');
+            else { setSelectedSet(flashcards[0]); setMode(id); }
+          }}
+            className="glass rounded-2xl p-5 text-left card-hover relative overflow-hidden"
+            style={{ border: '1px solid var(--border)' }}>
+            <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-3xl opacity-10" style={{ background: col }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 relative z-10" style={{ background: col + '20', color: col }}>
+              <Icon size={20} />
+            </div>
+            <h3 className="font-black text-sm relative z-10">{title}</h3>
+            <p className="text-xs opacity-40 mt-0.5 relative z-10">{desc}</p>
+            {badge && <span className="badge badge-warn absolute top-3 right-3" style={{ fontSize: 10 }}>{badge}</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Quick deck picker for match/fsrs */}
+      {flashcards.length > 0 && (
+        <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+          <h3 className="font-black text-xs opacity-50 uppercase tracking-widest mb-3">Your Decks</h3>
+          <div className="space-y-2">
+            {flashcards.map(set => {
+              const due = (set.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now()).length;
+              const score = FSRS.predictedScore(set.cards || []);
+              return (
+                <div key={set.id} className="flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-sm truncate">{set.title}</div>
+                    <div className="flex-1 progress-bar mt-1 h-1">
+                      <div className="progress-fill" style={{ width: `${score}%`, background: score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)' }} />
+                    </div>
+                  </div>
+                  {due > 0 && <span className="badge badge-warn text-xs">{due} due</span>}
+                  <div className="flex gap-1.5 shrink-0">
+                    <button onClick={() => { setSelectedSet(set); setMode('fsrs'); }} className="text-xs font-black px-2 py-1 rounded-lg" style={{ background: 'var(--accent)/10', color: 'var(--accent)' }}>Study</button>
+                    <button onClick={() => { setSelectedSet(set); setMode('match'); }} className="text-xs font-black px-2 py-1 rounded-lg" style={{ background: 'rgba(139,92,246,.15)', color: '#8b5cf6' }}>Match</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {flashcards.length === 0 && (
+        <div className="empty-state py-12">
+          <div className="empty-icon"><Brain size={40} /></div>
+          <p className="font-black text-lg mt-4">No decks to study</p>
+          <p className="text-sm opacity-40 mt-1">Generate flashcards from a document to start</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 class AppErrorBoundary extends React.Component {
   state = { hasError: false, error: null };

@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-  // GitHub Pages serves from /DrMariam/ — set base to match repo name
-  base: '/DrMariam/',
+  // GitHub Pages serves from /DrRoma/ — set base to match repo name
+  base: '/DrRoma/',
 
   build: {
     outDir: 'dist',
