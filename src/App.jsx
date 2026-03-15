@@ -6059,7 +6059,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         /* ══ MOBILE FLOATING PILL NAV ══ */
         .design-nav{
           position:fixed;
-          bottom:24px;left:8px;right:8px;
+          bottom:16px;
+          left:50%;
+          transform:translateX(-50%);
+          width:96%;
+          max-width:600px;
           height:auto;
           display:flex;align-items:center;justify-content:center;
           z-index:200;overflow:visible;
@@ -6068,12 +6072,12 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         @media (min-width:1024px){
           .design-nav{display:none!important;}
         }
-        .design-nav.keyboard-open-hidden{transform:translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
+        .design-nav.keyboard-open-hidden{transform:translateX(-50%) translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
         .design-nav-inner{
-          display:flex;align-items:center;justify-content:space-evenly;
-          width:100%;padding:5px;
+          display:flex;align-items:center;justify-content:space-between;
+          width:100%;padding:6px 8px;
           gap:0;
-          border-radius:2.5rem;
+          border-radius:30px;
           backdrop-filter:saturate(150%) blur(100px);
           -webkit-backdrop-filter:saturate(150%) blur(100px);
           position:relative;overflow:hidden;
