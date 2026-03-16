@@ -5016,6 +5016,7 @@ function SettingsView({ settings, setSettings, installPrompt, onInstall }) {
     { id: 'dark', label: 'Dark', icon: Moon, desc: 'Easy on eyes' },
     { id: 'slate', label: 'Slate', icon: Layers, desc: 'Modern grey' },
     { id: 'oled', label: 'OLED', icon: Zap, desc: 'Pure black' },
+    { id: 'ocean', label: 'Ocean', icon: Droplets, desc: 'Deep sea calm' },
   ];
   const accents = [
     { id: 'indigo', hex: '#5046e5', label: 'Indigo' },
@@ -5539,11 +5540,11 @@ function App() {
   // Theme
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('pure-white', 'light', 'warm', 'rose', 'forest', 'dark', 'slate', 'oled');
+    root.classList.remove('pure-white', 'light', 'warm', 'rose', 'forest', 'dark', 'slate', 'oled', 'ocean');
     let th = settings.theme;
     if (th === 'system') th = window.matchMedia?.('(prefers-color-scheme:dark)').matches ? 'dark' : 'pure-white';
     root.classList.add(th);
-    root.style.setProperty('color-scheme', ['dark','oled','slate'].includes(th) ? 'dark' : 'light');
+    root.style.setProperty('color-scheme', ['dark','oled','slate','ocean'].includes(th) ? 'dark' : 'light');
     const basePx = { small: 15, medium: 17, large: 18, xl: 19, xxl: 20 }[settings.fontSize] || 17;
     const scale = settings.fontScale || 1;
     root.style.fontSize = Math.round(basePx * scale) + 'px';
@@ -5875,6 +5876,14 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           --accent:#818cf8; --accent2:#c084fc; --acc-rgb:129,140,248;
           --nav-bg:rgba(0,0,0,.97); --sidebar-bg:linear-gradient(180deg,#040810,#000000);
           --card:#070c18; --glow:rgba(129,140,248,.12);
+        }
+        .ocean {
+          --bg:#071520; --bg2:#0a1c2a; --surface:#0d2236; --surface2:#112a40; --surface3:#16324a;
+          --text:#c8e0f8; --text2:#5a8aaa; --text3:#3a6888;
+          --border:rgba(56,189,248,.08); --border2:rgba(56,189,248,.15);
+          --accent:#06b6d4; --accent2:#22d3ee; --acc-rgb:6,182,212;
+          --nav-bg:rgba(7,21,32,.96); --sidebar-bg:linear-gradient(180deg,#0a1c2a,#071520);
+          --card:#0d2236; --glow:rgba(6,182,212,.14);
         }
         /* ══ ACCENT OVERRIDES ══ */
         .accent-indigo  {--accent:#4f46e5;--accent2:#7c3aed;--acc-rgb:79,70,229;}
@@ -6324,6 +6333,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .dark{--bg:#0b0c14;--bg2:#111219;--surface:rgba(255,255,255,0.05);--surface2:rgba(255,255,255,0.08);--text:#f0f4ff;--text2:rgba(240,244,255,0.82);--text3:rgba(240,244,255,0.62);--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.16);--accent:#3b82f6;--accent2:#8b5cf6;--acc-rgb:59,130,246;--nav-bg:rgba(11,12,20,0.94);--sidebar-bg:rgba(11,12,20,0.96);--card:rgba(255,255,255,0.05);--card-border:rgba(255,255,255,0.12);}
         .oled{--bg:#000000;--bg2:#080810;--surface:rgba(255,255,255,0.05);--surface2:rgba(255,255,255,0.08);--text:#f0f4ff;--text2:rgba(240,244,255,0.82);--text3:rgba(240,244,255,0.62);--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--accent:#818cf8;--accent2:#c084fc;--acc-rgb:129,140,248;--nav-bg:rgba(0,0,0,0.96);--sidebar-bg:rgba(4,4,12,0.98);--card:rgba(255,255,255,0.05);--card-border:rgba(255,255,255,0.1);}
         .slate{--bg:#0e1117;--bg2:#141a24;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.09);--text:#e8f0f8;--text2:rgba(232,240,248,0.80);--text3:rgba(232,240,248,0.60);--border:rgba(255,255,255,0.09);--border2:rgba(255,255,255,0.15);--accent:#38bdf8;--accent2:#818cf8;--acc-rgb:56,189,248;--nav-bg:rgba(14,17,23,0.96);--sidebar-bg:rgba(14,17,23,0.97);--card:rgba(255,255,255,0.06);--card-border:rgba(255,255,255,0.12);}
+        .ocean{--bg:#071520;--bg2:#0a1c2a;--surface:rgba(255,255,255,0.05);--surface2:rgba(255,255,255,0.08);--text:#c8e0f8;--text2:rgba(200,224,248,0.72);--text3:rgba(200,224,248,0.52);--border:rgba(56,189,248,0.08);--border2:rgba(56,189,248,0.15);--accent:#06b6d4;--accent2:#22d3ee;--acc-rgb:6,182,212;--nav-bg:rgba(7,21,32,0.96);--sidebar-bg:rgba(7,21,32,0.97);--card:rgba(255,255,255,0.05);--card-border:rgba(56,189,248,0.12);}
         /* ══ FONTS ══ */
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
         *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -6332,8 +6342,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .mono,code,pre{font-family:'JetBrains Mono',monospace!important;}
 
         /* Improve dim text visibility in dark themes */
-        .dark .opacity-40,.oled .opacity-40,.slate .opacity-40{opacity:.65!important;}
-        .dark .opacity-50,.oled .opacity-50,.slate .opacity-50{opacity:.72!important;}
+        .dark .opacity-40,.oled .opacity-40,.slate .opacity-40,.ocean .opacity-40{opacity:.65!important;}
+        .dark .opacity-50,.oled .opacity-50,.slate .opacity-50,.ocean .opacity-50{opacity:.72!important;}
 
         /* ── FONT SCALE ── Tailwind rem classes scale naturally via root font-size.
            Only cap extreme heading sizes so they don't blow up. */
@@ -6834,6 +6844,16 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
               <span className="hidden md:inline opacity-60">Search…</span>
               <span className="hidden md:inline text-xs opacity-30 font-mono">⌘K</span>
             </button>
+            {/* Install PWA */}
+            {installPrompt && (
+              <button onClick={onInstall}
+                className="flex items-center gap-2 px-3 py-2 rounded-full font-semibold transition-all border animate-pulse-slow"
+                style={{ background: 'rgba(var(--acc-rgb,59,130,246),.15)', borderColor: 'rgba(var(--acc-rgb,59,130,246),.4)', color: 'var(--accent)', fontSize: '13px' }}
+                title="Install App">
+                <Download size={15} />
+                <span className="hidden md:inline">Install</span>
+              </button>
+            )}
             {/* Pomodoro */}
             <PomodoroWidget onComplete={() => addToast('⏰ Timer complete!', 'success')} />
             {/* Deep Focus */}
@@ -6862,11 +6882,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             </div>
             {/* Theme Toggle */}
             <button
-              onClick={() => { const dark=['dark','oled','slate'].includes(settings.theme||'dark'); setSettings(s=>({...s,theme:dark?'light':'dark'})); }}
+              onClick={() => { const dark=['dark','oled','slate','ocean'].includes(settings.theme||'dark'); setSettings(s=>({...s,theme:dark?'light':'dark'})); }}
               className="w-10 h-10 flex items-center justify-center rounded-full border transition-all"
               style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: 'var(--text3)' }}
               title="Toggle light/dark">
-              {['dark','oled','slate'].includes(settings.theme||'dark') ? <Sun size={15}/> : <Moon size={15}/>}
+              {['dark','oled','slate','ocean'].includes(settings.theme||'dark') ? <Sun size={15}/> : <Moon size={15}/>}
             </button>
             {/* Voice Tutor */}
             <button onClick={() => setShowVoiceTutor(true)}
