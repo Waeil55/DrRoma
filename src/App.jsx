@@ -6820,6 +6820,10 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
                 {label}
               </button>
             ))}
+            <button onClick={() => setMoreOpen(p => !p)}
+              className={`mariam-tab-pill ${moreOpen || !['library','reader','study','flashcards','exams','cases','chat','settings'].includes(view) ? 'active' : ''}`}>
+              More
+            </button>
           </div>
 
           {/* Right actions */}
