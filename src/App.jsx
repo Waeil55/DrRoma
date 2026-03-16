@@ -1003,11 +1003,11 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, onNavigate, onClo
   const results = useMemo(() => {
     if (!q.trim() || q.length < 2) return [];
     const lq = q.toLowerCase(); const out = [];
-    docs.forEach(d => { if (d.name.toLowerCase().includes(lq)) out.push({ type: 'doc', icon: FileText, label: d.name, sub: `${d.totalPages} pages`, color: '#6366f1', action: () => onNavigate('reader', d.id) }); });
-    flashcards.forEach(set => set.cards?.forEach(c => { if ((c.q + c.a).toLowerCase().includes(lq)) out.push({ type: 'card', icon: Layers, label: c.q.slice(0, 60), sub: set.title, color: '#8b5cf6', action: () => onNavigate('flashcards') }); }));
+    docs.forEach(d => { if (!d?.name) return; if (d.name.toLowerCase().includes(lq)) out.push({ type: 'doc', icon: FileText, label: d.name, sub: `${d.totalPages || 0} pages`, color: '#6366f1', action: () => onNavigate('reader', d.id) }); });
+    flashcards.forEach(set => set.cards?.forEach(c => { if (!c?.q) return; if (((c.q || '') + (c.a || '')).toLowerCase().includes(lq)) out.push({ type: 'card', icon: Layers, label: (c.q || '').slice(0, 60), sub: set.title, color: '#8b5cf6', action: () => onNavigate('flashcards') }); }));
     exams.forEach(ex => ex.questions?.forEach(q2 => { if ((q2.q || '').toLowerCase().includes(lq)) out.push({ type: 'exam', icon: CheckSquare, label: (q2.q || '').slice(0, 60), sub: ex.title, color: '#3b82f6', action: () => onNavigate('exams') }); }));
     cases.forEach(set => set.questions?.forEach(c => { if ((c.vignette || '').toLowerCase().includes(lq)) out.push({ type: 'case', icon: Activity, label: (c.title || c.vignette || '').slice(0, 60), sub: set.title, color: '#06b6d4', action: () => onNavigate('cases') }); }));
-    notes.forEach(n => { if ((n.title + n.content).toLowerCase().includes(lq)) out.push({ type: 'note', icon: PenLine, label: n.title, sub: n.content?.slice(0, 50), color: '#f59e0b', action: () => onNavigate('library') }); });
+    notes.forEach(n => { if (!n) return; if (((n.title || '') + (n.content || '')).toLowerCase().includes(lq)) out.push({ type: 'note', icon: PenLine, label: n.title || 'Untitled', sub: n.content?.slice(0, 50), color: '#f59e0b', action: () => onNavigate('library') }); });
     return out.slice(0, 12);
   }, [q, docs, flashcards, exams, cases, notes]);
 
@@ -2453,9 +2453,9 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
   }), [docs.length, totalCards, totalQ, totalCases]);
 
   const filtered = useMemo(() => {
-    let d = docs.filter(doc => doc.name.toLowerCase().includes(search.toLowerCase()));
+    let d = docs.filter(doc => (doc.name || '').toLowerCase().includes(search.toLowerCase()));
     if (sortBy === 'date') d = [...d].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
-    else if (sortBy === 'name') d = [...d].sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === 'name') d = [...d].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     else if (sortBy === 'type') d = [...d].sort((a, b) => (a.fileCategory || 'pdf').localeCompare(b.fileCategory || 'pdf'));
     return d;
   }, [docs, search, sortBy]);
@@ -2717,9 +2717,9 @@ function LibraryView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
   }), [docs, flashcards, exams, cases]);
 
   const filtered = useMemo(() => {
-    let d = docs.filter(doc => doc.name.toLowerCase().includes(search.toLowerCase()));
+    let d = docs.filter(doc => (doc.name || '').toLowerCase().includes(search.toLowerCase()));
     if (sortBy === 'date') d = [...d].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
-    else if (sortBy === 'name') d = [...d].sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === 'name') d = [...d].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     else if (sortBy === 'type') d = [...d].sort((a, b) => (a.fileCategory || 'pdf').localeCompare(b.fileCategory || 'pdf'));
     return d;
   }, [docs, search, sortBy]);
@@ -8846,7 +8846,7 @@ function NotesView({ notes, setNotes, docs, settings, addToast }) {
 
   const filtered = useMemo(() => {
     let list = notes;
-    if (search) list = list.filter(n => (n.title + n.content + (n.tags || []).join('')).toLowerCase().includes(search.toLowerCase()));
+    if (search) list = list.filter(n => ((n.title || '') + (n.content || '') + (n.tags || []).join('')).toLowerCase().includes(search.toLowerCase()));
     if (activeTag) list = list.filter(n => (n.tags || []).includes(activeTag));
     return list.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
   }, [notes, search, activeTag]);
