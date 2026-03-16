@@ -1,0 +1,218 @@
+/* ╔══════════════════════════════════════════════════════════════════╗
+ * ║  MARIAM PRO — Component Utility Styles                         ║
+ * ║  Shared component patterns. Uses design tokens only.           ║
+ * ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* ── Glass card effect (frosted glass background) ── */
+.glass {
+  background: color-mix(in srgb, var(--surface, #1e1e2e) 80%, transparent);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: var(--radius-xl);
+}
+
+/* ── Floating Action Button ── */
+.fab {
+  position: fixed;
+  bottom: var(--content-bottom-clear);
+  right: var(--space-4);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: var(--z-dropdown);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.fab:active {
+  transform: scale(0.92);
+}
+
+/* ── Card base ── */
+.card-base {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+/* ── Pill badge ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-medium);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+/* ── Touch target enforcement ── */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Scrollable content area ── */
+.view-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: var(--content-bottom-clear);
+}
+
+/* ── Flashcard 3D scene ── */
+.flashcard-scene {
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+}
+.flashcard-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.64, 1);
+  will-change: transform;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Bottom sheet handle ── */
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border2, rgba(255,255,255,0.15));
+  margin: var(--space-2) auto var(--space-3);
+}
+
+/* ── Skeleton loading placeholder ── */
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-rect {
+  border-radius: var(--radius-md);
+}
+
+/* ── Focus visible outline ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Reduced motion safe variants ── */
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-inner {
+    transition: opacity 0.2s ease;
+  }
+  .flashcard-inner.flipped {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ── Goal Tracker Confetti ── */
+.goal-confetti-burst {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+.confetti-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color, var(--accent));
+  animation: confetti-burst 1.2s ease-out forwards;
+}
+@keyframes confetti-burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(calc(cos(var(--angle)) * var(--distance)), calc(sin(var(--angle)) * var(--distance))) scale(0); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-particle { animation: none; opacity: 0; }
+}
+
+/* ── Shake animation (MatchGame) ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-shake { animation: none; }
+}
+
+/* ── Match fly-off animation (MatchGame matched pairs) ── */
+@keyframes match-flyoff {
+  0%   { transform: scale(1); opacity: 1; box-shadow: 0 0 0 rgba(16,185,129,0); }
+  30%  { transform: scale(1.08); opacity: 1; box-shadow: 0 0 24px rgba(16,185,129,0.6); }
+  100% { transform: scale(0) translateY(-100px); opacity: 0; }
+}
+.animate-match-flyoff {
+  animation: match-flyoff 0.55s ease-out forwards;
+  animation-delay: 0.1s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-match-flyoff { animation: none; opacity: 0.5; }
+}
+
+/* ── Scale-in animation (cards/tiles appearing) ── */
+@keyframes scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(.34,1.3,.64,1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-scale-in { animation: none; }
+}
+
+/* ── prefers-reduced-motion: disable 3D flip, swipe, streaming cursor ── */
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-inner { transition: opacity 0.3s ease !important; }
+  .flashcard-inner.flipped { transform: none !important; opacity: 1; }
+  .flashcard-front, .flashcard-back { backface-visibility: visible !important; }
+  .flashcard-back { display: none; }
+  .flashcard-inner.flipped .flashcard-front { display: none; }
+  .flashcard-inner.flipped .flashcard-back { display: block; }
+  .streaming-cursor { animation: none !important; opacity: 1; }
+  .confetti-particle { animation: none !important; opacity: 0; }
+}

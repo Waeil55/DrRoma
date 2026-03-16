@@ -1,0 +1,72 @@
+/* ╔══════════════════════════════════════════════════════════════════╗
+ * ║  MARIAM PRO — Fluid Typography Scale (clamp-based)             ║
+ * ║  All font-size/weight rules in one place.                      ║
+ * ╚══════════════════════════════════════════════════════════════════╝ */
+
+:root {
+  /* ── User-adjustable multiplier (SettingsView writes to :root via style) ── */
+  --font-scale: 1;
+
+  /* ── clamp(min, preferred × scale, max) for fluid responsive type ── */
+  --text-xs:   clamp(10px, calc(11px  * var(--font-scale)), 13px);
+  --text-sm:   clamp(12px, calc(13px  * var(--font-scale)), 15px);
+  --text-base: clamp(13px, calc(15px  * var(--font-scale)), 18px);
+  --text-md:   clamp(13px, calc(15px  * var(--font-scale)), 18px);
+  --text-lg:   clamp(15px, calc(17px  * var(--font-scale)), 21px);
+  --text-xl:   clamp(17px, calc(20px  * var(--font-scale)), 24px);
+  --text-2xl:  clamp(20px, calc(24px  * var(--font-scale)), 30px);
+  --text-3xl:  clamp(24px, calc(30px  * var(--font-scale)), 38px);
+  --text-4xl:  clamp(30px, calc(36px  * var(--font-scale)), 48px);
+
+  /* ── Line heights ── */
+  --leading-tight:  1.25;
+  --leading-snug:   1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed:1.625;
+  --leading-loose:  2;
+
+  /* ── Font weight tokens ── */
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extrabold:800;
+}
+
+/* ── Weight normalisation (prevents CDN font overrides from rounding) ── */
+html, body, #root, * {
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Utility classes ── */
+.text-xs   { font-size: var(--text-xs)  !important; }
+.text-sm   { font-size: var(--text-sm)  !important; }
+.text-md   { font-size: var(--text-md)  !important; }
+.text-lg   { font-size: var(--text-lg)  !important; }
+.text-xl   { font-size: var(--text-xl)  !important; }
+.text-2xl  { font-size: var(--text-2xl) !important; }
+.text-3xl  { font-size: var(--text-3xl) !important; }
+.text-4xl  { font-size: var(--text-4xl) !important; }
+
+/* ── Weight enforcement rules ── */
+body             { font-weight: 400; }
+p, span, li      { font-weight: 400; }
+.label, .caption { font-weight: 500; }
+h3, .subheading  { font-weight: 600; }
+h2, .section-title { font-weight: 700; }
+h1, .page-title  { font-weight: 800; }
+.hero-title      { font-weight: 900; }
+
+/* ── Smooth font-size transition on rescaling ── */
+html { transition: font-size 0.2s ease; }
+
+/* ── Responsive body base ── */
+@media (max-width: 767px) {
+  :root { --font-scale: var(--font-scale-mobile, 1); }
+}
+
+@media (min-width: 1280px) {
+  :root { --font-scale: var(--font-scale-desktop, 1); }
+}

@@ -138,19 +138,19 @@ html.dark .design-header::before,
 .design-nav {
   position: fixed;
   bottom: calc(6px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  width: 98%;
-  max-width: 600px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: none;
+  transform: none;
   z-index: 1000;
-  /* Transition on the base so it animates BOTH ways (show and hide) */
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
 .design-nav.keyboard-open-hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 30px);
+  transform: translateY(30px);
 }
 
 .design-nav-inner {
@@ -216,64 +216,32 @@ html.dark .design-nav-btn.active,
   text-overflow: ellipsis;
 }
 
-/* Library should use the full desktop workspace width */
-@media (min-width: 1024px) {
+/* Tablet+Desktop: full content width */
+@media (min-width: 768px) {
   .library-view {
     max-width: none;
     width: 100%;
     padding-right: 20px;
   }
-}
 
-/* Desktop: convert bottom nav to a compact left sidebar */
-@media (min-width: 1024px) {
-  .design-nav {
-    bottom: auto;
-    top: 92px;
-    left: 18px;
-    transform: none;
-    width: 92px;
-    max-width: none;
-    height: calc(100dvh - 124px);
-    transition: none;
-  }
-  .design-nav.keyboard-open-hidden {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-  .design-nav-inner {
-    flex-direction: column;
-    padding: 12px;
-    gap: 8px;
-    align-items: center;
-    justify-content: flex-start;
-    border-radius: 16px;
-  }
-  .design-nav-btn { flex: none; padding: 10px 8px; border-radius: 12px; width: 100%; }
+  /* The sidebar nav code is superseded by App.jsx display:none — kept for reference only */
 
-  /* Wider content area on desktop */
+  /* Wider content area */
   .app-view { max-width: 1360px; padding: 24px 30px; }
 
-  /* Desktop shell: push content to the right so sidebar never overlays it */
+  /* Shell: no sidebar — no margin offset needed */
   .design-main {
-    margin-left: 128px;
     padding-bottom: 24px !important;
-    font-size: 1.04rem;
     line-height: 1.58;
   }
 
-  .design-main h1 { font-size: 2.1rem; }
-  .design-main h2 { font-size: 1.75rem; }
-  .design-main h3 { font-size: 1.35rem; }
-  .design-main h4 { font-size: 1.12rem; }
+  /* Font sizes — all use rem and scale with root font-size setting */
+  .design-main h1 { font-size: 1.55rem; font-weight: 700; }
+  .design-main h2 { font-size: 1.3rem; font-weight: 700; }
+  .design-main h3 { font-size: 1.1rem; font-weight: 600; }
+  .design-main h4 { font-size: 1.0rem; font-weight: 600; }
   .design-main p,
-  .design-main button,
-  .design-main input,
-  .design-main select,
-  .design-main textarea {
-    font-size: 1.02rem;
-  }
+  .design-main li { font-size: 0.95rem; }
 }
 
 .design-btn {
@@ -377,8 +345,5 @@ html.dark .design-btn-secondary:hover,
     max-width: 1480px;
     padding-left: 34px;
     padding-right: 34px;
-  }
-  .design-main {
-    margin-left: 136px;
   }
 }
