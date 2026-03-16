@@ -1854,21 +1854,10 @@ const setupPWA = () => {
 
   // Service Worker (best-effort, may fail in sandboxed environments)
   if ('serviceWorker' in navigator) {
-    const swCode = `
-const CACHE='mariam-v8';
-const OFFLINE_RESP=new Response('MARIAM PRO is cached and ready!',{headers:{'Content-Type':'text/plain'}});
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/'])).catch(()=>{}));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  e.respondWith(fetch(e.request).then(r=>{const rc=r.clone();caches.open(CACHE).then(c=>c.put(e.request,rc)).catch(()=>{});return r;}).catch(()=>caches.match(e.request).then(r=>r||OFFLINE_RESP)));
-});
-    `;
-    try {
-      const swBlob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swUrl).catch(() => { });
-    } catch { }
+    // Unregister any stale service workers first to avoid caching issues
+    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(() => {});
+    // Clear all caches on every load to ensure fresh content
+    if (typeof caches !== 'undefined') caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
   }
 };
 
