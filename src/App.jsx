@@ -142,7 +142,8 @@ const loadJsPDF = () => loadScript(CONFIG.JSPDF_CDN, 'jspdf');
  * Gracefully falls back to the basic Web Speech API if the engine
  * cannot initialise (e.g. no speechSynthesis on the device).
  */
-const speakText = (text, opts = {}) => {
+const speakText = (
+  text, opts = {}) => {
   const engine = getProsodyEngine();
   if (engine) {
     if (opts.rate !== undefined || opts.pitch !== undefined || opts.voiceURI !== undefined) {
@@ -5434,16 +5435,21 @@ function App() {
       const tag = (el?.tagName || '').toLowerCase();
       const isEditable = tag === 'input' || tag === 'textarea' || tag === 'select'
         || el?.isContentEditable || el?.getAttribute?.('contenteditable') === 'true';
-      setIsKeyboardOpen(delta > 100 && isEditable);
+      setIsKeyboardOpen(delta > 60 && isEditable);
     };
 
-    // iOS keyboard animation takes ~300ms; wait long enough after focus
-    const onFocusIn = () => {
+    // Also detect focus on editable elements directly (fallback for browsers where visualViewport doesn't shrink)
+    const onFocusIn = (e) => {
+      const el = e?.target;
+      const tag = (el?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || el?.isContentEditable) {
+        setIsKeyboardOpen(true);
+      }
       setTimeout(updateKeyboardState, 100);
       setTimeout(updateKeyboardState, 350);
       setTimeout(updateKeyboardState, 600);
     };
-    const onFocusOut = () => setTimeout(updateKeyboardState, 200);
+    const onFocusOut = () => { setIsKeyboardOpen(false); setTimeout(updateKeyboardState, 200); };
 
     vv?.addEventListener('resize', updateKeyboardState);
     window.addEventListener('resize', updateKeyboardState);
@@ -6018,7 +6024,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
 
         /* ══ MISC ══ */
         /* Mobile: pad bottom so content clears the pill nav (~62px) + safe area */
-        .scroll-content { padding-bottom:calc(96px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
+        .scroll-content { padding-bottom:calc(140px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling:touch; }
         @media(min-width:1024px){ .scroll-content { padding-bottom:0; } }
         .prose-custom h2,.prose-custom h3 { font-weight:800; margin:14px 0 5px; }
         .prose-custom li { margin:3px 0; }
@@ -6542,7 +6548,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         /* Tablet+Desktop: body starts below the slim fixed header */
         @media(min-width:768px){.design-body{margin-top:var(--header-h);}}
         /* Phone: no header → start at safe area, leave space for floating bottom pill */
-        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(env(safe-area-inset-top,44px) + 16px);padding-bottom:calc(120px + env(safe-area-inset-bottom));}
+        .design-main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-y:auto;position:relative;padding-top:calc(env(safe-area-inset-top,48px) + 20px);padding-bottom:calc(140px + env(safe-area-inset-bottom));}
         /* Tablet+Desktop: small top gap since body already clears header */
         @media(min-width:768px){.design-main{padding-top:20px!important;padding-bottom:0!important;}}
 
@@ -6628,7 +6634,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         @media (min-width:768px){
           .design-nav{display:none!important;}
         }
-        .design-nav.keyboard-open-hidden{transform:translateX(-50%) translateY(120px);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
+        .design-nav.keyboard-open-hidden{transform:translateX(-50%) translateY(200%);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
         .design-nav-inner{
           display:flex;align-items:center;justify-content:space-between;
           width:100%;padding:6px 8px;
