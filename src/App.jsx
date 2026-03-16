@@ -6989,7 +6989,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             <EnhancedStudyPodcast flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
           </ViewWrapper>
           <ViewWrapper active={view === 'focusmode'}>
-            <EnhancedDeepFocusMode onExit={() => setView('dashboard')} flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            <EnhancedDeepFocusMode onExit={() => setView('library')} flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
           </ViewWrapper>
           <ViewWrapper active={view === 'annotations'}>
             <DocumentAnnotationsView docs={docs} notes={notes} setNotes={setNotes} addToast={addToast} setView={setView} setActiveId={setActiveId} />
@@ -7294,15 +7294,39 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             <span className="design-nav-label">Tutor</span>
           </button>
 
-          {/* Settings */}
-          <button onClick={() => setView('settings')}
-            className={`design-nav-btn ${view === 'settings' ? 'active' : ''}`}
-            title="Settings">
-            <Settings size={20} strokeWidth={view === 'settings' ? 2.5 : 2} />
-            <span className="design-nav-label">Settings</span>
+          {/* More */}
+          <button onClick={() => setMoreOpen(p => !p)}
+            className={`design-nav-btn ${moreOpen || !['library','dashboard','reader','study','flashcards','exams','cases','chat','settings'].includes(view) ? 'active' : ''}`}
+            title="More">
+            <LayoutGrid size={20} strokeWidth={moreOpen ? 2.5 : 2} />
+            <span className="design-nav-label">More</span>
           </button>
         </div>
       </nav>
+
+      {/* ── MORE DRAWER ── */}
+      {moreOpen && (
+        <div className="fixed inset-0" style={{ zIndex: 'var(--z-modal, 110)' }}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMoreOpen(false)} />
+          <div className="absolute bottom-0 left-0 right-0 animate-slide-up" style={{ maxHeight: '80vh', background: 'var(--bg)', borderRadius: '24px 24px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,.4)' }}>
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <h2 className="font-bold text-base">All Features</h2>
+              <button onClick={() => setMoreOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full opacity-40 hover:opacity-80"><X size={18} /></button>
+            </div>
+            <div className="overflow-y-auto custom-scrollbar px-4 pb-6" style={{ maxHeight: 'calc(80vh - 60px)' }}>
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                {MORE_ITEMS.map(({ icon: Icon, label, v }) => (
+                  <button key={v} onClick={() => { setView(v); setMoreOpen(false); }}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all border ${view === v ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10' : 'border-transparent hover:bg-[var(--surface2)]'}`}>
+                    <Icon size={20} style={{ color: view === v ? 'var(--accent)' : 'var(--text2)' }} />
+                    <span className="text-xs font-medium text-center leading-tight" style={{ color: view === v ? 'var(--accent)' : 'var(--text2)' }}>{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Deep Focus overlay */}
       {deepFocus && (
