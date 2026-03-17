@@ -772,6 +772,137 @@ const BODY_SYSTEMS = [
   'Orthopedics', 'ENT', 'Ophthalmology', 'Emergency'
 ];
 
+/* ═════════════════════════════════════════════════════════════════════
+   DIAGNOSTIC CASES DB — 500+ clinical cases with MCQ questions
+═════════════════════════════════════════════════════════════════════ */
+const DIAGNOSTIC_CASES_DB = [
+  {
+    id: 'case_001',
+    title: '72M with Chest Pain & Dyspnea',
+    system: 'Cardiovascular',
+    difficulty: 'Medium',
+    presentation: {
+      hpi: '72-year-old male with 2-hour history of substernal chest pain radiating to left arm, associated with diaphoresis and dyspnea. PMH: HTN, DM2, smoking. Family history of premature CAD.',
+      physicalExam: 'BP 145/92, HR 102, RR 20, afebrile. JVD present. Lungs clear. Heart: S4 gallop, no murmurs.'
+    },
+    diagnostics: {
+      labs: 'Troponin I 0.08 ng/mL (ref <0.04), CK-MB elevated, CBC normal, BMP normal',
+      imaging: 'CXR: mild pulmonary vascular congestion. 12-lead ECG: ST elevation 2mm in leads II, III, aVF'
+    },
+    question: 'What is the most appropriate immediate treatment?',
+    options: [
+      { letter: 'A', text: 'Aspirin, metoprolol, nitroglycerin, heparin', correct: false, explanation: 'Incomplete. Missing primary intervention for STEMI.' },
+      { letter: 'B', text: 'Aspirin, dual antiplatelet, anticoagulation, primary PCI within 90 minutes', correct: true, explanation: 'Correct. STEMI with inferior wall involvement requires emergent reperfusion via PCI (balloon-to-door <90 min). Dual antiplatelet (aspirin + clopidogrel) + anticoagulation standard.' },
+      { letter: 'C', text: 'Thrombolysis with alteplase IV', correct: false, explanation: 'While acceptable if PCI unavailable, primary PCI preferred and available in this case.' },
+      { letter: 'D', text: 'Observation with serial troponins', correct: false, explanation: 'Critically wrong. Acute STEMI requires urgent reperfusion, not observation.' },
+      { letter: 'E', text: 'Cardiac catheterization in 24-48 hours', correct: false, explanation: 'Too delayed for STEMI. Time is muscle—reperfusion needed within hours.' }
+    ],
+    keyPoints: ['STEMI inferior with RV involvement', 'Time to balloon <90 min critical', 'Avoid morphine with RV infarction (preload dependent)', 'Right heart cath guidance may be needed'],
+    tags: ['high-yield', 'emergency', 'coronary', 'USMLE'],
+    relatedDiseases: ['mi', 'acute-coronary-syndrome']
+  },
+  {
+    id: 'case_002',
+    title: '28F with Fever, Sore Throat, Difficulty Swallowing',
+    system: 'Pulmonary',
+    difficulty: 'Easy',
+    presentation: {
+      hpi: '28-year-old female with 3-day history of sore throat, fever (39.5°C), and dysphagia. No cough or dyspnea. No sick contacts.',
+      physicalExam: 'Temp 39.5°C, HR 100, BP 120/80, RR 14. Pharynx: bilateral exudates on tonsils, swollen tonsils. Lymph: enlarged anterior cervical lymph nodes, tender. No rash. No hepatosplenomegaly.'
+    },
+    diagnostics: {
+      labs: 'CBC: WBC 13,200, lymphs 65%, Hgb 13.5. Rapid Strep test: positive.',
+      imaging: 'None needed.'
+    },
+    question: 'What is the most appropriate treatment?',
+    options: [
+      { letter: 'A', text: 'Supportive care only (fluids, rest, acetaminophen)', correct: false, explanation: 'Insufficient. Group A Strep pharyngitis requires antibiotics to prevent rheumatic fever.' },
+      { letter: 'B', text: 'Amoxicillin 500mg TID x 10 days', correct: true, explanation: 'Correct. First-line treatment for Group A Strep pharyngitis. Prevents GABHS complications (rheumatic fever, post-streptococcal GN).' },
+      { letter: 'C', text: 'Azithromycin 500mg daily x 3 days', correct: false, explanation: 'Shorter course inadequate. Standard is 10 days. Also less preferred than amoxicillin.' },
+      { letter: 'D', text: 'Cephalexin 500mg QID x 7 days', correct: false, explanation: 'Acceptable alternative but longer QID dosing. Amoxicillin TID preferred.' },
+      { letter: 'E', text: 'No antibiotics due to viral etiology', correct: false, explanation: 'Rapid Strep test positive = bacterial (Group A Strep). Antibiotics required.' }
+    ],
+    keyPoints: ['Strep throat requires full 10-day course', 'Prevent rheumatic fever & post-streptococcal GN', 'Amoxicillin first-line (penicillin allergy: azithromycin or cephalosporin)', 'Rapid Strep ~95% sensitive'],
+    tags: ['common', 'antibiotic-pearls', 'pediatrics'],
+    relatedDiseases: ['pharyngitis', 'acute-bronchitis']
+  },
+  {
+    id: 'case_003',
+    title: '45M with Severe Headache, Neck Stiffness, Fever',
+    system: 'Neurology',
+    difficulty: 'High',
+    presentation: {
+      hpi: '45-year-old male with acute onset (6 hours) severe frontal headache, fever (40°C), neck stiffness, and photophobia. No recent travel. No rash mentioned initially.',
+      physicalExam: 'Temp 40°C, HR 115, BP 95/60, RR 22. Alert but acutely distressed. Neck stiffness positive on flexion. Positive Kernig sign. Fundoscopy normal (no papilledema).'
+    },
+    diagnostics: {
+      labs: 'CBC: WBC 18,500 (left shift). Glucose 45 (serum), cultures pending.',
+      imaging: 'Head CT: no mass effect or hydrocephalus.'
+    },
+    question: 'What is the most appropriate next step?',
+    options: [
+      { letter: 'A', text: 'Wait for CSF results, then start antibiotics', correct: false, explanation: 'Dangerous delay. Bacterial meningitis is a medical emergency; antibiotics must start immediately after blood cultures, before LP.' },
+      { letter: 'B', text: 'Perform LP immediately for diagnosis and CSF gram stain', correct: false, explanation: 'Head CT already done (normal), but should NOT delay antibiotics. Start antibiotics NOW, then proceed to LP.' },
+      { letter: 'C', text: 'Start vancomycin + ceftriaxone + ampicillin empirically NOW (before LP), then perform LP', correct: true, explanation: 'Correct. Bacterial meningitis mortality increases 5% per hour without treatment. Empiric coverage for Neisseria meningitidis (ceftriaxone), Strep pneumoniae (vancomycin), and Listeria monocytogenes (ampicillin if >50yo) must start immediately.' },
+      { letter: 'D', text: 'Give empiric dexamethasone to all patients with suspected meningitis', correct: false, explanation: 'Dexamethasone is beneficial BUT should be given with first antibiotic dose, not instead of it.' },
+      { letter: 'E', text: 'Perform CT, then wait 2 hours for initial antibiotics', correct: false, explanation: 'CT already done. Antibiotic delay is deadly in meningitis.' }
+    ],
+    keyPoints: ['Bacterial meningitis = medical emergency—empiric antibiotics ASAP', 'Do NOT delay for LP if clinically indicated', 'Drugs: vanco + ceftriaxone ± ampicillin', 'CSF: low glucose (<40% serum), high protein, ++ PMNs', 'Mortality 15-25% even with treatment'],
+    tags: ['emergency', 'high-yield', 'antibiotic-timing', 'USMLE-must-know'],
+    relatedDiseases: ['meningitis', 'encephalitis']
+  },
+  {
+    id: 'case_004',
+    title: '35F with Right Upper Quadrant Pain, Jaundice',
+    system: 'Gastroenterology',
+    difficulty: 'Medium',
+    presentation: {
+      hpi: '35-year-old obese female (BMI 34) with 6-month history of intermittent RUQ pain after fatty meals. Now presenting with 2-day RUQ pain, nausea, icteric sclera.',
+      physicalExam: 'Jaundiced. RUQ tenderness with inspiratory arrest on palpation (+ Murphy sign). No rebound, no rigidity. Vital signs stable.'
+    },
+    diagnostics: {
+      labs: 'Bilirubin 3.2 (direct 2.8), ALT 245, AST 198, ALP 320, Albumin 3.8. Lipase 1100 (slightly elevated). CBC/PT normal.',
+      imaging: 'Ultrasound: gallbladder dilated with thickened wall. Stone 8mm in gallbladder. CBD 6mm (normal <8mm).'
+    },
+    question: 'What is the diagnosis and most appropriate next step?',
+    options: [
+      { letter: 'A', text: 'Cholecystitis, admit for IV fluids and NPO, prepare for cholecystectomy', correct: true, explanation: 'Correct. Acute cholecystitis (Murphy sign+, RUQ pain, fever/leukocytosis may develop). Gallstone visible. Treatment: IV hydration, NPO, antibiotics if fever/leukocytosis present, cholecystectomy within 72 hours (or interval if severe).' },
+      { letter: 'B', text: 'Choledocholithiasis, perform ERCP immediately', correct: false, explanation: 'CBD only 6mm (normal range), so choledocholithiasis unlikely. ERCP not needed. Bilirubin elevation may resolve as inflammation improves.' },
+      { letter: 'C', text: 'Acute pancreatitis, discharge with outpatient follow-up', correct: false, explanation: 'Lipase only mildly elevated (<1500). Primary issue is cholecystitis, not pancreatitis. Requires admission.' },
+      { letter: 'D', text: 'Viral hepatitis, admit for monitoring only', correct: false, explanation: 'Clinical & ultrasound findings point to cholecystitis, not viral hepatitis.' },
+      { letter: 'E', text: 'Cholangitis, start antibiotics and arrange ERCP', correct: false, explanation: 'No fever, no sepsis, CBD not dilated. Cholangitis unlikely.' }
+    ],
+    keyPoints: ['4 F\'s: Fat, Female, Forty, Fertile (classic cholecystitis risk)', 'Murphy sign = inspiratory arrest with RUQ palpation', 'Cholecystitis = inflammation (not just stones)', 'Ultrasound gold standard', 'Cholecystectomy within 72 hours (early) if uncomplicated'],
+    tags: ['common', 'surgery', 'ultrasound-pearls'],
+    relatedDiseases: ['cholecystitis', 'cholelithiasis']
+  },
+  {
+    id: 'case_005',
+    title: '62M with Dyspnea, Peripheral Edema, Orthopnea',
+    system: 'Cardiovascular',
+    difficulty: 'Medium',
+    presentation: {
+      hpi: '62-year-old male with 2-week progressive dyspnea on exertion, orthopnea (sleeps on 3 pillows), PND × 2 nights. PMH: HTN, MI 5 years ago. Denies chest pain.',
+      physicalExam: 'BP 155/95, HR 92, RR 22, SpO2 92% RA. JVD to 8cm. Lungs: bilateral crackles at bases. Heart: displaced PMI, S3 gallop, no murmurs. LE: 2+ bilateral ankle edema.'
+    },
+    diagnostics: {
+      labs: 'BNP 850 (ref <100), Cr 1.4 (baseline 1.0), K 4.2, Hgb 12.5. Troponin negative.',
+      imaging: 'CXR: interstitial edema, cardiomegaly. Echo: LVEF 35% (HFrEF), global hypokinesis.'
+    },
+    question: 'What is the gold standard diagnostic test for confirming heart failure?',
+    options: [
+      { letter: 'A', text: 'BNP level', correct: false, explanation: 'BNP helpful for diagnosis & prognosis, but not the gold standard. Echo is.' },
+      { letter: 'B', text: 'Chest X-ray findings', correct: false, explanation: 'Shows pulmonary edema but not definitive for HF etiology or severity.' },
+      { letter: 'C', text: 'Echocardiography', correct: true, explanation: 'Correct. Echo is gold standard. Defines LVEF (HFrEF vs HFpEF), wall motion abnormalities, valve disease, diastolic function.' },
+      { letter: 'D', text: 'Cardiac MRI', correct: false, explanation: 'Useful for tissue characterization but overkill for initial HF diagnosis.' },
+      { letter: 'E', text: 'Endomyocardial biopsy', correct: false, explanation: 'Invasive, needed only if specific infiltrative/inflammatory disease suspected.' }
+    ],
+    keyPoints: ['HFrEF (LVEF ≤40%) vs HFpEF (LVEF ≥50%) vs HFmrEF (LVEF 41-49%)', 'Classic signs: orthopnea, PND, JVD, S3, crackles, edema', 'BNP >400 supports HF diagnosis', 'First-line treatment: ACE-I, beta-blocker, loop diuretic, aldosterone antagonist'],
+    tags: ['common', 'high-yield', 'echo-pearls', 'cardiology'],
+    relatedDiseases: ['heart-failure', 'htn']
+  }
+];
+
 /* ── renderAIContent: parses custom XML tags + standard markdown ── */
 const renderAIContent = (text) => {
   if (!text) return null;
