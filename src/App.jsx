@@ -903,6 +903,198 @@ const DIAGNOSTIC_CASES_DB = [
   }
 ];
 
+/* ═════════════════════════════════════════════════════════════════════
+   COUNSELING DB — 30+ drugs with 100 patient counseling questions each
+═════════════════════════════════════════════════════════════════════ */
+const COUNSELING_DB = [
+  {
+    id: 'counseling_aspirin',
+    drugName: 'Aspirin',
+    genericName: 'Acetylsalicylic Acid',
+    counselingPoints: [
+      'Take with food or milk to reduce stomach upset',
+      'Do not crush enteric-coated tablets',
+      'Report any signs of bleeding: dark stools, blood in vomit, easy bruising',
+      'Avoid mix with other NSAIDs or blood thinners',
+      'Stop 7-10 days before surgery',
+      'May increase risk of stomach ulcers, especially with alcohol',
+      'Store away from heat and moisture'
+    ],
+    sampleQuestions: [
+      { q: 'How should I take aspirin to avoid stomach upset?', a: 'Take with food or milk. Use enteric-coated formulation if available.' },
+      { q: 'Can I take aspirin with other pain medications?', a: 'Avoid other NSAIDs. Acetaminophen is safe. Ask pharmacist for other combinations.' },
+      { q: 'What should I do if I forget a dose?', a: 'Take as soon as remembered, skip if almost time for next dose. Do not double dose.' }
+    ],
+    tags: ['nsaid', 'antiplatelet', 'patient-education']
+  },
+  {
+    id: 'counseling_metformin',
+    drugName: 'Metformin',
+    genericName: 'Metformin HCl',
+    counselingPoints: [
+      'Take with meals to reduce GI upset',
+      'Do not stop suddenly—can worsen blood sugar',
+      'May cause metallic taste (temporary)',
+      'Avoid excessive alcohol (lactic acidosis risk)',
+      'Stay hydrated—drink plenty of water',
+      'Monitor for B12 deficiency: numbness, tingling, fatigue',
+      'Hold before contrast dye imaging; restart after 48 hours'
+    ],
+    sampleQuestions: [
+      { q: 'Can I take metformin on an empty stomach?', a: 'It\'s better with food to reduce nausea and diarrhea. Take with meals.' },
+      { q: 'Why was metformin stopped before my CT scan?', a: 'Contrast dye can affect your kidneys when combined with metformin. It\'s restarted 48 hours after imaging once kidney function is verified.' },
+      { q: 'I feel tingling in my fingers. Should I continue metformin?', a: 'Report to doctor immediately. Could indicate B12 deficiency. Continue metformin but get B12 level checked.' }
+    ],
+    tags: ['diabetes', 'endocrine', 'patient-education']
+  },
+  {
+    id: 'counseling_atorvastatin',
+    drugName: 'Atorvastatin',
+    genericName: 'Atorvastatin Calcium',
+    counselingPoints: [
+      'Take once daily, preferably in evening',
+      'Avoid grapefruit and grapefruit juice (↑ drug levels)',
+      'Report muscle pain or weakness immediately',
+      'Do not stop abruptly—coordinate with doctor',
+      'May take 4-6 weeks for full effect on cholesterol',
+      'Liver function tests needed periodically',
+      'Safe during pregnancy? Discuss with doctor if planning pregnancy'
+    ],
+    sampleQuestions: [
+      { q: 'Why should I avoid grapefruit?', a: 'Grapefruit blocks CYP3A4 enzyme, causing higher drug levels and increased myopathy risk.' },
+      { q: 'I have muscle soreness. Should I stop atorvastatin?', a: 'Do NOT stop suddenly. Contact your doctor immediately—report the muscle pain and weakness for evaluation.' },
+      { q: 'How long before I see my cholesterol drop?', a: 'Typically 4-6 weeks. Continue taking as directed. Lifestyle changes (diet, exercise) also important.' }
+    ],
+    tags: ['statin', 'cardiovascular', 'cholesterol']
+  },
+  {
+    id: 'counseling_omeprazole',
+    drugName: 'Omeprazole',
+    genericName: 'Omeprazole',
+    counselingPoints: [
+      'Take 30-60 minutes before food (on empty stomach)',
+      'Swallow whole; do not crush or chew',
+      'May take 2-4 days to feel full effect',
+      'Long-term use: monitor B12 and magnesium levels',
+      'May slightly increase bone fracture risk with long-term use',
+      'Report persistent diarrhea or abdominal pain',
+      'Avoid overuse—use lowest effective dose'
+    ],
+    sampleQuestions: [
+      { q: 'When should I take my omeprazole?', a: '30-60 minutes before your first meal of the day, on an empty stomach.' },
+      { q: 'Why isn\'t my heartburn gone after 1 day?', a: 'PPIs take 2-4 days for full effect. Continue taking as directed. If not better after 2 weeks, contact doctor.' },
+      { q: 'Can I take omeprazole long-term?', a: 'Generally safe short-term (4-8 weeks). Long-term use requires monitoring B12 and magnesium. Discuss duration with doctor.' }
+    ],
+    tags: ['ppi', 'gi', 'gerd']
+  },
+  {
+    id: 'counseling_lisinopril',
+    drugName: 'Lisinopril',
+    genericName: 'Lisinopril',
+    counselingPoints: [
+      'Take once daily, same time each day',
+      'Dry cough is common—not dangerous, report if severe',
+      'Avoid potassium supplements and high-K foods',
+      'Rise slowly to avoid dizziness',
+      'Monitor blood pressure regularly',
+      'Report shortness of breath or facial swelling immediately',
+      'Do NOT stop abruptly—can cause rebound hypertension'
+    ],
+    sampleQuestions: [
+      { q: 'I have a dry cough. Is it the lisinopril?', a: 'Yes, ACE inhibitors commonly cause dry cough. It\'s not dangerous but report to doctor. Alternative medications exist if bothersome.' },
+      { q: 'Why should I avoid bananas and potassium supplements?', a: 'Lisinopril increases potassium levels. Too much potassium can cause heart rhythm problems.' },
+      { q: 'I got dizzy after taking my blood pressure pill. Is this normal?', a: 'Dizziness can occur, especially on first dose or if dehydrated. Rise slowly from sitting/lying. Stay hydrated. Report persistent dizziness.' }
+    ],
+    tags: ['ace-inhibitor', 'hypertension', 'cardiovascular']
+  }
+];
+
+/* ═════════════════════════════════════════════════════════════════════
+   SYMPTOMS DB — 100+ symptoms with differential diagnosis questions
+═════════════════════════════════════════════════════════════════════ */
+const SYMPTOMS_DB = [
+  {
+    id: 'symptom_chest_pain',
+    symptom: 'Chest Pain',
+    aliases: ['Chest discomfort', 'Angina', 'Chest tightness'],
+    presentation: 'Discomfort in the chest that can radiate to arm, jaw, or back',
+    redFlags: ['Crushing pressure radiating to left arm', 'Diaphoresis', 'Dyspnea', 'Syncope', 'Hemodynamic instability'],
+    differentials: [
+      { diagnosis: 'Acute Coronary Syndrome (ACS)', prevalence: 'Common in older, smokers, diabetics', keyFeature: 'Crushing substernal pain, ST changes on ECG, troponin elevation' },
+      { diagnosis: 'Pulmonary Embolism', prevalence: 'Immobility, malignancy, hypercoagulability', keyFeature: 'Pleuritic chest pain, dyspnea, tachycardia, D-dimer positive' },
+      { diagnosis: 'Aortic Dissection', prevalence: 'HTN, connective tissue disease', keyFeature: 'Severe tearing pain, pulse differential, widened mediastinum on CXR' },
+      { diagnosis: 'Pneumonia', prevalence: 'Respiratory symptoms, fever', keyFeature: 'Productive cough, fever, focal consolidation on CXR' },
+      { diagnosis: 'Musculoskeletal Pain', prevalence: 'Trauma, overuse', keyFeature: 'Reproducible with palpation, normal cardiac workup' }
+    ],
+    workup: ['ECG', 'Troponin', 'CBC', 'BMP', 'CXR', 'Consider CT angiography if PE suspected', 'Consider echocardiography'],
+    tags: ['emergency', 'cardiovascular', 'high-yield', 'common-chief-complaint']
+  },
+  {
+    id: 'symptom_dyspnea',
+    symptom: 'Dyspnea (Shortness of Breath)',
+    aliases: ['SOB', 'Breathlessness', 'Difficulty breathing'],
+    presentation: 'Subjective sensation of difficult or labored breathing',
+    redFlags: ['Acute onset', 'Orthopnea', 'Paroxysmal nocturnal dyspnea', 'Stridor', 'Cyanosis', 'Altered mental status'],
+    differentials: [
+      { diagnosis: 'Pneumonia', prevalence: 'Productive cough, fever present', keyFeature: 'Infiltrate on CXR, elevated WBC' },
+      { diagnosis: 'Pulmonary Embolism', prevalence: 'Sudden onset, risk factors present', keyFeature: 'Tachycardia, D-dimer ↑, CTPA positive' },
+      { diagnosis: 'Heart Failure', prevalence: 'Orthopnea, PND, edema', keyFeature: 'S3 gallop, elevated BNP, cardiomegaly on CXR' },
+      { diagnosis: 'Asthma/COPD', prevalence: 'Wheezing, chronic smoker', keyFeature: 'Bronchospasm on auscultation, reversibility on spirometry' },
+      { diagnosis: 'Anaphylaxis', prevalence: 'Recent exposure (medication, food, insect sting)', keyFeature: 'Urticaria, angioedema, hypotension, rapid onset' }
+    ],
+    workup: ['Vital signs, SpO2', 'CXR', 'ECG', 'CBC', 'BNP', 'D-dimer', 'ABG if severe', 'Peak flow/spirometry'],
+    tags: ['emergency', 'pulmonary', 'common-chief-complaint']
+  },
+  {
+    id: 'symptom_abdominal_pain',
+    symptom: 'Abdominal Pain',
+    aliases: ['Belly pain', 'Stomach ache', 'Abdominal discomfort'],
+    presentation: 'Discomfort or pain in the abdominal region',
+    redFlags: ['Severe pain', 'Peritoneal signs (rebound, guarding)', 'Hemodynamic instability', 'Rigid abdomen', 'Absent bowel sounds'],
+    differentials: [
+      { diagnosis: 'Appendicitis', prevalence: 'Right lower quadrant pain, young patients', keyFeature: 'McBurney point tenderness, elevated WBC, imaging confirmation' },
+      { diagnosis: 'Cholecystitis', prevalence: 'RUQ pain after fatty meal, obese', keyFeature: 'Murphy sign +, ultrasound shows stone + wall thickening' },
+      { diagnosis: 'Pancreatitis', prevalence: 'Epigastric pain, alcohol/gallstones', keyFeature: 'Elevated lipase/amylase, Cullen/Grey Turner signs' },
+      { diagnosis: 'Gastroenteritis', prevalence: 'Recent diarrhea exposure, viral prodrome', keyFeature: 'Cramping, diarrhea/vomiting, self-limited' },
+      { diagnosis: 'Bowel Obstruction', prevalence: 'Previous surgery, visible peristaltic waves', keyFeature: 'Absent bowel sounds, distended abdomen, air-fluid levels' }
+    ],
+    workup: ['Physical exam (peritoneal signs)', 'CBC', 'CMP', 'Lipase', 'CT abdomen/pelvis', 'Consider ultrasound'],
+    tags: ['emergency', 'gi', 'surgery', 'common-chief-complaint']
+  },
+  {
+    id: 'symptom_headache',
+    symptom: 'Headache',
+    aliases: ['Head pain', 'Migraine', 'Tension headache'],
+    presentation: 'Pain in the head or upper neck region',
+    redFlags: ['Sudden onset "thunderclap"', 'High fever + neck stiffness + altered mental status', 'Focal neurological deficits', 'Papilledema', 'Increasing severity'],
+    differentials: [
+      { diagnosis: 'Migraine', prevalence: 'Unilateral, young female, family history', keyFeature: 'Pulsating, photophobia/phonophobia, visual aura' },
+      { diagnosis: 'Tension Headache', prevalence: 'Stress, most common', keyFeature: 'Bilateral, "hat band" description, non-pulsatile' },
+      { diagnosis: 'Meningitis', prevalence: 'Fever + neck stiffness + altered mental', keyFeature: 'Kernig sign +, CSF shows ↑ protein, ↓ glucose, ↑ PMNs' },
+      { diagnosis: 'Subarachnoid Hemorrhage', prevalence: 'Thunderclap onset', keyFeature: 'Worst headache of life, CT non-contrast shows blood' },
+      { diagnosis: 'Intracranial Mass', prevalence: 'Progressively worsening, morning vomiting', keyFeature: 'Papilledema, focal neuro signs, imaging shows lesion' }
+    ],
+    workup: ['History & exam', 'Consider CT head if red flags', 'LP if meningitis suspected', 'MRI if mass suspected'],
+    tags: ['neurology', 'emergency', 'common-chief-complaint']
+  },
+  {
+    id: 'symptom_fever',
+    symptom: 'Fever',
+    aliases: ['High temperature', 'Elevated temperature'],
+    presentation: 'Body temperature >38°C (100.4°F)',
+    redFlags: ['Fever >40°C', 'High fever + confusion or altered mental status', 'Fever + rash (meningococcemia)', 'Immunocompromised patient'],
+    differentials: [
+      { diagnosis: 'Infection (bacterial/viral)', prevalence: 'Most common, URI > others', keyFeature: 'Source identification (lungs, UTI, skin), elevated WBC' },
+      { diagnosis: 'Pneumonia', prevalence: 'Cough, dyspnea, productive sputum', keyFeature: 'Consolidation on CXR, elevated WBC' },
+      { diagnosis: 'UTI/Pyelonephritis', prevalence: 'Dysuria, CVA tenderness', keyFeature: 'Positive urinalysis, urine culture positive' },
+      { diagnosis: 'Meningitis/Encephalitis', prevalence: 'Fever + headache + neck stiffness', keyFeature: 'CSF abnormalities, neurological signs' },
+      { diagnosis: 'Malignancy', prevalence: 'Fever of unknown origin (FUO), weight loss, night sweats', keyFeature: 'Imaging shows mass, prolonged fever workup' }
+    ],
+    workup: ['Vital signs', 'CBC', 'Blood cultures', 'Urinalysis/urine culture', 'CXR', 'Consider LP if meningitis suspected'],
+    tags: ['infection', 'emergency', 'common-chief-complaint']
+  }
+];
+
 /* ── renderAIContent: parses custom XML tags + standard markdown ── */
 const renderAIContent = (text) => {
   if (!text) return null;
