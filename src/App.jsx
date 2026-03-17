@@ -2426,40 +2426,169 @@ const ViewWrapper = ({ active, children }) => (
   </div>
 );
 
+/* Back-button header for sub-views */
+const SubViewHeader = ({ title, onBack }) => (
+  <div className="shrink-0 flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'var(--border2,var(--border))', background: 'var(--surface,var(--card))' }}>
+    <button onClick={onBack} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-[var(--accent)]/10"
+      style={{ border: '1px solid var(--border2,var(--border))' }}>
+      <ChevronLeft size={18} style={{ color: 'var(--accent)' }} />
+    </button>
+    <h1 className="font-bold text-sm truncate">{title}</h1>
+  </div>
+);
+
+const VIEW_TITLES = {
+  study: 'Study Mode', flashcards: 'Flashcards', exams: 'Exams', cases: 'Clinical Cases',
+  chat: 'AI Tutor', settings: 'Settings', knowledge: 'Knowledge Graph', analytics: 'Analytics',
+  tasks: 'Tasks', calendar: 'Calendar', notes: 'Notes', goals: 'Goals',
+  achievements: 'Achievements', timeline: 'Timeline', reminders: 'Reminders',
+  calculator: 'Medical Calculator', studyplan: 'Study Plan', simulator: 'Clinical Simulator',
+  progress: 'Progress Report', podcast: 'AI Study Podcast', focusmode: 'Focus Mode',
+  annotations: 'Annotations', glossary: 'Medical Glossary', labref: 'Lab Reference',
+  ddx: 'DDx Builder', mnemonics: 'Mnemonics', drugcheck: 'Drug Interactions',
+  rxpad: 'Prescription Pad', vitals: 'Vital Signs', streak: 'Study Streak',
+  pharma: 'Pharmacology Ref', guidelines: 'Clinical Guidelines', handouts: 'Patient Handouts',
+  procedures: 'Procedures', ebm: 'EBM Tools', anatomy: 'Anatomy', osce: 'OSCE Prep',
+  ecg: 'ECG Interpreter', radiology: 'Radiology', pedsdosing: 'Pediatric Dosing',
+  fluids: 'Fluids & Electrolytes', imagequiz: 'Image Quiz', criticalcare: 'Critical Care',
+  abg: 'ABG Analysis', infections: 'Infectious Disease', toxicology: 'Toxicology',
+  pathology: 'Pathology', microbiology: 'Microbiology', nutrition: 'Nutrition Calculator',
+  psychscreen: 'Psychiatry Screening', research: 'Research Methods', commskills: 'Communication Skills',
+  qi: 'Quality Improvement', obgyn: 'OB/GYN Calculators', ethics: 'Medical Ethics',
+  surganatomy: 'Surgical Anatomy', woundcare: 'Wound Care', painmgmt: 'Pain Management',
+  geriatrics: 'Geriatric Assessment', palliative: 'Palliative Care', transfusion: 'Transfusion Medicine',
+  abxsteward: 'Antibiotic Stewardship', ventgraphs: 'Ventilator Graphs', hemodynamics: 'Hemodynamics',
+  dermatology: 'Dermatology', ophthalmology: 'Ophthalmology', nephrology: 'Nephrology',
+  endocrinology: 'Endocrinology', hematology: 'Hematology', rheumatology: 'Rheumatology',
+  neurology: 'Neurology', cardiology: 'Cardiology', pulmonology: 'Pulmonology',
+  gastro: 'Gastroenterology', emergency: 'Emergency Medicine', orthopedics: 'Orthopedics',
+  ent: 'ENT', urology: 'Urology',
+};
+
+const BackableView = ({ viewKey, setView, children }) => (
+  <div className="flex flex-col flex-1 min-h-0">
+    <SubViewHeader title={VIEW_TITLES[viewKey] || viewKey} onBack={() => setView('library')} />
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content">
+      {children}
+    </div>
+  </div>
+);
+
 /* ═══════════════════════════════════════════════════════════════════
-   LIBRARY MERGED VIEW — Home + Library in one beautiful page (gooddesign)
+   HOME HUB VIEW — unified Library + Study + All Features in organized categories
 ═══════════════════════════════════════════════════════════════════ */
-function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, exams, cases, notes, setView, setActiveId, addToast, settings }) {
+const HOME_CATEGORIES = [
+  { id: 'study', title: 'Study Tools', icon: GraduationCap, color: '#8b5cf6', items: [
+    { icon: Layers, label: 'Flashcards', v: 'flashcards', desc: 'Spaced repetition cards' },
+    { icon: GraduationCap, label: 'Study Mode', v: 'study', desc: 'Smart study sessions' },
+    { icon: Mic2, label: 'Podcast', v: 'podcast', desc: 'AI study podcast' },
+    { icon: Zap, label: 'Focus Mode', v: 'focusmode', desc: 'Deep concentration' },
+    { icon: Flame, label: 'Streak', v: 'streak', desc: 'Daily study streak' },
+    { icon: Brain, label: 'Mnemonics', v: 'mnemonics', desc: 'Memory aids' },
+    { icon: MapPin, label: 'Study Plan', v: 'studyplan', desc: 'Organized study path' },
+    { icon: Bookmark, label: 'Annotations', v: 'annotations', desc: 'Document highlights' },
+  ]},
+  { id: 'practice', title: 'Practice & Assessment', icon: CheckSquare, color: '#3b82f6', items: [
+    { icon: CheckSquare, label: 'Exams', v: 'exams', desc: 'Take practice exams' },
+    { icon: Activity, label: 'Cases', v: 'cases', desc: 'Clinical case studies' },
+    { icon: Swords, label: 'Simulator', v: 'simulator', desc: 'Clinical simulator' },
+    { icon: ShieldCheck, label: 'OSCE Prep', v: 'osce', desc: 'OSCE station practice' },
+    { icon: Search, label: 'Image Quiz', v: 'imagequiz', desc: 'Visual diagnosis quiz' },
+  ]},
+  { id: 'clinical', title: 'Clinical Tools', icon: Stethoscope, color: '#06b6d4', items: [
+    { icon: Calculator, label: 'Med Calc', v: 'calculator', desc: 'Medical calculators' },
+    { icon: Pill, label: 'Drug Check', v: 'drugcheck', desc: 'Drug interactions' },
+    { icon: FlaskConical, label: 'Lab Ref', v: 'labref', desc: 'Lab values reference' },
+    { icon: Stethoscope, label: 'DDx Builder', v: 'ddx', desc: 'Differential diagnosis' },
+    { icon: Clipboard, label: 'Rx Pad', v: 'rxpad', desc: 'Prescription pad' },
+    { icon: Heart, label: 'Vitals', v: 'vitals', desc: 'Vital signs tracker' },
+    { icon: Baby, label: 'Peds Dosing', v: 'pedsdosing', desc: 'Pediatric dosing' },
+    { icon: Droplets, label: 'Fluids', v: 'fluids', desc: 'Fluid & electrolytes' },
+    { icon: Baby, label: 'OB/GYN Calc', v: 'obgyn', desc: 'OB/GYN calculators' },
+    { icon: Apple, label: 'Nutrition', v: 'nutrition', desc: 'Nutrition calculator' },
+    { icon: HeartPulse, label: 'Hemodynamics', v: 'hemodynamics', desc: 'Hemodynamic calc' },
+  ]},
+  { id: 'reference', title: 'Medical Reference', icon: BookOpen, color: '#10b981', items: [
+    { icon: Skull, label: 'Toxicology', v: 'toxicology', desc: 'Poisons & antidotes' },
+    { icon: BookOpen, label: 'Glossary', v: 'glossary', desc: 'Medical terminology' },
+    { icon: Pill, label: 'Pharma Ref', v: 'pharma', desc: 'Quick pharma reference' },
+    { icon: BookMarked, label: 'Guidelines', v: 'guidelines', desc: 'Clinical guidelines' },
+    { icon: Bone, label: 'Anatomy', v: 'anatomy', desc: 'Anatomy quick ref' },
+    { icon: Siren, label: 'ECG Guide', v: 'ecg', desc: 'ECG interpretation' },
+    { icon: Eye, label: 'Radiology', v: 'radiology', desc: 'Radiology guide' },
+    { icon: FileText, label: 'Handouts', v: 'handouts', desc: 'Patient handouts' },
+    { icon: CheckCheck, label: 'Procedures', v: 'procedures', desc: 'Procedure checklists' },
+    { icon: BarChart, label: 'EBM Tools', v: 'ebm', desc: 'Evidence-based medicine' },
+    { icon: Scissors, label: 'Surg Anatomy', v: 'surganatomy', desc: 'Surgical anatomy' },
+  ]},
+  { id: 'specialty', title: 'Specialty Guides', icon: HeartPulse, color: '#f59e0b', items: [
+    { icon: HeartPulse, label: 'Cardiology', v: 'cardiology', desc: 'Cardiology guide' },
+    { icon: Brain, label: 'Neurology', v: 'neurology', desc: 'Neurology guide' },
+    { icon: Stethoscope, label: 'Pulmonology', v: 'pulmonology', desc: 'Pulmonology guide' },
+    { icon: FlaskConical, label: 'GI', v: 'gastro', desc: 'Gastroenterology' },
+    { icon: Siren, label: 'Emergency', v: 'emergency', desc: 'Emergency medicine' },
+    { icon: HeartPulse, label: 'Critical Care', v: 'criticalcare', desc: 'Critical care protocols' },
+    { icon: Bug, label: 'Infections', v: 'infections', desc: 'Infectious disease' },
+    { icon: Microscope, label: 'Pathology', v: 'pathology', desc: 'Pathology quick ref' },
+    { icon: Bug, label: 'Micro Guide', v: 'microbiology', desc: 'Microbiology guide' },
+    { icon: Thermometer, label: 'ABG', v: 'abg', desc: 'Blood gas analysis' },
+    { icon: Palette, label: 'Dermatology', v: 'dermatology', desc: 'Dermatology atlas' },
+    { icon: Eye, label: 'Ophthalmology', v: 'ophthalmology', desc: 'Ophthalmology guide' },
+    { icon: Droplets, label: 'Nephrology', v: 'nephrology', desc: 'Nephrology guide' },
+    { icon: Thermometer, label: 'Endocrinology', v: 'endocrinology', desc: 'Endocrinology guide' },
+    { icon: Activity, label: 'Hematology', v: 'hematology', desc: 'Hematology guide' },
+    { icon: Bone, label: 'Rheumatology', v: 'rheumatology', desc: 'Rheumatology guide' },
+    { icon: Bone, label: 'Orthopedics', v: 'orthopedics', desc: 'Orthopedics guide' },
+    { icon: Mic2, label: 'ENT', v: 'ent', desc: 'ENT guide' },
+    { icon: Search, label: 'Urology', v: 'urology', desc: 'Urology guide' },
+    { icon: Clipboard, label: 'Wound Care', v: 'woundcare', desc: 'Wound care guide' },
+    { icon: Pill, label: 'Pain Mgmt', v: 'painmgmt', desc: 'Pain management' },
+    { icon: Activity, label: 'Geriatrics', v: 'geriatrics', desc: 'Geriatric assessment' },
+    { icon: Heart, label: 'Palliative', v: 'palliative', desc: 'Palliative care' },
+    { icon: Droplets, label: 'Transfusion', v: 'transfusion', desc: 'Transfusion medicine' },
+    { icon: ShieldCheck, label: 'Abx Steward', v: 'abxsteward', desc: 'Antibiotic stewardship' },
+    { icon: BarChart2, label: 'Vent Graphs', v: 'ventgraphs', desc: 'Ventilator graphs' },
+  ]},
+  { id: 'tracking', title: 'Tracking & Productivity', icon: BarChart2, color: '#ef4444', items: [
+    { icon: PenLine, label: 'Notes', v: 'notes', desc: 'Personal notes' },
+    { icon: ListChecks, label: 'Tasks', v: 'tasks', desc: 'Task manager' },
+    { icon: CalendarDays, label: 'Calendar', v: 'calendar', desc: 'Study calendar' },
+    { icon: Target, label: 'Goals', v: 'goals', desc: 'Goal tracking' },
+    { icon: Award, label: 'Achievements', v: 'achievements', desc: 'Your achievements' },
+    { icon: BarChart2, label: 'Analytics', v: 'analytics', desc: 'Study analytics' },
+    { icon: TrendingUp, label: 'Progress', v: 'progress', desc: 'Progress reports' },
+    { icon: History, label: 'Timeline', v: 'timeline', desc: 'Study timeline' },
+    { icon: Brain, label: 'Graph', v: 'knowledge', desc: 'Knowledge graph' },
+    { icon: Bell, label: 'Reminders', v: 'reminders', desc: 'Notifications' },
+    { icon: BrainCircuit, label: 'Psych Screen', v: 'psychscreen', desc: 'Psychiatry screening' },
+    { icon: BarChart, label: 'Research', v: 'research', desc: 'Research methods' },
+    { icon: MessageCircle, label: 'Comm Skills', v: 'commskills', desc: 'Communication skills' },
+    { icon: ListChecks, label: 'QI', v: 'qi', desc: 'Quality improvement' },
+    { icon: ShieldCheck, label: 'Ethics', v: 'ethics', desc: 'Medical ethics' },
+  ]},
+];
+
+function HomeHubView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, exams, cases, notes, setView, setActiveId, addToast, settings }) {
   const [search, setSearch] = useState('');
+  const [docSearch, setDocSearch] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid');
   const [dragging, setDragging] = useState(false);
+  const [collapsed, setCollapsed] = useState({});
   const inputRef = useRef(null);
 
   const totalCards = flashcards.reduce((s, f) => s + (f.cards?.length || 0), 0);
   const totalQ = exams.reduce((s, e) => s + (e.questions?.length || 0), 0);
   const totalCases = cases.reduce((s, c) => s + (c.questions?.length || 0), 0);
   const dueCards = flashcards.reduce((s, f) => s + (f.cards?.filter(c => c.nextReview <= Date.now()).length || 0), 0);
-  const recentScores = ANALYTICS.scores.slice(-7);
-  const avgScore = recentScores.length ? Math.round(recentScores.reduce((s, r) => s + r.pct, 0) / recentScores.length) : 0;
   const streak = ANALYTICS.streak || 0;
-  const recentDocs = docs.slice(-4).reverse();
-  const bgTaskList = Object.values(window.__MARIAM_BG__?.tasks || {});
-
-  const allStats = useMemo(() => ({
-    docs: docs.length,
-    cards: totalCards,
-    exams: totalQ,
-    cases: totalCases,
-  }), [docs.length, totalCards, totalQ, totalCases]);
 
   const filtered = useMemo(() => {
-    let d = docs.filter(doc => (doc.name || '').toLowerCase().includes(search.toLowerCase()));
+    let d = docs.filter(doc => (doc.name || '').toLowerCase().includes(docSearch.toLowerCase()));
     if (sortBy === 'date') d = [...d].sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
     else if (sortBy === 'name') d = [...d].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-    else if (sortBy === 'type') d = [...d].sort((a, b) => (a.fileCategory || 'pdf').localeCompare(b.fileCategory || 'pdf'));
     return d;
-  }, [docs, search, sortBy]);
+  }, [docs, docSearch, sortBy]);
 
   const handleDrop = useCallback(e => {
     e.preventDefault(); setDragging(false);
@@ -2467,13 +2596,24 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
     if (files.length) onUpload({ target: { files } });
   }, [onUpload]);
 
+  const toggle = id => setCollapsed(p => ({ ...p, [id]: !p[id] }));
+
+  // Filter categories and items by search
+  const searchLower = search.toLowerCase();
+  const filteredCategories = useMemo(() => {
+    if (!search.trim()) return HOME_CATEGORIES;
+    return HOME_CATEGORIES.map(cat => ({
+      ...cat,
+      items: cat.items.filter(it => (it.label + ' ' + (it.desc || '')).toLowerCase().includes(searchLower))
+    })).filter(cat => cat.items.length > 0 || cat.title.toLowerCase().includes(searchLower));
+  }, [search]);
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content bg-mesh" style={{ touchAction: "pan-y", WebkitOverflowScrolling: "touch" }}
       onDragOver={e => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}>
 
-      {/* Drag overlay */}
       {dragging && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none"
           style={{ background: 'rgba(var(--acc-rgb,99,102,241),.15)', backdropFilter: 'blur(4px)', zIndex: 'var(--z-modal, 110)' }}>
@@ -2485,13 +2625,13 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
         </div>
       )}
 
-      <div className="w-full p-5 lg:p-10 space-y-6">
+      <div className="w-full p-5 lg:p-10 space-y-5">
 
         {/* ── HERO ── */}
         <div className="relative overflow-hidden rounded-3xl animate-slide-in"
           style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', boxShadow: '0 16px 56px rgba(var(--acc-rgb,99,102,241),.4)' }}>
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, white 0%, transparent 60%)' }} />
-          <div className="relative p-6 lg:p-8 flex items-start justify-between gap-4">
+          <div className="relative p-5 lg:p-8 flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs font-bold uppercase tracking-[.15em] px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'rgba(255,255,255,.9)' }}>
@@ -2499,202 +2639,182 @@ function LibraryMergedView({ docs, uploading, onUpload, onOpen, onDelete, flashc
                 </span>
                 {streak >= 3 && <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}>🔥 {streak} day streak</span>}
               </div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans,system-ui' }}>
+              <h1 className="text-base lg:text-lg font-bold text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans,system-ui' }}>
                 {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'}
               </h1>
               <p className="text-sm mt-1 text-white/70 font-medium">
-                {dueCards > 0 ? `${dueCards} flashcards due · ${docs.length} documents` : docs.length === 0 ? 'Upload your first document to get started' : `${totalCards} cards · ${totalQ} exam questions · ${totalCases} cases`}
+                {dueCards > 0 ? `${dueCards} cards due · ${docs.length} docs · ${totalQ} questions` : docs.length === 0 ? 'Upload your first document to get started' : `${totalCards} cards · ${totalQ} questions · ${totalCases} cases`}
               </p>
-              <div className="flex gap-2 mt-4 flex-wrap">
-                <button onClick={() => setView('flashcards')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
-                  style={{ background: 'rgba(255,255,255,.2)', border: '1px solid rgba(255,255,255,.3)' }}>
-                  <Layers size={15} /> Study Cards {dueCards > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(255,255,255,.3)' }}>{dueCards}</span>}
-                </button>
-                <button onClick={() => setView('exams')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
+              <div className="flex gap-2 mt-3 flex-wrap">
+                {dueCards > 0 && (
+                  <button onClick={() => setView('study')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
+                    style={{ background: 'rgba(255,255,255,.2)', border: '1px solid rgba(255,255,255,.3)' }}>
+                    <GraduationCap size={15} /> Review {dueCards} Due
+                  </button>
+                )}
+                <button onClick={() => setView('chat')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
                   style={{ background: 'rgba(255,255,255,.15)', border: '1px solid rgba(255,255,255,.2)' }}>
-                  <CheckSquare size={15} /> Take Exam
-                </button>
-                <button onClick={() => setView('cases')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
-                  style={{ background: 'rgba(255,255,255,.15)', border: '1px solid rgba(255,255,255,.2)' }}>
-                  <Activity size={15} /> Cases
+                  <MessageSquare size={15} /> AI Tutor
                 </button>
               </div>
             </div>
             <div className="shrink-0 hidden sm:block">
-              <img src={MARIAM_IMG} alt="MARIAM" className="w-20 h-20 rounded-2xl object-cover"
+              <img src={MARIAM_IMG} alt="MARIAM" className="w-16 h-16 rounded-2xl object-cover"
                 style={{ boxShadow: '0 0 0 3px rgba(255,255,255,.3),0 8px 24px rgba(0,0,0,.2)' }} />
             </div>
           </div>
         </div>
 
-        {/* ── STATS ROW ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'Documents', value: allStats.docs, icon: FileText, color: '#6366f1', sub: 'uploaded' },
-            { label: 'Flashcards', value: allStats.cards, icon: Layers, color: '#8b5cf6', sub: dueCards > 0 ? `${dueCards} due` : 'total', urgent: dueCards > 0 },
-            { label: 'Exam Qs', value: allStats.exams, icon: CheckSquare, color: '#3b82f6', sub: `${exams.length} sets` },
-            { label: 'Cases', value: allStats.cases, icon: Activity, color: '#06b6d4', sub: `${cases.length} sets` },
-          ].map(({ label, value, icon: Icon, color, sub, urgent }, i) => (
-            <div key={label} className={`card-lined rounded-2xl p-4 animate-slide-up stagger-${i + 1}`}
-              style={urgent ? { borderTopColor: color + 'cc' } : {}}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: color + '18' }}>
-                  <Icon size={17} style={{ color }} />
-                </div>
-                {urgent && <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: color }} />}
-              </div>
-              <p className="text-xl font-black leading-none" style={{ color, fontFamily: 'Plus Jakarta Sans,system-ui' }}>{value}</p>
-              <p className="text-xs font-bold uppercase tracking-widest mt-1.5" style={{ color: 'var(--text3)' }}>{label}</p>
-              <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{sub}</p>
-            </div>
-          ))}
+        {/* ── SEARCH EVERYTHING ── */}
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" size={16} />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search features, tools, guides…"
+            className="w-full glass-input rounded-2xl pl-11 pr-4 py-3.5 text-sm font-medium outline-none" />
+          {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-80"><X size={16} /></button>}
         </div>
 
-        {/* ── BG TASKS ── */}
-        {bgTaskList.filter(t => t.status === 'running' || t.status === 'done').length > 0 && (
-          <div className="card-lined rounded-2xl p-5 animate-fade-in">
-            <h2 className="section-label mb-3 flex items-center gap-2"><Zap size={12} style={{ color: 'var(--accent)' }} />Active Generation</h2>
-            <div className="space-y-2">
-              {bgTaskList.map((t, i) => (
-                <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl border transition-all"
-                  style={t.status === 'done' ? { borderColor: 'var(--success-border)', background: 'var(--success-bg)' } : { borderColor: 'var(--border2,var(--border))', background: 'var(--surface2,var(--card))' }}>
-                  {t.status === 'running' ? <Loader2 size={14} className="animate-spin shrink-0" style={{ color: 'var(--accent)' }} /> : <CheckCircle2 size={14} className="shrink-0" style={{ color: 'var(--success)' }} />}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate capitalize">{t.type} · {t.docName?.slice(0, 28)}</p>
-                    {t.status === 'running' && t.total > 1 && (
-                      <div className="progress-bar mt-1.5">
-                        <div className="progress-fill" style={{ width: `${((t.done || 0) / t.total) * 100}%` }} />
-                      </div>
-                    )}
-                    {t.status === 'done' && <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{t.result?.count} items ready</p>}
-                  </div>
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${t.status === 'done' ? 'badge-success' : ''} badge`}>
-                    {t.status === 'done' ? 'Done' : 'Running'}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* ── STATS ROW ── */}
+        {!search && (
+          <div className="grid grid-cols-4 gap-2 sm:gap-3">
+            {[
+              { label: 'Docs', value: docs.length, icon: FileText, color: '#6366f1' },
+              { label: 'Cards', value: totalCards, icon: Layers, color: '#8b5cf6', badge: dueCards > 0 ? `${dueCards} due` : null },
+              { label: 'Exams', value: totalQ, icon: CheckSquare, color: '#3b82f6' },
+              { label: 'Cases', value: totalCases, icon: Activity, color: '#06b6d4' },
+            ].map(({ label, value, icon: Icon, color, badge }) => (
+              <div key={label} className="glass rounded-2xl p-2.5 text-center">
+                <Icon size={14} className="mx-auto mb-0.5" style={{ color }} />
+                <p className="text-sm font-bold leading-none" style={{ color }}>{value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest mt-0.5 opacity-40">{label}</p>
+                {badge && <p className="text-[10px] font-bold mt-0.5" style={{ color }}>{badge}</p>}
+              </div>
+            ))}
           </div>
         )}
 
-        {/* ── DOCUMENTS ── */}
-        <div className="card-lined rounded-2xl p-5 animate-slide-up stagger-3">
-          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-            <h2 className="section-label flex items-center gap-2"><FileText size={12} />My Documents</h2>
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={13} />
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search docs…"
-                  className="glass-input rounded-xl pl-9 pr-3 py-2 text-sm w-44 focus:w-56 transition-all" />
-              </div>
-              {/* Sort */}
-              <select value={sortBy} onChange={e => setSortBy(e.target.value)}
-                className="glass-input rounded-xl px-3 py-2 text-sm font-semibold cursor-pointer">
-                <option value="date">Newest</option>
-                <option value="name">Name A–Z</option>
-                <option value="type">Type</option>
-              </select>
-              {/* View toggle */}
-              <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border2,var(--border))' }}>
-                <button onClick={() => setViewMode('grid')}
-                  className="p-2 transition-colors"
-                  style={viewMode === 'grid' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
-                  <Grid size={16} />
-                </button>
-                <button onClick={() => setViewMode('list')}
-                  className="p-2 transition-colors"
-                  style={viewMode === 'list' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
-                  <List size={16} />
-                </button>
-              </div>
-              {/* Upload */}
-              <label className={`btn-accent flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer ${uploading ? 'opacity-60' : ''}`}>
-                {uploading ? <Loader2 size={15} className="animate-spin" /> : <FileUp size={15} />}
-                {uploading ? 'Uploading…' : 'Import'}
-                <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
-              </label>
-            </div>
-          </div>
-
-          {filtered.length === 0 ? (
-            <div className="empty-state cursor-pointer" onClick={() => inputRef.current?.click()}>
-              <div className="empty-icon">
-                <FileUp size={26} style={{ color: 'var(--accent)', opacity: .7 }} />
-              </div>
-              <p className="font-bold text-base">{search ? 'No documents found' : 'No documents yet'}</p>
-              <p className="text-sm" style={{ color: 'var(--text3)' }}>{search ? 'Try a different search' : 'Drop files here or click Import above'}</p>
-              {!search && <button className="btn-accent px-5 py-2.5 rounded-xl text-sm font-semibold mt-2">Browse Files</button>}
-            </div>
-          ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
-              {filtered.map((doc, i) => (
-                <div key={doc.id} onClick={() => onOpen(doc.id)}
-                  className={`glass rounded-2xl p-4 cursor-pointer card-hover group animate-scale-in stagger-${Math.min(i + 1, 6)}`}>
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-semibold mb-3"
-                    style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', boxShadow: '0 4px 14px rgba(var(--acc-rgb,99,102,241),.3)' }}>
-                    {doc.name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <p className="font-bold text-sm truncate leading-tight">{doc.name}</p>
-                  <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{doc.totalPages} pages</p>
-                  <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }}
-                    className="mt-3 w-full py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>
-                    Remove
-                  </button>
+        {/* ── FILES SECTION ── */}
+        {!search && (
+          <div className="glass rounded-2xl overflow-hidden">
+            <button onClick={() => toggle('files')} className="w-full flex items-center justify-between p-4 hover:bg-[var(--surface2)] transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#6366f118' }}>
+                  <FileText size={17} style={{ color: '#6366f1' }} />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {filtered.map((doc, i) => (
-                <div key={doc.id} onClick={() => onOpen(doc.id)}
-                  className={`flex items-center gap-3 p-3 rounded-xl card-hover cursor-pointer group animate-slide-in stagger-${Math.min(i + 1, 6)}`}
-                  style={{ border: '1px solid var(--border2,var(--border))', background: 'var(--surface,var(--card))' }}>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-semibold shrink-0"
-                    style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
-                    {doc.name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold truncate">{doc.name}</p>
-                    <p className="text-xs" style={{ color: 'var(--text3)' }}>{doc.totalPages} pages · {new Date(doc.addedAt || 0).toLocaleDateString()}</p>
-                  </div>
-                  <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }}
-                    className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: 'var(--danger-bg)', color: 'var(--danger)', border: '1px solid var(--danger-border)' }}>
-                    Remove
-                  </button>
-                  <ChevronRight size={14} className="shrink-0 opacity-0 group-hover:opacity-60 transition-opacity" style={{ color: 'var(--accent)' }} />
+                <div className="text-left">
+                  <h2 className="font-bold text-sm">My Files</h2>
+                  <p className="text-xs opacity-50">{docs.length} documents</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── QUICK ACTIONS ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-slide-up stagger-4">
-          {[
-            { lbl: 'Study Cards', Icon: Layers, v: 'flashcards', color: '#8b5cf6', count: totalCards },
-            { lbl: 'Take Exam', Icon: CheckSquare, v: 'exams', color: '#3b82f6', count: totalQ },
-            { lbl: 'Cases', Icon: Activity, v: 'cases', color: '#06b6d4', count: totalCases },
-            { lbl: 'AI Tutor', Icon: MessageSquare, v: 'chat', color: 'var(--accent)', count: null },
-          ].map(({ lbl, Icon, v, color, count }) => (
-            <button key={v} onClick={() => setView(v)}
-              className="glass card-hover rounded-2xl p-4 flex flex-col items-start gap-2 text-left group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: color + '18' }}>
-                <Icon size={18} style={{ color }} />
               </div>
-              <div>
-                <p className="font-bold text-sm">{lbl}</p>
-                {count !== null && <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--text3)' }}>{count} items</p>}
-              </div>
+              <ChevronRight size={16} className={`opacity-40 transition-transform ${collapsed.files ? '' : 'rotate-90'}`} />
             </button>
-          ))}
-        </div>
+            {!collapsed.files && (
+              <div className="px-4 pb-4 space-y-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="relative flex-1 min-w-[140px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={13} />
+                    <input value={docSearch} onChange={e => setDocSearch(e.target.value)} placeholder="Search files…"
+                      className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-sm" />
+                  </div>
+                  <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="glass-input rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer">
+                    <option value="date">Newest</option>
+                    <option value="name">Name</option>
+                  </select>
+                  <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border2,var(--border))' }}>
+                    <button onClick={() => setViewMode('grid')} className="p-2 transition-colors" style={viewMode === 'grid' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}><Grid size={14} /></button>
+                    <button onClick={() => setViewMode('list')} className="p-2 transition-colors" style={viewMode === 'list' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}><List size={14} /></button>
+                  </div>
+                  <label className={`btn-accent flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer ${uploading ? 'opacity-60' : ''}`}>
+                    {uploading ? <Loader2 size={14} className="animate-spin" /> : <FileUp size={14} />}
+                    {uploading ? '…' : 'Import'}
+                    <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
+                  </label>
+                </div>
+                {filtered.length === 0 ? (
+                  <div className="text-center py-8 cursor-pointer" onClick={() => inputRef.current?.click()}>
+                    <FileUp size={28} className="mx-auto mb-2 opacity-40" style={{ color: 'var(--accent)' }} />
+                    <p className="text-sm font-bold opacity-60">{docSearch ? 'No files found' : 'Drop files or click Import'}</p>
+                  </div>
+                ) : viewMode === 'grid' ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    {filtered.slice(0, 10).map(doc => (
+                      <div key={doc.id} onClick={() => onOpen(doc.id)} className="glass rounded-xl p-3 cursor-pointer card-hover group">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-semibold mb-2"
+                          style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
+                          {doc.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <p className="font-bold text-xs truncate">{doc.name}</p>
+                        <p className="text-xs opacity-40">{doc.totalPages} pg</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {filtered.slice(0, 10).map(doc => (
+                      <div key={doc.id} onClick={() => onOpen(doc.id)} className="flex items-center gap-3 p-2.5 rounded-xl card-hover cursor-pointer group" style={{ border: '1px solid var(--border2,var(--border))' }}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold shrink-0"
+                          style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
+                          {doc.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm truncate">{doc.name}</p>
+                          <p className="text-xs opacity-40">{doc.totalPages} pages</p>
+                        </div>
+                        <button onClick={e => { e.stopPropagation(); onDelete(doc.id, e); }} className="shrink-0 opacity-0 group-hover:opacity-60 transition-opacity">
+                          <Trash2 size={14} style={{ color: 'var(--danger)' }} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {filtered.length > 10 && <p className="text-xs text-center opacity-40 font-medium pt-1">Showing 10 of {filtered.length} — use search to find more</p>}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── FEATURE CATEGORIES ── */}
+        {filteredCategories.map(cat => (
+          <div key={cat.id} className="glass rounded-2xl overflow-hidden">
+            <button onClick={() => toggle(cat.id)} className="w-full flex items-center justify-between p-4 hover:bg-[var(--surface2)] transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: cat.color + '18' }}>
+                  <cat.icon size={17} style={{ color: cat.color }} />
+                </div>
+                <div className="text-left">
+                  <h2 className="font-bold text-sm">{cat.title}</h2>
+                  <p className="text-xs opacity-50">{cat.items.length} tools</p>
+                </div>
+              </div>
+              <ChevronRight size={16} className={`opacity-40 transition-transform ${collapsed[cat.id] ? '' : 'rotate-90'}`} />
+            </button>
+            {!collapsed[cat.id] && (
+              <div className="px-3 pb-3">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5">
+                  {cat.items.map(({ icon: Icon, label, v, desc }) => (
+                    <button key={v} onClick={() => setView(v)}
+                      className="flex flex-col items-center gap-1 p-3 rounded-xl transition-all hover:bg-[var(--surface2)] group">
+                      <Icon size={20} style={{ color: cat.color }} className="group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-semibold text-center leading-tight">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* ── QUICK ACCESS ── */}
+        {!search && (
+          <div className="flex items-center justify-center gap-3 py-2">
+            <button onClick={() => setView('settings')} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium opacity-50 hover:opacity-100 transition-opacity glass">
+              <Settings size={15} /> Settings
+            </button>
+          </div>
+        )}
 
       </div>
     </div>
@@ -6829,7 +6949,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           {/* Center pill tabs — desktop only */}
           <div className="hidden md:flex mariam-tab-pills">
             {[
-              ['library','Library'], ['study','Study'], ['flashcards','Cards'],
+              ['library','Home'], ['flashcards','Cards'],
               ['exams','Exams'], ['cases','Cases'], ['chat','Tutor'], ['settings','Settings']
             ].map(([v, label]) => (
               <button key={v} onClick={() => setView(v)}
@@ -6837,10 +6957,6 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
                 {label}
               </button>
             ))}
-            <button onClick={() => setMoreOpen(p => !p)}
-              className={`mariam-tab-pill ${moreOpen || !['library','reader','study','flashcards','exams','cases','chat','settings'].includes(view) ? 'active' : ''}`}>
-              More
-            </button>
           </div>
 
           {/* Right actions */}
@@ -6932,245 +7048,401 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           )}
 
           <ViewWrapper active={view === 'library'}>
-            <LibraryMergedView docs={docs} uploading={uploading} onUpload={handleUpload}
+            <HomeHubView docs={docs} uploading={uploading} onUpload={handleUpload}
               onOpen={id => { setOpenDocs(p => p.includes(id) ? p : [...p, id]); setActiveId(id); setView('reader'); }}
               onDelete={deleteDoc} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
               setView={setView} setActiveId={id => { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); }} addToast={addToast} settings={settings} />
           </ViewWrapper>
           <ViewWrapper active={view === 'flashcards'}>
-            <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast} docs={docs} setExams={setExams} setCases={setCases} />
+            <BackableView viewKey="flashcards" setView={setView}>
+              <FlashcardsView flashcards={flashcards} setFlashcards={setFlashcards} settings={settings} addToast={addToast} docs={docs} setExams={setExams} setCases={setCases} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'exams'}>
-            <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setCases={setCases} />
+            <BackableView viewKey="exams" setView={setView}>
+              <ExamsView exams={exams} setExams={setExams} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setCases={setCases} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'cases'}>
-            <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setExams={setExams} />
+            <BackableView viewKey="cases" setView={setView}>
+              <CasesView cases={cases} setCases={setCases} settings={settings} addToast={addToast} docs={docs} setFlashcards={setFlashcards} setExams={setExams} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'chat'}>
-            <ChatView settings={settings} sessions={chatSessions} setSessions={setChatSessions} />
+            <BackableView viewKey="chat" setView={setView}>
+              <ChatView settings={settings} sessions={chatSessions} setSessions={setChatSessions} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'settings'}>
-            <SettingsView settings={settings} setSettings={setSettings} installPrompt={installPrompt} onInstall={onInstall} />
+            <BackableView viewKey="settings" setView={setView}>
+              <SettingsView settings={settings} setSettings={setSettings} installPrompt={installPrompt} onInstall={onInstall} />
+            </BackableView>
           </ViewWrapper>
           {/* NEW VIEWS */}
           <ViewWrapper active={view === 'knowledge'}>
-            <KnowledgeGraphView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+            <BackableView viewKey="knowledge" setView={setView}>
+              <KnowledgeGraphView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'analytics'}>
-            <AnalyticsView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+            <BackableView viewKey="analytics" setView={setView}>
+              <AnalyticsView flashcards={flashcards} exams={exams} cases={cases} docs={docs} settings={settings} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'tasks'}>
-            <ChunkErrorBoundary><TasksView addToast={addToast} /></ChunkErrorBoundary>
+            <BackableView viewKey="tasks" setView={setView}>
+              <ChunkErrorBoundary><TasksView addToast={addToast} /></ChunkErrorBoundary>
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'calendar'}>
-            <ChunkErrorBoundary><CalendarView flashcards={flashcards} exams={exams} tasks={[]} /></ChunkErrorBoundary>
+            <BackableView viewKey="calendar" setView={setView}>
+              <ChunkErrorBoundary><CalendarView flashcards={flashcards} exams={exams} tasks={[]} /></ChunkErrorBoundary>
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'study'}>
-            <SmartStudyMode flashcards={flashcards} exams={exams} cases={cases} settings={settings} addToast={addToast} setFlashcards={setFlashcards} />
+            <BackableView viewKey="study" setView={setView}>
+              <SmartStudyMode flashcards={flashcards} exams={exams} cases={cases} settings={settings} addToast={addToast} setFlashcards={setFlashcards} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'notes'}>
-            <NotesView notes={notes} setNotes={setNotes} docs={docs} settings={settings} addToast={addToast} />
+            <BackableView viewKey="notes" setView={setView}>
+              <NotesView notes={notes} setNotes={setNotes} docs={docs} settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'goals'}>
-            <GoalTrackerView flashcards={flashcards} exams={exams} addToast={addToast} />
+            <BackableView viewKey="goals" setView={setView}>
+              <GoalTrackerView flashcards={flashcards} exams={exams} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'achievements'}>
-            <AchievementsView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} />
+            <BackableView viewKey="achievements" setView={setView}>
+              <AchievementsView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'timeline'}>
-            <StudyTimelineView flashcards={flashcards} exams={exams} docs={docs} cases={cases} />
+            <BackableView viewKey="timeline" setView={setView}>
+              <StudyTimelineView flashcards={flashcards} exams={exams} docs={docs} cases={cases} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'reminders'}>
-            <NotificationCenterView flashcards={flashcards} exams={exams} addToast={addToast} />
+            <BackableView viewKey="reminders" setView={setView}>
+              <NotificationCenterView flashcards={flashcards} exams={exams} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'calculator'}>
-            <MedicalCalculatorView />
+            <BackableView viewKey="calculator" setView={setView}>
+              <MedicalCalculatorView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'studyplan'}>
-            <StudyPlanView flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            <BackableView viewKey="studyplan" setView={setView}>
+              <StudyPlanView flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'simulator'}>
-            <ClinicalSimulatorView settings={settings} addToast={addToast} cases={cases} />
+            <BackableView viewKey="simulator" setView={setView}>
+              <ClinicalSimulatorView settings={settings} addToast={addToast} cases={cases} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'progress'}>
-            <ProgressReportView flashcards={flashcards} exams={exams} docs={docs} settings={settings} addToast={addToast} />
+            <BackableView viewKey="progress" setView={setView}>
+              <ProgressReportView flashcards={flashcards} exams={exams} docs={docs} settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'podcast'}>
-            <EnhancedStudyPodcast flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            <BackableView viewKey="podcast" setView={setView}>
+              <EnhancedStudyPodcast flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'focusmode'}>
-            <EnhancedDeepFocusMode onExit={() => setView('library')} flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            <BackableView viewKey="focusmode" setView={setView}>
+              <EnhancedDeepFocusMode onExit={() => setView('library')} flashcards={flashcards} exams={exams} settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'annotations'}>
-            <DocumentAnnotationsView docs={docs} notes={notes} setNotes={setNotes} addToast={addToast} setView={setView} setActiveId={setActiveId} />
+            <BackableView viewKey="annotations" setView={setView}>
+              <DocumentAnnotationsView docs={docs} notes={notes} setNotes={setNotes} addToast={addToast} setView={setView} setActiveId={setActiveId} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'glossary'}>
-            <MedicalGlossaryView />
+            <BackableView viewKey="glossary" setView={setView}>
+              <MedicalGlossaryView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'labref'}>
-            <LabReferenceView />
+            <BackableView viewKey="labref" setView={setView}>
+              <LabReferenceView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ddx'}>
-            <DifferentialDiagnosisView settings={settings} addToast={addToast} />
+            <BackableView viewKey="ddx" setView={setView}>
+              <DifferentialDiagnosisView settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'mnemonics'}>
-            <MedicalMnemonicsView addToast={addToast} />
+            <BackableView viewKey="mnemonics" setView={setView}>
+              <MedicalMnemonicsView addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'drugcheck'}>
-            <DrugInteractionCheckerView settings={settings} addToast={addToast} />
+            <BackableView viewKey="drugcheck" setView={setView}>
+              <DrugInteractionCheckerView settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'rxpad'}>
-            <PrescriptionPadView addToast={addToast} />
+            <BackableView viewKey="rxpad" setView={setView}>
+              <PrescriptionPadView addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'vitals'}>
-            <VitalSignsTrackerView addToast={addToast} />
+            <BackableView viewKey="vitals" setView={setView}>
+              <VitalSignsTrackerView addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'streak'}>
-            <ChunkErrorBoundary><StudyStreakView flashcards={flashcards} exams={exams} /></ChunkErrorBoundary>
+            <BackableView viewKey="streak" setView={setView}>
+              <ChunkErrorBoundary><StudyStreakView flashcards={flashcards} exams={exams} /></ChunkErrorBoundary>
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'pharma'}>
-            <PharmacologyQuickRefView />
+            <BackableView viewKey="pharma" setView={setView}>
+              <PharmacologyQuickRefView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'guidelines'}>
-            <ClinicalGuidelinesView />
+            <BackableView viewKey="guidelines" setView={setView}>
+              <ClinicalGuidelinesView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'handouts'}>
-            <PatientHandoutView settings={settings} addToast={addToast} />
+            <BackableView viewKey="handouts" setView={setView}>
+              <PatientHandoutView settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'procedures'}>
-            <ProcedureChecklistView />
+            <BackableView viewKey="procedures" setView={setView}>
+              <ProcedureChecklistView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ebm'}>
-            <EBMToolsView settings={settings} addToast={addToast} />
+            <BackableView viewKey="ebm" setView={setView}>
+              <EBMToolsView settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'anatomy'}>
-            <AnatomyQuickRefView />
+            <BackableView viewKey="anatomy" setView={setView}>
+              <AnatomyQuickRefView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'osce'}>
-            <OSCEPrepView settings={settings} addToast={addToast} />
+            <BackableView viewKey="osce" setView={setView}>
+              <OSCEPrepView settings={settings} addToast={addToast} />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ecg'}>
-            <ECGInterpreterView />
+            <BackableView viewKey="ecg" setView={setView}>
+              <ECGInterpreterView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'radiology'}>
-            <RadiologyInterpreterView />
+            <BackableView viewKey="radiology" setView={setView}>
+              <RadiologyInterpreterView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'pedsdosing'}>
-            <PediatricDosingView />
+            <BackableView viewKey="pedsdosing" setView={setView}>
+              <PediatricDosingView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'fluids'}>
-            <FluidElectrolyteView />
+            <BackableView viewKey="fluids" setView={setView}>
+              <FluidElectrolyteView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'imagequiz'}>
-            <ImageQuizView />
+            <BackableView viewKey="imagequiz" setView={setView}>
+              <ImageQuizView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'criticalcare'}>
-            <CriticalCareProtocolsView />
+            <BackableView viewKey="criticalcare" setView={setView}>
+              <CriticalCareProtocolsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'abg'}>
-            <BloodGasInterpreterView />
+            <BackableView viewKey="abg" setView={setView}>
+              <BloodGasInterpreterView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'infections'}>
-            <InfectiousDiseaseGuideView />
+            <BackableView viewKey="infections" setView={setView}>
+              <InfectiousDiseaseGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'toxicology'}>
-            <ToxicologyView />
+            <BackableView viewKey="toxicology" setView={setView}>
+              <ToxicologyView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'pathology'}>
-            <PathologyQuickRefView />
+            <BackableView viewKey="pathology" setView={setView}>
+              <PathologyQuickRefView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'microbiology'}>
-            <MicrobiologyGuideView />
+            <BackableView viewKey="microbiology" setView={setView}>
+              <MicrobiologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'nutrition'}>
-            <NutritionCalculatorView />
+            <BackableView viewKey="nutrition" setView={setView}>
+              <NutritionCalculatorView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'psychscreen'}>
-            <PsychiatryScreeningView />
+            <BackableView viewKey="psychscreen" setView={setView}>
+              <PsychiatryScreeningView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'research'}>
-            <ResearchMethodsView />
+            <BackableView viewKey="research" setView={setView}>
+              <ResearchMethodsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'commskills'}>
-            <CommunicationSkillsView />
+            <BackableView viewKey="commskills" setView={setView}>
+              <CommunicationSkillsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'qi'}>
-            <QualityImprovementView />
+            <BackableView viewKey="qi" setView={setView}>
+              <QualityImprovementView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'obgyn'}>
-            <ObGynCalculatorsView />
+            <BackableView viewKey="obgyn" setView={setView}>
+              <ObGynCalculatorsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ethics'}>
-            <MedicalEthicsView />
+            <BackableView viewKey="ethics" setView={setView}>
+              <MedicalEthicsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'surganatomy'}>
-            <SurgicalAnatomyView />
+            <BackableView viewKey="surganatomy" setView={setView}>
+              <SurgicalAnatomyView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'woundcare'}>
-            <WoundCareGuideView />
+            <BackableView viewKey="woundcare" setView={setView}>
+              <WoundCareGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'painmgmt'}>
-            <PainManagementView />
+            <BackableView viewKey="painmgmt" setView={setView}>
+              <PainManagementView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'geriatrics'}>
-            <GeriatricAssessmentView />
+            <BackableView viewKey="geriatrics" setView={setView}>
+              <GeriatricAssessmentView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'palliative'}>
-            <PalliativeCareView />
+            <BackableView viewKey="palliative" setView={setView}>
+              <PalliativeCareView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'transfusion'}>
-            <TransfusionMedicineView />
+            <BackableView viewKey="transfusion" setView={setView}>
+              <TransfusionMedicineView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'abxsteward'}>
-            <AntibioticStewardshipView />
+            <BackableView viewKey="abxsteward" setView={setView}>
+              <AntibioticStewardshipView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ventgraphs'}>
-            <VentilatorGraphsView />
+            <BackableView viewKey="ventgraphs" setView={setView}>
+              <VentilatorGraphsView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'hemodynamics'}>
-            <HemodynamicCalculatorView />
+            <BackableView viewKey="hemodynamics" setView={setView}>
+              <HemodynamicCalculatorView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'dermatology'}>
-            <DermatologyAtlasView />
+            <BackableView viewKey="dermatology" setView={setView}>
+              <DermatologyAtlasView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ophthalmology'}>
-            <OphthalmologyGuideView />
+            <BackableView viewKey="ophthalmology" setView={setView}>
+              <OphthalmologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'nephrology'}>
-            <NephrologyGuideView />
+            <BackableView viewKey="nephrology" setView={setView}>
+              <NephrologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'endocrinology'}>
-            <EndocrinologyGuideView />
+            <BackableView viewKey="endocrinology" setView={setView}>
+              <EndocrinologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'hematology'}>
-            <HematologyGuideView />
+            <BackableView viewKey="hematology" setView={setView}>
+              <HematologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'rheumatology'}>
-            <RheumatologyGuideView />
+            <BackableView viewKey="rheumatology" setView={setView}>
+              <RheumatologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'neurology'}>
-            <NeurologyGuideView />
+            <BackableView viewKey="neurology" setView={setView}>
+              <NeurologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'cardiology'}>
-            <CardiologyGuideView />
+            <BackableView viewKey="cardiology" setView={setView}>
+              <CardiologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'pulmonology'}>
-            <PulmonologyGuideView />
+            <BackableView viewKey="pulmonology" setView={setView}>
+              <PulmonologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'gastro'}>
-            <GastroenterologyGuideView />
+            <BackableView viewKey="gastro" setView={setView}>
+              <GastroenterologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'emergency'}>
-            <EmergencyMedicineGuideView />
+            <BackableView viewKey="emergency" setView={setView}>
+              <EmergencyMedicineGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'orthopedics'}>
-            <OrthopedicsGuideView />
+            <BackableView viewKey="orthopedics" setView={setView}>
+              <OrthopedicsGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ent'}>
-            <ENTGuideView />
+            <BackableView viewKey="ent" setView={setView}>
+              <ENTGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'urology'}>
-            <UrologyGuideView />
+            <BackableView viewKey="urology" setView={setView}>
+              <UrologyGuideView />
+            </BackableView>
           </ViewWrapper>
           <ViewWrapper active={showReader}>
             {activeDoc && (
@@ -7253,90 +7525,51 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         )}
       </div>
 
-      {/* BOTTOM NAV — all 7 pages visible, centered */}
+      {/* MOBILE AI FAB — visible on phone when reading a document */}
+      {showReader && isMobile && !rpOpen && (
+        <button onClick={() => setRpOpen(true)}
+          className="fixed z-[199] flex items-center gap-2 px-4 py-3 rounded-full shadow-xl animate-scale-in active:scale-95 transition-transform md:hidden"
+          style={{ bottom: 'calc(100px + env(safe-area-inset-bottom))', right: 16, background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))', color: '#fff', boxShadow: '0 8px 32px rgba(var(--acc-rgb,59,130,246),.5)' }}>
+          <Sparkles size={18} />
+          <span className="text-sm font-bold">AI Tools</span>
+        </button>
+      )}
+
+      {/* BOTTOM NAV — 5 clean tabs */}
       <nav className={`design-nav ${isMobile && isKeyboardOpen ? 'keyboard-open-hidden' : ''}`}>
         <div className="design-nav-inner">
-          {/* Home */}
           <button onClick={() => setView('library')}
             className={`design-nav-btn ${['library','dashboard','reader'].includes(view) ? 'active' : ''}`}
             title="Home">
             <LayoutDashboard size={20} strokeWidth={['library','dashboard','reader'].includes(view) ? 2.5 : 2} />
             <span className="design-nav-label">Home</span>
           </button>
-
-          {/* Study */}
-          <button onClick={() => setView('study')}
-            className={`design-nav-btn ${view === 'study' ? 'active' : ''}`}
-            title="Study">
-            <GraduationCap size={20} strokeWidth={view === 'study' ? 2.5 : 2} />
-            <span className="design-nav-label">Study</span>
-          </button>
-
-          {/* Cards */}
           <button onClick={() => setView('flashcards')}
             className={`design-nav-btn ${view === 'flashcards' ? 'active' : ''}`}
-            title="Flashcards">
+            title="Cards">
             <Layers size={20} strokeWidth={view === 'flashcards' ? 2.5 : 2} />
             <span className="design-nav-label">Cards</span>
           </button>
-
-          {/* Exams */}
           <button onClick={() => setView('exams')}
             className={`design-nav-btn ${view === 'exams' ? 'active' : ''}`}
             title="Exams">
             <CheckSquare size={20} strokeWidth={view === 'exams' ? 2.5 : 2} />
             <span className="design-nav-label">Exams</span>
           </button>
-
-          {/* Cases */}
-          <button onClick={() => setView('cases')}
-            className={`design-nav-btn ${view === 'cases' ? 'active' : ''}`}
-            title="Cases">
-            <Activity size={20} strokeWidth={view === 'cases' ? 2.5 : 2} />
-            <span className="design-nav-label">Cases</span>
-          </button>
-
-          {/* Tutor */}
           <button onClick={() => setView('chat')}
             className={`design-nav-btn ${view === 'chat' ? 'active' : ''}`}
-            title="AI Tutor">
+            title="Tutor">
             <MessageSquare size={20} strokeWidth={view === 'chat' ? 2.5 : 2} />
             <span className="design-nav-label">Tutor</span>
           </button>
-
-          {/* More */}
-          <button onClick={() => setMoreOpen(p => !p)}
-            className={`design-nav-btn ${moreOpen || !['library','dashboard','reader','study','flashcards','exams','cases','chat','settings'].includes(view) ? 'active' : ''}`}
-            title="More">
-            <LayoutGrid size={20} strokeWidth={moreOpen ? 2.5 : 2} />
-            <span className="design-nav-label">More</span>
+          <button onClick={() => setView('settings')}
+            className={`design-nav-btn ${view === 'settings' ? 'active' : ''}`}
+            title="Settings">
+            <Settings size={20} strokeWidth={view === 'settings' ? 2.5 : 2} />
+            <span className="design-nav-label">Settings</span>
           </button>
         </div>
       </nav>
-
-      {/* ── MORE DRAWER ── */}
-      {moreOpen && (
-        <div className="fixed inset-0" style={{ zIndex: 'var(--z-modal, 110)' }}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMoreOpen(false)} />
-          <div className="absolute bottom-0 left-0 right-0 animate-slide-up" style={{ maxHeight: '80vh', background: 'var(--bg)', borderRadius: '24px 24px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,.4)' }}>
-            <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <h2 className="font-bold text-base">All Features</h2>
-              <button onClick={() => setMoreOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full opacity-40 hover:opacity-80"><X size={18} /></button>
-            </div>
-            <div className="overflow-y-auto custom-scrollbar px-4 pb-6" style={{ maxHeight: 'calc(80vh - 60px)' }}>
-              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                {MORE_ITEMS.map(({ icon: Icon, label, v }) => (
-                  <button key={v} onClick={() => { setView(v); setMoreOpen(false); }}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all border ${view === v ? 'border-[var(--accent)]/40 bg-[var(--accent)]/10' : 'border-transparent hover:bg-[var(--surface2)]'}`}>
-                    <Icon size={20} style={{ color: view === v ? 'var(--accent)' : 'var(--text2)' }} />
-                    <span className="text-xs font-medium text-center leading-tight" style={{ color: view === v ? 'var(--accent)' : 'var(--text2)' }}>{label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Deep Focus overlay */}
       {deepFocus && (
