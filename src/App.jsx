@@ -2849,7 +2849,8 @@ function MedicinesView({ settings }) {
   );
 }
 
-
+/* ═══════════════════════════════════════════════════════════════════
+   PROVIDER PRESETS
 ═══════════════════════════════════════════════════════════════════ */
 const PROVIDERS = {
   anthropic: { label: 'Claude (Anthropic)', note: 'Works built-in — no API key needed in Claude artifacts.', needsKey: false, defaultModel: 'claude-sonnet-4-20250514', baseUrl: '' },
