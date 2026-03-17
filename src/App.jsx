@@ -3017,6 +3017,292 @@ const VIEW_TITLES = {
   ent: 'ENT', urology: 'Urology',
 };
 
+/* ═════════════════════════════════════════════════════════════════════
+   DISEASE EXPLORER VIEW — Map 150+ diseases with full clinical detail
+═════════════════════════════════════════════════════════════════════ */
+function DiseaseExplorerView({ settings }) {
+  const [search, setSearch] = useState('');
+  const [selectedSystem, setSelectedSystem] = useState('All');
+  const [selectedDisease, setSelectedDisease] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [sortBy, setSortBy] = useState('name');
+  const isMobile = window.innerWidth < 768;
+  const searchRef = useRef(null);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return DISEASE_DB
+      .filter(d => {
+        const matchSys = selectedSystem === 'All' || d.system === selectedSystem;
+        const matchSearch = !q || d.name.toLowerCase().includes(q) || (d.aliases || []).some(a => a.toLowerCase().includes(q)) || (d.tags || []).some(t => t.toLowerCase().includes(q));
+        return matchSys && matchSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'system') return (a.system || '').localeCompare(b.system || '');
+        return a.name.localeCompare(b.name);
+      });
+  }, [search, selectedSystem, sortBy]);
+
+  const tutorContext = selectedDisease ? {
+    disease: selectedDisease.name,
+    system: selectedDisease.system,
+    icd10: selectedDisease.icd10,
+    overview: selectedDisease.overview,
+    pathophysiology: selectedDisease.pathophysiology,
+    diagnosis: JSON.stringify(selectedDisease.diagnosis),
+    treatment: JSON.stringify(selectedDisease.treatment),
+    complications: (selectedDisease.complications || []).join(', '),
+    keyFacts: (selectedDisease.keyFacts || []).join(', ')
+  } : null;
+
+  const TABS = [
+    { id: 'overview', label: 'Overview', icon: Info },
+    { id: 'pathophysiology', label: 'Pathophysiology', icon: FlaskConical },
+    { id: 'diagnosis', label: 'Diagnosis', icon: Microscope },
+    { id: 'treatment', label: 'Treatment', icon: Pill },
+    { id: 'complications', label: 'Complications', icon: AlertCircle },
+    { id: 'differentials', label: 'Differentials', icon: GitBranch },
+    { id: 'mnemonics', label: 'Memory Aids', icon: Brain },
+    { id: 'keyfacts', label: 'Key Facts', icon: BookOpen }
+  ];
+
+  return (
+    <div className="flex-1 min-h-0 flex overflow-hidden" style={{ background: 'var(--bg)' }}>
+      {/* LEFT: Search + Disease List */}
+      <div className="flex flex-col shrink-0 border-r border-[color:var(--border)]" style={{ width: isMobile && selectedDisease ? 0 : isMobile ? '100%' : 310, overflow: 'hidden', transition: 'width 0.3s ease' }}>
+        {/* Search + Filters */}
+        <div className="p-3 shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface, var(--card))' }}>
+          {/* Search box */}
+          <div className="relative mb-2.5">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+            <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, aliases, tags…" className="w-full pl-9 pr-9 py-2.5 text-sm rounded-xl outline-none" style={{ background: 'var(--bg)', border: '1px solid var(--border2, var(--border))', color: 'var(--text)' }} />
+            {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-100"><X size={14} /></button>}
+          </div>
+
+          {/* System chips */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 mb-2" style={{ scrollbarWidth: 'none' }}>
+            {BODY_SYSTEMS.map(sys => (
+              <button key={sys} onClick={() => setSelectedSystem(sys)} className="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold transition-all" style={selectedSystem === sys ? { background: 'var(--accent)', color: '#fff' } : { background: 'var(--surface2, var(--card))', color: 'var(--text2)', border: '1px solid var(--border)' }}>
+                {sys}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort row */}
+          <div className="flex gap-2">
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 text-xs px-2 py-1.5 rounded-lg outline-none" style={{ background: 'var(--surface2, var(--card))', border: '1px solid var(--border)', color: 'var(--text)' }}>
+              <option value="name">Sort: Name</option>
+              <option value="system">Sort: System</option>
+            </select>
+          </div>
+
+          <p className="text-xs opacity-30 mt-1.5 font-bold">{filtered.length} diseases</p>
+        </div>
+
+        {/* Disease list */}
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-32 opacity-30">
+              <Stethoscope size={24} className="mb-2" />
+              <p className="text-sm font-bold">No results for "{search}"</p>
+            </div>
+          ) : filtered.map(d => (
+            <button key={d.id} onClick={() => { setSelectedDisease(d); setActiveTab('overview'); }} className="w-full text-left px-4 py-3 transition-all" style={{ borderBottom: '1px solid var(--border)', background: selectedDisease?.id === d.id ? 'rgba(var(--acc-rgb,99,102,241),0.1)' : 'transparent', borderLeft: selectedDisease?.id === d.id ? '3px solid var(--accent)' : '3px solid transparent' }}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold truncate" style={{ color: selectedDisease?.id === d.id ? 'var(--accent)' : 'var(--text)' }}>{d.name}</p>
+                  <p className="text-xs opacity-50 mt-0.5 truncate">{d.system}</p>
+                  {d.icd10 && <p className="text-xs opacity-35 truncate">ICD-10: {d.icd10}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  {d.tags?.includes('emergency') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>⚠️</span>}
+                  {d.tags?.includes('usmle-high-yield') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>HY</span>}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* RIGHT: Disease Detail + Tutor */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {!selectedDisease ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 opacity-40 p-8 text-center">
+            <Stethoscope size={48} />
+            <p className="text-xl font-black">Select a Disease</p>
+            <p className="text-sm">Search and tap any disease to view comprehensive clinical information</p>
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 flex overflow-hidden">
+            {/* Disease content */}
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+              {/* Disease header */}
+              <div className="px-5 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface, var(--card))' }}>
+                {isMobile && <button onClick={() => setSelectedDisease(null)} className="flex items-center gap-1 text-xs font-bold mb-2 opacity-60"><ChevronLeft size={14} /> Back</button>}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h1 className="text-xl font-black truncate" style={{ color: 'var(--text)' }}>{selectedDisease.name}</h1>
+                    {selectedDisease.aliases?.length > 0 && <p className="text-sm opacity-60 mt-0.5">Aliases: {selectedDisease.aliases.slice(0, 3).join(', ')}</p>}
+                    {selectedDisease.icd10 && <p className="text-xs opacity-40 mt-0.5">ICD-10: {selectedDisease.icd10}</p>}
+                    {/* Tags row */}
+                    <div className="flex gap-2 flex-wrap mt-2">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.15)', color: 'var(--accent)' }}>{selectedDisease.system}</span>
+                      {selectedDisease.tags?.map((tag, i) => (
+                        <span key={i} className="text-xs font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgba(107,114,128,0.15)', color: 'var(--text2)' }}>{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tab navigation */}
+                <div className="flex gap-1 mt-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                  {TABS.map(({ id, label, icon: Icon }) => (
+                    <button key={id} onClick={() => setActiveTab(id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all" style={activeTab === id ? { background: 'var(--accent)', color: '#fff' } : { background: 'var(--surface2, var(--card))', color: 'var(--text2)', border: '1px solid var(--border)', opacity: 0.7 }}>
+                      <Icon size={12} />{label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab content */}
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+                {activeTab === 'overview' && (
+                  <div className="space-y-3">
+                    {selectedDisease.overview && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">OVERVIEW</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.overview}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'pathophysiology' && (
+                  <div className="space-y-3">
+                    {selectedDisease.pathophysiology && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">MECHANISM</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.pathophysiology}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'diagnosis' && (
+                  <div className="space-y-3">
+                    {selectedDisease.diagnosis && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">DIAGNOSTIC APPROACH</p>
+                        {typeof selectedDisease.diagnosis === 'string' ? (
+                          <p className="text-sm leading-relaxed">{selectedDisease.diagnosis}</p>
+                        ) : (
+                          <ul className="text-sm space-y-1">
+                            {Object.entries(selectedDisease.diagnosis).map(([key, val]) => (
+                              <li key={key}><span className="font-bold capitalize">{key}: </span>{Array.isArray(val) ? val.join(', ') : val}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'treatment' && (
+                  <div className="space-y-3">
+                    {selectedDisease.treatment && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">MANAGEMENT</p>
+                        {typeof selectedDisease.treatment === 'string' ? (
+                          <p className="text-sm leading-relaxed">{selectedDisease.treatment}</p>
+                        ) : (
+                          <ul className="text-sm space-y-1">
+                            {Object.entries(selectedDisease.treatment).map(([key, val]) => (
+                              <li key={key}><span className="font-bold capitalize">{key}: </span>{Array.isArray(val) ? val.join(', ') : val}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'complications' && (
+                  <div className="space-y-3">
+                    {selectedDisease.complications && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">COMPLICATIONS & OUTCOMES</p>
+                        <ul className="text-sm space-y-1">
+                          {(Array.isArray(selectedDisease.complications) ? selectedDisease.complications : [selectedDisease.complications]).map((complication, i) => (
+                            <li key={i}>• {complication}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'differentials' && (
+                  <div className="space-y-3">
+                    {selectedDisease.differentials && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">DIFFERENTIAL DIAGNOSES</p>
+                        <ul className="text-sm space-y-1">
+                          {(Array.isArray(selectedDisease.differentials) ? selectedDisease.differentials : [selectedDisease.differentials]).map((diff, i) => (
+                            <li key={i}>• {diff}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'mnemonics' && (
+                  <div className="space-y-3">
+                    {selectedDisease.mnemonics && selectedDisease.mnemonics.length > 0 && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">MEMORY AIDS</p>
+                        <ul className="text-sm space-y-2">
+                          {selectedDisease.mnemonics.map((mnemonic, i) => (
+                            <li key={i} className="px-3 py-2 rounded-lg" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.1)', borderLeft: '3px solid var(--accent)' }}>{mnemonic}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'keyfacts' && (
+                  <div className="space-y-3">
+                    {selectedDisease.keyFacts && selectedDisease.keyFacts.length > 0 && (
+                      <div>
+                        <p className="text-xs font-black opacity-60 mb-1">HIGH-YIELD FACTS</p>
+                        <ul className="text-sm space-y-2">
+                          {selectedDisease.keyFacts.map((fact, i) => (
+                            <li key={i} className="flex gap-2">
+                              <span className="text-accent shrink-0 font-black">→</span>
+                              <span>{fact}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Docked tutor — desktop */}
+            {!isMobile && <DraggableTutorPanel context={tutorContext} contextLabel={selectedDisease.name} settings={settings} defaultMode="docked" />}
+          </div>
+        )}
+      </div>
+
+      {/* Floating tutor — mobile */}
+      {isMobile && selectedDisease && <DraggableTutorPanel context={tutorContext} contextLabel={selectedDisease?.name} settings={settings} defaultMode="floating" />}
+    </div>
+  );
+}
+
 const BackableView = ({ viewKey, setView, children }) => (
   <div className="flex flex-col flex-1 min-h-0">
     <SubViewHeader title={VIEW_TITLES[viewKey] || viewKey} onBack={() => setView('library')} />
@@ -3064,6 +3350,7 @@ const HOME_CATEGORIES = [
     { icon: Skull, label: 'Toxicology', v: 'toxicology', desc: 'Poisons & antidotes' },
     { icon: BookOpen, label: 'Glossary', v: 'glossary', desc: 'Medical terminology' },
     { icon: Pill, label: 'Medicines', v: 'medicines', desc: 'Drug database & info' },
+    { icon: Stethoscope, label: 'Diseases', v: 'diseases', desc: 'Disease reference 150+' },
     { icon: Pill, label: 'Pharma Ref', v: 'pharma', desc: 'Quick pharma reference' },
     { icon: BookMarked, label: 'Guidelines', v: 'guidelines', desc: 'Clinical guidelines' },
     { icon: Bone, label: 'Anatomy', v: 'anatomy', desc: 'Anatomy quick ref' },
@@ -7732,6 +8019,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           <ViewWrapper active={view === 'medicines'}>
             <BackableView viewKey="medicines" setView={setView}>
               <MedicinesView settings={settings} />
+            </BackableView>
+          </ViewWrapper>
+          <ViewWrapper active={view === 'diseases'}>
+            <BackableView viewKey="diseases" setView={setView}>
+              <DiseaseExplorerView settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ddx'}>
