@@ -712,6 +712,54 @@ const UiCallout = ({ type, children }) => {
   );
 };
 
+/* ═══════════════════════════════════════════════════════════════════
+   MEDICINES DATABASE — 200+ medicines with detailed pharmacology
+═══════════════════════════════════════════════════════════════════ */
+
+const MEDICINE_DB = [
+  {
+    id: 'aspirin',
+    name: 'Aspirin',
+    genericName: 'Acetylsalicylic Acid',
+    brandNames: ['Bayer', 'Ecotrin', 'Bufferin', 'Excedrin'],
+    drugClass: 'NSAID / Antiplatelet',
+    category: 'Cardiovascular',
+    schedule: 'OTC',
+    mechanism: 'Irreversibly inhibits COX-1 and COX-2 enzymes, reducing prostaglandin synthesis. At low doses, inhibits thromboxane A2 in platelets, preventing platelet aggregation.',
+    indications: ['Acute MI (325mg stat)', 'Stroke prevention (81mg daily)', 'Pain/fever (325-650mg PRN)', 'Anti-inflammatory (higher doses)', 'Kawasaki disease', 'Colorectal cancer prevention'],
+    dosing: { adult: 'Pain/fever: 325-650mg PO q4-6h PRN. Antiplatelet: 81mg PO daily. Acute MI: 325mg chewed stat.', pediatric: 'AVOID in children <12 (Reye syndrome risk). Exception: Kawasaki disease under specialist guidance.', renal: 'Use with caution. Avoid in severe renal impairment (GFR <10).', hepatic: 'Avoid in severe hepatic disease.', maxDose: '4g/day for pain/fever. No dose limit for 81mg antiplatelet.' },
+    sideEffects: { common: ['GI upset', 'Nausea', 'Heartburn', 'GI bleeding risk'], serious: ['Peptic ulcer disease', 'GI hemorrhage', 'Reye syndrome (children)', 'Salicylate toxicity', 'Bronchospasm in aspirin-sensitive asthma'], rare: ['Anaphylaxis', 'Tinnitus (toxicity marker)', 'Hepatotoxicity'] },
+    contraindications: ['Children <12 with viral illness (Reye syndrome)', 'Active peptic ulcer', 'Hemophilia/bleeding disorders', 'Aspirin-exacerbated respiratory disease (AERD)', 'Last trimester pregnancy (premature closure of ductus arteriosus)'],
+    interactions: ['Warfarin (↑ bleeding risk)', 'Ibuprofen (antagonizes antiplatelet effect)', 'Methotrexate (↑ toxicity)', 'ACE inhibitors (↓ efficacy)', 'Alcohol (↑ GI bleeding)'],
+    monitoring: ['Signs of GI bleeding (dark/tarry stools)', 'Renal function in long-term use', 'Tinnitus (sign of toxicity)'],
+    pharmacokinetics: { absorption: 'Rapidly absorbed from GI tract. Peak plasma: 1-2h.', distribution: 'Widely distributed. Protein binding: 80-90%.', metabolism: 'Hepatic hydrolysis to salicylic acid.', elimination: 'Renal. Half-life: 15-20min (aspirin), 2-30h (salicylate, dose-dependent).' },
+    pregnancy: 'Category D (3rd trimester). Avoid in late pregnancy.',
+    nursing: 'Excreted in breast milk. Use with caution.',
+    blackBoxWarning: null,
+    counseling: ['Take with food or milk to reduce GI irritation', 'Do not crush enteric-coated tablets', 'Avoid alcohol while taking', 'Stop 7 days before surgery (antiplatelet effect)'],
+    mnemonics: ['ASA = Acetylsalicylic Acid', 'COX inhibitor → less prostaglandin → less pain/fever/inflammation'],
+    keyFacts: ['Low-dose (81mg) for antiplatelet, high-dose for anti-inflammatory', 'Irreversible COX inhibition — platelet effect lasts platelet lifespan (~10 days)', 'Antidote for toxicity: sodium bicarbonate (alkalinize urine) + dialysis if severe'],
+    tags: ['usmle-high-yield', 'otc', 'antiplatelet', 'nsaid'],
+    relatedDrugs: ['ibuprofen', 'clopidogrel', 'warfarin'],
+  },
+  { id: 'metoprolol', name: 'Metoprolol', genericName: 'Metoprolol Tartrate / Succinate', brandNames: ['Lopressor', 'Toprol XL', 'Betaloc'], drugClass: 'Beta-1 Selective Blocker', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'Selective β1-adrenergic antagonist. Decreases heart rate, cardiac contractility, and cardiac output. Reduces BP through decreased CO and vascular resistance.', indications: ['Hypertension', 'Angina', 'Acute MI (early intervention)', 'Heart failure (sustained-release form)', 'Supraventricular tachycardia (SVT)', 'Essential tremor', 'Migraine prophylaxis', 'Hyperthyroidism (symptomatic control)'], dosing: { adult: 'HTN: 50-100mg PO daily-BID. Angina: 100-450mg daily in divided doses. Post-MI: 25-100mg PO BID. HF: 190mg XL daily.', pediatric: 'Not typically used; if needed, 1-2mg/kg/day divided BID-TID.', renal: 'Reduce dose if GFR <30.', hepatic: 'Reduce dose in severe hepatic disease.', maxDose: '400mg/day (immediate-release), 190mg/day (XL).' }, sideEffects: { common: ['Fatigue', 'Dizziness', 'Bradycardia', 'Hypotension'], serious: ['Heart block', 'Bronchospasm (in asthmatics)', 'Acute decompensation (abrupt withdrawal)', 'Exacerbation of Raynaud\'s phenomenon'], rare: ['Lupus-like syndrome', 'Agranulocytosis'] }, contraindications: ['Acute decompensated HF', 'Cardiogenic shock', '2nd/3rd degree AV block', 'Asthma/COPD (use β3-selective or avoid)', 'Severe bradycardia', 'Uncontrolled hypoglycemia'], interactions: ['Calcium channel blockers (↑ bradycardia/hypotension)', 'Clonidine (↑ rebound HTN if stopped together)', 'NSAIDs (↓ antihypertensive effect)', 'Insulin (↓ hypoglycemic awareness)'], monitoring: ['HR, BP, ECG', 'Signs of heart failure exacerbation', 'Respiratory status (asthma patients)'], pharmacokinetics: { absorption: 'Well absorbed; peak 1.5h (IR), 6-7h (XL).', distribution: 'Distributed to most tissues. Crosses BBB.', metabolism: 'Hepatic. High first-pass effect (60-70%).', elimination: 'Renal. Half-life: 3-7h IR, 15-19h XL.' }, pregnancy: 'Category B (limited use). Consider for HTN in pregnancy.', nursing: 'Present in breast milk (low levels). Generally safe.', blackBoxWarning: 'Abrupt withdrawal may cause rebound HTN, MI, or arrhythmias. Taper over 1-2 weeks.', counseling: ['Take with food (IR form)', 'Do not crush/chew XL tablets', 'Do NOT stop abruptly', 'May mask hypoglycemic symptoms'], mnemonics: ['β1-blocker: ↓HR, ↓contractility, ↓BP', 'Selective at lower doses, non-selective at higher'], keyFacts: ['Only β-blocker with proven mortality benefit post-MI (Lipid Intervention Trial)', 'Card-selective = ↓ bronchoconstriction vs non-selective β-blockers', 'Best avoided in asthma; use labetalol or hydralazine instead'], tags: ['usmle-high-yield', 'cardiology', 'post-mi'], relatedDrugs: ['atenolol', 'carvedilol', 'propranolol', 'labetalol'] },
+  { id: 'lisinopril', name: 'Lisinopril', genericName: 'Lisinopril', brandNames: ['Prinivil', 'Zestril', 'Generic'], drugClass: 'ACE Inhibitor', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'Inhibits angiotensin-converting enzyme, blocking conversion of angiotensin I to angiotensin II. Reduces vasoconstriction and aldosterone secretion → ↓BP, ↓afterload.', indications: ['Hypertension', 'Acute MI (with/without heart failure)', 'Chronic heart failure', 'Diabetic nephropathy (Type 1 & 2)', 'Post-MI LV dysfunction'], dosing: { adult: 'HTN: 10mg PO daily, titrate to 20-40mg. Post-MI: 5mg start, then 5mg q24h, titrate PRN. HF: 2.5-5mg start, titrate to 20-40mg.', pediatric: '≥6y: 0.07mg/kg/day (max 5mg), titrate PRN.', renal: 'GFR 30-59: 5-10mg daily. GFR <30: 2.5-5mg daily.', hepatic: 'No major adjustment needed.', maxDose: '40mg/day.' }, sideEffects: { common: ['Dry cough (10-20%)', 'Hypotension', 'Dizziness', 'Hyperkalemia'], serious: ['Angioedema (0.1-0.2%)', 'Acute kidney injury (if pre-renal)', 'Hyperkalemia (especially with renal disease)', 'Syncope'], rare: ['Hepatotoxicity', 'Pemphigus', 'Pancreatitis'] }, contraindications: ['Pregnancy (all trimesters)', 'History of angioedema with ACE-I', 'Baseline K+ >5.5', 'CrCl <15 (or dialysis)', 'Bilateral renal artery stenosis'], interactions: ['NSAIDs (↑ AKI risk, ↓ BP control)', 'K+ supplements / K+-sparing diuretics (↑ hyperkalemia)', 'Potassium-sparing diuretics (spironolactone, amiloride)', 'Lithium (↑ lithium toxicity)'], monitoring: ['BUN/Cr at baseline & 1-2 weeks post-start', 'K+ at baseline & 1-2 weeks', 'BP regularly', 'ACE-I cough (counsel patient)'], pharmacokinetics: { absorption: 'Readily absorbed; peak 6-7h. Unaffected by food.', distribution: 'Little protein binding (0-10%).', metabolism: 'Not hepatically metabolized.', elimination: 'Entirely renal (unchanged). Half-life: 12h.' }, pregnancy: 'Category X (contraindicated). Teratogenic in 2nd/3rd trimester.', nursing: 'Present in breast milk. Consider benefits/risks.', blackBoxWarning: 'Pregnancy: can cause fetal/neonatal morbidity/mortality when used in 2nd/3rd trimester.', counseling: ['Dry cough is common (not dangerous)', 'Avoid K+ supplements & high-K+ foods (bananas, potatoes)', 'Rise slowly to avoid dizziness', 'Angioedema (lips, tongue) → seek immediate care'], mnemonics: ['ACE-I: ↓Angiotensin II → ↓aldosterone → ↓K+ retention (but ↑K+ clinically!)'], keyFacts: ['Cough due to ↑bradykinin degradation inhibition', 'First-dose phenomenon: severe hypotension if volume depleted or on diuretics', 'Renal protective effects in diabetic nephropathy'], tags: ['usmle-high-yield', 'cardiology', 'nephrology', 'htn'], relatedDrugs: ['enalapril', 'ramipril', 'losartan', 'valsartan'] },
+  { id: 'amlodipine', name: 'Amlodipine', genericName: 'Amlodipine Besylate', brandNames: ['Norvasc', 'Katerzia', 'Generic'], drugClass: 'Calcium Channel Blocker (Dihydropyridine)', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'Blocks L-type calcium channels in vascular smooth muscle and cardiac tissue. Causes peripheral vasodilation and modest negative inotropic/chronotropic effects.', indications: ['Hypertension', 'Coronary artery disease / Angina', 'Raynaud\'s phenomenon', 'Heart failure with preserved ejection fraction (off-label)'], dosing: { adult: 'HTN/Angina: 5mg PO daily, titrate to 10mg if needed.', pediatric: '≥6y: 2.5-5mg daily.', renal: 'No adjustment needed.', hepatic: 'Start 2.5mg daily (hepatic metabolism).', maxDose: '10mg/day.' }, sideEffects: { common: ['Peripheral edema (leg/ankle)', 'Flushing', 'Headache', 'Reflex tachycardia (less than other CCBs)'], serious: ['Angina exacerbation (especially if combined with β-blockers)', 'Hypotension', 'Arrhythmias (rare)'], rare: ['Gingival hyperplasia', 'Hepatotoxicity'] }, contraindications: ['Severe hypotension (SBP <90)', 'Acute MI with LV dysfunction', 'Unstable angina (avoid monotherapy)'], interactions: ['Simvastatin (↑levels, ↑myopathy risk)', 'P-gp inhibitors (increased levels)', 'CYP3A4 inhibitors (ketoconazole, ritonavir) → higher levels'], monitoring: ['BP at each visit', 'Peripheral edema assessment', 'HR/rhythm'], pharmacokinetics: { absorption: 'Slowly but completely absorbed; peak 6-12h.', distribution: 'Extensive tissue distribution. 99% protein-bound.', metabolism: 'Extensively metabolized by CYP3A4.', elimination: 'Renal. Half-life: 30-50h.' }, pregnancy: 'Category C. Use if benefits outweigh risks.', nursing: 'Excreted in breast milk. Use with caution.', blackBoxWarning: null, counseling: ['Peripheral edema usually resolves after 2-4 weeks', 'May cause flushing (usually transient)', 'Avoid grapefruit juice (↑levels)', 'Swallow whole; do not crush'], mnemonics: ['Dihydropyridine CCBs: ↓BP (reflex ↑HR) vs rate-limiting CCBs'], keyFacts: ['Longer half-life (30-50h) → once-daily dosing', 'Peripheral edema common but not dangerous (reduces over time)', 'Can be used safely with ACE-I or ARBs'], tags: ['otc', 'usmle-high-yield', 'cardiology', 'htn'], relatedDrugs: ['nifedipine', 'diltiazem', 'verapamil', 'felodipine'] },
+  { id: 'metformin', name: 'Metformin', genericName: 'Metformin HCl', brandNames: ['Glucophage', 'Fortamet', 'Glumetza'], drugClass: 'Biguanide (Antidiabetic)', category: 'Endocrine', schedule: 'Rx Only', mechanism: 'Decreases hepatic glucose production and increases peripheral glucose uptake. Does not stimulate insulin secretion.', indications: ['Type 2 diabetes (first-line)', 'Prediabetes prevention', 'PCOS (off-label)', 'Weight loss (off-label)'], dosing: { adult: 'Start 500mg BID with meals. Titrate by 500mg weekly to 1000-1500mg BID (max 2550mg/day).', pediatric: '≥10y: 500mg daily-BID initially, titrate PRN to max 2000mg/day.', renal: 'GFR 45-59: max 1000mg/day. GFR <45: contraindicated.', hepatic: 'Caution in cirrhosis (lactic acidosis risk).', maxDose: '1000mg TID (IR), 1500mg BID (ER).' }, sideEffects: { common: ['GI upset (nausea, diarrhea, constipation)', 'Metallic taste', 'B12 deficiency (10%)'], serious: ['Lactic acidosis (rare, <1/10,000)', 'Acute kidney injury'], rare: ['Hepatotoxicity'] }, contraindications: ['eGFR <30', 'Acute decompensated HF', 'Recent MI or stroke', 'Alcoholism (lactic acidosis risk)', 'Acute illness (sepsis, hypoxia)', 'Iodinated contrast dye (hold 48h before/after)'], interactions: ['ACE-I/ARBs (↑ hypoglycemia)', 'Diuretics (↓ efficacy, ↑ hyperglycemia)', 'Contrast dye (↑ lactic acidosis risk)', 'Topiramate (↑ lactic acidosis)'], monitoring: ['Annual B12 level', 'eGFR annually (more if compromised)', 'Fasting glucose', 'HbA1c q3mo initially, then q6mo'], pharmacokinetics: { absorption: 'Peak 2-3h. Delayed gastric emptying increases absorption.', distribution: 'Not metabolized; does not bind plasma protein.', metabolism: 'None; excreted unchanged.', elimination: 'Entirely renal. Half-life: 4-8.7h.' }, pregnancy: 'Category B. Safe in pregnancy for GDM and T2DM.', nursing: 'Safe; minimal breast milk excretion.', blackBoxWarning: null, counseling: ['Take with meals to reduce GI effects', 'Lactic acidosis very rare but seek care if unusual fatigue/difficulty breathing', 'Avoid binge drinking (lactic acidosis risk)', 'May cause B12 deficiency over time'], mnemonics: ['Biguanide: ↓hepatic glucose production, ↑peripheral uptake'], keyFacts: ['No hypoglycemia risk as monotherapy (needs insulin/secretagogues)', 'First-line for T2DM metformin; especially favorable in obese/overweight', 'Annual B12 monitoring recommended'], tags: ['usmle-high-yield', 'endocrine', 'diabetes'], relatedDrugs: ['glipizide', 'pioglitazone', 'sitagliptin'] },
+  { id: 'omeprazole', name: 'Omeprazole', genericName: 'Omeprazole', brandNames: ['Prilosec', 'OTC generic', 'Losec'], drugClass: 'Proton Pump Inhibitor', category: 'Gastroenterology', schedule: 'OTC / Rx', mechanism: 'Irreversibly inhibits gastric H+/K+ ATPase (proton pump), reducing gastric acid secretion by >90%.', indications: ['GERD (erosive esophagitis)', 'Peptic ulcer disease (H. pylori triple therapy)', 'Zollinger-Ellison syndrome', 'Stress ulcer prophylaxis', 'NSAID-induced ulcer prevention'], dosing: { adult: 'GERD: 20-40mg PO daily for 4-8 weeks. Maintenance: 20mg daily. H. pylori: 20-40mg BID (part of triple/quad therapy).', pediatric: '<2y: not recommended. ≥2y: weight-based dosing.', renal: 'No adjustment needed.', hepatic: 'Reduce dose in cirrhosis.', maxDose: '40mg/day.' }, sideEffects: { common: ['Headache', 'Nausea', 'Diarrhea/constipation'], serious: ['Hypomagnesemia (long-term)', 'C. difficile infection', 'Acute interstitial nephritis', 'Bone fractures (long-term use)', 'CYP2C19-mediated drug interactions'], rare: ['Stevens-Johnson syndrome', 'Hepatotoxicity'] }, contraindications: ['Severe renal disease (rare)', 'Clopidogrel use (reduced antiplatelet effect)'], interactions: ['Clopidogrel (↓efficacy)', 'Atazanavir (↓levels, treatment failure)', 'Methotrexate (↑levels)', 'CYP2C19 substrates (warfarin, diazepam) → ↑levels'], monitoring: ['Magnesium if long-term (>1y)', 'Bone density if long-term PPU use', 'B12 if long-term (rare deficiency)'], pharmacokinetics: { absorption: 'Absorbed as inactive prodrug; activated in acidic parietal cell canaliculus.', distribution: '95% protein-bound.', metabolism: 'Hepatic (CYP2C19 metabolism).', elimination: 'Renal. Half-life: 0.5-1h, but prolonged acid suppression (24-96h).' }, pregnancy: 'Category C. Likely safe; limited data.', nursing: 'Minimal breast milk excretion; considered safe.', blackBoxWarning: null, counseling: ['Take 30-60min before meals (on empty ppi)', 'May take 2-4 days for full effect', 'Prolonged use associated with B12/Mg deficiency', 'Do not combine with clopidogrel if possible'], mnemonics: ['PPI: proton pump inhibitor → <90% acid reduction'], keyFacts: ['Delayed absorption if taken with calcium/iron (separate dosing)', 'Irreversible pump inhibition → longer duration than H2-blockers', 'Class effect: PPIs ↑C. diff risk if overused'], tags: ['otc', 'usmle-high-yield', 'gi'], relatedDrugs: ['lansoprazole', 'pantoprazole', 'esomeprazole', 'famotidine'] },
+  { id: 'atorvastatin', name: 'Atorvastatin', genericName: 'Atorvastatin Calcium', brandNames: ['Lipitor', 'Generic'], drugClass: 'HMG-CoA Reductase Inhibitor (Statin)', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'Competitively inhibits HMG-CoA reductase → ↓cholesterol synthesis. Upregulates LDL receptors → ↑hepatic LDL clearance.', indications: ['Hypercholesterolemia', 'CAD risk reduction', 'Post-MI', 'Stroke prevention', 'Heart failure (selected patients)'], dosing: { adult: 'Start 10-20mg daily. Titrate q2-4w to target (usual 40-80mg).', pediatric: '≥10y: 10-20mg daily (heterozygous familial hypercholesterolemia).', renal: 'No adjustment.', hepatic: 'Avoid if active liver disease.', maxDose: '80mg/day.' }, sideEffects: { common: ['Muscle myalgia (5-10%)', 'Headache'], serious: ['Rhabdomyolysis (rare, 1/10,000)', 'Hepatotoxicity (very rare)', 'Neuropathy (rare)'], rare: ['Stevens-Johnson', 'Immune-mediated necrotizing myopathy'] }, contraindications: ['Active liver disease (AST/ALT >3× ULN)', 'Pregnancy / lactation', 'Concurrent gemfibrozil (↑myopathy risk)'], interactions: ['Gemfibrozil (↑statin levels, ↑myopathy)', 'Clarithromycin / ritonavir (CYP3A4 inhibitors)', 'Cyclosporine (↑levels)', 'Warfarin (↑INR slightly)'], monitoring: ['Lipid panel at 6-8 weeks', 'Liver function tests at baseline & as needed', 'Muscle symptoms / CK if symptomatic', 'Consider CoQ10 if myopathy'], pharmacokinetics: { absorption: 'Rapidly absorbed; peak 1-2h.', distribution: '~98% protein-bound. Enters most tissues poorly.', metabolism: 'CYP3A4 primarily.', elimination: 'Biliary/fecal. Half-life: 14-20h.' }, pregnancy: 'Category X. Contraindicated.', nursing: 'Contraindicated.', blackBoxWarning: null, counseling: ['Report muscle pain/weakness immediately', 'Avoid grapefruit juice (↑levels)', 'Continue diet/exercise modifications', 'Muscle symptoms: stop and check CK'], mnemonics: ['HMG-CoA inhibitor → ↓cholesterol everywhere → ↑LDL receptors → ↓LDL'], keyFacts: ['Most potent statin; highest LDL reduction', 'Can reduce CV events by 30-40%', 'Myopathy/rhabda rare but serious; risk ↑ with: age, renal disease, drug interactions'], tags: ['usmle-high-yield', 'cardiology', 'dyslipidemia'], relatedDrugs: ['rosuvastatin', 'pravastatin', 'lovastatin', 'simvastatin'] },
+  { id: 'levothyroxine', name: 'Levothyroxine', genericName: 'Levothyroxine Sodium', brandNames: ['Synthroid', 'Levoxyl', 'Tirosint'], drugClass: 'Thyroid Hormone Replacement', category: 'Endocrine', schedule: 'Rx Only', mechanism: 'T4 → converted peripherally to active T3. Increases cellular metabolic rate, thermogenesis, and protein synthesis.', indications: ['Hypothyroidism (primary & central)', 'Myxedema coma (IV)', 'TSH suppression (post-thyroidectomy)', 'Thyroid cancer', 'Goiter prevention'], dosing: { adult: 'Average 1.6-1.8 μg/kg/day PO. Start 25-50μg; titrate q4-6w by 12.5-25μg.', pediatric: '0-3mo: 10-15μg/kg/day. 3-6mo: 8-10μg/kg/day. Titrate based on TSH.', renal: 'Caution; dose reduction may be needed.', hepatic: 'No direct adjustment; monitor for overdose.', maxDose: 'Individualized based on TSH.' }, sideEffects: { common: ['Tremor', 'Palpitations', 'Anxiety', 'Heat intolerance', 'Hair loss', 'Insomnia'], serious: ['Atrial fibrillation', 'Myocardial ischemia (in elderly/CAD)', 'Thyroid storm (if overdosed + stress)'], rare: ['Seizures', 'Psychosis'] }, contraindications: ['Untreated thyrotoxicosis', 'Recent MI', 'Acute myocarditis', 'Uncontrolled arrhythmias'], interactions: ['Calcium/Iron/Antacids (↓absorption; separate by 4h)', 'Warfarin (↑INR)', 'β-blockers → may need higher dose', 'Phenytoin (↑metabolism)'], monitoring: ['TSH at 6-8 weeks post-initiation/change', 'Free T4', 'Symptoms of hyper/hypothyroidism', 'Pulse, affect'], pharmacokinetics: { absorption: '70-80% absorbed on empty stomach; improved with fasting.', distribution: '99.9% protein-bound.', metabolism: 'Peripheral deiodination to T3 (active).', elimination: 'Renal & biliary. Half-life: 7-8 days.' }, pregnancy: 'Category A. Essential to maintain euthyroidism in pregnancy.', nursing: 'Minimal breast milk excretion; safe.', blackBoxWarning: null, counseling: ['Take on empty stomach 30-60min before breakfast', 'Separate from calcium, iron, multivitamins by 4+ hours', 'Consistent brand is recommended (bioavailability can vary)', 'TSH checks every 6-8 weeks initially'], mnemonics: ['T4 → T3 (peripheral conversion). TSH ↓ if overdosed, ↑ if underdosed.'], keyFacts: ['Longest-acting thyroid hormone; allows once-daily dosing', 'Steady state ~6-8 weeks; don\'t increase dose more frequently', 'Dosage adjustments needed: pregnancy, age >50, cardiac disease'], tags: ['usmle-high-yield', 'endocrine'], relatedDrugs: ['liothyronine', 'desiccated thyroid', 'levothyroxine/liothyronine combination'] },
+];
+
+const DRUG_CATEGORIES = [
+  'All', 'Cardiovascular', 'Antibiotics', 'Analgesics/Pain', 'CNS/Psychiatry',
+  'Endocrine', 'Pulmonary', 'Gastroenterology', 'Renal/Urology',
+  'Hematology/Oncology', 'Immunology/Rheumatology', 'Neurology',
+  'Infectious Disease', 'OB/GYN', 'Dermatology', 'Emergency/Critical Care'
+];
+
+const DRUG_SCHEDULES = ['All', 'OTC', 'Schedule II', 'Schedule III', 'Schedule IV', 'Schedule V', 'Rx Only'];
+
 /* ── renderAIContent: parses custom XML tags + standard markdown ── */
 const renderAIContent = (text) => {
   if (!text) return null;
@@ -1088,6 +1136,13 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
       if ((set.title || '').toLowerCase().includes(lq)) push({ type: 'case set', icon: Activity, label: set.title, sub: `${tag} · ${set.questions?.length || 0} cases`, color: '#06b6d4', action: () => onNavigate('cases') });
       set.questions?.forEach(c => { if ((c.vignette || '').toLowerCase().includes(lq)) push({ type: 'case', icon: Activity, label: (c.title || c.vignette || '').slice(0, 60), sub: `${tag} · ${set.title || ''}`, color: '#06b6d4', action: () => onNavigate('cases') }); });
     }));
+
+    /* ── 12. MEDICINES DATABASE ── */
+    (typeof MEDICINE_DB !== 'undefined' ? MEDICINE_DB : []).forEach(d => {
+      const searchStr = [d.name, d.genericName, d.drugClass, ...(d.brandNames || []), ...(d.indications || []), ...(d.tags || [])].join(' ').toLowerCase();
+      if (searchStr.includes(lq))
+        push({ type: 'Medicine', icon: Pill, label: d.name, sub: `${d.drugClass} · ${d.genericName || ''}`, color: '#10b981', action: () => onNavigate('medicines') });
+    });
 
     return out;
   }, [q, docs, flashcards, exams, cases, notes, chatSessions]);
@@ -2379,7 +2434,422 @@ function TutorChat({ context, settings, contextLabel = '' }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   PROVIDER PRESETS
+   DRAGGABLE TUTOR PANEL — docks right in desktop, floats on mobile
+═══════════════════════════════════════════════════════════════════ */
+function DraggableTutorPanel({ context, settings, contextLabel = '', defaultMode = 'docked' }) {
+  const [isDocked, setIsDocked] = useState(defaultMode === 'docked');
+  const [pos, setPos] = useState({ x: window.innerWidth - 380, y: 80 });
+  const [dragging, setDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const panelRef = useRef(null);
+
+  const handleMouseDown = (e) => {
+    if (!isDocked && panelRef.current) {
+      setDragging(true);
+      const rect = panelRef.current.getBoundingClientRect();
+      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
+  };
+
+  useEffect(() => {
+    if (!dragging) return;
+    const handleMouseMove = (e) => {
+      setPos({ x: e.clientX - dragOffset.x, y: e.clientY - dragOffset.y });
+    };
+    const handleMouseUp = () => setDragging(false);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragging, dragOffset]);
+
+  return isDocked ? (
+    <div className="shrink-0 flex flex-col overflow-hidden border-l border-[color:var(--border)]" style={{ width: 320, background: 'var(--bg)' }}>
+      <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
+    </div>
+  ) : (
+    <div
+      ref={panelRef}
+      onMouseDown={handleMouseDown}
+      className="fixed rounded-2xl shadow-2xl overflow-hidden border border-[color:var(--border)]"
+      style={{
+        left: `${pos.x}px`,
+        top: `${pos.y}px`,
+        width: 320,
+        height: 500,
+        background: 'var(--bg)',
+        backdropFilter: 'blur(12px)',
+        zIndex: 100,
+        cursor: dragging ? 'grabbing' : 'grab',
+      }}
+    >
+      <div className="flex items-center justify-between px-3 py-2 border-b border-[color:var(--border)] bg-[var(--surface,var(--card))]" style={{ cursor: 'grab' }}>
+        <span className="text-xs font-bold uppercase" style={{ color: 'var(--accent)' }}>AI Tutor</span>
+        <button onClick={() => setIsDocked(true)} className="opacity-50 hover:opacity-100" title="Dock panel">
+          <Maximize size={14} />
+        </button>
+      </div>
+      <div style={{ height: 'calc(100% - 40px)', overflow: 'hidden' }}>
+        <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MEDICINES EXPLORER VIEW
+═══════════════════════════════════════════════════════════════════ */
+function MedicinesView({ settings }) {
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedSchedule, setSelectedSchedule] = useState('All');
+  const [selectedDrug, setSelectedDrug] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [sortBy, setSortBy] = useState('name');
+  const isMobile = window.innerWidth < 768;
+  const searchRef = useRef(null);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return MEDICINE_DB
+      .filter(d => {
+        const matchCat = selectedCategory === 'All' || d.category === selectedCategory;
+        const matchSched = selectedSchedule === 'All' || d.schedule === selectedSchedule;
+        const matchSearch = !q || d.name.toLowerCase().includes(q) || (d.genericName || '').toLowerCase().includes(q) || (d.brandNames || []).some(b => b.toLowerCase().includes(q)) || (d.drugClass || '').toLowerCase().includes(q) || (d.indications || []).some(i => i.toLowerCase().includes(q)) || (d.tags || []).some(t => t.toLowerCase().includes(q));
+        return matchCat && matchSched && matchSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'class') return (a.drugClass || '').localeCompare(b.drugClass || '');
+        if (sortBy === 'category') return (a.category || '').localeCompare(b.category || '');
+        return a.name.localeCompare(b.name);
+      });
+  }, [search, selectedCategory, selectedSchedule, sortBy]);
+
+  const tutorContext = selectedDrug ? { drug: selectedDrug.name, genericName: selectedDrug.genericName, drugClass: selectedDrug.drugClass, mechanism: selectedDrug.mechanism, indications: (selectedDrug.indications || []).join(', '), dosing: JSON.stringify(selectedDrug.dosing), sideEffects: JSON.stringify(selectedDrug.sideEffects), contraindications: (selectedDrug.contraindications || []).join(', '), interactions: (selectedDrug.interactions || []).join(', '), keyFacts: (selectedDrug.keyFacts || []).join(', ') } : null;
+
+  const TABS = [{ id: 'overview', label: 'Overview', icon: Info }, { id: 'dosing', label: 'Dosing', icon: Clipboard }, { id: 'sideeffects', label: 'Side Effects', icon: AlertCircle }, { id: 'interactions', label: 'Interactions', icon: GitBranch }, { id: 'pharmacology', label: 'PK/PD', icon: FlaskConical }, { id: 'counseling', label: 'Counseling', icon: MessageSquare }];
+
+  const scheduleColor = (s) => {
+    if (!s || s === 'OTC') return { bg: 'rgba(16,185,129,0.15)', color: '#10b981' };
+    if (s === 'Schedule II') return { bg: 'rgba(239,68,68,0.15)', color: '#ef4444' };
+    if (s === 'Schedule III') return { bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' };
+    if (s === 'Schedule IV') return { bg: 'rgba(99,102,241,0.15)', color: '#6366f1' };
+    return { bg: 'rgba(107,114,128,0.15)', color: '#6b7280' };
+  };
+
+  return (
+    <div className="flex-1 min-h-0 flex overflow-hidden" style={{ background: 'var(--bg)' }}>
+      {/* LEFT: Search + Drug List */}
+      <div className="flex flex-col shrink-0 border-r border-[color:var(--border)]" style={{ width: isMobile && selectedDrug ? 0 : isMobile ? '100%' : 310, overflow: 'hidden', transition: 'width 0.3s ease' }}>
+        {/* Search + Filters */}
+        <div className="p-3 shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface, var(--card))' }}>
+          {/* Search box */}
+          <div className="relative mb-2.5">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+            <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, brand, class, indication…" className="w-full pl-9 pr-9 py-2.5 text-sm rounded-xl outline-none" style={{ background: 'var(--bg)', border: '1px solid var(--border2, var(--border))', color: 'var(--text)' }} />
+            {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-100"><X size={14} /></button>}
+          </div>
+
+          {/* Category chips */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 mb-2" style={{ scrollbarWidth: 'none' }}>
+            {DRUG_CATEGORIES.map(cat => (
+              <button key={cat} onClick={() => setSelectedCategory(cat)} className="shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold transition-all" style={selectedCategory === cat ? { background: 'var(--accent)', color: '#fff' } : { background: 'var(--surface2, var(--card))', color: 'var(--text2)', border: '1px solid var(--border)' }}>
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort + Schedule row */}
+          <div className="flex gap-2">
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="flex-1 text-xs px-2 py-1.5 rounded-lg outline-none" style={{ background: 'var(--surface2, var(--card))', border: '1px solid var(--border)', color: 'var(--text)' }}>
+              <option value="name">Sort: Name</option>
+              <option value="class">Sort: Drug Class</option>
+              <option value="category">Sort: Category</option>
+            </select>
+            <select value={selectedSchedule} onChange={e => setSelectedSchedule(e.target.value)} className="flex-1 text-xs px-2 py-1.5 rounded-lg outline-none" style={{ background: 'var(--surface2, var(--card))', border: '1px solid var(--border)', color: 'var(--text)' }}>
+              {DRUG_SCHEDULES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <p className="text-xs opacity-30 mt-1.5 font-bold">{filtered.length} medicines</p>
+        </div>
+
+        {/* Drug list */}
+        <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-32 opacity-30">
+              <Pill size={24} className="mb-2" />
+              <p className="text-sm font-bold">No results for "{search}"</p>
+            </div>
+          ) : filtered.map(d => {
+            const sc = scheduleColor(d.schedule);
+            return (
+              <button key={d.id} onClick={() => { setSelectedDrug(d); setActiveTab('overview'); }} className="w-full text-left px-4 py-3 transition-all" style={{ borderBottom: '1px solid var(--border)', background: selectedDrug?.id === d.id ? 'rgba(var(--acc-rgb,99,102,241),0.1)' : 'transparent', borderLeft: selectedDrug?.id === d.id ? '3px solid var(--accent)' : '3px solid transparent' }}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold truncate" style={{ color: selectedDrug?.id === d.id ? 'var(--accent)' : 'var(--text)' }}>{d.name}</p>
+                    <p className="text-xs opacity-50 mt-0.5 truncate">{d.genericName || d.drugClass}</p>
+                    <p className="text-xs opacity-35 truncate">{d.drugClass}</p>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={sc}>{d.schedule || 'Rx'}</span>
+                    {d.tags?.includes('usmle-high-yield') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>HY</span>}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* RIGHT: Drug Detail + Tutor */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        {!selectedDrug ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 opacity-40 p-8 text-center">
+            <Pill size={48} />
+            <p className="text-xl font-black">Select a Medicine</p>
+            <p className="text-sm">Search and tap any medicine to view full prescribing information</p>
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 flex overflow-hidden">
+            {/* Drug content */}
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+              {/* Drug header */}
+              <div className="px-5 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface, var(--card))' }}>
+                {isMobile && <button onClick={() => setSelectedDrug(null)} className="flex items-center gap-1 text-xs font-bold mb-2 opacity-60"><ChevronLeft size={14} /> Back</button>}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h1 className="text-xl font-black truncate" style={{ color: 'var(--text)' }}>{selectedDrug.name}</h1>
+                    {selectedDrug.genericName && selectedDrug.genericName !== selectedDrug.name && <p className="text-sm opacity-60 mt-0.5">{selectedDrug.genericName}</p>}
+                    {selectedDrug.brandNames?.length > 0 && <p className="text-xs opacity-40 mt-0.5">Brands: {selectedDrug.brandNames.slice(0, 4).join(', ')}</p>}
+                    {/* Tags row */}
+                    <div className="flex gap-2 flex-wrap mt-2">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.15)', color: 'var(--accent)' }}>{selectedDrug.drugClass}</span>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={scheduleColor(selectedDrug.schedule)}>{selectedDrug.schedule || 'Rx Only'}</span>
+                      {selectedDrug.blackBoxWarning && <span className="text-xs font-black px-2 py-0.5 rounded-lg flex items-center gap-1" style={{ background: 'rgba(0,0,0,0.8)', color: '#fff' }}>⬛ BLACK BOX</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tab navigation */}
+                <div className="flex gap-1 mt-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                  {TABS.map(({ id, label, icon: Icon }) => (
+                    <button key={id} onClick={() => setActiveTab(id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black shrink-0 transition-all" style={activeTab === id ? { background: 'var(--accent)', color: '#fff' } : { background: 'var(--surface2, var(--card))', color: 'var(--text2)', border: '1px solid var(--border)', opacity: 0.7 }}>
+                      <Icon size={12} />{label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab content */}
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+                {selectedDrug.blackBoxWarning && (
+                  <div className="rounded-2xl p-4 flex items-start gap-3" style={{ background: 'rgba(0,0,0,0.85)', border: '2px solid #000' }}>
+                    <span className="text-xl shrink-0">⬛</span>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-widest text-white mb-1">BLACK BOX WARNING</p>
+                      <p className="text-sm text-white/90 leading-relaxed">{selectedDrug.blackBoxWarning}</p>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'overview' && (
+                  <>
+                    {selectedDrug.mechanism && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Mechanism of Action</p>
+                        <p className="text-sm leading-relaxed">{selectedDrug.mechanism}</p>
+                      </div>
+                    )}
+                    {selectedDrug.indications?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Indications</p>
+                        <div className="space-y-1.5">
+                          {selectedDrug.indications.map(ind => (
+                            <div key={ind} className="flex items-start gap-2 text-sm">
+                              <CheckCircle2 size={12} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                              {ind}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDrug.keyFacts?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(var(--acc-rgb,99,102,241),0.3)', background: 'rgba(var(--acc-rgb,99,102,241),0.05)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--accent)' }}>
+                          <Zap size={12} /> Key Facts / High-Yield
+                        </p>
+                        {selectedDrug.keyFacts.map(f => (
+                          <div key={f} className="flex items-start gap-2 text-sm font-medium mb-1.5">
+                            <Star size={12} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                            {f}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {selectedDrug.mnemonics?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(139,92,246,0.3)', background: 'rgba(139,92,246,0.05)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#8b5cf6' }}>🧠 Mnemonics</p>
+                        {selectedDrug.mnemonics.map(m => (
+                          <p key={m} className="text-sm font-medium mb-1.5">{m}</p>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'dosing' && selectedDrug.dosing && (
+                  <>
+                    {[{ key: 'adult', label: 'Adult Dosing', color: 'var(--accent)' }, { key: 'pediatric', label: 'Pediatric Dosing', color: '#06b6d4' }, { key: 'renal', label: 'Renal Adjustment', color: '#f59e0b' }, { key: 'hepatic', label: 'Hepatic Adjustment', color: '#f97316' }, { key: 'maxDose', label: 'Maximum Dose', color: '#ef4444' }].filter(({ key }) => selectedDrug.dosing[key]).map(({ key, label, color }) => (
+                      <div key={key} className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color, opacity: 0.8 }}>{label}</p>
+                        <p className="text-sm leading-relaxed">{selectedDrug.dosing[key]}</p>
+                      </div>
+                    ))}
+                    {selectedDrug.pregnancy && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(236,72,153,0.3)', background: 'rgba(236,72,153,0.05)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: '#ec4899' }}>Pregnancy</p>
+                        <p className="text-sm leading-relaxed">{selectedDrug.pregnancy}</p>
+                      </div>
+                    )}
+                    {selectedDrug.nursing && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(236,72,153,0.2)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: '#ec4899' }}>Lactation / Nursing</p>
+                        <p className="text-sm leading-relaxed">{selectedDrug.nursing}</p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'sideeffects' && selectedDrug.sideEffects && (
+                  <>
+                    {selectedDrug.sideEffects.common?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 opacity-40">Common Side Effects</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedDrug.sideEffects.common.map(s => (
+                            <span key={s} className="px-2.5 py-1 rounded-xl text-xs font-bold" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }}>
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDrug.sideEffects.serious?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>⚠️ Serious / Severe</p>
+                        <div className="space-y-1.5">
+                          {selectedDrug.sideEffects.serious.map(s => (
+                            <div key={s} className="flex items-start gap-2 text-sm">
+                              <AlertCircle size={12} className="shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+                              {s}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDrug.contraindications?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.25)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 opacity-40">Contraindications</p>
+                        <div className="space-y-1.5">
+                          {selectedDrug.contraindications.map(c => (
+                            <div key={c} className="flex items-start gap-2 text-sm font-medium">
+                              <X size={12} className="shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+                              {c}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDrug.monitoring?.length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 opacity-40">Monitoring Parameters</p>
+                        <div className="space-y-1.5">
+                          {selectedDrug.monitoring.map(m => (
+                            <div key={m} className="flex items-start gap-2 text-sm">
+                              <Activity size={12} className="shrink-0 mt-0.5" style={{ color: '#06b6d4' }} />
+                              {m}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'interactions' && (
+                  <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                    <p className="text-xs font-black uppercase tracking-widest mb-3 opacity-40">Drug Interactions</p>
+                    <div className="space-y-2">
+                      {(selectedDrug.interactions || []).map(inter => (
+                        <div key={inter} className="flex items-start gap-2 p-2.5 rounded-xl text-sm" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                          <Zap size={12} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                          {inter}
+                        </div>
+                      ))}
+                    </div>
+                    {selectedDrug.relatedDrugs?.length > 0 && (
+                      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 opacity-40">Related Drugs</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedDrug.relatedDrugs.map(rd => {
+                            const found = MEDICINE_DB.find(d => d.id === rd || d.name.toLowerCase() === rd.toLowerCase());
+                            return (
+                              <button key={rd} onClick={() => found && setSelectedDrug(found)} className="px-2.5 py-1 rounded-xl text-xs font-bold transition-all hover:scale-105" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.15)', color: 'var(--accent)', border: '1px solid rgba(var(--acc-rgb,99,102,241),0.3)' }}>
+                                {found ? found.name : rd}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'pharmacology' && selectedDrug.pharmacokinetics && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[{ key: 'absorption', label: 'Absorption', icon: '⬆️' }, { key: 'distribution', label: 'Distribution', icon: '🔄' }, { key: 'metabolism', label: 'Metabolism', icon: '⚗️' }, { key: 'elimination', label: 'Elimination', icon: '⬇️' }].filter(({ key }) => selectedDrug.pharmacokinetics[key]).map(({ key, label, icon }) => (
+                        <div key={key} className="glass rounded-2xl p-4 col-span-1" style={{ border: '1px solid var(--border)' }}>
+                          <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">{icon} {label}</p>
+                          <p className="text-xs leading-relaxed">{selectedDrug.pharmacokinetics[key]}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {activeTab === 'counseling' && selectedDrug.counseling?.length > 0 && (
+                  <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.04)' }}>
+                    <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#10b981' }}>Patient Counseling Points</p>
+                    <div className="space-y-3">
+                      {selectedDrug.counseling.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-3 text-sm">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-black shrink-0" style={{ background: 'rgba(16,185,129,0.2)', color: '#10b981' }}>{i + 1}</span>
+                          {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Docked tutor — desktop */}
+            {!isMobile && <DraggableTutorPanel context={tutorContext} contextLabel={selectedDrug.name} settings={settings} defaultMode="docked" />}
+          </div>
+        )}
+      </div>
+
+      {/* Floating tutor — mobile */}
+      {isMobile && selectedDrug && <DraggableTutorPanel context={tutorContext} contextLabel={selectedDrug?.name} settings={settings} defaultMode="floating" />}
+    </div>
+  );
+}
+
+
 ═══════════════════════════════════════════════════════════════════ */
 const PROVIDERS = {
   anthropic: { label: 'Claude (Anthropic)', note: 'Works built-in — no API key needed in Claude artifacts.', needsKey: false, defaultModel: 'claude-sonnet-4-20250514', baseUrl: '' },
@@ -2580,6 +3050,7 @@ const HOME_CATEGORIES = [
   { id: 'reference', title: 'Medical Reference', icon: BookOpen, color: '#10b981', items: [
     { icon: Skull, label: 'Toxicology', v: 'toxicology', desc: 'Poisons & antidotes' },
     { icon: BookOpen, label: 'Glossary', v: 'glossary', desc: 'Medical terminology' },
+    { icon: Pill, label: 'Medicines', v: 'medicines', desc: 'Drug database & info' },
     { icon: Pill, label: 'Pharma Ref', v: 'pharma', desc: 'Quick pharma reference' },
     { icon: BookMarked, label: 'Guidelines', v: 'guidelines', desc: 'Clinical guidelines' },
     { icon: Bone, label: 'Anatomy', v: 'anatomy', desc: 'Anatomy quick ref' },
@@ -5505,6 +5976,7 @@ const MORE_ITEMS = [
   { icon: Bookmark,      label: 'Annotations',   v: 'annotations' },
   { icon: BookOpen,      label: 'Glossary',      v: 'glossary' },
   { icon: FlaskConical,  label: 'Lab Ref',       v: 'labref' },
+  { icon: Pill,          label: 'Medicines',     v: 'medicines' },
   { icon: Stethoscope,   label: 'DDx Builder',   v: 'ddx' },
   { icon: Brain,         label: 'Mnemonics',     v: 'mnemonics' },
   { icon: Pill,          label: 'Drug Check',    v: 'drugcheck' },
@@ -5665,6 +6137,7 @@ function App() {
     ['ctrl+4', () => setView('exams')],
     ['ctrl+5', () => setView('cases')],
     ['ctrl+6', () => setView('chat')],
+    ['ctrl+m', () => setView('medicines')],
     ['?', () => setShowShortcutsHelp(p => !p)],
     ['ctrl+r', () => setShowQuickReview(p => !p)],
   ]);
@@ -7241,6 +7714,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           <ViewWrapper active={view === 'labref'}>
             <BackableView viewKey="labref" setView={setView}>
               <LabReferenceView />
+            </BackableView>
+          </ViewWrapper>
+          <ViewWrapper active={view === 'medicines'}>
+            <BackableView viewKey="medicines" setView={setView}>
+              <MedicinesView settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'ddx'}>
