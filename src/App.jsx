@@ -997,31 +997,100 @@ function useKeyboardShortcuts(shortcuts) {
 /* ═══════════════════════════════════════════════════════════════════
    GLOBAL SEARCH — searches across all content
 ═══════════════════════════════════════════════════════════════════ */
-function GlobalSearch({ docs, flashcards, exams, cases, notes, onNavigate, onClose }) {
+function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onNavigate, onClose }) {
   const [q, setQ] = useState(''); const inputRef = useRef(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
 
   const results = useMemo(() => {
     if (!q.trim() || q.length < 2) return [];
     const lq = q.toLowerCase(); const out = [];
-    // Search features / views first (MORE_ITEMS + main nav)
-    const ALL_VIEWS = [
-      { icon: LayoutDashboard, label: 'Home / Library', v: 'library', keywords: 'home library files documents upload' },
-      { icon: GraduationCap, label: 'Study Mode', v: 'study', keywords: 'study review flashcards fsrs' },
-      ...MORE_ITEMS,
-    ];
-    ALL_VIEWS.forEach(item => {
-      const searchText = (item.label + ' ' + (item.keywords || '')).toLowerCase();
-      if (searchText.includes(lq)) out.push({ type: 'feature', icon: item.icon, label: item.label, sub: 'Go to feature', color: 'var(--accent)', action: () => onNavigate(item.v) });
+    const MAX = 50;
+    const push = (item) => { if (out.length < MAX) out.push(item); };
+
+    /* ── 1. Features from HOME_CATEGORIES (label + desc + category title) ── */
+    HOME_CATEGORIES.forEach(cat => {
+      cat.items?.forEach(item => {
+        if ((item.label + ' ' + (item.desc || '') + ' ' + cat.title).toLowerCase().includes(lq))
+          push({ type: 'feature', icon: item.icon, label: item.label, sub: cat.title + ' · ' + (item.desc || ''), color: cat.color || 'var(--accent)', action: () => onNavigate(item.v) });
+      });
     });
-    // Search user data
-    docs.forEach(d => { if (!d?.name) return; if (d.name.toLowerCase().includes(lq)) out.push({ type: 'doc', icon: FileText, label: d.name, sub: `${d.totalPages || 0} pages`, color: '#6366f1', action: () => onNavigate('reader', d.id) }); });
-    flashcards.forEach(set => set.cards?.forEach(c => { if (!c?.q) return; if (((c.q || '') + (c.a || '')).toLowerCase().includes(lq)) out.push({ type: 'card', icon: Layers, label: (c.q || '').slice(0, 60), sub: set.title, color: '#8b5cf6', action: () => onNavigate('flashcards') }); }));
-    exams.forEach(ex => ex.questions?.forEach(q2 => { if ((q2.q || '').toLowerCase().includes(lq)) out.push({ type: 'exam', icon: CheckSquare, label: (q2.q || '').slice(0, 60), sub: ex.title, color: '#3b82f6', action: () => onNavigate('exams') }); }));
-    cases.forEach(set => set.questions?.forEach(c => { if ((c.vignette || '').toLowerCase().includes(lq)) out.push({ type: 'case', icon: Activity, label: (c.title || c.vignette || '').slice(0, 60), sub: set.title, color: '#06b6d4', action: () => onNavigate('cases') }); }));
-    notes.forEach(n => { if (!n) return; if (((n.title || '') + (n.content || '')).toLowerCase().includes(lq)) out.push({ type: 'note', icon: PenLine, label: n.title || 'Untitled', sub: n.content?.slice(0, 50), color: '#f59e0b', action: () => onNavigate('notes') }); });
-    return out.slice(0, 20);
-  }, [q, docs, flashcards, exams, cases, notes]);
+
+    /* ── 2. Extra top-level nav not in categories ── */
+    [
+      { icon: LayoutDashboard, label: 'Home / Library', v: 'library', kw: 'home library files documents upload hub' },
+      { icon: GraduationCap, label: 'Study Mode', v: 'study', kw: 'study review fsrs spaced repetition' },
+      { icon: MessageSquare, label: 'AI Tutor', v: 'chat', kw: 'chat ai tutor assistant' },
+      { icon: Settings, label: 'Settings', v: 'settings', kw: 'settings preferences theme font accent' },
+    ].forEach(item => {
+      if ((item.label + ' ' + item.kw).toLowerCase().includes(lq))
+        push({ type: 'feature', icon: item.icon, label: item.label, sub: 'Go to feature', color: 'var(--accent)', action: () => onNavigate(item.v) });
+    });
+
+    /* ── 3. User documents ── */
+    docs.forEach(d => { if (d?.name && d.name.toLowerCase().includes(lq)) push({ type: 'doc', icon: FileText, label: d.name, sub: `${d.totalPages || 0} pages`, color: '#6366f1', action: () => onNavigate('reader', d.id) }); });
+
+    /* ── 4. User flashcards — set titles + card content ── */
+    flashcards.forEach(set => {
+      if ((set.title || '').toLowerCase().includes(lq)) push({ type: 'deck', icon: Layers, label: set.title, sub: `${set.cards?.length || 0} cards`, color: '#8b5cf6', action: () => onNavigate('flashcards') });
+      set.cards?.forEach(c => { if (c?.q && ((c.q || '') + ' ' + (c.a || '')).toLowerCase().includes(lq)) push({ type: 'card', icon: Layers, label: (c.q || '').slice(0, 60), sub: set.title, color: '#8b5cf6', action: () => onNavigate('flashcards') }); });
+    });
+
+    /* ── 5. User exams — set titles + question text ── */
+    exams.forEach(ex => {
+      if ((ex.title || '').toLowerCase().includes(lq)) push({ type: 'exam set', icon: CheckSquare, label: ex.title, sub: `${ex.questions?.length || 0} questions`, color: '#3b82f6', action: () => onNavigate('exams') });
+      ex.questions?.forEach(q2 => { if ((q2.q || '').toLowerCase().includes(lq)) push({ type: 'exam', icon: CheckSquare, label: (q2.q || '').slice(0, 60), sub: ex.title, color: '#3b82f6', action: () => onNavigate('exams') }); });
+    });
+
+    /* ── 6. User cases — set titles + vignettes ── */
+    cases.forEach(set => {
+      if ((set.title || '').toLowerCase().includes(lq)) push({ type: 'case set', icon: Activity, label: set.title, sub: `${set.questions?.length || 0} cases`, color: '#06b6d4', action: () => onNavigate('cases') });
+      set.questions?.forEach(c => { if ((c.vignette || '').toLowerCase().includes(lq)) push({ type: 'case', icon: Activity, label: (c.title || c.vignette || '').slice(0, 60), sub: set.title, color: '#06b6d4', action: () => onNavigate('cases') }); });
+    });
+
+    /* ── 7. User notes ── */
+    notes.forEach(n => { if (!n) return; if (((n.title || '') + ' ' + (n.content || '')).toLowerCase().includes(lq)) push({ type: 'note', icon: PenLine, label: n.title || 'Untitled', sub: (n.content || '').slice(0, 50), color: '#f59e0b', action: () => onNavigate('notes') }); });
+
+    /* ── 8. Chat sessions ── */
+    (chatSessions || []).forEach(s => {
+      const hit = (s.title || '').toLowerCase().includes(lq) || s.messages?.some(m => (m.content || '').toLowerCase().includes(lq));
+      if (hit) push({ type: 'chat', icon: MessageSquare, label: s.title || 'Chat Session', sub: `${s.messages?.length || 0} messages`, color: '#10b981', action: () => onNavigate('chat') });
+    });
+
+    /* ── 9. Built-in flashcards (Counseling, Diseases, Drug, Law) ── */
+    [
+      { data: counselingFlashcards, tag: 'Counseling' },
+      { data: diseasesFlashcards, tag: 'Diseases' },
+      { data: drugFlashcards, tag: 'Drug' },
+      { data: lawFlashcards, tag: 'Law' },
+    ].forEach(({ data, tag }) => data?.forEach(set => {
+      if ((set.title || '').toLowerCase().includes(lq)) push({ type: 'deck', icon: Layers, label: set.title, sub: `${tag} · ${set.cards?.length || 0} cards`, color: '#8b5cf6', action: () => onNavigate('flashcards') });
+      set.cards?.forEach(c => { if (c?.q && ((c.q || '') + ' ' + (c.a || '')).toLowerCase().includes(lq)) push({ type: 'card', icon: Layers, label: (c.q || '').slice(0, 60), sub: `${tag} · ${set.title || ''}`, color: '#8b5cf6', action: () => onNavigate('flashcards') }); });
+    }));
+
+    /* ── 10. Built-in exams (Counseling, Diseases, Drug, Law) ── */
+    [
+      { data: counselingExams, tag: 'Counseling' },
+      { data: diseasesExams, tag: 'Diseases' },
+      { data: drugExams, tag: 'Drug' },
+      { data: lawExams, tag: 'Law' },
+    ].forEach(({ data, tag }) => data?.forEach(ex => {
+      if ((ex.title || '').toLowerCase().includes(lq)) push({ type: 'exam set', icon: CheckSquare, label: ex.title, sub: `${tag} · ${ex.questions?.length || 0} questions`, color: '#3b82f6', action: () => onNavigate('exams') });
+      ex.questions?.forEach(q2 => { if ((q2.q || '').toLowerCase().includes(lq)) push({ type: 'exam', icon: CheckSquare, label: (q2.q || '').slice(0, 60), sub: `${tag} · ${ex.title || ''}`, color: '#3b82f6', action: () => onNavigate('exams') }); });
+    }));
+
+    /* ── 11. Built-in cases (Counseling, Diseases, Drug, Law) ── */
+    [
+      { data: counselingCases, tag: 'Counseling' },
+      { data: diseasesCases, tag: 'Diseases' },
+      { data: drugCases, tag: 'Drug' },
+      { data: lawCases, tag: 'Law' },
+    ].forEach(({ data, tag }) => data?.forEach(set => {
+      if ((set.title || '').toLowerCase().includes(lq)) push({ type: 'case set', icon: Activity, label: set.title, sub: `${tag} · ${set.questions?.length || 0} cases`, color: '#06b6d4', action: () => onNavigate('cases') });
+      set.questions?.forEach(c => { if ((c.vignette || '').toLowerCase().includes(lq)) push({ type: 'case', icon: Activity, label: (c.title || c.vignette || '').slice(0, 60), sub: `${tag} · ${set.title || ''}`, color: '#06b6d4', action: () => onNavigate('cases') }); });
+    }));
+
+    return out;
+  }, [q, docs, flashcards, exams, cases, notes, chatSessions]);
 
   return (
     <div className="fixed inset-0 flex items-start justify-center pt-16 px-4"
@@ -1032,7 +1101,7 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, onNavigate, onClo
         <div className="flex items-center gap-3 px-5 py-4 border-b border-[color:var(--border2,var(--border))]">
           <Search size={20} className="text-[var(--accent)] shrink-0" />
           <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
-            placeholder="Search everything — documents, cards, questions, cases, notes…"
+            placeholder="Search everything — features, docs, cards, exams, cases, notes, chats…"
             className="flex-1 bg-transparent text-sm outline-none font-medium placeholder:opacity-40 text-[var(--text)]" />
           <kbd className="text-xs font-bold opacity-30 px-2 py-1 glass rounded-lg">ESC</kbd>
           <button onClick={onClose} className="opacity-40 hover:opacity-80" aria-label="Close"><X size={18} /></button>
@@ -6899,7 +6968,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
       {/* Glass strip behind iPhone status bar (wifi/bluetooth/time) */}
       <div className="design-top-glass" aria-hidden="true" />
       <ToastContainer toasts={toasts} />
-      {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes}
+      {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions}
         onNavigate={(v, id) => { setView(v); if (id) { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); setDocPages(p => ({ ...p, [id]: 1 })); }; }}
         onClose={() => setShowGlobalSearch(false)} />}
       <GlobalTaskIndicator onViewResult={(id, task) => {
