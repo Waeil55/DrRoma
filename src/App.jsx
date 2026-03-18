@@ -5451,6 +5451,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                   ))}
                 </div>
                 {q.explanation && <p className="text-xs opacity-50 mt-3 italic">{q.explanation}</p>}
+                <KeyInfoPanel examQ={q} />
               </div>
             ))}
           </div>
@@ -5674,6 +5675,9 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                 {q.evidence && <p className="text-xs italic pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}" — p.{q.sourcePage}</p>}
               </div>
             )}
+
+            {/* Drug Quick Reference — shown after submitting */}
+            {submitted && <KeyInfoPanel examQ={q} />}
 
             {/* Action */}
             <div className="pb-4">
@@ -8165,8 +8169,12 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         /* ══ RESPONSIVE ══ */
         @media(max-width:640px){
           .hide-mobile{display:none!important;}
-          .glass{backdrop-filter:none;-webkit-backdrop-filter:none;}
           button,[role=button]{min-height:44px;}
+        }
+        /* Disable ALL backdrop-filter on touch devices (iPhone/iPad) to prevent WebKit GPU crashes */
+        @media(max-width:1024px){
+          .glass{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+          *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
         }
         @media(min-width:768px){.hide-desktop{display:none!important;}}
         .responsive-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));}
@@ -8201,8 +8209,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         </div>
       )}
 
-      {/* GRADIENT BLOBS — desktop only (too GPU-heavy for mobile iOS WebKit) */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden hidden md:block" aria-hidden="true">
+      {/* GRADIENT BLOBS — large desktop only (too GPU-heavy for iPad/mobile WebKit) */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden hidden lg:block" aria-hidden="true">
         <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full"
           style={{ background: 'rgba(147,51,234,0.45)', filter: 'blur(40px)', mixBlendMode: 'screen' }} />
         <div className="absolute top-[15%] right-[-15%] w-[65%] h-[65%] rounded-full"

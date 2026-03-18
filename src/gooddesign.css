@@ -33,8 +33,6 @@ html.dark,
 
 .design-card {
   background: var(--card-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--card-border);
   border-radius: 20px;
   padding: 16px;
@@ -63,8 +61,6 @@ html.dark,
     rgba(255, 255, 255, 0.97) 0%,
     rgba(240, 245, 255, 0.90) 100%
   );
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
   border-bottom: 1.5px solid rgba(120, 130, 255, 0.25);
   box-shadow:
     0 2px 24px rgba(79, 70, 229, 0.10),
@@ -102,8 +98,6 @@ html.dark .design-header,
   z-index: 55;
   pointer-events: none;
   background: rgba(240, 245, 255, 0.98);
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
 }
 
 html.dark .design-top-glass,
@@ -120,8 +114,6 @@ html.dark .design-top-glass,
   right: 0;
   height: env(safe-area-inset-top, 0px);
   background: rgba(240, 245, 255, 0.97);
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
   pointer-events: none;
 }
 
@@ -159,8 +151,6 @@ html.dark .design-header::before,
     rgba(255, 255, 255, 0.96) 0%,
     rgba(240, 244, 255, 0.92) 100%
   );
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
   border: 1.5px solid rgba(120, 130, 255, 0.22);
   border-radius: 24px;
   padding: 4px 6px;
@@ -345,5 +335,29 @@ html.dark .design-btn-secondary:hover,
     max-width: 1480px;
     padding-left: 34px;
     padding-right: 34px;
+  }
+}
+
+/* Only enable backdrop-filter on large desktops where GPU can handle it */
+@media (min-width: 1025px) {
+  .design-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .design-header {
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+  }
+  .design-top-glass {
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+  }
+  .design-header::before {
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+  }
+  .design-nav-inner {
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
   }
 }
