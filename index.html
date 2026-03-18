@@ -6,15 +6,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a14" />
     <title>Dr Mariam AI</title>
+    <!-- Global error trap: catches JS errors BEFORE React mounts and shows them on screen -->
+    <script>
+      window.__appErrors = [];
+      window.onerror = function(msg, src, line, col, err) {
+        var el = document.getElementById('root');
+        if (el) {
+          el.style.cssText = 'padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;height:100vh';
+          el.innerHTML = '<h2 style="color:red">App Error (line ' + line + ')</h2><pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px">' + msg + '\n\nFile: ' + src + '\nLine: ' + line + ':' + col + (err && err.stack ? '\n\nStack:\n' + err.stack : '') + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px">Reload</button>';
+        }
+        return false;
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        var el = document.getElementById('root');
+        if (el && !el.querySelector('h2')) {
+          el.style.cssText = 'padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;height:100vh';
+          el.innerHTML = '<h2 style="color:orange">Unhandled Promise Error</h2><pre style="background:#fff7ed;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px">' + (e.reason || e) + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px">Reload</button>';
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+
