@@ -16,10 +16,16 @@ export default defineConfig({
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
-        // Split vendor chunks for better caching
-        manualChunks: {
-          react: ['react', 'react-dom'],
-          icons: ['lucide-react'],
+        // Split chunks to reduce peak memory during JS parsing:
+        // – Each chunk file is parsed independently, lowering iOS Safari OOM risk
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'react';
+          if (id.includes('node_modules/lucide-react')) return 'icons';
+          if (id.includes('Counseling.js')) return 'data-counseling';
+          if (id.includes('Diseases.js')) return 'data-diseases';
+          if (id.includes('drugData.js')) return 'data-drugs';
+          if (id.includes('lawData.js')) return 'data-law';
+          if (id.includes('diseaseDatabase.js')) return 'data-disease-db';
         },
       },
     },
