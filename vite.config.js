@@ -10,8 +10,8 @@ export default defineConfig({
 
   build: {
     outDir: 'dist',
-    minify: false,
-    target: 'esnext',
+    minify: 'esbuild',
+    target: 'es2019',
     // Increase chunk size warning limit (the app is intentionally large)
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
