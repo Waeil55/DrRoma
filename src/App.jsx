@@ -2364,8 +2364,8 @@ function ToastContainer({ toasts }) {
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '1rem',
               color: '#fff',
-              backdropFilter: 'saturate(150%) blur(60px)',
-              WebkitBackdropFilter: 'saturate(150%) blur(60px)',
+              backdropFilter: 'saturate(130%) blur(12px)',
+              WebkitBackdropFilter: 'saturate(130%) blur(12px)',
               minWidth: 240,
               boxShadow: '0 20px 40px rgba(0,0,0,.35)',
             }}
@@ -5957,8 +5957,8 @@ EXAMPLE CALLOUT:
     <div className="h-full flex rounded-[2rem] overflow-hidden animate-fade-in-up"
       style={{
         background: 'rgba(255,255,255,0.03)',
-        backdropFilter: 'saturate(150%) blur(60px)',
-        WebkitBackdropFilter: 'saturate(150%) blur(60px)',
+        backdropFilter: 'saturate(130%) blur(12px)',
+        WebkitBackdropFilter: 'saturate(130%) blur(12px)',
         border: '1px solid rgba(255,255,255,0.1)',
         boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
       }}>
@@ -5993,7 +5993,7 @@ EXAMPLE CALLOUT:
       <div className={`flex flex-col transition-all duration-300 shrink-0
         ${sidebarOpen ? 'w-72' : 'w-0 overflow-hidden'}
         lg:relative absolute inset-y-0 left-0`}
-        style={{ borderRight: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)', zIndex: 'var(--z-modal, 110)' }}>
+        style={{ borderRight: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', zIndex: 'var(--z-modal, 110)' }}>
 
         {/* Sidebar header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--border2,var(--border))] shrink-0">
@@ -6233,7 +6233,7 @@ EXAMPLE CALLOUT:
               </div>
             )}
             <div className="relative flex items-end p-2 rounded-3xl transition-all"
-              style={{ background: 'rgba(26,27,54,0.7)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,.3)', backdropFilter: 'blur(20px)' }}>
+              style={{ background: 'rgba(26,27,54,0.7)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 8px 32px rgba(0,0,0,.3)', backdropFilter: 'blur(10px)' }}>
               <button className="shrink-0 p-2.5 rounded-full transition-colors opacity-50 hover:opacity-100" style={{ color: 'var(--text)' }}>
                 <Paperclip size={19} />
               </button>
@@ -7276,7 +7276,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
 
         .main-header {
           background:var(--nav-bg);
-          backdrop-filter:saturate(200%) blur(20px); -webkit-backdrop-filter:saturate(200%) blur(20px);
+          backdrop-filter:saturate(140%) blur(10px); -webkit-backdrop-filter:saturate(140%) blur(10px);
           border-bottom:1px solid var(--border);
         }
 
@@ -7394,8 +7394,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           display:flex; align-items:flex-start; justify-content:center;
           z-index:200; padding-top:8px;
           background:var(--nav-bg);
-          backdrop-filter:saturate(200%) blur(28px);
-          -webkit-backdrop-filter:saturate(200%) blur(28px);
+          backdrop-filter:saturate(140%) blur(10px);
+          -webkit-backdrop-filter:saturate(140%) blur(10px);
           border-top:1px solid var(--border2,var(--border));
           box-shadow:0 -8px 32px rgba(0,0,0,.08),0 -1px 0 var(--border,rgba(0,0,0,.05));
           /* Allow More drawer to overflow upward */
@@ -7682,8 +7682,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
 
         /* ══ SURFACES — iOS 26 reference: theme-aware deep glassmorphism ══ */
         .glass{
-          backdrop-filter:saturate(150%) blur(120px);
-          -webkit-backdrop-filter:saturate(150%) blur(120px);
+          backdrop-filter:saturate(130%) blur(12px);
+          -webkit-backdrop-filter:saturate(130%) blur(12px);
           border-radius:2.5rem;
           transition:background .5s ease,border-color .5s ease;
         }
@@ -7698,26 +7698,26 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           box-shadow:0 30px 60px rgba(0,0,0,.05),inset 0 1px 0 rgba(255,255,255,1);
         }
         .glass-2{
-          backdrop-filter:saturate(140%) blur(80px);-webkit-backdrop-filter:saturate(140%) blur(80px);
+          backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);
           border-radius:2rem;
         }
         .dark .glass-2,.oled .glass-2,.slate .glass-2{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.1);}
         .pure-white .glass-2,.light .glass-2,.warm .glass-2,.rose .glass-2,.forest .glass-2{background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,.8);}
         .glass-sm{
-          backdrop-filter:saturate(150%) blur(40px);-webkit-backdrop-filter:saturate(150%) blur(40px);
+          backdrop-filter:saturate(130%) blur(10px);-webkit-backdrop-filter:saturate(130%) blur(10px);
           border-radius:1rem;
         }
         .dark .glass-sm,.oled .glass-sm,.slate .glass-sm{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.2);}
         .pure-white .glass-sm,.light .glass-sm,.warm .glass-sm,.rose .glass-sm,.forest .glass-sm{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);box-shadow:0 4px 20px rgba(0,0,0,.05);}
         .card-lined{
-          backdrop-filter:saturate(150%) blur(120px);-webkit-backdrop-filter:saturate(150%) blur(120px);
+          backdrop-filter:saturate(130%) blur(12px);-webkit-backdrop-filter:saturate(130%) blur(12px);
           border-radius:2.5rem;
         }
         .dark .card-lined,.oled .card-lined,.slate .card-lined{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.15);border-top:2px solid rgba(var(--acc-rgb,59,130,246),.35);box-shadow:0 30px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.08);}
         .pure-white .card-lined,.light .card-lined,.warm .card-lined,.rose .card-lined,.forest .card-lined{background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);border-top:2px solid rgba(var(--acc-rgb,59,130,246),.28);box-shadow:0 30px 60px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,1);}
-        .card-glow{backdrop-filter:saturate(150%) blur(80px);-webkit-backdrop-filter:saturate(150%) blur(80px);border-radius:2.5rem;background:linear-gradient(145deg,rgba(var(--acc-rgb,59,130,246),.08),rgba(var(--acc-rgb,59,130,246),.02));border:1px solid rgba(var(--acc-rgb,59,130,246),.22);box-shadow:0 0 40px rgba(var(--acc-rgb,59,130,246),.1);}
+        .card-glow{backdrop-filter:saturate(130%) blur(10px);-webkit-backdrop-filter:saturate(130%) blur(10px);border-radius:2.5rem;background:linear-gradient(145deg,rgba(var(--acc-rgb,59,130,246),.08),rgba(var(--acc-rgb,59,130,246),.02));border:1px solid rgba(var(--acc-rgb,59,130,246),.22);box-shadow:0 0 40px rgba(var(--acc-rgb,59,130,246),.1);}
         .glass-input{
-          backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+          backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
           border-radius:9999px;transition:border-color .2s,box-shadow .2s;
         }
         .dark .glass-input,.oled .glass-input,.slate .glass-input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#fff;}
@@ -7780,8 +7780,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           min-height:0;
           z-index:201;
           pointer-events:none;
-          backdrop-filter:saturate(180%) blur(28px);
-          -webkit-backdrop-filter:saturate(180%) blur(28px);
+          backdrop-filter:saturate(140%) blur(10px);
+          -webkit-backdrop-filter:saturate(140%) blur(10px);
         }
         .dark .design-top-glass,.oled .design-top-glass,.slate .design-top-glass{
           background:rgba(10,10,20,0.75);
@@ -7797,7 +7797,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           padding-top:max(env(safe-area-inset-top),16px);
           padding-left:12px;padding-right:12px;
           pointer-events:none;
-          transition:background .3s ease,box-shadow .3s ease,backdrop-filter .3s ease;
+          transition:background .3s ease,box-shadow .3s ease;
         }
         .design-header > *{pointer-events:auto;}
         /* Phone only: hide the floating pill header — bottom nav is the only nav */
@@ -7815,8 +7815,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             padding-left:28px;padding-right:28px;
             height:var(--header-h);
             align-items:center;
-            backdrop-filter:saturate(180%) blur(24px);
-            -webkit-backdrop-filter:saturate(180%) blur(24px);
+            backdrop-filter:saturate(140%) blur(10px);
+            -webkit-backdrop-filter:saturate(140%) blur(10px);
           }
           .dark .design-header,.oled .design-header,.slate .design-header{
             background:rgba(10,10,20,0.72);
@@ -7846,8 +7846,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         }
         .mariam-pill-nav.scrolled{
           padding:5px 5px 5px 16px;
-          backdrop-filter:saturate(180%) blur(80px);
-          -webkit-backdrop-filter:saturate(180%) blur(80px);
+          backdrop-filter:saturate(140%) blur(10px);
+          -webkit-backdrop-filter:saturate(140%) blur(10px);
         }
         .dark .mariam-pill-nav.scrolled,.oled .mariam-pill-nav.scrolled,.slate .mariam-pill-nav.scrolled{
           background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.12);
@@ -7870,7 +7870,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         /* ── Tab pills container ── */
         .mariam-tab-pills{
           display:flex;align-items:center;gap:1px;padding:4px;border-radius:9999px;
-          backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+          backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
         }
         .dark .mariam-tab-pills,.oled .mariam-tab-pills,.slate .mariam-tab-pills{
           background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);
@@ -7925,8 +7925,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           width:100%;padding:6px 8px;
           gap:0;
           border-radius:30px;
-          backdrop-filter:saturate(150%) blur(100px);
-          -webkit-backdrop-filter:saturate(150%) blur(100px);
+          backdrop-filter:saturate(130%) blur(10px);
+          -webkit-backdrop-filter:saturate(130%) blur(10px);
           position:relative;overflow:hidden;
         }
         .dark .design-nav-inner,.oled .design-nav-inner,.slate .design-nav-inner{
@@ -7962,8 +7962,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         .sidebar-nav button:not(:disabled):hover .nav-icon{opacity:1!important;transform:scale(1.1);}
         .nav-item-active{position:relative;}
         .nav-item-active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:26px;border-radius:0 4px 4px 0;background:linear-gradient(180deg,var(--accent),var(--accent2,var(--accent)));}
-        .mobile-nav{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--card-border,var(--border));border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,.15);}
-        .main-header{background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--card-border,var(--border));}
+        .mobile-nav{background:var(--nav-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--card-border,var(--border));border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,.15);}
+        .main-header{background:var(--nav-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--card-border,var(--border));}
 
         /* ══ BG MESH — transparent, blobs handled by fixed divs ══ */
         .bg-mesh{background:transparent;}
@@ -8084,14 +8084,14 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         </div>
       )}
 
-      {/* GRADIENT BLOBS — exact match to reference design */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden" aria-hidden="true">
+      {/* GRADIENT BLOBS — desktop only (too GPU-heavy for mobile iOS WebKit) */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden hidden md:block" aria-hidden="true">
         <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full"
-          style={{ background: 'rgba(147,51,234,0.45)', filter: 'blur(130px)', mixBlendMode: 'screen' }} />
+          style={{ background: 'rgba(147,51,234,0.45)', filter: 'blur(40px)', mixBlendMode: 'screen' }} />
         <div className="absolute top-[15%] right-[-15%] w-[65%] h-[65%] rounded-full"
-          style={{ background: 'rgba(59,130,246,0.38)', filter: 'blur(160px)', mixBlendMode: 'screen' }} />
+          style={{ background: 'rgba(59,130,246,0.38)', filter: 'blur(40px)', mixBlendMode: 'screen' }} />
         <div className="absolute bottom-[-25%] left-[15%] w-[75%] h-[75%] rounded-full"
-          style={{ background: 'rgba(219,39,119,0.35)', filter: 'blur(140px)', mixBlendMode: 'screen' }} />
+          style={{ background: 'rgba(219,39,119,0.35)', filter: 'blur(40px)', mixBlendMode: 'screen' }} />
       </div>
 
       {/* FLOATING PILL HEADER — exact reference design */}
@@ -8640,9 +8640,9 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             </div>
             <aside
               className="flex flex-col shrink-0 lg:relative absolute inset-0 lg:inset-auto animate-fade-in-up h-full"
-              style={{ width: window.innerWidth >= 1024 ? `${rpW}px` : '100%', background: 'var(--sidebar-bg)', backdropFilter: 'saturate(150%) blur(100px)', WebkitBackdropFilter: 'saturate(150%) blur(100px)', borderLeft: '1px solid var(--border)', borderRadius: window.innerWidth >= 1024 ? '0 2.5rem 2.5rem 0' : 0, zIndex: 'var(--z-modal-backdrop, 100)' }}>
+              style={{ width: window.innerWidth >= 1024 ? `${rpW}px` : '100%', background: 'var(--sidebar-bg)', backdropFilter: 'saturate(130%) blur(10px)', WebkitBackdropFilter: 'saturate(130%) blur(10px)', borderLeft: '1px solid var(--border)', borderRadius: window.innerWidth >= 1024 ? '0 2.5rem 2.5rem 0' : 0, zIndex: 'var(--z-modal-backdrop, 100)' }}>
               {/* Panel header */}
-              <div className="flex items-center justify-between px-6 py-5 shrink-0" style={{ borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(255,255,255,0.03)' }}>
+              <div className="flex items-center justify-between px-6 py-5 shrink-0" style={{ borderBottom: '1px solid var(--border)', backdropFilter: 'blur(10px)', background: 'rgba(255,255,255,0.03)' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                     style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2,var(--accent)))' }}>
@@ -9817,7 +9817,7 @@ function VoiceTutorModal({ settings, onClose }) {
   const PhaseIcon = pc.icon;
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(24px)', zIndex: 'var(--z-modal, 110)' }}>
+    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(10px)', zIndex: 'var(--z-modal, 110)' }}>
       <div className="glass rounded-3xl p-8 max-w-sm w-full mx-4 flex flex-col items-center gap-6 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
         <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100" style={{ position: 'absolute', top: 16, right: 16 }} aria-label="Close"><X size={14} /></button>
         <img src="https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg" className="w-20 h-20 rounded-2xl object-cover shadow-2xl" style={{ boxShadow: `0 0 0 4px ${pc.color}40` }} />
@@ -10634,7 +10634,7 @@ function OnboardingFlow({ onComplete, settings, setSettings }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(24px)', zIndex: 'var(--z-modal, 110)' }}>
+    <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(10px)', zIndex: 'var(--z-modal, 110)' }}>
       <div className="glass rounded-3xl p-8 max-w-md w-full mx-4 flex flex-col items-center gap-6 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
         {/* Progress dots */}
         <div className="flex gap-2">
@@ -11934,7 +11934,7 @@ function FlashcardTinderMode({ set, onClose, onUpdate }) {
 
   if (done) return (
     <div className="fixed inset-0 flex flex-col items-center justify-center gap-6 p-6"
-      style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', zIndex: 'var(--z-modal, 110)' }}>
+      style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(10px)', zIndex: 'var(--z-modal, 110)' }}>
       <div className="text-3xl">🎉</div>
       <div className="text-center">
         <h2 className="text-xl font-bold">Done!</h2>
