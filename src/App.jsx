@@ -4796,6 +4796,95 @@ function VaultPanel({ activeDocId, flashcards, setFlashcards, exams, setExams, c
 ═══════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════════
+   KEY INFO PANEL — auto-structured reference card below flashcards/exams
+   Parses structured drug data (Brand / Class / Counseling Points)
+   from the card answer field and renders it as a visual reference block.
+═══════════════════════════════════════════════════════════════════ */
+function KeyInfoPanel({ card, examQ }) {
+  // For exam questions: look up the correct option in drug flashcard data
+  let resolvedCard = card;
+  if (examQ && !card) {
+    const correctOption = examQ.options?.[examQ.correct] || '';
+    if (correctOption) {
+      const allCards = BUILTIN_FLASHCARD_SETS.flatMap(set => set.cards || []);
+      resolvedCard = allCards.find(c => c.q?.toLowerCase().trim() === correctOption.toLowerCase().trim()) || null;
+    }
+  }
+
+  const rawText = resolvedCard?.a || '';
+  const drugName = resolvedCard?.q || '';
+
+  // Parse structured drug format: "Brand: X\nIndication: Y\nClass: Z\nCounseling Points:\n- ..."
+  const lines = rawText.split('\n');
+  const brand = lines.find(l => /^Brand:/i.test(l.trim()))?.replace(/^Brand:\s*/i, '').trim();
+  const indication = lines.find(l => /^Indication:/i.test(l.trim()))?.replace(/^Indication:\s*/i, '').trim();
+  const drugClass = lines.find(l => /^Class:/i.test(l.trim()))?.replace(/^Class:\s*/i, '').trim();
+  const cpIdx = lines.findIndex(l => /counseling\s*point/i.test(l));
+  const counselingPoints = cpIdx >= 0
+    ? lines.slice(cpIdx + 1).filter(l => /^[-•]/.test(l.trim())).slice(0, 4).map(l => l.replace(/^[-•]\s*/, '').trim())
+    : [];
+
+  // Only render if we have drug-structured data
+  const hasDrugData = brand || drugClass || counselingPoints.length > 0;
+  if (!hasDrugData && !indication) return null;
+
+  return (
+    <div className="rounded-2xl border animate-slide-up overflow-hidden"
+      style={{ borderColor: 'var(--accent)', borderLeftWidth: 4, background: 'var(--accent-subtle, rgba(99,102,241,0.06))' }}>
+      {/* Header */}
+      <div className="px-4 py-2.5 flex items-center gap-2 border-b" style={{ borderColor: 'var(--accent)', borderBottomWidth: 1, opacity: 0.85 }}>
+        <BookOpen size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>📋 Key Reference</span>
+      </div>
+      <div className="px-4 py-3 space-y-3">
+        {/* Drug identity row */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          {drugName && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-0.5">Generic Name</p>
+              <p className="text-sm font-bold leading-snug">{drugName}</p>
+            </div>
+          )}
+          {brand && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-0.5">Brand Name</p>
+              <p className="text-sm font-bold leading-snug" style={{ color: 'var(--accent)' }}>{brand}</p>
+            </div>
+          )}
+          {drugClass && (
+            <div className={brand || drugName ? 'col-span-2' : ''}>
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-0.5">Drug Class</p>
+              <p className="text-sm font-semibold leading-snug">{drugClass}</p>
+            </div>
+          )}
+          {indication && (
+            <div className="col-span-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-0.5">Indication</p>
+              <p className="text-sm leading-snug">{indication}</p>
+            </div>
+          )}
+        </div>
+        {/* Counseling points */}
+        {counselingPoints.length > 0 && (
+          <div className="pt-2 border-t" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
+            <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-2">⭐ Top Counseling Points</p>
+            <ul className="space-y-1.5">
+              {counselingPoints.map((pt, i) => (
+                <li key={i} className="flex gap-2 text-xs leading-relaxed">
+                  <span className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white mt-0.5"
+                    style={{ background: 'var(--accent)' }}>{i + 1}</span>
+                  <span>{pt}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    AI TUTOR PANEL — draggable side panel for Flashcards, Exams, Cases
 ═══════════════════════════════════════════════════════════════════ */
 function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOpen = false }) {
@@ -4818,19 +4907,45 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
     setMsgs(newMsgs); setLoading(true);
     try {
       const hist = newMsgs.slice(-8, -1).map(m => `${m.role === 'user' ? 'STUDENT' : 'TUTOR'}: ${m.content}`).join('\n');
-      const prompt = `You are an expert medical/academic AI tutor. The student is currently studying the following content:\n\nCONTEXT:\n${context || 'General study session'}\n\nConversation so far:\n${hist}\n\nSTUDENT: ${msg}\n\nTUTOR: Provide a clear, educational explanation. Use bullet points, bold key terms, and be thorough but concise.\n\nCRITICAL MEDICINE RULE: Whenever you discuss any medication or drug, ALWAYS start with the brand name first, followed by the generic name in parentheses. Format: "BrandName (generic name)". Example: "Tylenol (acetaminophen)", "Lipitor (atorvastatin)", "Lasix (furosemide)". Apply this to every single drug mentioned anywhere in your response.`;
-      await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 4000);
+      const sysPrompt = `You are an expert medical AI tutor. You are STRICTLY focused ONLY on the exact context below — never introduce information from other drugs, diseases, or topics.
+
+CONTEXT (ANSWER ONLY ABOUT THIS):
+${context || 'General medical study session'}
+
+CORE RESPONSE RULES:
+1. Answer in 6-8 focused, highly accurate lines. Be very detailed and clinically precise.
+2. NEVER mix information from other drugs, diseases, or unrelated topics.
+3. Use **bold** for key terms. Use bullet points for lists.
+4. Drug rule: ALWAYS write BrandName (generic name) — e.g. Tylenol (acetaminophen).
+
+QUESTION-TYPE SPECIFIC RULES:
+- "Explain this in detail" → Cover: definition/core concept, mechanism of action or pathophysiology, clinical significance, dosing/key numbers if applicable, 1-2 clinical pearls. Max 8 lines. Stay strictly on the exact topic above.
+- "Why is this the correct answer?" → State the correct answer clearly. Explain the mechanism/reasoning in 4-5 lines. Then for each WRONG option explain exactly why it is incorrect. End with what makes this a high-yield exam point.
+- "What are common mistakes here?" → List exactly 4-5 common student mistakes about THIS specific topic. Format each as: ❌ Mistake → ✅ Correct fact. Be very specific to the context above.
+- "Give me a mnemonic" → Provide 1-2 powerful mnemonics SPECIFIC to this topic. Explain each letter/element with its clinical meaning. Give a memory tip.
+- "What else should I know?" → Give 6-8 high-yield additional facts: exam traps, monitoring parameters, contraindications, drug interactions, or clinical nuances that students commonly miss.
+- "Create a practice question" → Write 1 USMLE-style MCQ with a clinical vignette, 4-5 options (A-E), the correct answer with a detailed explanation, and why each wrong answer is incorrect.
+
+MANDATORY KEY REFERENCE — add this after EVERY response (after a "---" divider):
+📋 **Key Reference**
+- If drug/counseling topic: **Brand:** [brand name] | **Generic:** [generic name] | **Class:** [drug class]
+  **Top Counseling Points:** (bullet list of 3-4 most critical counseling points for this specific drug)
+- If disease topic: **Disease:** [name] | **Key Sx:** [2-3 classic symptoms] | **First-Line Tx:** [treatment] | **Pearl:** [must-remember fact]
+- If law/regulation: **Law:** [name] | **Requirement:** [key mandate] | **Clinical Impact:** [how it affects practice]
+- If general concept: **Topic:** [name] | **Core Concept:** [1-line] | **High-Yield:** [most testable fact]`;
+      const prompt = `${sysPrompt}\n\nConversation history:\n${hist}\n\nSTUDENT: ${msg}\n\nTUTOR:`;
+      await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 5000);
     } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `⚠️ ${e.message}` }]); }
     finally { setLoading(false); }
   };
 
   const QUICK = [
-    'Explain this in detail',
-    'Why is this the correct answer?',
-    'What are common mistakes here?',
-    'Give me a mnemonic',
-    'What else should I know?',
-    'Create a practice question',
+    { label: 'Explain this in detail', q: 'Explain this in detail' },
+    { label: 'Why is this correct?', q: 'Why is this the correct answer?' },
+    { label: 'Common mistakes?', q: 'What are common mistakes here?' },
+    { label: 'Give me a mnemonic', q: 'Give me a mnemonic' },
+    { label: 'What else to know?', q: 'What else should I know?' },
+    { label: 'Practice question', q: 'Create a practice question' },
   ];
 
   return (
@@ -4870,10 +4985,10 @@ function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOp
       {/* Quick prompts — hidden once user sends any message */}
       {showQuicks && (
         <div className="px-3 py-2 flex gap-1.5 flex-wrap shrink-0 border-t border-[color:var(--border2,var(--border))]">
-          {QUICK.map(q => (
-            <button key={q} onClick={() => send(q)}
+          {QUICK.map(({ label, q }) => (
+            <button key={label} onClick={() => send(q)}
               className="px-2.5 py-1.5 glass rounded-xl text-xs font-bold opacity-60 hover:opacity-100 hover:border-[var(--accent)]/40 transition-all border border-[color:var(--border2,var(--border))] leading-tight text-left">
-              {q}
+              {label}
             </button>
           ))}
         </div>
@@ -5035,6 +5150,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
               </button>
             )}
             {/* Inline AI Tutor Trigger */}
+            <KeyInfoPanel card={card} />
             <div className="lg:hidden mt-2 flex-shrink-0">
               <button onClick={() => setMobileTutorOpen(true)} className="w-full glass py-3.5 rounded-2xl flex items-center justify-center gap-2 font-bold text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/10 transition-colors">
                 <MessageSquare size={18} /> Ask AI Tutor
@@ -5259,6 +5375,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                 {q.evidence && <p className="text-xs italic mt-3 pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}"</p>}
               </div>
             )}
+            {submitted && <KeyInfoPanel examQ={q} />}
             <div className="pb-4">
               {!submitted ?
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-bold disabled:opacity-40 shadow-xl">Submit Answer</button> :
