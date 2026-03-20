@@ -6216,22 +6216,18 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
           </div>
         </div>
 
-        {/* MOBILE: floating AI Tutor FAB */}
-        {createPortal(
-          <>
-            <button onClick={() => setMobileTutorOpen(true)}
-              className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-              style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-              <MessageSquare size={24} />
-            </button>
-            {mobileTutorOpen && (
-              <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setMobileTutorOpen(false)}>
-                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setMobileTutorOpen(false)} width={window.innerWidth} />
-                </div>
-              </div>
-            )}
-          </>, document.getElementById('portal-root') || document.body
+        {/* MOBILE: floating AI Tutor FAB — rendered inline (position:fixed) to avoid React removeChild crash when parent unmounts */}
+        <button onClick={() => setMobileTutorOpen(true)}
+          className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+          style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
+          <MessageSquare size={24} />
+        </button>
+        {mobileTutorOpen && (
+          <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setMobileTutorOpen(false)}>
+            <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
+              <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setMobileTutorOpen(false)} width={window.innerWidth} />
+            </div>
+          </div>
         )}
       </div>
     );
@@ -6446,22 +6442,18 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
           </div>
           {/* RIGHT: AI Tutor always open */}
-          {/* MOBILE: floating AI Tutor FAB */}
-          {createPortal(
-            <>
-              <button onClick={() => setExamMobileOpen(true)}
-                className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-                style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-                <MessageSquare size={24} />
-              </button>
-              {examMobileOpen && (
-                <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setExamMobileOpen(false)}>
-                  <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                    <AiTutorPanel settings={settings} context={`Exam: ${selEx?.title}\nQ${qi + 1}: ${selEx?.questions?.[qi]?.q}\nOptions: ${selEx?.questions?.[qi]?.options?.join(' | ')}\nCorrect: ${selEx?.questions?.[qi]?.options?.[selEx?.questions?.[qi]?.correct]}`} onClose={() => setExamMobileOpen(false)} width={window.innerWidth} />
-                  </div>
-                </div>
-              )}
-            </>, document.getElementById('portal-root') || document.body
+          {/* MOBILE: floating AI Tutor FAB — rendered inline (position:fixed) to avoid React removeChild crash when parent unmounts */}
+          <button onClick={() => setExamMobileOpen(true)}
+            className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+            style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
+            <MessageSquare size={24} />
+          </button>
+          {examMobileOpen && (
+            <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setExamMobileOpen(false)}>
+              <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
+                <AiTutorPanel settings={settings} context={`Exam: ${selEx?.title}\nQ${qi + 1}: ${selEx?.questions?.[qi]?.q}\nOptions: ${selEx?.questions?.[qi]?.options?.join(' | ')}\nCorrect: ${selEx?.questions?.[qi]?.options?.[selEx?.questions?.[qi]?.correct]}`} onClose={() => setExamMobileOpen(false)} width={window.innerWidth} />
+              </div>
+            </div>
           )}
           <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0" style={{ width: examTutorW }}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true} />
@@ -6855,22 +6847,18 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
           )}
         </div>
 
-        {/* MOBILE: floating AI Tutor FAB */}
-        {createPortal(
-          <>
-            <button onClick={() => setCasesMobileTutorOpen(true)}
-              className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
-              style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
-              <MessageSquare size={24} />
-            </button>
-            {casesMobileTutorOpen && (
-              <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setCasesMobileTutorOpen(false)}>
-                <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-                  <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setCasesMobileTutorOpen(false)} width={window.innerWidth} />
-                </div>
-              </div>
-            )}
-          </>, document.getElementById('portal-root') || document.body
+        {/* MOBILE: floating AI Tutor FAB — rendered inline (position:fixed) to avoid React removeChild crash when parent unmounts */}
+        <button onClick={() => setCasesMobileTutorOpen(true)}
+          className="lg:hidden fixed w-14 h-14 rounded-[22px] btn-accent shadow-2xl flex items-center justify-center transition-transform active:scale-90"
+          style={{ bottom: 'calc(90px + env(safe-area-inset-bottom))', right: 16, zIndex: 9000 }} title="AI Tutor">
+          <MessageSquare size={24} />
+        </button>
+        {casesMobileTutorOpen && (
+          <div className="lg:hidden fixed inset-0 flex flex-col justify-end backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.55)', zIndex: 'var(--z-ai-tutor, 130)' }} onClick={e => e.target === e.currentTarget && setCasesMobileTutorOpen(false)}>
+            <div className="glass rounded-t-[32px] flex flex-col overflow-hidden animate-slide-up" style={{ height: '85%', boxShadow: '0 -10px 50px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
+              <AiTutorPanel settings={settings} context={tutorCtx} onClose={() => setCasesMobileTutorOpen(false)} width={window.innerWidth} />
+            </div>
+          </div>
         )}
 
       </div>
