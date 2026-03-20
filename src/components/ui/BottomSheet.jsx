@@ -1,5 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
+// NOTE: createPortal is intentionally NOT used here.
+// Rendering fixed-position content inline avoids the React removeChild crash
+// that occurs when a parent view unmounts while its portal is still attached
+// to document.body (the portal container reference becomes stale).
+// position:fixed elements always position relative to the viewport regardless
+// of where they sit in the DOM tree, so no portal is needed.
 
 /**
  * MARIAM PRO — BottomSheet Component
@@ -39,7 +44,7 @@ export default function BottomSheet({ isOpen, onClose, title, children, height =
 
   if (!visible) return null;
 
-  return createPortal(
+  return (
     <div
       style={{
         position: 'fixed', inset: 0,
@@ -97,7 +102,7 @@ export default function BottomSheet({ isOpen, onClose, title, children, height =
           {children}
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+

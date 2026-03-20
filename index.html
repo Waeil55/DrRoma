@@ -10,23 +10,34 @@
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a14" />
     <title>Dr Mariam AI</title>
-    <!-- Global error trap: catches JS errors BEFORE React mounts and shows them on screen -->
+    <!-- Global error trap: catches JS errors BEFORE React mounts.
+         CRITICAL: NEVER call innerHTML on #root — that destroys React's fiber
+         tree, causing a cascade of removeChild crashes. Instead we show a
+         separate overlay div that sits on top without touching React's DOM. -->
     <script>
       window.__appErrors = [];
+
+      function __showErrOverlay(title, body, color) {
+        // Only show once — repeated errors would keep replacing the overlay
+        if (document.getElementById('__err_overlay')) return;
+        var ov = document.createElement('div');
+        ov.id = '__err_overlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:99999;padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;';
+        ov.innerHTML = '<h2 style="color:' + color + ';margin-top:0">' + title + '</h2><pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:12px;overflow:auto;max-height:60vh">' + body + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Reload</button>';
+        document.body.appendChild(ov);
+      }
+
       window.onerror = function(msg, src, line, col, err) {
-        var el = document.getElementById('root');
-        if (el) {
-          el.style.cssText = 'padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;height:100vh';
-          el.innerHTML = '<h2 style="color:red">App Error (line ' + line + ')</h2><pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px">' + msg + '\n\nFile: ' + src + '\nLine: ' + line + ':' + col + (err && err.stack ? '\n\nStack:\n' + err.stack : '') + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px">Reload</button>';
-        }
-        return false;
+        window.__appErrors.push({ msg: msg, src: src, line: line });
+        var body = msg + '\n\nFile: ' + src + '\nLine: ' + line + ':' + col +
+          (err && err.stack ? '\n\nStack:\n' + err.stack : '');
+        __showErrOverlay('App Error (line ' + line + ')', body, 'red');
+        return false; // don't suppress — let React error boundary also catch it
       };
+
       window.addEventListener('unhandledrejection', function(e) {
-        var el = document.getElementById('root');
-        if (el && !el.querySelector('h2')) {
-          el.style.cssText = 'padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;height:100vh';
-          el.innerHTML = '<h2 style="color:orange">Unhandled Promise Error</h2><pre style="background:#fff7ed;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:13px">' + (e.reason || e) + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px">Reload</button>';
-        }
+        window.__appErrors.push({ reason: String(e.reason) });
+        __showErrOverlay('Unhandled Promise Error', String(e.reason), 'orange');
       });
     </script>
   </head>

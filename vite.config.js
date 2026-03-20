@@ -11,10 +11,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     minify: 'esbuild',
-    // Target Safari 14 (iOS 14+) explicitly so esbuild transpiles correctly for WebKit.
-    // es2020 keeps optional-chaining/nullish-coalescing as native syntax (Safari 14 supports both),
-    // avoiding the verbose ternary expansions that inflated the bundle under 'es2019'.
-    target: ['es2020', 'safari14'],
+    // es2019 ensures optional-chaining (?.) and nullish-coalescing (??) are
+    // transpiled to ternary chains compatible with Safari 13/iOS 13 and older.
+    // Leaving these as native syntax (es2020/safari14) causes SyntaxError crashes
+    // on iOS < 14, which still represents a meaningful share of users.
+    target: 'es2019',
     // Increase chunk size warning limit (the app is intentionally large)
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
