@@ -13463,6 +13463,7 @@ const BUILTIN_MNEMONICS = [
 
 function MedicalMnemonicsView({ addToast, settings }) {
   const isMobile = window.innerWidth < 768;
+  const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [expanded, setExpanded] = useState(null);
   const [customs, setCustoms] = useState(() => { try { return JSON.parse(localStorage.getItem('mariam_custom_mnemonics') || '[]'); } catch { return []; } });
