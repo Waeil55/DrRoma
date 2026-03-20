@@ -1402,14 +1402,18 @@ function useKeyboardShortcuts(shortcuts) {
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    GLOBAL SEARCH â€” searches across all content
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onNavigate, onClose }) {
+function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, mindMaps, timelines, onNavigate, onClose }) {
   const [q, setQ] = useState(''); const inputRef = useRef(null);
+  const [tasks, setTasks] = useState([]);
   useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => {
+    getState('tasks_v1').then(saved => { if (Array.isArray(saved)) setTasks(saved); }).catch(() => {});
+  }, []);
 
   const results = useMemo(() => {
     if (!q.trim() || q.length < 2) return [];
     const lq = q.toLowerCase(); const out = [];
-    const MAX = 50;
+    const MAX = 80;
     const push = (item) => { if (out.length < MAX) out.push(item); };
 
     /* â”€â”€ 1. Features from HOME_CATEGORIES (label + desc + category title) â”€â”€ */
@@ -1459,6 +1463,24 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
     (chatSessions || []).forEach(s => {
       const hit = (s.title || '').toLowerCase().includes(lq) || s.messages?.some(m => (m.content || '').toLowerCase().includes(lq));
       if (hit) push({ type: 'chat', icon: MessageSquare, label: s.title || 'Chat Session', sub: `${s.messages?.length || 0} messages`, color: '#10b981', action: () => onNavigate('chat') });
+    });
+
+    /* -- 8b. User tasks -- */
+    (tasks || []).forEach(t => {
+      const searchStr = [(t.title || ''), (t.description || ''), ...(t.tags || [])].join(' ').toLowerCase();
+      if (searchStr.includes(lq)) push({ type: 'task', icon: CheckCheck, label: t.title || 'Untitled Task', sub: (t.description ? t.description.slice(0, 50) : t.dueDate || 'Task') + (t.status === 'done' ? ' · Done' : ''), color: '#22c55e', action: () => onNavigate('tasks') });
+    });
+
+    /* -- 8c. Mind maps -- */
+    (mindMaps || []).forEach(m => {
+      if (((m.title || '') + ' ' + JSON.stringify(m.nodes || '')).toLowerCase().includes(lq))
+        push({ type: 'mind map', icon: GitBranch, label: m.title || 'Mind Map', sub: `${m.nodes?.length || 0} nodes`, color: '#06b6d4', action: () => onNavigate('mindmaps') });
+    });
+
+    /* -- 8d. Timelines -- */
+    (timelines || []).forEach(tl => {
+      if (((tl.title || '') + ' ' + (tl.content || '')).toLowerCase().includes(lq))
+        push({ type: 'timeline', icon: Clock, label: tl.title || 'Timeline', sub: '', color: '#8b5cf6', action: () => onNavigate('timelines') });
     });
 
     /* â”€â”€ 9. Built-in flashcards (Counseling, Diseases, Drug, Law) â”€â”€ */
@@ -1523,11 +1545,10 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
     });
 
     return out;
-  }, [q, docs, flashcards, exams, cases, notes, chatSessions]);
-
+  }, [q, docs, flashcards, exams, cases, notes, chatSessions, tasks, mindMaps, timelines]);
   return (
     <div className="fixed inset-0 flex items-start justify-center pt-16 px-4"
-      style={{ zIndex: 'var(--z-modal, 110)', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+      style={{ zIndex: 9999, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
       onClick={onClose}>
       <div className="w-full max-w-2xl glass rounded-3xl shadow-2xl overflow-hidden animate-slide-up border border-[var(--accent)]/30"
         onClick={e => e.stopPropagation()}>
@@ -9223,7 +9244,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           onDecline={() => { localStorage.setItem('mariam_cookie_consent_v1', 'essential'); setShowCookieBanner(false); }}
         />
       )}
-      {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions}
+      {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} mindMaps={mindMaps} timelines={timelines}
         onNavigate={(v, id) => { setView(v); if (id) { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); setDocPages(p => ({ ...p, [id]: 1 })); }; }}
         onClose={() => setShowGlobalSearch(false)} />}
       <GlobalTaskIndicator onViewResult={(id, task) => {
