@@ -1981,7 +1981,7 @@ function BottomSheet({ open, onClose, title, children, maxHeight = '85vh' }) {
         <div className="px-4">{children}</div>
       </div>
     </div>,
-    document.body
+    document.getElementById('portal-root') || document.body
   );
 }
 
@@ -5445,7 +5445,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                 </div>
               </div>
             )}
-          </>, document.body
+          </>, document.getElementById('portal-root') || document.body
         )}
       </div>
     );
@@ -5675,7 +5675,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                   </div>
                 </div>
               )}
-            </>, document.body
+            </>, document.getElementById('portal-root') || document.body
           )}
           <div className="hidden lg:flex flex-col border-l border-[color:var(--border2,var(--border))] shrink-0" style={{ width: examTutorW }}>
             <AiTutorPanel settings={settings} context={tutorCtx} onClose={null} width={examTutorW} onDragStart={startExamTutorDrag} alwaysOpen={true} />
@@ -6084,7 +6084,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                 </div>
               </div>
             )}
-          </>, document.body
+          </>, document.getElementById('portal-root') || document.body
         )}
 
       </div>
