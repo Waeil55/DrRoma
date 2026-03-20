@@ -2772,62 +2772,163 @@ function TutorChat({ context, settings, contextLabel = '' }) {
    DRAGGABLE TUTOR PANEL — docks right in desktop, floats on mobile
 ═══════════════════════════════════════════════════════════════════ */
 function DraggableTutorPanel({ context, settings, contextLabel = '', defaultMode = 'docked' }) {
-  const [isDocked, setIsDocked] = useState(defaultMode === 'docked');
-  const [pos, setPos] = useState({ x: window.innerWidth - 380, y: 80 });
-  const [dragging, setDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const isMobile = window.innerWidth < 768;
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState(defaultMode || (isMobile ? 'floating' : 'docked'));
+  const [dockedWidth, setDockedWidth] = useState(320);
+  const [floatPos, setFloatPos] = useState({ x: null, y: null });
+  const [floatSize, setFloatSize] = useState({ w: 340, h: 480 });
   const panelRef = useRef(null);
-
-  const handleMouseDown = (e) => {
-    if (!isDocked && panelRef.current) {
-      setDragging(true);
-      const rect = panelRef.current.getBoundingClientRect();
-      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-  };
+  const dragState = useRef({ dragging: false, startX: 0, startY: 0, ox: 0, oy: 0 });
 
   useEffect(() => {
-    if (!dragging) return;
-    const handleMouseMove = (e) => {
-      setPos({ x: e.clientX - dragOffset.x, y: e.clientY - dragOffset.y });
-    };
-    const handleMouseUp = () => setDragging(false);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragging, dragOffset]);
+    if (floatPos.x === null) {
+      setFloatPos({ x: window.innerWidth - floatSize.w - 16, y: window.innerHeight - floatSize.h - 80 });
+    }
+  }, []);
 
-  return isDocked ? (
-    <div className="shrink-0 flex flex-col overflow-hidden border-l border-[color:var(--border)]" style={{ width: 320, background: 'var(--bg)' }}>
-      <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
-    </div>
-  ) : (
-    <div
-      ref={panelRef}
-      onMouseDown={handleMouseDown}
-      className="fixed rounded-2xl shadow-2xl overflow-hidden border border-[color:var(--border)]"
-      style={{
-        left: `${pos.x}px`,
-        top: `${pos.y}px`,
-        width: 320,
-        height: 500,
-        background: 'var(--bg)',
-        backdropFilter: 'blur(12px)',
-        zIndex: 100,
-        cursor: dragging ? 'grabbing' : 'grab',
-      }}
-    >
-      <div className="flex items-center justify-between px-3 py-2 border-b border-[color:var(--border)] bg-[var(--surface,var(--card))]" style={{ cursor: 'grab' }}>
-        <span className="text-xs font-bold uppercase" style={{ color: 'var(--accent)' }}>AI Tutor</span>
-        <button onClick={() => setIsDocked(true)} className="opacity-50 hover:opacity-100" title="Dock panel">
-          <Maximize size={14} />
-        </button>
+  const startFloatDrag = (e) => {
+    if (e.type === 'mousedown') e.preventDefault();
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+    const rect = panelRef.current?.getBoundingClientRect();
+    dragState.current = { dragging: true, startX: clientX, startY: clientY, ox: rect?.left ?? 0, oy: rect?.top ?? 0 };
+    const onMove = (ev) => {
+      if (!dragState.current.dragging) return;
+      const cx = ev.clientX ?? ev.touches?.[0]?.clientX ?? clientX;
+      const cy = ev.clientY ?? ev.touches?.[0]?.clientY ?? clientY;
+      setFloatPos({
+        x: Math.max(0, Math.min(window.innerWidth - floatSize.w, dragState.current.ox + (cx - dragState.current.startX))),
+        y: Math.max(0, Math.min(window.innerHeight - floatSize.h - 60, dragState.current.oy + (cy - dragState.current.startY))),
+      });
+    };
+    const onUp = () => {
+      dragState.current.dragging = false;
+      window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+  };
+
+  const handleDockedDrag = useCallback(x => {
+    setDockedWidth(Math.max(260, Math.min(560, window.innerWidth - x)));
+  }, []);
+  const startDockedDrag = useDrag(handleDockedDrag, [handleDockedDrag]);
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="fixed z-[130] flex items-center gap-2 px-3 py-2 rounded-xl font-black text-sm shadow-xl transition-all hover:scale-105 active:scale-95"
+        style={{
+          bottom: 'calc(var(--bottom-nav-h, 72px) + var(--sab, 0px) + 16px)',
+          right: 16,
+          background: 'linear-gradient(135deg, var(--accent), var(--accent2, var(--accent)))',
+          color: '#fff',
+          boxShadow: '0 8px 24px rgba(var(--acc-rgb, 99,102,241), 0.4)',
+        }}>
+        <GraduationCap size={16} />
+        <span className="hidden sm:inline">AI Tutor</span>
+      </button>
+    );
+  }
+
+  if (mode === 'floating') {
+    return createPortal(
+      <div
+        ref={panelRef}
+        className="fixed z-[135] flex flex-col rounded-2xl overflow-hidden shadow-2xl"
+        style={{
+          left: floatPos.x ?? window.innerWidth - 356,
+          top: floatPos.y ?? 80,
+          width: floatSize.w,
+          height: floatSize.h,
+          background: 'var(--surface, var(--card))',
+          border: '1px solid var(--border2, var(--border))',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+          minWidth: 280,
+          minHeight: 320,
+        }}>
+        <div
+          onMouseDown={startFloatDrag}
+          onTouchStart={startFloatDrag}
+          className="flex items-center gap-2 px-3 py-2.5 shrink-0 cursor-grab active:cursor-grabbing select-none"
+          style={{ background: 'var(--surface2, var(--card))', borderBottom: '1px solid var(--border)' }}>
+          <div className="flex flex-col gap-0.5 opacity-40 shrink-0">
+            {[0,1,2].map(i => <div key={i} className="flex gap-0.5">{[0,1].map(j => <div key={j} className="w-1 h-1 rounded-full" style={{ background: 'var(--text)' }} />)}</div>)}
+          </div>
+          <img src={MARIAM_IMG} className="w-6 h-6 rounded-lg object-cover shrink-0" alt="AI" />
+          <span className="text-xs font-black uppercase tracking-widest flex-1 truncate" style={{ color: 'var(--accent)' }}>
+            AI Tutor {contextLabel ? `— ${contextLabel.slice(0, 18)}` : ''}
+          </span>
+          <div className="flex gap-1 shrink-0">
+            {!isMobile && (
+              <button onClick={() => setMode('docked')} title="Dock panel"
+                className="w-6 h-6 rounded-lg flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
+                style={{ background: 'var(--border)' }}>
+                <Layout size={11} />
+              </button>
+            )}
+            <button onClick={() => setOpen(false)}
+              className="w-6 h-6 rounded-lg flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
+              style={{ background: 'var(--border)' }}>
+              <X size={11} />
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0">
+          <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
+        </div>
+        <div
+          className="absolute bottom-0 right-0 w-5 h-5 cursor-nwse-resize opacity-30 hover:opacity-70"
+          style={{ touchAction: 'none' }}
+          onMouseDown={e => {
+            e.preventDefault();
+            const startW = floatSize.w, startH = floatSize.h, sx = e.clientX, sy = e.clientY;
+            const onMove = ev => setFloatSize({ w: Math.max(280, startW + ev.clientX - sx), h: Math.max(320, startH + ev.clientY - sy) });
+            const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+            window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
+          }}>
+          <svg width={16} height={16} viewBox="0 0 16 16" style={{ position: 'absolute', bottom: 3, right: 3 }}>
+            <path d="M14 14L14 8M14 14L8 14M14 14L6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
+  // DOCKED MODE
+  return (
+    <div className="flex shrink-0" style={{ height: '100%' }}>
+      <div
+        ref={startDockedDrag.ref}
+        onMouseDown={startDockedDrag}
+        className="w-4 cursor-col-resize flex items-center justify-center hover:bg-[var(--accent)]/10 transition-colors shrink-0 group"
+        style={{ borderLeft: '1px solid var(--border)' }}>
+        <GripVertical size={12} className="opacity-20 group-hover:opacity-60" style={{ color: 'var(--text)' }} />
       </div>
-      <div style={{ height: 'calc(100% - 40px)', overflow: 'hidden' }}>
-        <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
+      <div className="flex flex-col" style={{ width: dockedWidth, borderLeft: '1px solid var(--border)', background: 'var(--surface, var(--card))' }}>
+        <div className="flex items-center gap-2 px-3 py-2.5 shrink-0" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface2, var(--card))' }}>
+          <img src={MARIAM_IMG} className="w-6 h-6 rounded-lg object-cover shrink-0" alt="AI" />
+          <span className="text-xs font-black uppercase tracking-widest flex-1 truncate" style={{ color: 'var(--accent)' }}>AI Tutor</span>
+          <button onClick={() => setMode('floating')} title="Float panel"
+            className="w-6 h-6 rounded-lg flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
+            style={{ background: 'var(--border)' }}>
+            <Maximize size={11} />
+          </button>
+          <button onClick={() => setOpen(false)}
+            className="w-6 h-6 rounded-lg flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
+            style={{ background: 'var(--border)' }}>
+            <X size={11} />
+          </button>
+        </div>
+        <div className="flex-1 min-h-0">
+          <TutorChat context={context} settings={settings} contextLabel={contextLabel} />
+        </div>
       </div>
     </div>
   );
@@ -3489,106 +3590,263 @@ function DiseaseExplorerView({ settings }) {
 
               {/* Tab content */}
               <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
+
                 {activeTab === 'overview' && (
-                  <div className="space-y-3">
+                  <>
                     {selectedDisease.overview && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">OVERVIEW</p>
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Overview</p>
                         <p className="text-sm leading-relaxed">{selectedDisease.overview}</p>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {activeTab === 'pathophysiology' && (
-                  <div className="space-y-3">
+                    {selectedDisease.epidemiology && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Epidemiology</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.epidemiology}</p>
+                      </div>
+                    )}
                     {selectedDisease.pathophysiology && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">MECHANISM</p>
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Pathophysiology</p>
                         <p className="text-sm leading-relaxed">{selectedDisease.pathophysiology}</p>
                       </div>
                     )}
+                    {(selectedDisease.riskFactors || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Risk Factors</p>
+                        <div className="flex flex-wrap gap-2">
+                          {(selectedDisease.riskFactors || []).map(r => (
+                            <span key={r} className="px-2.5 py-1 rounded-xl text-xs font-bold"
+                              style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                              {r}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {(selectedDisease.symptoms || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Signs & Symptoms</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.symptoms || []).map(s => (
+                            <div key={s} className="flex items-start gap-2 text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: 'var(--accent)' }} />
+                              {s}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {(selectedDisease.physicalExam || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Physical Exam Findings</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.physicalExam || []).map(s => (
+                            <div key={s} className="flex items-start gap-2 text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: '#06b6d4' }} />
+                              {s}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {(selectedDisease.keyFacts || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)', background: 'rgba(var(--acc-rgb,99,102,241),0.04)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2" style={{ color: 'var(--accent)' }}>
+                          <Zap size={12} /> Key Facts / High-Yield
+                        </p>
+                        <div className="space-y-2">
+                          {(selectedDisease.keyFacts || []).map(f => (
+                            <div key={f} className="flex items-start gap-2 text-sm font-medium">
+                              <Star size={12} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                              {f}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {activeTab === 'pathophysiology' && (
+                  <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                    <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Mechanism</p>
+                    <p className="text-sm leading-relaxed">{selectedDisease.pathophysiology || 'Not available for this disease.'}</p>
                   </div>
                 )}
 
-                {activeTab === 'diagnosis' && (
-                  <div className="space-y-3">
-                    {selectedDisease.diagnosis && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">DIAGNOSTIC APPROACH</p>
-                        {typeof selectedDisease.diagnosis === 'string' ? (
-                          <p className="text-sm leading-relaxed">{selectedDisease.diagnosis}</p>
-                        ) : (
-                          <ul className="text-sm space-y-1">
-                            {Object.entries(selectedDisease.diagnosis).map(([key, val]) => (
-                              <li key={key}><span className="font-bold capitalize">{key}: </span>{Array.isArray(val) ? val.join(', ') : val}</li>
-                            ))}
-                          </ul>
-                        )}
+                {activeTab === 'diagnosis' && selectedDisease.diagnosis && (
+                  <>
+                    {selectedDisease.diagnosis.goldStandard && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Gold Standard</p>
+                        <p className="text-sm font-bold" style={{ color: 'var(--accent)' }}>{selectedDisease.diagnosis.goldStandard}</p>
                       </div>
                     )}
-                  </div>
+                    {(selectedDisease.diagnosis.labs || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Laboratory Studies</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.diagnosis.labs || []).map(l => (
+                            <div key={l} className="flex items-start gap-2 text-sm">
+                              <FlaskConical size={12} className="shrink-0 mt-0.5" style={{ color: '#06b6d4' }} />
+                              {l}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {(selectedDisease.diagnosis.imaging || []).length > 0 && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Imaging & Studies</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.diagnosis.imaging || []).map(i => (
+                            <div key={i} className="flex items-start gap-2 text-sm">
+                              <Camera size={12} className="shrink-0 mt-0.5" style={{ color: '#8b5cf6' }} />
+                              {i}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDisease.diagnosis.ecgFindings && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">ECG Findings</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.diagnosis.ecgFindings}</p>
+                      </div>
+                    )}
+                    {!selectedDisease.diagnosis.goldStandard && typeof selectedDisease.diagnosis === 'string' && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-sm leading-relaxed">{selectedDisease.diagnosis}</p>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {activeTab === 'treatment' && (
-                  <div className="space-y-3">
-                    {selectedDisease.treatment && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">MANAGEMENT</p>
-                        {typeof selectedDisease.treatment === 'string' ? (
-                          <p className="text-sm leading-relaxed">{selectedDisease.treatment}</p>
-                        ) : (
-                          <ul className="text-sm space-y-1">
-                            {Object.entries(selectedDisease.treatment).map(([key, val]) => (
-                              <li key={key}><span className="font-bold capitalize">{key}: </span>{Array.isArray(val) ? val.join(', ') : val}</li>
-                            ))}
-                          </ul>
-                        )}
+                  <>
+                    {selectedDisease.treatment?.acute && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>🚨 Acute Management</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.treatment.acute || []).map(t => (
+                            <div key={t} className="flex items-start gap-2 text-sm">
+                              <Zap size={12} className="shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+                              {t}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
-                  </div>
+                    {selectedDisease.treatment?.definitive && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(var(--acc-rgb,99,102,241),0.3)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: 'var(--accent)' }}>Definitive Treatment</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.treatment.definitive || []).map(t => (
+                            <div key={t} className="flex items-start gap-2 text-sm">
+                              <CheckCircle2 size={12} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                              {t}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDisease.treatment?.longTerm && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.04)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#10b981' }}>Long-Term Management</p>
+                        <div className="space-y-1.5">
+                          {(selectedDisease.treatment.longTerm || []).map(t => (
+                            <div key={t} className="flex items-start gap-2 text-sm">
+                              <Heart size={12} className="shrink-0 mt-0.5" style={{ color: '#10b981' }} />
+                              {t}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDisease.treatment && !selectedDisease.treatment.acute && typeof selectedDisease.treatment === 'string' && (
+                      <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                        <p className="text-sm leading-relaxed">{selectedDisease.treatment}</p>
+                      </div>
+                    )}
+                    {selectedDisease.treatment && !selectedDisease.treatment.acute && typeof selectedDisease.treatment === 'object' && !selectedDisease.treatment.definitive && (
+                      <div className="glass rounded-2xl p-4 space-y-2" style={{ border: '1px solid var(--border)' }}>
+                        {Object.entries(selectedDisease.treatment).map(([key, val]) => (
+                          <div key={key}>
+                            <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-1">{key}</p>
+                            <p className="text-sm">{Array.isArray(val) ? val.join(', ') : val}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {activeTab === 'complications' && (
-                  <div className="space-y-3">
-                    {selectedDisease.complications && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">COMPLICATIONS & OUTCOMES</p>
-                        <ul className="text-sm space-y-1">
-                          {(Array.isArray(selectedDisease.complications) ? selectedDisease.complications : [selectedDisease.complications]).map((complication, i) => (
-                            <li key={i}>• {complication}</li>
-                          ))}
-                        </ul>
+                  <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                    <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Complications</p>
+                    <div className="space-y-2">
+                      {(Array.isArray(selectedDisease.complications) ? selectedDisease.complications : [selectedDisease.complications]).filter(Boolean).map(c => (
+                        <div key={c} className="flex items-start gap-2 text-sm">
+                          <AlertCircle size={12} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />
+                          {c}
+                        </div>
+                      ))}
+                    </div>
+                    {selectedDisease.prognosis && (
+                      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Prognosis</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.prognosis}</p>
+                      </div>
+                    )}
+                    {selectedDisease.prevention && (
+                      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                        <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">Prevention</p>
+                        <p className="text-sm leading-relaxed">{selectedDisease.prevention}</p>
                       </div>
                     )}
                   </div>
                 )}
 
                 {activeTab === 'differentials' && (
-                  <div className="space-y-3">
-                    {selectedDisease.differentials && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">DIFFERENTIAL DIAGNOSES</p>
-                        <ul className="text-sm space-y-1">
-                          {(Array.isArray(selectedDisease.differentials) ? selectedDisease.differentials : [selectedDisease.differentials]).map((diff, i) => (
-                            <li key={i}>• {diff}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                  <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
+                    <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">Differential Diagnosis</p>
+                    <div className="space-y-2">
+                      {(Array.isArray(selectedDisease.differentials) ? selectedDisease.differentials : [selectedDisease.differentials]).filter(Boolean).map((d, i) => (
+                        <button key={d} onClick={() => {
+                          const found = DISEASE_DB.find(dd => dd.name.toLowerCase() === d.toLowerCase() || (dd.aliases || []).some(a => a.toLowerCase() === d.toLowerCase()));
+                          if (found) { setSelectedDisease(found); setActiveTab('overview'); }
+                        }}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:opacity-80"
+                          style={{ border: '1px solid var(--border)', background: 'var(--surface2, var(--card))' }}>
+                          <span className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0"
+                            style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.15)', color: 'var(--accent)' }}>
+                            {i + 1}
+                          </span>
+                          <span className="text-sm font-medium flex-1">{d}</span>
+                          <ChevronRight size={14} className="opacity-30 shrink-0" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {activeTab === 'mnemonics' && (
                   <div className="space-y-3">
-                    {selectedDisease.mnemonics && selectedDisease.mnemonics.length > 0 && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">MEMORY AIDS</p>
-                        <ul className="text-sm space-y-2">
-                          {selectedDisease.mnemonics.map((mnemonic, i) => (
-                            <li key={i} className="px-3 py-2 rounded-lg" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.1)', borderLeft: '3px solid var(--accent)' }}>{mnemonic}</li>
-                          ))}
-                        </ul>
+                    {(selectedDisease.mnemonics || []).map(m => (
+                      <div key={m} className="glass rounded-2xl p-4"
+                        style={{ border: '1px solid rgba(var(--acc-rgb,99,102,241),0.25)', background: 'rgba(var(--acc-rgb,99,102,241),0.05)' }}>
+                        <div className="flex items-start gap-3">
+                          <Brain size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                          <p className="text-sm leading-relaxed font-medium">{m}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {(!selectedDisease.mnemonics || selectedDisease.mnemonics.length === 0) && (
+                      <div className="text-center py-8 opacity-40">
+                        <Brain size={32} className="mx-auto mb-3" />
+                        <p className="text-sm font-bold">No mnemonics available</p>
+                        <p className="text-xs mt-1">Ask the AI Tutor to create a mnemonic for this disease</p>
                       </div>
                     )}
                   </div>
@@ -3596,21 +3854,24 @@ function DiseaseExplorerView({ settings }) {
 
                 {activeTab === 'keyfacts' && (
                   <div className="space-y-3">
-                    {selectedDisease.keyFacts && selectedDisease.keyFacts.length > 0 && (
-                      <div>
-                        <p className="text-xs font-black opacity-60 mb-1">HIGH-YIELD FACTS</p>
-                        <ul className="text-sm space-y-2">
-                          {selectedDisease.keyFacts.map((fact, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="text-accent shrink-0 font-black">→</span>
-                              <span>{fact}</span>
-                            </li>
-                          ))}
-                        </ul>
+                    {(selectedDisease.keyFacts || []).map((fact, i) => (
+                      <div key={i} className="glass rounded-2xl p-4"
+                        style={{ border: '1px solid rgba(var(--acc-rgb,99,102,241),0.2)', background: 'rgba(var(--acc-rgb,99,102,241),0.04)' }}>
+                        <div className="flex items-start gap-3">
+                          <Star size={14} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+                          <p className="text-sm font-medium leading-relaxed">{fact}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {(!selectedDisease.keyFacts || selectedDisease.keyFacts.length === 0) && (
+                      <div className="text-center py-8 opacity-40">
+                        <Star size={32} className="mx-auto mb-3" />
+                        <p className="text-sm font-bold">No key facts available</p>
                       </div>
                     )}
                   </div>
                 )}
+
               </div>
             </div>
 
@@ -8386,7 +8647,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'calendar'}>
             <BackableView viewKey="calendar" setView={setView}>
-              <ChunkErrorBoundary><CalendarView flashcards={flashcards} exams={exams} tasks={[]} /></ChunkErrorBoundary>
+              <ChunkErrorBoundary><CalendarView flashcards={flashcards} exams={exams} tasks={[]} settings={settings} /></ChunkErrorBoundary>
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'study'}>
@@ -8401,22 +8662,22 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'goals'}>
             <BackableView viewKey="goals" setView={setView}>
-              <GoalTrackerView flashcards={flashcards} exams={exams} addToast={addToast} />
+              <GoalTrackerView flashcards={flashcards} exams={exams} addToast={addToast} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'achievements'}>
             <BackableView viewKey="achievements" setView={setView}>
-              <AchievementsView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} />
+              <AchievementsView docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'timeline'}>
             <BackableView viewKey="timeline" setView={setView}>
-              <StudyTimelineView flashcards={flashcards} exams={exams} docs={docs} cases={cases} />
+              <StudyTimelineView flashcards={flashcards} exams={exams} docs={docs} cases={cases} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'reminders'}>
             <BackableView viewKey="reminders" setView={setView}>
-              <NotificationCenterView flashcards={flashcards} exams={exams} addToast={addToast} />
+              <NotificationCenterView flashcards={flashcards} exams={exams} addToast={addToast} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'calculator'}>
@@ -8461,7 +8722,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'labref'}>
             <BackableView viewKey="labref" setView={setView}>
-              <LabReferenceView />
+              <LabReferenceView settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'medicines'}>
@@ -8481,7 +8742,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'mnemonics'}>
             <BackableView viewKey="mnemonics" setView={setView}>
-              <MedicalMnemonicsView addToast={addToast} />
+              <MedicalMnemonicsView addToast={addToast} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'drugcheck'}>
@@ -8491,7 +8752,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'rxpad'}>
             <BackableView viewKey="rxpad" setView={setView}>
-              <PrescriptionPadView addToast={addToast} />
+              <PrescriptionPadView addToast={addToast} settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'vitals'}>
@@ -8531,7 +8792,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </ViewWrapper>
           <ViewWrapper active={view === 'anatomy'}>
             <BackableView viewKey="anatomy" setView={setView}>
-              <AnatomyQuickRefView />
+              <AnatomyQuickRefView settings={settings} />
             </BackableView>
           </ViewWrapper>
           <ViewWrapper active={view === 'osce'}>
@@ -9136,6 +9397,7 @@ function PomodoroWidget({ onComplete }) {
    KNOWLEDGE GRAPH VIEW — Force-directed concept graph
 ═══════════════════════════════════════════════════════════════════ */
 function KnowledgeGraphView({ flashcards, exams, cases, docs, settings }) {
+  const isMobile = window.innerWidth < 768;
   const canvasRef = useRef(null);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -9325,6 +9587,7 @@ function KnowledgeGraphView({ flashcards, exams, cases, docs, settings }) {
   const selectedNode = nodes.find(n => n.id === selected);
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col p-4 gap-4">
       {/* Stats row */}
       <div className="grid grid-cols-4 gap-3 shrink-0">
@@ -9390,6 +9653,9 @@ function KnowledgeGraphView({ flashcards, exams, cases, docs, settings }) {
           </>
         )}
       </div>
+    </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Knowledge Graph', description: 'Visualize concept connections, identify knowledge gaps, and explore study mastery.' }} contextLabel="Knowledge Graph" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Knowledge Graph' }} contextLabel="Knowledge Graph" settings={settings} defaultMode="floating" />}
     </div>
   );
 }
@@ -9481,6 +9747,7 @@ function MasteryHeatmap() {
 }
 
 function AnalyticsView({ flashcards, exams, cases, docs, settings }) {
+  const isMobile = window.innerWidth < 768;
   const allCards = useMemo(() => flashcards.flatMap(s => s.cards || []), [flashcards]);
   const predictedScore = useMemo(() => FSRS.predictedScore(allCards), [allCards]);
 
@@ -9519,8 +9786,8 @@ function AnalyticsView({ flashcards, exams, cases, docs, settings }) {
   const scoreColor = predictedScore >= 80 ? 'var(--success)' : predictedScore >= 60 ? 'var(--warning)' : 'var(--danger)';
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
-      {/* Hero — predicted score */}
       <div className="glass rounded-3xl p-6 relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <div className="bg-mesh absolute inset-0 opacity-30" />
         <div className="relative z-10 flex flex-col items-center text-center">
@@ -9614,13 +9881,25 @@ function AnalyticsView({ flashcards, exams, cases, docs, settings }) {
         </div>
       )}
     </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Analytics Dashboard', description: 'Analyze study patterns, exam predictions, flashcard mastery, and progress trends.' }} contextLabel="Analytics" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Analytics Dashboard' }} contextLabel="Analytics" settings={settings} defaultMode="floating" />}
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    CALENDAR VIEW — Monthly study calendar with FSRS + events
 ═══════════════════════════════════════════════════════════════════ */
-function CalendarView(props) { return <_ModCalendarView {...props} />; }
+function CalendarView(props) {
+  const isMobile = window.innerWidth < 768;
+  return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden"><_ModCalendarView {...props} /></div>
+      {!isMobile && <DraggableTutorPanel context={{ tool: 'Study Calendar', description: 'Plan your study schedule and review calendar events.' }} contextLabel="Calendar" settings={props.settings} defaultMode="docked" />}
+      {isMobile && <DraggableTutorPanel context={{ tool: 'Study Calendar' }} contextLabel="Calendar" settings={props.settings} defaultMode="floating" />}
+    </div>
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    MATCH GAME — Tap-to-match flashcard pairs
@@ -9994,6 +10273,7 @@ function VoiceTutorModal({ settings, onClose }) {
    SMART STUDY MODE — unified adaptive study session
 ═══════════════════════════════════════════════════════════════════ */
 function SmartStudyMode({ flashcards, exams, cases, settings, addToast, setFlashcards }) {
+  const isMobile = window.innerWidth < 768;
   const [mode, setMode] = useState(null); // null | 'fsrs' | 'match' | 'podcast' | 'voice'
   const [selectedSet, setSelectedSet] = useState(null);
 
@@ -10024,6 +10304,7 @@ function SmartStudyMode({ flashcards, exams, cases, settings, addToast, setFlash
   }
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
       {/* Due cards hero */}
       {allDue > 0 && (
@@ -10117,13 +10398,17 @@ function SmartStudyMode({ flashcards, exams, cases, settings, addToast, setFlash
         </div>
       )}
     </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Smart Study Mode', description: 'FSRS flashcard review, match games, podcasts, and voice tutor.' }} contextLabel="Study Mode" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Smart Study Mode' }} contextLabel="Study Mode" settings={settings} defaultMode="floating" />}
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    GOAL TRACKER VIEW — daily goals, milestones, study streaks
 ═══════════════════════════════════════════════════════════════════ */
-function GoalTrackerView({ flashcards, exams, addToast }) {
+function GoalTrackerView({ flashcards, exams, addToast, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [goals, setGoals] = useState(() => {
     try { return JSON.parse(localStorage.getItem('mariam_goals') || 'null') || { dailyCards: 20, dailyExams: 5, weeklyStudyDays: 5 }; } catch { return { dailyCards: 20, dailyExams: 5, weeklyStudyDays: 5 }; }
   });
@@ -10168,6 +10453,7 @@ function GoalTrackerView({ flashcards, exams, addToast }) {
   ];
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold">Goal Tracker</h1>
@@ -10291,6 +10577,9 @@ function GoalTrackerView({ flashcards, exams, addToast }) {
         </div>
       </div>
     </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Goal Tracker', description: 'Track daily study goals, streaks, and progress milestones.' }} contextLabel="Goal Tracker" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Goal Tracker' }} contextLabel="Goal Tracker" settings={settings} defaultMode="floating" />}
+    </div>
   );
 }
 
@@ -10336,7 +10625,8 @@ const ACHIEVEMENT_DEFS = [
     check: (d, fc) => fc.some(f => (f.cards?.length || 0) > 5 && (f.cards || []).every(c => (c.stability || 0) >= 10)) },
 ];
 
-function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions }) {
+function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [showUnlock, setShowUnlock] = useState(null);
   const [prevUnlocked, setPrevUnlocked] = useState(() => new Set(JSON.parse(localStorage.getItem('mariam_achievements') || '[]')));
 
@@ -10361,6 +10651,7 @@ function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions 
   const pct = Math.round((unlocked.size / ACHIEVEMENT_DEFS.length) * 100);
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4 space-y-4">
       {/* Unlock modal */}
       {showUnlock && (
@@ -10409,6 +10700,9 @@ function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions 
         })}
       </div>
     </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Achievements', description: 'View and unlock study achievements and badges.' }} contextLabel="Achievements" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Achievements' }} contextLabel="Achievements" settings={settings} defaultMode="floating" />}
+    </div>
   );
 }
 
@@ -10416,6 +10710,7 @@ function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions 
    ENHANCED NOTES VIEW — tags, AI expand, search, export
 ═══════════════════════════════════════════════════════════════════ */
 function NotesView({ notes, setNotes, docs, settings, addToast }) {
+  const isMobile = window.innerWidth < 768;
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -10539,6 +10834,7 @@ function NotesView({ notes, setNotes, docs, settings, addToast }) {
   );
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col">
       {/* Header */}
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -10608,13 +10904,17 @@ function NotesView({ notes, setNotes, docs, settings, addToast }) {
         ))}
       </div>
     </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Notes', description: 'Organize, search, and AI-expand your study notes.' }} contextLabel="Notes" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Notes' }} contextLabel="Notes" settings={settings} defaultMode="floating" />}
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    TIMELINE VIEW — chronological study event log
 ═══════════════════════════════════════════════════════════════════ */
-function StudyTimelineView({ flashcards, exams, docs, cases }) {
+function StudyTimelineView({ flashcards, exams, docs, cases, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [filter, setFilter] = useState('all'); // all | card | exam | doc | case
   const [expandedId, setExpandedId] = useState(null);
 
@@ -10655,6 +10955,7 @@ function StudyTimelineView({ flashcards, exams, docs, cases }) {
   ];
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <h2 className="font-black text-lg mb-3">Study Timeline</h2>
@@ -10728,6 +11029,9 @@ function StudyTimelineView({ flashcards, exams, docs, cases }) {
           </div>
         ))}
       </div>
+    </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Study Timeline', description: 'Review your chronological study events, flashcard reviews, and exam attempts.' }} contextLabel="Timeline" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Study Timeline' }} contextLabel="Timeline" settings={settings} defaultMode="floating" />}
     </div>
   );
 }
@@ -10990,7 +11294,8 @@ function ShortcutsHelpOverlay({ onClose }) {
 /* ═══════════════════════════════════════════════════════════════════
    NOTIFICATION CENTER — scheduled reminders and study alerts
 ═══════════════════════════════════════════════════════════════════ */
-function NotificationCenterView({ flashcards, exams, addToast }) {
+function NotificationCenterView({ flashcards, exams, addToast, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [notifs, setNotifs] = useState(() => JSON.parse(localStorage.getItem('mariam_notifs') || '[]'));
   const [showNew, setShowNew] = useState(false);
   const [draft, setDraft] = useState({ title: '', type: 'review', time: '09:00', days: [] });
@@ -11023,6 +11328,7 @@ function NotificationCenterView({ flashcards, exams, addToast }) {
   const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold flex items-center gap-2"><Bell size={20} style={{ color: 'var(--accent)' }} /> Reminders</h1>
@@ -11121,6 +11427,9 @@ function NotificationCenterView({ flashcards, exams, addToast }) {
           </div>
         ))}
       </div>
+    </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Notification Center', description: 'Set up study reminders and manage scheduled alerts.' }} contextLabel="Reminders" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Notification Center' }} contextLabel="Reminders" settings={settings} defaultMode="floating" />}
     </div>
   );
 }
@@ -12830,7 +13139,8 @@ const LAB_REFERENCE_DATA = [
   { name: 'HCO₃', cat: 'Blood Gas', male: '22–26 mEq/L', female: '22–26 mEq/L', critical: '<10 or >40 mEq/L', notes: 'Metabolic acidosis: <22 (DKA, lactic, renal). Metabolic alkalosis: >26 (vomiting, diuretics). Calculate anion gap.' },
 ];
 
-function LabReferenceView() {
+function LabReferenceView({ settings }) {
+  const isMobile = window.innerWidth < 768;
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [expanded, setExpanded] = useState(null);
@@ -12909,6 +13219,12 @@ function LabReferenceView() {
         })}
         {filtered.length === 0 && <div className="empty-state py-12"><p className="font-bold mt-4">No labs found</p></div>}
       </div>
+      <DraggableTutorPanel
+        context={{ tool: 'Lab Reference', description: 'Normal lab ranges, critical values, gender-specific reference intervals for CBC, BMP, CMP, LFTs, coagulation, urine, and more' }}
+        contextLabel="Lab Reference"
+        settings={settings}
+        defaultMode={isMobile ? 'floating' : 'floating'}
+      />
     </div>
   );
 }
@@ -13104,6 +13420,12 @@ List 6-10 differentials ordered by likelihood. Be thorough and clinically accura
           </div>
         )}
       </div>
+      <DraggableTutorPanel
+        context={{ tool: 'Differential Diagnosis', description: 'AI-powered differential diagnosis builder — provide symptoms, age, sex to get ranked DDx list with workup recommendations' }}
+        contextLabel="DDx Builder"
+        settings={settings}
+        defaultMode="floating"
+      />
     </div>
   );
 }
@@ -13138,8 +13460,8 @@ const BUILTIN_MNEMONICS = [
     letters: [['C','Confusion (new)'],['U','Urea > 7 mmol/L (BUN > 20)'],['R','Respiratory rate ≥ 30'],['B','BP: SBP < 90 or DBP ≤ 60'],['65','Age ≥ 65']] },
 ];
 
-function MedicalMnemonicsView({ addToast }) {
-  const [search, setSearch] = useState('');
+function MedicalMnemonicsView({ addToast, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [category, setCategory] = useState('All');
   const [expanded, setExpanded] = useState(null);
   const [customs, setCustoms] = useState(() => { try { return JSON.parse(localStorage.getItem('mariam_custom_mnemonics') || '[]'); } catch { return []; } });
@@ -13248,6 +13570,12 @@ function MedicalMnemonicsView({ addToast }) {
         })}
         {filtered.length === 0 && <div className="empty-state py-12"><p className="font-bold mt-4">No mnemonics found</p></div>}
       </div>
+      <DraggableTutorPanel
+        context={{ tool: 'Medical Mnemonics', description: 'Curated collection of medical mnemonics and memory aids for clinical knowledge — MUDPILES, AEIOU-TIPS, SOCRATES, and more' }}
+        contextLabel="Mnemonics"
+        settings={settings}
+        defaultMode="floating"
+      />
     </div>
   );
 }
@@ -13387,7 +13715,8 @@ Be thorough and clinically accurate. List ALL pairwise interactions found.`,
 /* ═══════════════════════════════════════════════════════════════════
    PRESCRIPTION PAD VIEW — structured Rx writer with common templates
 ═══════════════════════════════════════════════════════════════════ */
-function PrescriptionPadView({ addToast }) {
+function PrescriptionPadView({ addToast, settings }) {
+  const isMobile = window.innerWidth < 768;
   const [rxList, setRxList] = useState(() => { try { return JSON.parse(localStorage.getItem('mariam_rx_pad') || '[]'); } catch { return []; } });
   const [editing, setEditing] = useState(null); // index or 'new'
   const [form, setForm] = useState({ drug: '', dose: '', route: 'PO', freq: 'OD', duration: '', instructions: '', refills: '0' });
@@ -13428,6 +13757,7 @@ function PrescriptionPadView({ addToast }) {
   };
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
@@ -13532,6 +13862,9 @@ function PrescriptionPadView({ addToast }) {
           </div>
         ))}
       </div>
+    </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Prescription Pad', description: 'Write and manage prescriptions. Help with dosing, routes, frequency, and clinical guidelines.' }} contextLabel="Prescription Pad" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Prescription Pad' }} contextLabel="Prescription Pad" settings={settings} defaultMode="floating" />}
     </div>
   );
 }
@@ -14565,11 +14898,13 @@ const ANATOMY_SYSTEMS = [
     ]},
 ];
 
-function AnatomyQuickRefView() {
+function AnatomyQuickRefView({ settings }) {
+  const isMobile = window.innerWidth < 768;
   const [activeId, setActiveId] = useState(null);
   const active = ANATOMY_SYSTEMS.find(s => s.id === activeId);
 
   return (
+    <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <h2 className="font-black text-xl flex items-center gap-2">🫀 Anatomy Reference</h2>
@@ -14619,6 +14954,9 @@ function AnatomyQuickRefView() {
           </div>
         )}
       </div>
+    </div>
+    {!isMobile && <DraggableTutorPanel context={{ tool: 'Anatomy Reference', description: 'Explore body systems, anatomical structures, and clinical correlations.' }} contextLabel="Anatomy Ref" settings={settings} defaultMode="docked" />}
+    {isMobile && <DraggableTutorPanel context={{ tool: 'Anatomy Reference' }} contextLabel="Anatomy Ref" settings={settings} defaultMode="floating" />}
     </div>
   );
 }
