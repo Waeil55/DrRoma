@@ -737,6 +737,51 @@ const DRUG_CATEGORIES = [
 
 const DRUG_SCHEDULES = ['All', 'OTC', 'Schedule II', 'Schedule III', 'Schedule IV', 'Schedule V', 'Rx Only'];
 
+/* ══════════════════════════════════════════════════════════════════════════
+   GAMIFICATION — XP Table + Level Definitions (Prompt2.md Spec, Part E §6)
+══════════════════════════════════════════════════════════════════════════ */
+const XP_TABLE = {
+  card_studied: 5, card_mastered: 25, exam_correct: 10, exam_completed: 50,
+  case_solved: 75, daily_goal: 100, streak_day: 20, streak_7: 200,
+  streak_30: 500, streak_100: 2000, file_uploaded: 30, achievement_unlocked: 150,
+};
+const LEVELS = [
+  { n: 1,  title: 'Pre-Med',         xp: 0 },
+  { n: 5,  title: 'Medical Student', xp: 1000 },
+  { n: 10, title: 'Clinical Intern', xp: 5000 },
+  { n: 15, title: 'Junior Resident', xp: 15000 },
+  { n: 20, title: 'Senior Resident', xp: 40000 },
+  { n: 25, title: 'Fellow',          xp: 100000 },
+  { n: 30, title: 'Attending',       xp: 250000 },
+  { n: 35, title: 'Chief of Staff',  xp: 500000 },
+  { n: 40, title: 'Professor',       xp: 1000000 },
+];
+const getXPLevel = (xp) => [...LEVELS].reverse().find(l => xp >= l.xp) || LEVELS[0];
+const getXPToNext = (xp) => {
+  const cur = getXPLevel(xp);
+  const idx = LEVELS.indexOf(cur);
+  return idx < LEVELS.length - 1 ? LEVELS[idx + 1].xp - xp : 0;
+};
+
+const VARIABLE_REWARD_INSIGHTS = [
+  "🧠 You're in the top learning zone — keep this session going!",
+  "📈 Your review consistency is building long-term retention.",
+  "🔥 Spaced repetition is proven to outperform cramming by 200%.",
+  "💡 Each card you review strengthens the neural pathway.",
+  "⭐ You're building clinical intuition one card at a time.",
+  "🏆 Medical mastery is built through consistent daily practice.",
+];
+
+/** Award XP and persist to localStorage. Returns new total XP. */
+const awardXPLocalStorage = (amount) => {
+  try {
+    const prev = parseInt(localStorage.getItem('mariam_total_xp') || '0', 10);
+    const next = prev + amount;
+    localStorage.setItem('mariam_total_xp', String(next));
+    return next;
+  } catch { return amount; }
+};
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DISEASE DATABASE â€” 120+ diseases covering all major body systems
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -2053,6 +2098,8 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
       setUploadedDoc(doc); setUploadPct(100);
       setStartPage(1); setEndPage(data.totalPages);
       addToast(`"${file.name}" loaded!`, 'success');
+      awardXPLocalStorage(XP_TABLE.file_uploaded);
+      addToast(`+${XP_TABLE.file_uploaded} XP 📁`, 'success');
     } catch (e) { addToast(e.message, 'error'); }
     finally { setUploading(false); }
   };
@@ -6028,9 +6075,23 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
         })
       };
     }));
+    // Award XP for card study
+    const isMastered = q >= 5;
+    const xpGain = isMastered ? XP_TABLE.card_mastered : XP_TABLE.card_studied;
+    awardXPLocalStorage(xpGain);
+    addToast(`+${xpGain} XP 📚`, 'success');
+    // Variable reward insight: after every 10th card (40% chance)
+    try {
+      const count = parseInt(localStorage.getItem('mariam_cards_rated') || '0', 10) + 1;
+      localStorage.setItem('mariam_cards_rated', String(count));
+      if (count % 10 === 0 && Math.random() < 0.4) {
+        const insight = VARIABLE_REWARD_INSIGHTS[Math.floor(Math.random() * VARIABLE_REWARD_INSIGHTS.length)];
+        setTimeout(() => addToast(insight, 'info'), 800);
+      }
+    } catch {}
     const nextIdx = idx + 1;
     if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); }
-    else { addToast('ðŸŽ‰ Set complete!', 'success'); setSelSet(null); setIdx(0); }
+    else { addToast('🎉 Set complete!', 'success'); setSelSet(null); setIdx(0); }
   }, [selSet, idx, setFlashcards, addToast]);
 
   const handleExport = async (set) => {
@@ -6331,7 +6392,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-bold disabled:opacity-40 shadow-xl">Submit Answer</button> :
                 qi < selEx.questions.length - 1 ?
                   <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">Next Question â†’</button> :
-                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); }} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">See Results â†’</button>
+                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); awardXPLocalStorage(XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct); addToast(`+${XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct} XP 📝`, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">See Results â†’</button>
               }
             </div>
 

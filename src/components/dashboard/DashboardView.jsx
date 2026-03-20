@@ -8,6 +8,7 @@ import {
   History, ChevronRight, BarChart, TrendingUp, Zap, MessageSquare,
   Loader2, CheckCircle2, AlertCircle, X
 } from 'lucide-react';
+import { getTotalXP, getXPLevel, getLevelPct, getXPToNext } from '../../utils/xpSystem';
 
 const MARIAM_IMG = 'https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jpeg';
 
@@ -34,6 +35,10 @@ export default function DashboardView({
 
   const recentDocs = docs.slice(-4).reverse();
   const bgTaskList = Object.values(window.__MARIAM_BG__?.tasks || {});
+  const totalXP = getTotalXP();
+  const curLevel = getXPLevel(totalXP);
+  const levelPct = getLevelPct(totalXP);
+  const xpToNext = getXPToNext(totalXP);
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content"
@@ -47,6 +52,7 @@ export default function DashboardView({
                 {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </span>
               {streak >= 3 && <span className="badge" style={{ color: '#f59e0b', borderColor: 'rgba(245,158,11,.3)', background: 'rgba(245,158,11,.1)' }}>🔥 {streak} day streak</span>}
+              <span className="badge" style={{ color: 'var(--accent)', borderColor: 'rgba(99,102,241,.3)', background: 'rgba(99,102,241,.1)' }}>🏆 Lv.{curLevel.n} {curLevel.title}</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-black leading-tight"
               style={{ fontFamily: 'Plus Jakarta Sans,system-ui', color: 'var(--text)' }}>
@@ -55,6 +61,15 @@ export default function DashboardView({
             <p className="text-base mt-1 font-medium" style={{ color: 'var(--text2)' }}>
               {docs.length === 0 ? 'Upload a document to get started' : 'Your AI-powered study command center'}
             </p>
+            {/* XP mini progress bar */}
+            <div className="mt-3 flex items-center gap-2 max-w-xs">
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                <div className="h-full rounded-full" style={{ width: `${levelPct}%`, background: 'var(--accent)', transition: 'width 1s ease' }} />
+              </div>
+              <span className="text-xs font-bold" style={{ color: 'var(--text3)', whiteSpace: 'nowrap' }}>
+                {totalXP.toLocaleString()} XP{xpToNext > 0 ? ` · ${xpToNext.toLocaleString()} to next` : ''}
+              </span>
+            </div>
           </div>
           <div className="relative shrink-0 hidden sm:block">
             <img src={MARIAM_IMG} alt="" className="w-16 h-16 rounded-2xl object-cover"

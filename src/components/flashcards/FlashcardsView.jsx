@@ -14,6 +14,7 @@ import { useDrag } from '../../hooks/useDrag';
 import { exportToPDF } from '../../utils/exportToPDF';
 import { FSRS } from '../../utils/fsrs';
 import { trackStudy } from '../../utils/analytics';
+import { XP_TABLE, awardXP, checkVariableReward } from '../../utils/xpSystem';
 import QuickGenerateModal from '../generate/QuickGenerateModal';
 import AiTutorPanel from '../tutor/AiTutorPanel';
 
@@ -37,10 +38,16 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
   const rateCard = useCallback(q => {
     trackStudy('flashcard');
     const fsrsGrade = q >= 5 ? 3 : q >= 3 ? 2 : q >= 2 ? 1 : 0;
+    const isMastered = q >= 5;
     setFlashcards(p => p.map(set => {
       if (set.id !== selSet.id) return set;
       return { ...set, cards: set.cards.map((c, i) => i !== idx ? c : FSRS.schedule(c, fsrsGrade)) };
     }));
+    const xpGain = isMastered ? XP_TABLE.card_mastered : XP_TABLE.card_studied;
+    awardXP(xpGain);
+    addToast(`+${xpGain} XP 📚`, 'success');
+    const insight = checkVariableReward();
+    if (insight) setTimeout(() => addToast(insight, 'info'), 800);
     const nextIdx = idx + 1;
     if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); }
     else { addToast('🎉 Set complete!', 'success'); setSelSet(null); setIdx(0); }

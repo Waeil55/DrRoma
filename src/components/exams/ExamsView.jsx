@@ -12,6 +12,7 @@ import {
 import { useDrag } from '../../hooks/useDrag';
 import { exportToPDF } from '../../utils/exportToPDF';
 import { trackStudy, ANALYTICS } from '../../utils/analytics';
+import { XP_TABLE, awardXP } from '../../utils/xpSystem';
 import QuickGenerateModal from '../generate/QuickGenerateModal';
 import AiTutorPanel from '../tutor/AiTutorPanel';
 
@@ -118,7 +119,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-black disabled:opacity-40 shadow-xl">Submit Answer</button> :
                 qi < selEx.questions.length - 1 ?
                   <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question →</button> :
-                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
+                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); const xpGain = XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct; awardXP(xpGain); addToast(`+${xpGain} XP 📝`, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
               }
             </div>
             <div className="lg:hidden mt-4 flex-shrink-0">

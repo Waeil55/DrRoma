@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Trophy, CalendarClock } from 'lucide-react';
 
 export default function CalendarView({ flashcards, exams, tasks }) {
   const today = new Date();
@@ -9,6 +9,21 @@ export default function CalendarView({ flashcards, exams, tasks }) {
   const [selectedDay, setSelectedDay] = useState(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0);
+
+  // Boards Countdown state
+  const [examDate, setExamDate] = useState(() => localStorage.getItem('mariam_exam_date') || '');
+  const [cdExpanded, setCdExpanded] = useState(false);
+
+  const daysLeft = examDate
+    ? Math.ceil((new Date(examDate).setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86400000)
+    : null;
+  const totalCards = (flashcards || []).reduce((a, s) => a + (s.cards?.length || 0), 0);
+  const cardsPerDay = daysLeft > 0 ? Math.max(15, Math.ceil(totalCards * 2 / daysLeft)) : 0;
+  const urgencyColor = daysLeft === null ? 'var(--accent)'
+    : daysLeft <= 7 ? 'var(--danger,#ef4444)'
+    : daysLeft <= 30 ? '#f59e0b'
+    : 'var(--success,#22c55e)';
+  const saveExamDate = (val) => { setExamDate(val); if (val) localStorage.setItem('mariam_exam_date', val); else localStorage.removeItem('mariam_exam_date'); };
 
   const dateKey = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
@@ -61,6 +76,96 @@ export default function CalendarView({ flashcards, exams, tasks }) {
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4" style={{ touchAction: 'pan-y' }}>
+
+      {/* Boards Countdown Widget */}
+      {!examDate ? (
+        <button
+          onClick={() => setCdExpanded(true)}
+          className="w-full mb-4 flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all hover:opacity-90"
+          style={{ background: 'var(--surface,var(--card))', border: '1.5px dashed var(--accent)', color: 'var(--accent)' }}
+        >
+          <CalendarClock size={18} />
+          <span>Set boards exam date → get your daily study plan</span>
+        </button>
+      ) : (
+        <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: `2px solid ${urgencyColor}` }}>
+          <button
+            onClick={() => setCdExpanded(e => !e)}
+            className="w-full flex items-center gap-3 px-4 py-3"
+            style={{ background: `color-mix(in srgb, ${urgencyColor} 12%, var(--surface,var(--card)))` }}
+          >
+            <Trophy size={18} style={{ color: urgencyColor, flexShrink: 0 }} />
+            <div className="flex-1 text-left">
+              <span className="font-black text-sm" style={{ color: urgencyColor }}>
+                {daysLeft > 0 ? `${daysLeft} day${daysLeft === 1 ? '' : 's'} to Boards` : daysLeft === 0 ? 'Boards Today! 🏆' : 'Boards date passed'}
+              </span>
+              <span className="text-xs opacity-60 ml-2">{new Date(examDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+            </div>
+            <span className="text-xs opacity-50">{cdExpanded ? '▲' : '▼'}</span>
+          </button>
+          {cdExpanded && (
+            <div className="px-4 pb-4 pt-2 space-y-3" style={{ background: 'var(--surface,var(--card))' }}>
+              {daysLeft > 0 ? (
+                <>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-xl py-2 px-1" style={{ background: 'var(--card)' }}>
+                      <div className="text-lg font-black" style={{ color: urgencyColor }}>{daysLeft}</div>
+                      <div className="text-xs opacity-50">days left</div>
+                    </div>
+                    <div className="rounded-xl py-2 px-1" style={{ background: 'var(--card)' }}>
+                      <div className="text-lg font-black" style={{ color: 'var(--accent)' }}>{cardsPerDay}</div>
+                      <div className="text-xs opacity-50">cards/day</div>
+                    </div>
+                    <div className="rounded-xl py-2 px-1" style={{ background: 'var(--card)' }}>
+                      <div className="text-lg font-black" style={{ color: 'var(--success,#22c55e)' }}>{Math.min(daysLeft, Math.ceil(daysLeft / 7))}</div>
+                      <div className="text-xs opacity-50">mock exams</div>
+                    </div>
+                  </div>
+                  <div className="rounded-xl px-3 py-2.5 text-xs space-y-1" style={{ background: 'var(--card)' }}>
+                    <div className="font-bold opacity-70 mb-1">Daily Plan</div>
+                    <div>📚 Review <strong>{cardsPerDay}</strong> flashcards</div>
+                    {daysLeft > 7 && <div>📝 1 practice exam section/week</div>}
+                    {daysLeft <= 7 && <div>🔥 Full mock exam today + weak areas</div>}
+                    <div>💬 Ask tutor about unclear topics</div>
+                  </div>
+                  {/* Progress bar */}
+                  <div>
+                    <div className="flex justify-between text-xs opacity-50 mb-1">
+                      <span>Journey start</span><span>Boards day</span>
+                    </div>
+                    <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--card)' }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${Math.max(2, Math.min(98, 100 - (daysLeft / 365) * 100))}%`, background: urgencyColor }} />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-center opacity-60 py-4 text-sm">{daysLeft === 0 ? '🎓 Good luck today!' : '🏁 Set a new exam date below.'}</p>
+              )}
+              <div className="flex items-center gap-2">
+                <label className="text-xs opacity-60 shrink-0">Change date:</label>
+                <input type="date" value={examDate} onChange={e => saveExamDate(e.target.value)}
+                  className="flex-1 rounded-xl px-3 py-1.5 text-xs" style={{ background: 'var(--card)', color: 'var(--text)', border: '1px solid var(--border)' }} />
+                <button onClick={() => { saveExamDate(''); setCdExpanded(false); }} className="text-xs opacity-50 hover:opacity-80 px-2">✕</button>
+              </div>
+            </div>
+          )}
+          {!cdExpanded && (
+            <div className="px-4 pb-3" style={{ background: 'var(--surface,var(--card))' }}>
+              <div className="text-xs opacity-60">Study <strong>{cardsPerDay}</strong> cards/day to stay on track</div>
+            </div>
+          )}
+        </div>
+      )}
+      {/* Date picker shown inline when no date set and expanded */}
+      {!examDate && cdExpanded && (
+        <div className="mb-4 rounded-2xl p-4 space-y-3" style={{ background: 'var(--surface,var(--card))', border: '1.5px solid var(--border)' }}>
+          <div className="text-sm font-bold">When is your boards exam?</div>
+          <input type="date" value={examDate} min={new Date().toISOString().slice(0,10)} onChange={e => { saveExamDate(e.target.value); if (e.target.value) setCdExpanded(true); }}
+            className="w-full rounded-xl px-3 py-2 text-sm" style={{ background: 'var(--card)', color: 'var(--text)', border: '1px solid var(--border)' }} />
+          <button onClick={() => setCdExpanded(false)} className="text-xs opacity-40">Cancel</button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
