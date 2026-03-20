@@ -1403,15 +1403,27 @@ function useKeyboardShortcuts(shortcuts) {
    GLOBAL SEARCH â€” searches across all content
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, mindMaps, timelines, onNavigate, onClose }) {
-  const [q, setQ] = useState(''); const inputRef = useRef(null);
+  const [rawQ, setRawQ] = useState(''); // immediate input display
+  const [q, setQ] = useState('');       // debounced query used for search
+  const inputRef = useRef(null);
+  const debounceRef = useRef(null);
   const [tasks, setTasks] = useState([]);
   useEffect(() => { inputRef.current?.focus(); }, []);
   useEffect(() => {
     getState('tasks_v1').then(saved => { if (Array.isArray(saved)) setTasks(saved); }).catch(() => {});
   }, []);
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
+
+  const handleInput = (e) => {
+    const val = e.target.value;
+    setRawQ(val);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setQ(val), 250);
+  };
 
   const results = useMemo(() => {
     if (!q.trim() || q.length < 2) return [];
+    try {
     const lq = q.toLowerCase(); const out = [];
     const MAX = 80;
     const push = (item) => { if (out.length < MAX) out.push(item); };
@@ -1544,7 +1556,11 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, min
         push({ type: 'Counseling', icon: Brain, label: e.name, sub: (e.type || '') + ' \u00b7 ' + (e.subtitle || ''), color: '#8b5cf6', action: () => onNavigate('counseling') });
     });
 
-    return out;
+      return out;
+    } catch (err) {
+      console.error('[GlobalSearch] crash:', err);
+      return [];
+    }
   }, [q, docs, flashcards, exams, cases, notes, chatSessions, tasks, mindMaps, timelines]);
   return (
     <div className="fixed inset-0 flex items-start justify-center pt-16 px-4"
@@ -1554,18 +1570,18 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, min
         onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-3 px-5 py-4 border-b border-[color:var(--border2,var(--border))]">
           <Search size={20} className="text-[var(--accent)] shrink-0" />
-          <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
+          <input ref={inputRef} value={rawQ} onChange={handleInput}
             placeholder="Search everything â€” features, docs, cards, exams, cases, notes, chatsâ€¦"
             className="flex-1 bg-transparent text-sm outline-none font-medium placeholder:opacity-40 text-[var(--text)]" />
           <kbd className="text-xs font-bold opacity-30 px-2 py-1 glass rounded-lg">ESC</kbd>
           <button onClick={onClose} className="opacity-40 hover:opacity-80" aria-label="Close"><X size={18} /></button>
         </div>
-        {q.length >= 2 && (
+        {rawQ.length >= 2 && (
           <div className="max-h-96 overflow-y-auto custom-scrollbar">
             {results.length === 0 ? (
               <div className="py-12 text-center opacity-40">
                 <Search size={32} className="mx-auto mb-3" />
-                <p className="text-sm font-bold">No results for "{q}"</p>
+                <p className="text-sm font-bold">No results for "{rawQ}"</p>
               </div>
             ) : results.map((r, i) => (
               <button key={i} onClick={() => { r.action(); onClose(); }}
@@ -1582,7 +1598,7 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, min
             ))}
           </div>
         )}
-        {!q && (
+        {!rawQ && (
           <div className="p-5 grid grid-cols-2 sm:grid-cols-5 gap-2">
             {[
               ['Documents', 'library', FileText, '#6366f1'],
@@ -9298,10 +9314,11 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           </div>
 
           {/* Center pill tabs â€” desktop only */}
-          <div className="hidden md:flex mariam-tab-pills">
+          <div className="hidden md:flex mariam-tab-pills" style={{ overflowX: "auto", scrollbarWidth: "none" }}>
             {[
-              ['library','Home'], ['flashcards','Cards'],
-              ['exams','Exams'], ['cases','Cases'], ['chat','Tutor'], ['settings','Settings']
+              ['library','Home'], ['study','Study'], ['flashcards','Cards'],
+              ['exams','Exams'], ['cases','Cases'], ['medicines','Medicine'],
+              ['diseases','Diseases'], ['chat','Tutor'], ['settings','Settings']
             ].map(([v, label]) => (
               <button key={v} onClick={() => setView(v)}
                 className={`mariam-tab-pill ${view === v ? 'active' : ''}`}>
