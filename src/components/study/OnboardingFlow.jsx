@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { FileUp, Sparkles, Brain, Eye, EyeOff } from 'lucide-react';
 
 export default function OnboardingFlow({ onComplete, settings, setSettings }) {
@@ -8,10 +8,10 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
   const [showKey, setShowKey] = useState(false);
 
   const STEPS = [
-    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: '‍' },
+    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: '' },
     { title: "What's your name?", subtitle: 'Personalize your experience', emoji: '' },
     { title: 'Connect Your AI', subtitle: 'Add an API key to unlock AI features', emoji: '' },
-    { title: 'How it works', subtitle: 'Upload → Generate → Study', emoji: '' },
+    { title: 'How it works', subtitle: 'Upload  Generate  Study', emoji: '' },
     { title: "You're all set!", subtitle: 'Start your learning journey', emoji: '' },
   ];
 
@@ -45,7 +45,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
 
         {step === 1 && (
           <input value={name} onChange={e => setName(e.target.value)}
-            placeholder="Enter your name…"
+            placeholder="Enter your name"
             className="w-full glass-input rounded-xl px-4 py-3 text-center font-bold text-lg outline-none"
             style={{ border: '1px solid var(--border)' }}
             onKeyDown={e => e.key === 'Enter' && next()}
@@ -57,7 +57,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
             <div className="relative">
               <input value={apiKey} onChange={e => setApiKey(e.target.value)}
                 type={showKey ? 'text' : 'password'}
-                placeholder="sk-… or Bearer …"
+                placeholder="sk- or Bearer "
                 className="w-full glass-input rounded-xl px-4 py-3 pr-12 text-sm outline-none"
                 style={{ border: '1px solid var(--border)' }} />
               <button onClick={() => setShowKey(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50">
@@ -71,7 +71,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
         {step === 3 && (
           <div className="w-full space-y-3">
             {[
-              { n: '1', icon: FileUp, t: 'Upload', d: 'PDF, Word, Excel, Images — drag & drop' },
+              { n: '1', icon: FileUp, t: 'Upload', d: 'PDF, Word, Excel, Images  drag & drop' },
               { n: '2', icon: Sparkles, t: 'Generate', d: 'AI creates flashcards, exams & cases' },
               { n: '3', icon: Brain, t: 'Study', d: 'Learn with FSRS spaced repetition' },
             ].map(({ n, icon: Icon, t, d }) => (
@@ -100,7 +100,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
         <div className="flex gap-3 w-full">
           {step > 0 && <button onClick={() => setStep(s => s - 1)} className="flex-1 glass py-3 rounded-2xl font-black" style={{ border: '1px solid var(--border)' }}>Back</button>}
           <button onClick={next} className="flex-1 btn-accent py-3 rounded-2xl font-black">
-            {step === STEPS.length - 1 ? "Let's Go! " : 'Continue →'}
+            {step === STEPS.length - 1 ? "Let's Go! " : 'Continue '}
           </button>
         </div>
 

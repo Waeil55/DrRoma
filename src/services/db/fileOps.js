@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — File Operations (IndexedDB 'files' store)
+ * MARIAM PRO  File Operations (IndexedDB 'files' store)
  */
 import { dbOp } from './dbOp.js';
 

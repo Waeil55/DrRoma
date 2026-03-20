@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — AI Call (one-shot, non-streaming)
+ * MARIAM PRO  AI Call (one-shot, non-streaming)
  * Provider-agnostic: Anthropic, Gemini, OpenAI-compatible.
  */
 import { buildGenerationSystemPrompt } from './generationPrompts.js';
@@ -7,9 +7,9 @@ import { buildGenerationSystemPrompt } from './generationPrompts.js';
 /**
  * One-shot AI call. Returns the model's text response.
  * @param {string}  prompt
- * @param {boolean} expectJson  — appends strict JSON instruction
- * @param {boolean} strictMode  — tells the model to cite only document text
- * @param {object}  settings    — { provider, apiKey, baseUrl, model }
+ * @param {boolean} expectJson   appends strict JSON instruction
+ * @param {boolean} strictMode   tells the model to cite only document text
+ * @param {object}  settings     { provider, apiKey, baseUrl, model }
  * @param {number}  maxTokens
  * @returns {Promise<string>}
  */
@@ -53,7 +53,7 @@ export const callAI = async (prompt, expectJson, strictMode, settings = {}, maxT
   }
 
   // OpenAI-compatible (OpenAI, DeepSeek, Groq, Ollama, etc.)
-  if (!apiKey) throw new Error('API key required — add it in Settings.');
+  if (!apiKey) throw new Error('API key required  add it in Settings.');
   const base = (baseUrl || 'https://api.openai.com').replace(/\/$/, '');
   const r = await fetch(`${base}/v1/chat/completions`, {
     method: 'POST',

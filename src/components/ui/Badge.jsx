@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — Badge Component
+ * MARIAM PRO  Badge Component
  */
 export default function Badge({ children, variant = 'default', size = 'sm', className = '' }) {
   const variants = {

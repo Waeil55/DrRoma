@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 /**
- * MARIAM PRO — Modal Component
+ * MARIAM PRO  Modal Component
  * Theme-aware, accessible, with proper focus management.
  */
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 480 }) {

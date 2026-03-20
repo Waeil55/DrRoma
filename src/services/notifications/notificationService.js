@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — NotificationService
+/**
+ * MARIAM PRO  NotificationService
  * Wraps the Web Notifications API and schedules study reminders.
  * All 6 notification types supported.
  */
@@ -25,7 +25,7 @@ const ICONS = {
 class NotificationService {
   constructor() {
     this._permitted  = false;
-    this._timers     = {};  // type → setTimeout id
+    this._timers     = {};  // type  setTimeout id
     this._swReg      = null;
     this._checkPermission();
   }
@@ -35,7 +35,7 @@ class NotificationService {
     this._permitted = Notification.permission === 'granted';
   }
 
-  /** Request permission — call from a user gesture. */
+  /** Request permission  call from a user gesture. */
   async requestPermission() {
     if (!('Notification' in window)) return false;
     if (Notification.permission === 'granted') {
@@ -158,7 +158,7 @@ class NotificationService {
       if (dueCards.length > 0) {
         const delay = this._msUntil('09:00');
         this.schedule(`review_${deck.id}`, delay, {
-          title: ` ${dueCards.length} cards due — ${deck.title || 'Flashcards'}`,
+          title: ` ${dueCards.length} cards due  ${deck.title || 'Flashcards'}`,
           body: 'Keep your streak alive! Review now to maximize retention.',
           data: { view: 'flashcards', deckId: deck.id },
         });
@@ -201,7 +201,7 @@ class NotificationService {
   }
 }
 
-// ── Singleton export ──────────────────────────────────────────────────
+//  Singleton export 
 let _instance = null;
 
 export function getNotificationService() {

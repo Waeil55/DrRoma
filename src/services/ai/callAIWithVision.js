@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — AI Vision Call
+ * MARIAM PRO  AI Vision Call
  * Supports Anthropic vision models and falls back for non-vision providers.
  */
 import { callAI } from './callAI.js';

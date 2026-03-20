@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — StudyPodcastPanel Component
+/**
+ * MARIAM PRO  StudyPodcastPanel Component
  * AI-generated audio summaries with multi-voice dialogue, chapter markers,
  * speed controls, and Media Session API integration.
  */
@@ -65,7 +65,7 @@ export default function StudyPodcastPanel({ flashcards, settings, addToast, call
     setGenerating(true);
     try {
       const topCards = (set.cards || []).slice(0, 15);
-      const content = topCards.map((c, i) => `${i + 1}. ${c.q} — ${c.a}`).join('\n');
+      const content = topCards.map((c, i) => `${i + 1}. ${c.q}  ${c.a}`).join('\n');
       const prompt = dialogueMode
         ? `You are writing a medical study podcast dialogue between a HOST (Dr. Mariam) and a STUDENT. Create a 3-4 minute conversational script summarizing these flashcards. Format: use "## Topic Name" for chapter headings. Use "HOST:" and "STUDENT:" prefixes for each speaker. Make it engaging and educational.\n\nFlashcard set: "${set.title}"\nCards:\n${content}\n\nWrite ONLY the dialogue script.`
         : `You are a medical study podcast host. Create an engaging 2-3 minute spoken audio script summarizing these flashcards. Use "## Topic Name" for chapter headings. Make it conversational, memorable, and educational. Use "you" to address the listener.\n\nFlashcard set: "${set.title}"\nCards:\n${content}\n\nWrite ONLY the spoken script.`;
@@ -120,7 +120,7 @@ export default function StudyPodcastPanel({ flashcards, settings, addToast, call
     // Register Media Session
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: script.title + ' — Study Podcast',
+        title: script.title + '  Study Podcast',
         artist: 'MARIAM PRO',
         album: 'Study Podcasts',
       });
@@ -161,13 +161,13 @@ export default function StudyPodcastPanel({ flashcards, settings, addToast, call
         <div className="flex gap-2 mb-3">
           <select value={selectedSet?.id || ''} onChange={e => setSelectedSet(flashcards.find(s => s.id === e.target.value) || null)}
             className="glass-input flex-1 rounded-xl px-3 py-2 text-sm outline-none">
-            <option value="">Choose a deck…</option>
+            <option value="">Choose a deck</option>
             {flashcards.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
           </select>
           <button onClick={() => generateScript(selectedSet)} disabled={!selectedSet || generating}
             className="btn-accent px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 shrink-0">
             {generating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
-            {generating ? 'Writing…' : 'Generate'}
+            {generating ? 'Writing' : 'Generate'}
           </button>
         </div>
         {/* Dialogue mode toggle */}
@@ -191,7 +191,7 @@ export default function StudyPodcastPanel({ flashcards, settings, addToast, call
             {SPEEDS.map(s => (
               <button key={s} onClick={() => setSpeed(s)}
                 className={`px-2.5 py-2 text-xs font-black transition-all ${speed === s ? 'bg-[var(--accent)] text-white' : 'opacity-50 hover:opacity-80'}`}>
-                {s}×
+                {s}
               </button>
             ))}
           </div>

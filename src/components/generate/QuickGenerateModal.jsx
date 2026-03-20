@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — QuickGenerateModal
+/**
+ * MARIAM PRO  QuickGenerateModal
  * Generate flashcards / exams / cases from any document.
  * Supports library pick or file upload, page range, count (1-1000), difficulty.
  */
@@ -75,19 +75,19 @@ export default function QuickGenerateModal({
         }));
         setFlashcards(p => [...p, {
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
-          title: `Cards — ${activeDoc.name.slice(0, 30)}`, cards, createdAt: now
+          title: `Cards  ${activeDoc.name.slice(0, 30)}`, cards, createdAt: now
         }]);
         addToast(`${cards.length} flashcards saved! `, 'success');
       } else if (type === 'exam') {
         setExams(p => [...p, {
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
-          title: `Exam — ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
+          title: `Exam  ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
         }]);
         addToast(`${data.length} exam questions saved! `, 'success');
       } else if (type === 'cases') {
         setCases(p => [...p, {
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
-          title: `Cases — ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
+          title: `Cases  ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
         }]);
         addToast(`${data.length} cases saved! `, 'success');
       }
@@ -99,7 +99,7 @@ export default function QuickGenerateModal({
       difficultyLevel: levels[difficulty - 1], settings, onSave
     });
     if (onTaskStart) onTaskStart(taskId);
-    addToast(`Generating ${count} ${tc.label}… runs in background!`, 'info');
+    addToast(`Generating ${count} ${tc.label} runs in background!`, 'info');
     onClose();
   };
 
@@ -171,7 +171,7 @@ export default function QuickGenerateModal({
                   {uploading ? (
                     <div className="space-y-3">
                       <Loader2 size={28} className="mx-auto animate-spin" style={{ color: 'var(--accent)' }} />
-                      <p className="text-xs font-bold">Processing…</p>
+                      <p className="text-xs font-bold">Processing</p>
                       <div className="progress-bar"><div className="progress-fill" style={{ width: `${uploadPct}%` }} /></div>
                     </div>
                   ) : (
@@ -244,7 +244,7 @@ export default function QuickGenerateModal({
                   className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${count === n ? 'bg-[var(--accent)] text-white' : 'glass opacity-60 hover:opacity-100'}`}>{n}</button>
               ))}
             </div>
-            {count > 50 && <p className="text-xs font-bold flex items-center gap-1.5" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI — runs fully in background</p>}
+            {count > 50 && <p className="text-xs font-bold flex items-center gap-1.5" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI  runs fully in background</p>}
           </div>
 
           {/* Difficulty */}
@@ -270,7 +270,7 @@ export default function QuickGenerateModal({
             <Zap size={18} fill="currentColor" />
             Generate {count} {tc.label} in Background
           </button>
-          <p className="text-xs text-center opacity-30 font-bold mt-2">You can switch pages — generation never stops</p>
+          <p className="text-xs text-center opacity-30 font-bold mt-2">You can switch pages  generation never stops</p>
         </div>
       </div>
     </div>

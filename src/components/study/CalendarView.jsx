@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Trophy, CalendarClock } from 'lucide-react';
 
 export default function CalendarView({ flashcards, exams, tasks }) {
@@ -61,7 +61,7 @@ export default function CalendarView({ flashcards, exams, tasks }) {
   const nextMonth = () => { if (displayMonth === 11) { setDisplayMonth(0); setDisplayYear(y => y+1); } else setDisplayMonth(m => m+1); };
 
   const navLabel = calMode === 'month' ? `${MONTHS[displayMonth]} ${displayYear}`
-    : calMode === 'week' ? `${weekDays[0].date.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${weekDays[6].date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
+    : calMode === 'week' ? `${weekDays[0].date.toLocaleDateString('en-US',{month:'short',day:'numeric'})}  ${weekDays[6].date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
     : selectedDay ? selectedDay.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}) : 'Select a day';
 
   const navPrev = () => { if (calMode === 'month') prevMonth(); else if (calMode === 'week') setWeekOffset(w => w-1); else if (selectedDay) { const d = new Date(selectedDay.date); d.setDate(d.getDate()-1); const key = dateKey(d); setSelectedDay({ date: d, key, dayNum: d.getDate(), events: eventMap[key] || [] }); } };
@@ -85,7 +85,7 @@ export default function CalendarView({ flashcards, exams, tasks }) {
           style={{ background: 'var(--surface,var(--card))', border: '1.5px dashed var(--accent)', color: 'var(--accent)' }}
         >
           <CalendarClock size={18} />
-          <span>Set boards exam date → get your daily study plan</span>
+          <span>Set boards exam date  get your daily study plan</span>
         </button>
       ) : (
         <div className="mb-4 rounded-2xl overflow-hidden" style={{ border: `2px solid ${urgencyColor}` }}>
@@ -101,7 +101,7 @@ export default function CalendarView({ flashcards, exams, tasks }) {
               </span>
               <span className="text-xs opacity-60 ml-2">{new Date(examDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
             </div>
-            <span className="text-xs opacity-50">{cdExpanded ? '▲' : '▼'}</span>
+            <span className="text-xs opacity-50">{cdExpanded ? '' : ''}</span>
           </button>
           {cdExpanded && (
             <div className="px-4 pb-4 pt-2 space-y-3" style={{ background: 'var(--surface,var(--card))' }}>
@@ -205,7 +205,7 @@ export default function CalendarView({ flashcards, exams, tasks }) {
                   <div className="text-lg font-bold" style={isToday ? { color: 'var(--accent)' } : {}}>{day.dayNum}</div>
                 </div>
                 <div className="flex-1 min-h-0 space-y-1">
-                  {day.events.length === 0 && <div className="text-xs opacity-30 text-center py-4">—</div>}
+                  {day.events.length === 0 && <div className="text-xs opacity-30 text-center py-4"></div>}
                   {day.events.map((ev, ei) => (
                     <button key={ei} onClick={() => switchToDay(day)} className="w-full text-left px-2 py-1.5 rounded-lg text-xs truncate" style={{ background: 'var(--card)', borderLeft: `3px solid ${ev.color}` }}>
                       {ev.label}

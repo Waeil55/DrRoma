@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Bell, Plus, Trash2, AlertCircle } from 'lucide-react';
 
 export default function NotificationCenterView({ flashcards, exams, addToast }) {
@@ -63,7 +63,7 @@ export default function NotificationCenterView({ flashcards, exams, addToast }) 
           <h2 className="font-black mb-4 text-sm">New Reminder</h2>
           <div className="space-y-3">
             <input value={draft.title} onChange={e => setDraft(p => ({ ...p, title: e.target.value }))}
-              placeholder="Reminder title…"
+              placeholder="Reminder title"
               className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ border: '1px solid var(--border)' }} />
             <div className="flex gap-3">

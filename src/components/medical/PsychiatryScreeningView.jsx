@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const PSYCH_TOOLS = [
@@ -9,7 +9,7 @@ const PSYCH_TOOLS = [
       'Trouble falling/staying asleep, or sleeping too much',
       'Feeling tired or having little energy',
       'Poor appetite or overeating',
-      'Feeling bad about yourself—or that you are a failure',
+      'Feeling bad about yourselfor that you are a failure',
       'Trouble concentrating on things',
       'Moving or speaking slowly, or being fidgety/restless',
       'Thoughts that you would be better off dead or hurting yourself',
@@ -91,7 +91,7 @@ const PSYCH_TOOLS = [
     ],
     interpret: score => {
       if (score < 7) return { severity: 'Negative Screen', color: '#10b981', action: 'Bipolar disorder unlikely based on this screen' };
-      return { severity: 'Positive Screen', color: '#ef4444', action: 'Further evaluation for bipolar disorder recommended — screen is suggestive, NOT diagnostic' };
+      return { severity: 'Positive Screen', color: '#ef4444', action: 'Further evaluation for bipolar disorder recommended  screen is suggestive, NOT diagnostic' };
     },
   },
 ];
@@ -158,7 +158,7 @@ export default function PsychiatryScreeningView() {
                 <div className="glass rounded-xl p-3 text-center">
                   <p className="text-sm opacity-70">{result.action}</p>
                 </div>
-                <p className="text-xs opacity-30 text-center">Screening tool only — not a diagnosis. Clinical correlation required.</p>
+                <p className="text-xs opacity-30 text-center">Screening tool only  not a diagnosis. Clinical correlation required.</p>
               </div>
             )}
           </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — AppShell Layout
+ * MARIAM PRO  AppShell Layout
  * Fixed header, body with safe-area management, bottom nav slot.
  */
 export default function AppShell({ header, children, bottomNav, className = '' }) {

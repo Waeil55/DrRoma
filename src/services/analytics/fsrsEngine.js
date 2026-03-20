@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — FSRS-5 Spaced Repetition Engine
+ * MARIAM PRO  FSRS-5 Spaced Repetition Engine
  *
  * Full FSRS-5 algorithm with 17-weight parameter set.
  * Based on the open paper: https://github.com/open-spaced-repetition/fsrs4anki
@@ -16,7 +16,7 @@ export const DEFAULT_W = [
 ];
 
 const DECAY    = -0.5;
-const FACTOR   = 19 / 81;        // (0.9)^(1/DECAY) − 1 rearranged constant
+const FACTOR   = 19 / 81;        // (0.9)^(1/DECAY)  1 rearranged constant
 const MIN_S    = 0.1;            // minimum stability in days
 const MAX_DAYS = 36500;          // 100 years hard cap
 
@@ -82,7 +82,7 @@ function nextStabilityForget(D, S, R, W = DEFAULT_W) {
     Math.exp((1 - R) * W[14]);
 }
 
-/** Desired retention → interval mapping. */
+/** Desired retention  interval mapping. */
 function intervalFromStability(S, requestedRetention = 0.9) {
   return Math.min(
     Math.max(1, Math.round(S * (Math.pow(requestedRetention, 1 / DECAY) - 1) / FACTOR)),
@@ -130,7 +130,7 @@ export function scheduleCard(card, grade, opts = {}) {
 
   const interval = state === 'review'
     ? intervalFromStability(stability, retention)
-    : 1;  // learning / relearning → review same day or next day
+    : 1;  // learning / relearning  review same day or next day
 
   const due = new Date(now.getTime() + interval * 86400000);
 
@@ -167,7 +167,7 @@ export function forecastWorkload(cards, days = 30) {
 
 /**
  * Predict overall retention score across all cards.
- * Returns mean retrievability × 100 (0–100 scale).
+ * Returns mean retrievability  100 (0100 scale).
  * @param {object[]} cards
  * @param {Date}     [now]
  * @returns {number}

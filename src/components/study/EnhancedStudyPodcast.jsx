@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Zap, Loader2, Play, Square, Trash2, Volume2 } from 'lucide-react';
 import { callAIStreaming } from '../../services/ai/callAIStreaming';
 
@@ -103,20 +103,20 @@ export default function EnhancedStudyPodcast({ flashcards, exams, settings, addT
         <div className="flex gap-2 mb-3">
           <select value={selectedSet?.id || ''} onChange={e => setSelectedSet(flashcards.find(s => s.id === e.target.value) || null)}
             className="glass-input flex-1 rounded-xl px-3 py-2 text-sm outline-none">
-            <option value="">Choose a deck…</option>
+            <option value="">Choose a deck</option>
             {flashcards.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
           </select>
           <button onClick={() => generateScript(selectedSet)} disabled={!selectedSet || generating}
             className="btn-accent px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 shrink-0">
             {generating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
-            {generating ? 'Writing…' : 'Generate'}
+            {generating ? 'Writing' : 'Generate'}
           </button>
         </div>
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex items-center gap-2 glass rounded-xl px-3 py-2">
             <span className="text-xs opacity-40">Speed</span>
             <input type="range" min={0.5} max={2} step={0.25} value={speed} onChange={e => setSpeed(+e.target.value)} className="w-16" />
-            <span className="text-xs font-black w-8">{speed}×</span>
+            <span className="text-xs font-black w-8">{speed}</span>
           </div>
           <label className="flex items-center gap-2 glass rounded-xl px-3 py-2 cursor-pointer">
             <input type="checkbox" checked={useMultiVoice} onChange={e => setUseMultiVoice(e.target.checked)} className="w-4 h-4" />
@@ -172,7 +172,7 @@ export default function EnhancedStudyPodcast({ flashcards, exams, settings, addT
                 ))}
               </div>
             )}
-            <p className="text-xs opacity-40 line-clamp-2 mt-2">{script.script.replace(/\[CHAPTER:[^\]]+\]/g, '').slice(0, 120)}…</p>
+            <p className="text-xs opacity-40 line-clamp-2 mt-2">{script.script.replace(/\[CHAPTER:[^\]]+\]/g, '').slice(0, 120)}</p>
           </div>
         ))}
         {scripts.length === 0 && !generating && (

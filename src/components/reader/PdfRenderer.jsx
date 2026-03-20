@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — PdfRenderer
+ * MARIAM PRO  PdfRenderer
  * Canvas-based PDF page renderer with proper cleanup to prevent memory leaks.
  * Uses PDF.js loaded via CDN (window.pdfjsLib).
  */

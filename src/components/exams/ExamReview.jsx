@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — ExamReview Component
+ * MARIAM PRO  ExamReview Component
  * Shows all questions in an exam with correct answers highlighted.
  */
 import React, { useState } from 'react';
@@ -24,7 +24,7 @@ export default function ExamReview({ exam, onBack, addToast }) {
             className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2">
             <ChevronLeft size={18} />Back
           </button>
-          <h2 className="font-black text-lg">{exam.title} — Review</h2>
+          <h2 className="font-black text-lg">{exam.title}  Review</h2>
           <button onClick={handleExport} disabled={exporting}
             className="ml-auto btn-accent px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md">
             {exporting ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}

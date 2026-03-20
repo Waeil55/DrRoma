@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Chat Message Component
+ * MARIAM PRO  Chat Message Component
  * Individual message bubble with copy action.
  */
 import React from 'react';
@@ -20,7 +20,7 @@ export default function ChatMessage({ message, index }) {
         <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed
           ${isUser ? 'bg-[var(--accent)] text-white rounded-tr-sm max-w-[80%]' : 'rounded-tl-sm'}`}>
           {!isUser ? (
-            <div className="prose-custom">{message.content ? renderAIContent(message.content) : <span className="opacity-30 animate-pulse">▊</span>}</div>
+            <div className="prose-custom">{message.content ? renderAIContent(message.content) : <span className="opacity-30 animate-pulse"></span>}</div>
           ) : (
             <p className="whitespace-pre-wrap">{message.content}</p>
           )}

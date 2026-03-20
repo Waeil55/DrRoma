@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 export default function BloodGasInterpreterView() {
   const [values, setValues] = useState({ ph: '', pco2: '', hco3: '', pao2: '', fio2: '' });
@@ -45,7 +45,7 @@ export default function BloodGasInterpreterView() {
         pco2 > expectedPco2 + 2 ? 'Inadequate compensation (concurrent respiratory acidosis)' :
         'Over-compensation (concurrent respiratory alkalosis)';
       compensation = comp;
-      findings.push({ label: 'Expected pCO₂ (Winter\'s)', value: `${(expectedPco2 - 2).toFixed(0)}-${(expectedPco2 + 2).toFixed(0)} mmHg (actual: ${pco2})`, color: '#8b5cf6' });
+      findings.push({ label: 'Expected pCO (Winter\'s)', value: `${(expectedPco2 - 2).toFixed(0)}-${(expectedPco2 + 2).toFixed(0)} mmHg (actual: ${pco2})`, color: '#8b5cf6' });
     }
     if (primary.includes('Metabolic Acidosis')) {
       const ag = 140 - 101 - hco3; // simplified (using standard Na=140, Cl=101)
@@ -54,7 +54,7 @@ export default function BloodGasInterpreterView() {
         findings.push({ label: 'AG Acidosis Causes (MUDPILES)', value: 'Methanol, Uremia, DKA, Propylene glycol, INH/Iron, Lactic acidosis, Ethylene glycol, Salicylates', color: '#f59e0b' });
         const deltaGap = ag - 12;
         const correctedHCO3 = hco3 + deltaGap;
-        findings.push({ label: 'Delta-Delta (Corrected HCO₃)', value: `${correctedHCO3.toFixed(1)} mEq/L — ${correctedHCO3 > 26 ? 'concurrent metabolic alkalosis' : correctedHCO3 < 22 ? 'concurrent non-AG metabolic acidosis' : 'pure AG metabolic acidosis'}`, color: '#8b5cf6' });
+        findings.push({ label: 'Delta-Delta (Corrected HCO)', value: `${correctedHCO3.toFixed(1)} mEq/L  ${correctedHCO3 > 26 ? 'concurrent metabolic alkalosis' : correctedHCO3 < 22 ? 'concurrent non-AG metabolic acidosis' : 'pure AG metabolic acidosis'}`, color: '#8b5cf6' });
       } else {
         findings.push({ label: 'Non-AG Acidosis Causes (HARDUPS)', value: 'Hyperalimentation, Acetazolamide, RTA, Diarrhea, Ureteral diversion, Pancreatic fistula, Saline (dilutional)', color: '#f59e0b' });
       }
@@ -85,10 +85,10 @@ export default function BloodGasInterpreterView() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
               { key: 'ph', label: 'pH', placeholder: '7.35-7.45', unit: '' },
-              { key: 'pco2', label: 'pCO₂', placeholder: '35-45', unit: 'mmHg' },
-              { key: 'hco3', label: 'HCO₃⁻', placeholder: '22-26', unit: 'mEq/L' },
-              { key: 'pao2', label: 'PaO₂', placeholder: '80-100', unit: 'mmHg' },
-              { key: 'fio2', label: 'FiO₂', placeholder: '21', unit: '%' },
+              { key: 'pco2', label: 'pCO', placeholder: '35-45', unit: 'mmHg' },
+              { key: 'hco3', label: 'HCO', placeholder: '22-26', unit: 'mEq/L' },
+              { key: 'pao2', label: 'PaO', placeholder: '80-100', unit: 'mmHg' },
+              { key: 'fio2', label: 'FiO', placeholder: '21', unit: '%' },
             ].map(f => (
               <div key={f.key}>
                 <label className="text-xs font-black opacity-40 block mb-1">{f.label} {f.unit && <span className="opacity-50">({f.unit})</span>}</label>
@@ -133,12 +133,12 @@ export default function BloodGasInterpreterView() {
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
           <h3 className="font-black text-sm mb-3"> ABG Interpretation Steps</h3>
           {[
-            'Step 1: Look at pH → Acidemia (<7.35) or Alkalemia (>7.45)?',
-            'Step 2: Identify primary disorder → pCO₂ (respiratory) or HCO₃⁻ (metabolic)?',
-            'Step 3: Check compensation → Appropriate? (Winter\'s formula for metabolic acidosis)',
-            'Step 4: If metabolic acidosis → Calculate anion gap (Na⁺ – Cl⁻ – HCO₃⁻)',
-            'Step 5: If AG elevated → Delta-delta (corrected HCO₃⁻) to check for hidden disorder',
-            'Step 6: Assess oxygenation → A-a gradient, P/F ratio',
+            'Step 1: Look at pH  Acidemia (<7.35) or Alkalemia (>7.45)?',
+            'Step 2: Identify primary disorder  pCO (respiratory) or HCO (metabolic)?',
+            'Step 3: Check compensation  Appropriate? (Winter\'s formula for metabolic acidosis)',
+            'Step 4: If metabolic acidosis  Calculate anion gap (Na  Cl  HCO)',
+            'Step 5: If AG elevated  Delta-delta (corrected HCO) to check for hidden disorder',
+            'Step 6: Assess oxygenation  A-a gradient, P/F ratio',
           ].map((step, i) => (
             <div key={i} className="flex items-start gap-3 py-1.5 text-xs">
               <span className="w-5 h-5 rounded flex items-center justify-center shrink-0 font-black" style={{ background: 'var(--accent)/15', color: 'var(--accent)', fontSize: 10 }}>{i + 1}</span>

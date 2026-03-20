@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -99,14 +99,14 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
                 <div>
                   <label className="text-xs font-black opacity-50 uppercase tracking-widest block mb-2">Weak Subjects</label>
                   <input value={weakSubjects} onChange={e => setWeakSubjects(e.target.value)}
-                    placeholder="e.g. Cardiology, Pharmacology…"
+                    placeholder="e.g. Cardiology, Pharmacology"
                     className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
                     style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
                 </div>
               </div>
               <button onClick={generate} disabled={generating}
                 className="btn-accent w-full py-3 rounded-xl font-black flex items-center justify-center gap-2">
-                {generating ? <><Loader2 size={16} className="animate-spin" /> Generating Plan…</> : <><Sparkles size={16} /> Generate AI Study Plan</>}
+                {generating ? <><Loader2 size={16} className="animate-spin" /> Generating Plan</> : <><Sparkles size={16} /> Generate AI Study Plan</>}
               </button>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
@@ -131,7 +131,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
                     </div>
                   );
                 })}
-                {flashcards.filter(f => !f.isBuiltin).length === 0 && <p className="text-xs opacity-40">No custom decks yet — upload documents to create them.</p>}
+                {flashcards.filter(f => !f.isBuiltin).length === 0 && <p className="text-xs opacity-40">No custom decks yet  upload documents to create them.</p>}
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
                     {plan.examDate && <p className="text-xs opacity-40 mt-0.5">Exam: {new Date(plan.examDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>}
                   </div>
                   <button onClick={generate} disabled={generating} className="glass px-3 py-1.5 rounded-xl text-xs font-black shrink-0" style={{ color: 'var(--accent)' }}>
-                    {generating ? <Loader2 size={12} className="animate-spin" /> : '↺ Regenerate'}
+                    {generating ? <Loader2 size={12} className="animate-spin" /> : ' Regenerate'}
                   </button>
                 </div>
                 <p className="text-sm opacity-70 leading-relaxed">{plan.overview}</p>

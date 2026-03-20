@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
 /**
- * MARIAM PRO — Toast Component
+ * MARIAM PRO  Toast Component
  * Auto-dismissing notification toasts.
  */
 const ICONS = {
@@ -75,7 +75,7 @@ export function ToastContainer({ toasts, removeToast }) {
 }
 
 /**
- * Toast hook — returns { toasts, addToast, removeToast }
+ * Toast hook  returns { toasts, addToast, removeToast }
  */
 export function useToast() {
   const [toasts, setToasts] = useState([]);

@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — CasePlayer Component
+/**
+ * MARIAM PRO  CasePlayer Component
  * Three-panel clinical case player: Vignette/Q + Lab Results + AI Tutor
  */
 import React, { useState, useCallback } from 'react';
@@ -33,7 +33,7 @@ export default function CasePlayer({ caseSet, settings, addToast, AiTutorPanel }
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-      {/* ── TOP BAR ── */}
+      {/*  TOP BAR  */}
       <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
         <button onClick={() => window.history.back()}
           className="glass px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 hover:border-[var(--accent)]/40 transition-all">
@@ -57,7 +57,7 @@ export default function CasePlayer({ caseSet, settings, addToast, AiTutorPanel }
         </button>
       </div>
 
-      {/* ── MAIN THREE-PANEL ROW ── */}
+      {/*  MAIN THREE-PANEL ROW  */}
       <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* LEFT: Vignette + Question + Answers */}
         <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-5 space-y-4"
@@ -105,7 +105,7 @@ export default function CasePlayer({ caseSet, settings, addToast, AiTutorPanel }
               {q.explanation && <p className="text-sm leading-relaxed">{q.explanation}</p>}
               {q.evidence && (
                 <p className="text-xs italic pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>
-                  "{q.evidence}" — p.{q.sourcePage}
+                  "{q.evidence}"  p.{q.sourcePage}
                 </p>
               )}
             </div>

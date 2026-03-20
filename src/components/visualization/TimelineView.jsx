@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — TimelineView
+ * MARIAM PRO  TimelineView
  * Vertical timeline with gradient connector.
  */
 import React from 'react';

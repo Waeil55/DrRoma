@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — ChatView orchestrator
+/**
+ * MARIAM PRO  ChatView orchestrator
  * Sidebar with sessions (grouped by date, pinned, projects), streaming chat,
  * voice input, starter prompts, context menu, session management, project CRUD.
  */
@@ -214,7 +214,7 @@ EXAMPLE CALLOUT:
         </div>
       )}
 
-      {/* ── SIDEBAR ── */}
+      {/*  SIDEBAR  */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 bg-black/40 z-[40] backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
@@ -234,7 +234,7 @@ EXAMPLE CALLOUT:
         <div className="px-3 py-2 shrink-0">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
-            <input value={sessSearch} onChange={e => setSessSearch(e.target.value)} placeholder="Search conversations…" className="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" />
+            <input value={sessSearch} onChange={e => setSessSearch(e.target.value)} placeholder="Search conversations" className="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" />
           </div>
         </div>
 
@@ -278,7 +278,7 @@ EXAMPLE CALLOUT:
             <button onClick={() => setShowNewProject(true)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors"><Plus size={16} />New Project</button>
             {showNewProject && (
               <div className="mx-3 mb-3 p-3 glass rounded-xl border border-[color:var(--border2,var(--border))] space-y-2">
-                <input value={newProjectName} onChange={e => setNewProjectName(e.target.value)} onKeyDown={e => e.key === 'Enter' && createProject()} placeholder="Project name…" autoFocus className="w-full text-sm bg-transparent outline-none border-b border-[color:var(--border2,var(--border))] pb-1 text-[var(--text)]" />
+                <input value={newProjectName} onChange={e => setNewProjectName(e.target.value)} onKeyDown={e => e.key === 'Enter' && createProject()} placeholder="Project name" autoFocus className="w-full text-sm bg-transparent outline-none border-b border-[color:var(--border2,var(--border))] pb-1 text-[var(--text)]" />
                 <div className="flex gap-2">
                   <button onClick={createProject} className="flex-1 py-1.5 btn-accent rounded-lg text-xs font-black">Create</button>
                   <button onClick={() => setShowNewProject(false)} className="flex-1 py-1.5 glass rounded-lg text-xs font-black opacity-60">Cancel</button>
@@ -326,7 +326,7 @@ EXAMPLE CALLOUT:
         </div>
       </div>
 
-      {/* ── MAIN CHAT AREA ── */}
+      {/*  MAIN CHAT AREA  */}
       <div className="flex-1 flex flex-col min-h-0 min-w-0 relative">
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[color:var(--border2,var(--border))] bg-[var(--surface,var(--card))]/80 backdrop-blur-sm shrink-0">
           <button onClick={() => setSidebarOpen(o => !o)} className="w-9 h-9 glass rounded-xl flex items-center justify-center opacity-60 hover:opacity-100 shrink-0 transition-all"><History size={18} /></button>
@@ -361,7 +361,7 @@ EXAMPLE CALLOUT:
                   </div>
                 </div>
                 <h1 className="text-3xl font-black">What can I help you study?</h1>
-                <p className="text-base opacity-50 max-w-md">Your AI study assistant — medicine, sciences, and beyond</p>
+                <p className="text-base opacity-50 max-w-md">Your AI study assistant  medicine, sciences, and beyond</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-2xl">
                 {STARTERS.map(s => (
@@ -390,7 +390,7 @@ EXAMPLE CALLOUT:
                   <div className={`flex-1 max-w-[85%] flex flex-col gap-1.5 ${m.role === 'user' ? 'items-end' : ''}`}>
                     <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm max-w-[80%]' : 'rounded-tl-sm'}`}>
                       {m.role === 'assistant' ? (
-                        <div className="prose-custom">{m.content ? renderAIContent(m.content) : <span className="opacity-30 animate-pulse">▊</span>}</div>
+                        <div className="prose-custom">{m.content ? renderAIContent(m.content) : <span className="opacity-30 animate-pulse"></span>}</div>
                       ) : (
                         <p className="whitespace-pre-wrap">{m.content}</p>
                       )}
@@ -430,7 +430,7 @@ EXAMPLE CALLOUT:
               <textarea ref={inputRef} value={input}
                 onChange={e => { setInput(e.target.value); setInputRows(Math.min(8, e.target.value.split('\n').length)); }}
                 onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-                placeholder="Message MARIAM…" disabled={loading} rows={inputRows}
+                placeholder="Message MARIAM" disabled={loading} rows={inputRows}
                 className="flex-1 max-h-48 bg-transparent px-2 py-2.5 text-sm outline-none resize-none custom-scrollbar leading-relaxed"
                 style={{ color: 'var(--text)', minHeight: 44 }} />
               <div className="shrink-0 flex items-center gap-1 p-1">

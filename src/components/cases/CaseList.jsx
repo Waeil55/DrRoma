@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — CaseList Component
+/**
+ * MARIAM PRO  CaseList Component
  * Clinical case set listing with stats and actions.
  */
 import React, { useState } from 'react';

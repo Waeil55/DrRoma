@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Copy, PenLine, Trash2, Clipboard } from 'lucide-react';
 
 const ROUTES = ['PO', 'IV', 'IM', 'SC', 'SL', 'PR', 'Topical', 'Inhaled', 'Nasal', 'Ophthalmic', 'Otic'];
@@ -130,7 +130,7 @@ export default function PrescriptionPadView({ addToast }) {
             <div className="flex items-start justify-between gap-3 mb-2">
               <div>
                 <h3 className="font-black text-base">Rx: {rx.drug}</h3>
-                <p className="text-sm font-bold opacity-70 mt-0.5">{rx.dose} — {rx.route} — {rx.freq}</p>
+                <p className="text-sm font-bold opacity-70 mt-0.5">{rx.dose}  {rx.route}  {rx.freq}</p>
               </div>
               <div className="flex gap-1.5 shrink-0">
                 <button onClick={() => copyRx(rx)} className="w-7 h-7 glass rounded-lg flex items-center justify-center opacity-40 hover:opacity-80"><Copy size={12} /></button>

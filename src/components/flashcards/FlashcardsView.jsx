@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — FlashcardsView orchestrator
+/**
+ * MARIAM PRO  FlashcardsView orchestrator
  * Full flashcard study mode with Quizlet-style 3D flip, swipe gestures,
  * FSRS rating, inline AI tutor, deck list, and PDF export.
  */
@@ -68,7 +68,7 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
   const handleFcTutorDrag = useCallback(x => { setFcTutorW(Math.max(280, Math.min(560, window.innerWidth - x))); }, []);
   const startFcTutorDrag = useDrag(handleFcTutorDrag, [handleFcTutorDrag]);
 
-  /* ═══ STUDY MODE ═══ */
+  /*  STUDY MODE  */
   if (selSet) {
     const card = selSet.cards[idx];
     const progress = ((idx + 1) / selSet.cards.length) * 100;
@@ -129,7 +129,7 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
                     <p className="text-base font-semibold leading-relaxed flex-1">{card.q}</p>
                     <p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-2">
                       <RefreshCw size={11} />Tap/swipe to flip
-                      <span className="opacity-60">· → Easy · ← Again · ↑ Good</span>
+                      <span className="opacity-60">·  Easy ·  Again ·  Good</span>
                     </p>
                   </div>
                   {/* BACK */}
@@ -197,7 +197,7 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
     );
   }
 
-  /* ═══ DECK LIST ═══ */
+  /*  DECK LIST  */
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
       {showModal && <QuickGenerateModal type="flashcards" docs={docs || []} settings={settings}

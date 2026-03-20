@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const PEDS_DRUGS = [
@@ -8,8 +8,8 @@ const PEDS_DRUGS = [
   { name: 'Ceftriaxone', indication: 'Meningitis, sepsis, severe infections', standardDose: '50-100 mg/kg/day IV/IM (daily or divided BID for meningitis)', maxDose: '2 g/dose (4 g/day for meningitis)', formulations: ['250 mg vial', '1 g vial', '2 g vial'], notes: 'AVOID in neonates <28 days with hyperbilirubinemia (displaces bilirubin from albumin). Do not co-administer with calcium-containing IV solutions.' },
   { name: 'Ondansetron', indication: 'Nausea/vomiting, gastroenteritis', standardDose: '0.15 mg/kg/dose Q8h (max 3 doses)', maxDose: '4 mg/dose', formulations: ['4 mg/5 mL oral solution', '4 mg ODT tablet'], notes: 'Very effective for gastroenteritis vomiting. Single dose often sufficient. QTc prolongation at high doses.' },
   { name: 'Prednisolone', indication: 'Asthma exacerbation, croup', standardDose: 'Asthma: 1-2 mg/kg/day (3-5 days). Croup: 1-2 mg/kg single dose', maxDose: '60 mg/day (asthma), 60 mg single dose (croup)', formulations: ['15 mg/5 mL solution', '5 mg tablet'], notes: 'Dexamethasone 0.6 mg/kg single dose often preferred for croup. No taper needed if <5 days.' },
-  { name: 'Albuterol (Salbutamol)', indication: 'Asthma, bronchospasm, wheezing', standardDose: 'MDI: 4-8 puffs via spacer Q20min × 3, then Q1-4h. Neb: 2.5-5 mg Q20min × 3', maxDose: 'Continuous nebulization 10-20 mg/hr in severe exacerbation', formulations: ['MDI 90 mcg/puff', 'Nebulizer solution 2.5 mg/3 mL, 5 mg/mL'], notes: 'Always use spacer with MDI in children. Side effects: tachycardia, tremor, hypokalemia.' },
-  { name: 'Epinephrine (Adrenaline)', indication: 'Anaphylaxis, severe croup, cardiac arrest', standardDose: 'Anaphylaxis: 0.01 mg/kg IM (0.01 mL/kg of 1:1000). Cardiac arrest: 0.01 mg/kg IV (0.1 mL/kg of 1:10,000)', maxDose: '0.5 mg IM (anaphylaxis), 1 mg IV (cardiac arrest)', formulations: ['1:1000 (1 mg/mL) IM — anaphylaxis', '1:10,000 (0.1 mg/mL) IV — cardiac arrest', 'EpiPen Jr 0.15 mg (<30 kg), EpiPen 0.3 mg (>30 kg)'], notes: 'IM anterolateral thigh ALWAYS for anaphylaxis. Can repeat Q5-15 min. Do NOT give IV 1:1000 (fatal).' },
+  { name: 'Albuterol (Salbutamol)', indication: 'Asthma, bronchospasm, wheezing', standardDose: 'MDI: 4-8 puffs via spacer Q20min  3, then Q1-4h. Neb: 2.5-5 mg Q20min  3', maxDose: 'Continuous nebulization 10-20 mg/hr in severe exacerbation', formulations: ['MDI 90 mcg/puff', 'Nebulizer solution 2.5 mg/3 mL, 5 mg/mL'], notes: 'Always use spacer with MDI in children. Side effects: tachycardia, tremor, hypokalemia.' },
+  { name: 'Epinephrine (Adrenaline)', indication: 'Anaphylaxis, severe croup, cardiac arrest', standardDose: 'Anaphylaxis: 0.01 mg/kg IM (0.01 mL/kg of 1:1000). Cardiac arrest: 0.01 mg/kg IV (0.1 mL/kg of 1:10,000)', maxDose: '0.5 mg IM (anaphylaxis), 1 mg IV (cardiac arrest)', formulations: ['1:1000 (1 mg/mL) IM  anaphylaxis', '1:10,000 (0.1 mg/mL) IV  cardiac arrest', 'EpiPen Jr 0.15 mg (<30 kg), EpiPen 0.3 mg (>30 kg)'], notes: 'IM anterolateral thigh ALWAYS for anaphylaxis. Can repeat Q5-15 min. Do NOT give IV 1:1000 (fatal).' },
 ];
 
 const parseDose = (doseStr) => {
@@ -30,13 +30,13 @@ export default function PediatricDosingView() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-black opacity-40 block mb-1">Weight (kg)</label>
-            <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="Enter weight…"
+            <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="Enter weight"
               className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
           </div>
           <div>
             <label className="text-xs font-black opacity-40 block mb-1">Search drug</label>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Drug name…"
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Drug name"
               className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
           </div>
@@ -77,7 +77,7 @@ export default function PediatricDosingView() {
                   {w > 0 && dose && (
                     <div className="glass rounded-xl p-4 text-center" style={{ background: 'var(--accent)/05', border: '1px solid var(--accent)/20' }}>
                       <div className="text-2xl font-black" style={{ color: 'var(--accent)' }}>{calcDose} mg/dose</div>
-                      <p className="text-xs opacity-50 mt-1">Based on {w} kg × {dose} mg/kg</p>
+                      <p className="text-xs opacity-50 mt-1">Based on {w} kg  {dose} mg/kg</p>
                     </div>
                   )}
                   <div><span className="text-xs font-black opacity-40">Standard Dose:</span><p className="text-xs opacity-70 mt-0.5">{drug.standardDose}</p></div>

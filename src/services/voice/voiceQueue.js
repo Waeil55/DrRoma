@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Voice Queue Manager
+ * MARIAM PRO  Voice Queue Manager
  * Manages queued utterances for sequential TTS playback.
  */
 import { getProsodyEngine } from './speechSynthesis.js';

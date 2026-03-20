@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -129,7 +129,7 @@ Be thorough and clinically accurate. Include all relevant interactions.`;
                 background: 'rgba(99,102,241,0.15)', color: 'var(--accent, #6366f1)',
               }}>
                 {d}
-                <span onClick={() => removeDrug(d)} style={{ cursor: 'pointer', opacity: 0.7, lineHeight: 1 }}>×</span>
+                <span onClick={() => removeDrug(d)} style={{ cursor: 'pointer', opacity: 0.7, lineHeight: 1 }}></span>
               </span>
             ))}
           </div>
@@ -215,7 +215,7 @@ Be thorough and clinically accurate. Include all relevant interactions.`;
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
                 <span style={{ fontSize: '1.1rem' }}>{SEV_ICONS[inter.severity] || ''}</span>
                 <span style={{ fontWeight: 700, flex: 1, fontSize: '0.95rem' }}>
-                  {inter.drugs?.join(' ↔ ')}
+                  {inter.drugs?.join('  ')}
                 </span>
                 <span style={{
                   padding: '0.2rem 0.6rem', borderRadius: 12, fontSize: '0.75rem', fontWeight: 700,

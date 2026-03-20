@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Chat Input Component
+ * MARIAM PRO  Chat Input Component
  * Text input with voice and send buttons.
  */
 import React, { useRef, useState, useCallback } from 'react';
@@ -46,7 +46,7 @@ export default function ChatInput({ onSend, loading, projectColor }) {
           <textarea ref={inputRef} value={input}
             onChange={e => { setInput(e.target.value); setInputRows(Math.min(8, e.target.value.split('\n').length)); }}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            placeholder="Message MARIAM…" disabled={loading} rows={inputRows}
+            placeholder="Message MARIAM" disabled={loading} rows={inputRows}
             className="flex-1 max-h-48 bg-transparent px-2 py-2.5 text-sm outline-none resize-none custom-scrollbar leading-relaxed"
             style={{ color: 'var(--text)', minHeight: 44 }} />
           <div className="shrink-0 flex items-center gap-1 p-1">

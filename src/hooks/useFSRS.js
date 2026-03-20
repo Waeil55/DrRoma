@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useFSRS Hook
+ * MARIAM PRO  useFSRS Hook
  * React wrapper for FSRS-5 spaced repetition engine.
  */
 import { useState, useCallback } from 'react';

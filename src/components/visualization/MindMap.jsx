@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — MindMap (SVG radial)
+ * MARIAM PRO  MindMap (SVG radial)
  * Renders a radial mind-map from AI-generated data.
  */
 import React from 'react';

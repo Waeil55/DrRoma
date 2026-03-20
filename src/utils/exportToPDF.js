@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — Export to PDF utility
+/**
+ * MARIAM PRO  Export to PDF utility
  * Dynamically loads jsPDF from CDN and generates styled PDFs.
  */
 import { loadScript } from './config';

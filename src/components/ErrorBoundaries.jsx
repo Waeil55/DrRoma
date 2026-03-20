@@ -2,7 +2,7 @@ import React from 'react';
 import { RefreshCw, AlertTriangle, Mic, FileText, Sparkles } from 'lucide-react';
 
 /**
- * ChunkErrorBoundary — Handles lazy-loaded code-split failures.
+ * ChunkErrorBoundary  Handles lazy-loaded code-split failures.
  * Shows a "Retry loading" button that re-renders the tree.
  */
 export class ChunkErrorBoundary extends React.Component {
@@ -26,7 +26,7 @@ export class ChunkErrorBoundary extends React.Component {
 }
 
 /**
- * PdfErrorBoundary — Wraps PDF renderer specifically.
+ * PdfErrorBoundary  Wraps PDF renderer specifically.
  */
 export class PdfErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -45,7 +45,7 @@ export class PdfErrorBoundary extends React.Component {
 }
 
 /**
- * AiErrorBoundary — Wraps AI-generated content rendering.
+ * AiErrorBoundary  Wraps AI-generated content rendering.
  */
 export class AiErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -68,7 +68,7 @@ export class AiErrorBoundary extends React.Component {
 }
 
 /**
- * VoiceErrorBoundary — Wraps all voice features.
+ * VoiceErrorBoundary  Wraps all voice features.
  */
 export class VoiceErrorBoundary extends React.Component {
   state = { hasError: false };

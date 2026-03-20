@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — Schedule Engine
+/**
+ * MARIAM PRO  Schedule Engine
  * FSRS-driven review scheduling + exam/task/streak notification triggers.
  * Wired to the NotificationService and FSRS engine.
  */
@@ -27,7 +27,7 @@ export function scheduleFSRSReminders(allDecks) {
     const due = getDueCards(deck.cards || []);
     if (due.length > 0) {
       notifier.schedule(NOTIFICATION_TYPES.REVIEW_DUE, _msUntil('09:00'), {
-        title: ` ${due.length} cards due — ${deck.title}`,
+        title: ` ${due.length} cards due  ${deck.title}`,
         body: 'Keep your streak alive! Review now to maximize retention.',
         data: { view: 'flashcards', deckId: deck.id },
       });
@@ -94,9 +94,9 @@ export function scheduleAllNotifications(state = {}) {
     if (exam.date) scheduleExamReminder(exam.title, exam.date);
   }
 
-  // Type 4: Task Due Soon — handled per-task in TaskStore
+  // Type 4: Task Due Soon  handled per-task in TaskStore
 
-  // Type 5: Weekly Report — schedule for Sunday
+  // Type 5: Weekly Report  schedule for Sunday
   const now = new Date();
   if (now.getDay() === 0) {
     notifier.schedule('weekly_report', _msUntil('10:00'), {

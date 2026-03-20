@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Settings Store
+ * MARIAM PRO  Settings Store
  */
 import { createStore } from './createStore.js';
 

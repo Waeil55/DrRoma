@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Study Analytics (module-level)
+ * MARIAM PRO  Study Analytics (module-level)
  * Stored on window so it survives React lifecycle / view switches.
  */
 

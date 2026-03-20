@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart2 } from 'lucide-react';
 import { openDB } from '../../services/db/openDB';
 
@@ -30,7 +30,7 @@ function MasteryHeatmap() {
   return (
     <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-black text-sm opacity-70">Study Activity — Last 91 Days</h2>
+        <h2 className="font-black text-sm opacity-70">Study Activity  Last 91 Days</h2>
         <div className="flex gap-4 text-xs font-bold">
           {streak > 0 && <span style={{ color: 'var(--accent)' }}> {streak}d streak</span>}
           {bestStreak > 0 && <span className="opacity-40">Best: {bestStreak}d</span>}

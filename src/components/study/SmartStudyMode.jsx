@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Brain, Zap, Volume2, Mic, ChevronLeft } from 'lucide-react';
 import FSRSFlashcardReview from './FSRSFlashcardReview';
 import MatchGame from '../flashcards/MatchGame';

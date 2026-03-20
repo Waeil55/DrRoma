@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Study Analytics Service
+ * MARIAM PRO  Study Analytics Service
  * Tracks daily study activity and computes insights.
  */
 import { dbOp } from '../db/dbOp.js';

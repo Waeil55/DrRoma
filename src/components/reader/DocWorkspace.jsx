@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — DocWorkspace
+ * MARIAM PRO  DocWorkspace
  * PDF canvas + text/image viewer with tab bar, page nav, zoom controls.
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -159,7 +159,7 @@ export default function DocWorkspace({ activeDoc, setDocs, currentPage, setCurre
       <div ref={containerRef} className="flex-1 overflow-auto custom-scrollbar min-h-0 bg-zinc-200 dark:bg-zinc-900">
         {loading ? (
           <div className="flex items-center justify-center h-full gap-3 text-[var(--accent)]">
-            <Loader2 size={28} className="animate-spin" /><span className="text-xs font-bold opacity-50">Loading…</span>
+            <Loader2 size={28} className="animate-spin" /><span className="text-xs font-bold opacity-50">Loading</span>
           </div>
         ) : isPdf && pdf ? (
           <div className="p-2 pb-20 lg:pb-4 flex justify-center">

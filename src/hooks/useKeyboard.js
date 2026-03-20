@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useKeyboard Hook
+ * MARIAM PRO  useKeyboard Hook
  * Global keyboard shortcut handler.
  */
 import { useEffect, useRef } from 'react';

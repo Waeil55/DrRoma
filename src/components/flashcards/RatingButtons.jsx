@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — Rating Buttons Component
+/**
+ * MARIAM PRO  Rating Buttons Component
  * FSRS rating buttons (Again/Hard/Good/Easy) for flashcard review.
  */
 import React from 'react';

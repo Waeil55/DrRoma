@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Application Configuration
+ * MARIAM PRO  Application Configuration
  * Centralised constants for the entire app.
  */
 

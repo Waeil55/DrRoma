@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — VaultPanel Component
+ * MARIAM PRO  VaultPanel Component
  * Document vault showing flashcards, exams, cases, notes, mind maps, timelines for active doc.
  */
 import React, { useState } from 'react';

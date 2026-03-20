@@ -7,7 +7,7 @@ import React, { useRef, useEffect, useState } from 'react';
 // of where they sit in the DOM tree, so no portal is needed.
 
 /**
- * MARIAM PRO — BottomSheet Component
+ * MARIAM PRO  BottomSheet Component
  * Mobile drag-to-dismiss sheet with spring physics.
  */
 export default function BottomSheet({ isOpen, onClose, title, children, height = '60vh' }) {

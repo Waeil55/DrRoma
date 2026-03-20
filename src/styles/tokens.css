@@ -1,9 +1,9 @@
-/* ╔══════════════════════════════════════════════════════════════════╗
- * ║  MARIAM PRO — Design Token System                              ║
- * ║  ALL CSS variables defined here. NEVER hardcode values.        ║
- * ╚══════════════════════════════════════════════════════════════════╝ */
+/* 
+ *   MARIAM PRO  Design Token System                              
+ *   ALL CSS variables defined here. NEVER hardcode values.        
+ *  */
 
-/* ── Z-INDEX LAYER SYSTEM — strictly enforced ── */
+/*  Z-INDEX LAYER SYSTEM  strictly enforced  */
 :root {
   --z-base:           1;
   --z-card:          10;
@@ -19,7 +19,7 @@
   --z-top-glass:     170;
   --z-header:        180;
 
-  /* ── Spacing scale ── */
+  /*  Spacing scale  */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -30,7 +30,7 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* ── Border radius scale ── */
+  /*  Border radius scale  */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -38,7 +38,7 @@
   --radius-2xl: 24px;
   --radius-full: 9999px;
 
-  /* ── Transition presets ── */
+  /*  Transition presets  */
   --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
   --ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1);
   --ease-in:     cubic-bezier(0.4, 0.0, 1, 1);

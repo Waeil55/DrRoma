@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 export default function NutritionCalculatorView() {
   const [tab, setTab] = useState('bmr');
@@ -107,7 +107,7 @@ export default function NutritionCalculatorView() {
                   <button key={a.v} onClick={() => setActivity(a.v)}
                     className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
                     style={activity === a.v ? { background: 'var(--accent)', color: '#fff' } : { border: '1px solid var(--border)' }}>
-                    {a.l} (×{a.v})
+                    {a.l} ({a.v})
                   </button>
                 ))}
               </div>
@@ -126,7 +126,7 @@ export default function NutritionCalculatorView() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 rounded-xl" style={{ background: bmi < 18.5 ? '#3b82f610' : bmi < 25 ? '#10b98110' : bmi < 30 ? '#f59e0b10' : '#ef444410' }}>
                   <div className="text-2xl font-black" style={{ color: bmi < 18.5 ? '#3b82f6' : bmi < 25 ? '#10b981' : bmi < 30 ? '#f59e0b' : '#ef4444' }}>{bmi.toFixed(1)}</div>
-                  <div className="text-xs opacity-40 mt-1">BMI (kg/m²)</div>
+                  <div className="text-xs opacity-40 mt-1">BMI (kg/m)</div>
                   <div className="text-xs mt-0.5" style={{ color: bmi < 18.5 ? '#3b82f6' : bmi < 25 ? '#10b981' : bmi < 30 ? '#f59e0b' : '#ef4444' }}>
                     {bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese'}
                   </div>
@@ -146,7 +146,7 @@ export default function NutritionCalculatorView() {
                 { range: '25-29.9', cat: 'Overweight', color: '#f59e0b' },
                 { range: '30-34.9', cat: 'Obese Class I', color: '#ef4444' },
                 { range: '35-39.9', cat: 'Obese Class II', color: '#ef4444' },
-                { range: '≥40', cat: 'Obese Class III (Morbid)', color: '#ef4444' },
+                { range: '40', cat: 'Obese Class III (Morbid)', color: '#ef4444' },
               ].map(b => (
                 <div key={b.range} className="flex items-center gap-3 py-1.5 text-xs">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: b.color }}></span>
@@ -170,7 +170,7 @@ export default function NutritionCalculatorView() {
                   <button key={s.v} onClick={() => setStress(s.v)}
                     className="px-3 py-1.5 rounded-lg text-xs font-black transition-all"
                     style={stress === s.v ? { background: 'var(--accent)', color: '#fff' } : { border: '1px solid var(--border)' }}>
-                    {s.l} (×{s.v})
+                    {s.l} ({s.v})
                   </button>
                 ))}
               </div>
@@ -191,10 +191,10 @@ export default function NutritionCalculatorView() {
                 'Parenteral nutrition (TPN): only if EN fails or contraindicated (bowel obstruction, severe ileus, GI ischemia)',
                 'Do NOT start TPN until day 7 in well-nourished patients (EDEN/PermiT trials)',
                 'Monitor: glucose (target 140-180 in ICU), electrolytes (refeeding syndrome risk), triglycerides',
-                'Refeeding syndrome: phosphate, Mg²⁺, K⁺ shifts into cells when refeeding after prolonged starvation → cardiac/resp failure',
+                'Refeeding syndrome: phosphate, Mg, K shifts into cells when refeeding after prolonged starvation  cardiac/resp failure',
               ].map((line, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs py-0.5">
-                  <span className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }}>▸</span>
+                  <span className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }}></span>
                   <span className="opacity-70 leading-relaxed">{line}</span>
                 </div>
               ))}
@@ -224,7 +224,7 @@ export default function NutritionCalculatorView() {
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
               <h3 className="font-black text-sm mb-3">TPN Estimated Breakdown</h3>
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="opacity-60">Protein:</span><span className="font-black">{tpnProteinG.toFixed(0)} g → {tpnProteinCal.toFixed(0)} kcal</span></div>
+                <div className="flex justify-between"><span className="opacity-60">Protein:</span><span className="font-black">{tpnProteinG.toFixed(0)} g  {tpnProteinCal.toFixed(0)} kcal</span></div>
                 <div className="flex justify-between"><span className="opacity-60">Dextrose:</span><span className="font-black">{tpnDextroseCal.toFixed(0)} kcal</span></div>
                 <div className="flex justify-between"><span className="opacity-60">Lipid:</span><span className="font-black">{tpnLipidCal.toFixed(0)} kcal</span></div>
                 <div className="flex justify-between pt-2" style={{ borderTop: '1px solid var(--border)' }}>

@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — ExamResults Component
+ * MARIAM PRO  ExamResults Component
  * Score display after completing an exam.
  */
 import React from 'react';

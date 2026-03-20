@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — FlashcardCard Component
+/**
+ * MARIAM PRO  FlashcardCard Component
  * 3D flip card with RAF physics driver, dynamic shadow, and swipe gesture support.
  */
 import React, { useRef, useCallback } from 'react';
@@ -67,7 +67,7 @@ export default function FlashcardCard({ card, flipped, setFlipped, swipeHandlers
           transform: flipped ? 'rotateX(180deg)' : 'rotateX(0deg)',
           filter: `drop-shadow(0 calc(var(--flip-progress, 0) * 40px + 8px) calc(var(--flip-progress, 0) * 60px + 16px) rgba(0,0,0,calc(var(--flip-progress, 0) * 0.35 + 0.12)))`,
         }}>
-          {/* FRONT — Question */}
+          {/* FRONT  Question */}
           <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', gridArea: '1 / 1' }}
             className="glass rounded-3xl p-8 flex flex-col justify-between border border-[color:var(--border2,var(--border))] hover:border-[var(--accent)]/40 transition-colors">
             <div className="flex items-start justify-between mb-4">
@@ -77,10 +77,10 @@ export default function FlashcardCard({ card, flipped, setFlipped, swipeHandlers
             <p className="text-base font-semibold leading-relaxed flex-1">{card.q}</p>
             <p className="text-xs opacity-25 text-center mt-6 flex items-center justify-center gap-2">
               <RefreshCw size={11} />Tap/swipe to flip
-              <span className="opacity-60">· → Easy · ← Again · ↑ Good</span>
+              <span className="opacity-60">·  Easy ·  Again ·  Good</span>
             </p>
           </div>
-          {/* BACK — Answer */}
+          {/* BACK  Answer */}
           <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', gridArea: '1 / 1', transform: 'rotateX(180deg)' }}
             className="glass rounded-3xl p-8 flex flex-col justify-between border border-[var(--accent)]/30 bg-[var(--accent)]/4 transition-colors">
             <div className="flex items-start justify-between mb-4">

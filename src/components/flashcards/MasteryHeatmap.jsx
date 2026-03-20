@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Mastery Heatmap Component
+ * MARIAM PRO  Mastery Heatmap Component
  * Visualizes FSRS mastery levels as a grid heatmap.
  */
 import React, { useMemo } from 'react';
@@ -56,7 +56,7 @@ export default function MasteryHeatmap({ cards = [], title = 'Mastery Heatmap' }
           <div key={i}
             className="w-5 h-5 rounded-sm transition-all hover:scale-150 cursor-pointer"
             style={{ background: COLORS[item.level], opacity: 0.7 + (item.stability / 20) * 0.3 }}
-            title={`${item.q.slice(0, 50)} — ${item.level} (S: ${item.stability.toFixed(1)})`}
+            title={`${item.q.slice(0, 50)}  ${item.level} (S: ${item.stability.toFixed(1)})`}
           />
         ))}
       </div>

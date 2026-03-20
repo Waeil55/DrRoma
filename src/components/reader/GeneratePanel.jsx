@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — GeneratePanel
+/**
+ * MARIAM PRO  GeneratePanel
  * 16 AI tools with config, page range, count, difficulty, language, results preview + save.
  */
 import React, { useState, useEffect } from 'react';
@@ -44,13 +44,13 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
     const g = bgTask.result;
     if (g.type === 'flashcards') {
       const cards = g.data.map(c => ({ id: Date.now() + Math.random(), q: c.q, a: c.a, evidence: c.evidence, sourcePage: c.sourcePage, repetitions: 0, ef: 2.5, interval: 1, nextReview: Date.now(), lastReview: Date.now() }));
-      setFlashcards(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: g.pages, title: `Cards — Pgs ${g.pages}`, cards, createdAt: new Date().toISOString() }]);
+      setFlashcards(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: g.pages, title: `Cards  Pgs ${g.pages}`, cards, createdAt: new Date().toISOString() }]);
       addToast(`${cards.length} flashcards saved!`, 'success');
     } else if (g.type === 'cases') {
       setCases(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: g.pages, title: 'Patient Cases', questions: g.data, createdAt: new Date().toISOString() }]);
       addToast(`${g.data.length} cases saved!`, 'success');
     } else if (g.type === 'exam') {
-      setExams(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: g.pages, title: `Exam — Pgs ${g.pages}`, questions: g.data, createdAt: new Date().toISOString() }]);
+      setExams(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, sourcePages: g.pages, title: `Exam  Pgs ${g.pages}`, questions: g.data, createdAt: new Date().toISOString() }]);
       addToast(`${g.data.length} questions saved!`, 'success');
     } else if (g.type === 'mindmap') {
       if (setMindMaps) setMindMaps(p => [...p, { id: Date.now().toString(), docId: activeDoc.id, pages: g.pages, data: g.data, createdAt: new Date().toISOString() }]);
@@ -65,7 +65,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
     onClear(); onVault();
   };
 
-  /* ── RESULTS VIEW ── */
+  /*  RESULTS VIEW  */
   if (bgTask?.isFinished) return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b shrink-0" style={{ background: 'var(--success-bg)', borderColor: 'var(--success-border)' }}>
@@ -84,7 +84,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
           <div key={i} className="glass p-4 rounded-2xl">
             <p className="font-bold text-xs mb-3 leading-relaxed"><span className="opacity-30 mr-1.5 font-mono text-xs">Q{i + 1}</span>{item.q}</p>
             <div className="bg-[var(--accent)]/10 border border-[var(--accent)]/20 p-3 rounded-xl text-xs text-[var(--accent)]">{item.a}</div>
-            {item.evidence && <p className="mt-2 text-xs opacity-40 italic">"{item.evidence}" — Pg {item.sourcePage}</p>}
+            {item.evidence && <p className="mt-2 text-xs opacity-40 italic">"{item.evidence}"  Pg {item.sourcePage}</p>}
           </div>
         ))}
         {(bgTask.result?.type === 'exam' || bgTask.result?.type === 'cases') && bgTask.result.data.slice(0, 3).map((item, i) => {
@@ -122,7 +122,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
     </div>
   );
 
-  /* ── CONFIG VIEW ── */
+  /*  CONFIG VIEW  */
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4 h-full">
       <div className="glass rounded-2xl p-4">
@@ -171,7 +171,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${targetLang === lang ? 'bg-[var(--accent)] text-white' : 'glass opacity-60 hover:opacity-100'}`}>{lang}</button>
             ))}
           </div>
-          <input value={targetLang} onChange={e => setTargetLang(e.target.value)} placeholder="Or type any language…"
+          <input value={targetLang} onChange={e => setTargetLang(e.target.value)} placeholder="Or type any language"
             className="mt-3 w-full glass border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none focus:border-[var(--accent)] text-[var(--text)]" />
         </div>
       )}
@@ -189,7 +189,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
                 className={`px-2 py-1 rounded-lg text-xs font-black transition-colors ${count === n ? 'bg-[var(--accent)] text-white' : 'glass opacity-60 hover:opacity-100'}`}>{n}</button>
             ))}
           </div>
-          {count > 50 && <p className="text-xs font-bold mt-2 flex items-center gap-1" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI — {count}+ items in ~30-120s</p>}
+          {count > 50 && <p className="text-xs font-bold mt-2 flex items-center gap-1" style={{ color: 'var(--warning)' }}><AlertCircle size={10} />Parallel AI  {count}+ items in ~30-120s</p>}
         </div>
       )}
 

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -77,7 +77,7 @@ Evaluate using CASP (Critical Appraisal Skills Programme) criteria:
 7. Overall level of evidence (Oxford CEBM)
 8. Bottom line: Is this evidence strong enough to change practice?
 
-Keep response under 300 words. Be balanced — note strengths AND weaknesses.`,
+Keep response under 300 words. Be balanced  note strengths AND weaknesses.`,
         chunk => { setAppraiseResult(p => p + chunk); },
         settings, 500
       );
@@ -152,10 +152,10 @@ Keep response under 300 words. Be balanced — note strengths AND weaknesses.`,
             <div className="glass rounded-2xl p-5 space-y-3" style={{ border: '1px solid var(--border)' }}>
               <h3 className="font-black text-sm">PICO Framework</h3>
               {[
-                { key: 'p', label: 'P — Patient / Population', placeholder: 'e.g. Adult patients with type 2 diabetes' },
-                { key: 'i', label: 'I — Intervention', placeholder: 'e.g. SGLT2 inhibitors' },
-                { key: 'c', label: 'C — Comparison', placeholder: 'e.g. Metformin alone' },
-                { key: 'o', label: 'O — Outcome', placeholder: 'e.g. HbA1c reduction, CV events' },
+                { key: 'p', label: 'P  Patient / Population', placeholder: 'e.g. Adult patients with type 2 diabetes' },
+                { key: 'i', label: 'I  Intervention', placeholder: 'e.g. SGLT2 inhibitors' },
+                { key: 'c', label: 'C  Comparison', placeholder: 'e.g. Metformin alone' },
+                { key: 'o', label: 'O  Outcome', placeholder: 'e.g. HbA1c reduction, CV events' },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-xs font-black opacity-50 block mb-1">{f.label}</label>
@@ -166,7 +166,7 @@ Keep response under 300 words. Be balanced — note strengths AND weaknesses.`,
               ))}
               <button onClick={generatePICO} disabled={picoLoading}
                 className="btn-accent w-full py-3 rounded-xl font-black flex items-center justify-center gap-2">
-                {picoLoading ? <><Loader2 size={16} className="animate-spin" /> Generating…</> : <><Sparkles size={16} /> Build PICO Question</>}
+                {picoLoading ? <><Loader2 size={16} className="animate-spin" /> Generating</> : <><Sparkles size={16} /> Build PICO Question</>}
               </button>
             </div>
             {picoResult && (
@@ -182,11 +182,11 @@ Keep response under 300 words. Be balanced — note strengths AND weaknesses.`,
             <div className="glass rounded-2xl p-5 space-y-3" style={{ border: '1px solid var(--border)' }}>
               <h3 className="font-black text-sm">Critical Appraisal</h3>
               <textarea value={appraiseStudy} onChange={e => setAppraiseStudy(e.target.value)}
-                rows={6} placeholder="Paste a study abstract or describe the study design, methods, results, and conclusions…"
+                rows={6} placeholder="Paste a study abstract or describe the study design, methods, results, and conclusions"
                 className="w-full glass-input rounded-xl px-4 py-3 text-sm outline-none resize-none" style={{ border: '1px solid var(--border)' }} />
               <button onClick={appraiseStudyFn} disabled={appraiseLoading || !appraiseStudy.trim()}
                 className="btn-accent w-full py-3 rounded-xl font-black flex items-center justify-center gap-2">
-                {appraiseLoading ? <><Loader2 size={16} className="animate-spin" /> Appraising…</> : <><Sparkles size={16} /> Appraise Study</>}
+                {appraiseLoading ? <><Loader2 size={16} className="animate-spin" /> Appraising</> : <><Sparkles size={16} /> Appraise Study</>}
               </button>
             </div>
             {appraiseResult && (

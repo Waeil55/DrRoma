@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, RotateCcw } from 'lucide-react';
 
 export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
@@ -66,7 +66,7 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
       <div className="text-6xl"></div>
       <div className="text-center">
         <h2 className="text-3xl font-black">Done!</h2>
-        <p className="opacity-50 mt-2">{set.title} — {cards.length} cards</p>
+        <p className="opacity-50 mt-2">{set.title}  {cards.length} cards</p>
       </div>
       <div className="flex gap-8">
         <div className="text-center">

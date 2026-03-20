@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — General Formatters
+ * MARIAM PRO  General Formatters
  */
 
 /** Format bytes to human-readable string */
@@ -44,7 +44,7 @@ export const formatRelativeTime = (date) => {
 /** Truncate text with ellipsis */
 export const truncate = (text, maxLen = 100) => {
   if (!text || text.length <= maxLen) return text || '';
-  return text.slice(0, maxLen - 1) + '…';
+  return text.slice(0, maxLen - 1) + '';
 };
 
 /** Capitalize first letter */

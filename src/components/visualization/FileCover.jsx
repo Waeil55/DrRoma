@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — FileCover
+ * MARIAM PRO  FileCover
  * Gradient cover for file cards with category icon.
  */
 import React from 'react';

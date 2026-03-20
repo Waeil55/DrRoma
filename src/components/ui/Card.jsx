@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — Card Component
+ * MARIAM PRO  Card Component
  * Theme-aware card with hover effects.
  */
 export default function Card({ children, className = '', onClick, padding = true, ...rest }) {

@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const RADIOLOGY_APPROACHES = [
   { id: 'cxr', title: 'Chest X-Ray (CXR)', icon: '',
     systematic: [
       { area: 'Technical Quality (RIPE)', checks: ['Rotation: spinous processes equidistant between clavicle heads', 'Inspiration: 5-6 anterior ribs visible above diaphragm', 'Penetration: vertebral bodies just visible behind heart', 'Exposure: adequate brightness/contrast'] },
-      { area: 'Airway', checks: ['Trachea: midline (deviation → tension pneumothorax, mass, collapse)', 'Carina: bifurcation at T4-T5', 'Main bronchi: right wider + more vertical', 'ETT if present: tip 2-4 cm above carina'] },
+      { area: 'Airway', checks: ['Trachea: midline (deviation  tension pneumothorax, mass, collapse)', 'Carina: bifurcation at T4-T5', 'Main bronchi: right wider + more vertical', 'ETT if present: tip 2-4 cm above carina'] },
       { area: 'Breathing (Lungs)', checks: ['Compare both lung fields systematically', 'Upper zones, mid zones, lower zones', 'Costophrenic angles (blunting = effusion >200 mL)', 'Consolidation (air bronchograms = pneumonia)', 'Mass/nodule (coin lesion)', 'Pneumothorax (absent lung markings peripherally)'] },
       { area: 'Cardiac', checks: ['Heart size: CTR <50% on PA (not reliable on AP)', 'Heart borders: right = RA, left = LV', 'Mediastinal width: <8 cm (widened = aortic dissection, lymphoma)', 'Aortic knuckle: calcification, unfolding'] },
       { area: 'Diaphragm', checks: ['Right hemidiaphragm slightly higher (liver)', 'Free air under diaphragm = perforation (upright film)', 'Elevated hemidiaphragm: phrenic nerve palsy, collapse, hepatomegaly'] },
@@ -23,13 +23,13 @@ const RADIOLOGY_APPROACHES = [
       { area: 'Technical', checks: ['Supine or erect', 'Adequate coverage: diaphragm to symphysis pubis', 'Patient ID and date'] },
       { area: 'Gas Pattern', checks: ['Small bowel: central, valvulae conniventes (cross entire lumen)', 'Large bowel: peripheral, haustra (do NOT cross entire lumen)', 'Small bowel obstruction: dilated >3 cm, multiple air-fluid levels (erect)', 'Large bowel obstruction: dilated >6 cm (>9 cm cecum = risk of perforation)'] },
       { area: 'Solid Organs', checks: ['Liver: right upper quadrant, hepatomegaly', 'Spleen: left upper quadrant, splenomegaly', 'Kidneys: psoas shadow, renal outline', 'Bladder: central pelvic density'] },
-      { area: 'Calcifications', checks: ['Renal stones (90% radio-opaque)', 'Gallstones (10% radio-opaque)', 'Pancreatic calcification (chronic pancreatitis)', 'Aortic calcification (atherosclerosis, aneurysm)', 'Phleboliths (pelvic, rounded with lucent center — benign)'] },
+      { area: 'Calcifications', checks: ['Renal stones (90% radio-opaque)', 'Gallstones (10% radio-opaque)', 'Pancreatic calcification (chronic pancreatitis)', 'Aortic calcification (atherosclerosis, aneurysm)', 'Phleboliths (pelvic, rounded with lucent center  benign)'] },
       { area: 'Bones & Soft Tissue', checks: ['Lumbar spine: fractures, degenerative changes', 'Pelvis/hips: fractures, AVN', 'Sacroiliac joints: ankylosing spondylitis'] },
     ],
     commonFindings: [
       { finding: 'Dilated small bowel + transition point', ddx: 'Adhesions (#1), hernia, tumor, gallstone ileus' },
       { finding: 'Dilated large bowel + "coffee bean" sign', ddx: 'Sigmoid volvulus' },
-      { finding: 'Pneumoperitoneum (free air)', ddx: 'Perforated viscus (peptic ulcer, diverticulitis, appendicitis) — surgical emergency' },
+      { finding: 'Pneumoperitoneum (free air)', ddx: 'Perforated viscus (peptic ulcer, diverticulitis, appendicitis)  surgical emergency' },
       { finding: 'Thumbprinting of colon', ddx: 'Ischemic colitis, C.diff, IBD' },
     ]},
 ];
@@ -61,7 +61,7 @@ export default function RadiologyInterpreterView() {
                 <div className="space-y-1.5">
                   {area.checks.map((check, ci) => (
                     <div key={ci} className="flex items-start gap-2 text-xs py-0.5">
-                      <span style={{ color: 'var(--accent)' }}>▫</span>
+                      <span style={{ color: 'var(--accent)' }}></span>
                       <span className="opacity-70 leading-relaxed">{check}</span>
                     </div>
                   ))}

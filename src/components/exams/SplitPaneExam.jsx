@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — SplitPaneExam
+ * MARIAM PRO  SplitPaneExam
  * Desktop split-pane exam view: question on left, lab results / reference on right.
  * Uses the shared SplitPane UI component.
  */

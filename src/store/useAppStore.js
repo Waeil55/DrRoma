@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Global App Store
+ * MARIAM PRO  Global App Store
  * Replaces ALL prop drilling for core app state.
  */
 import { createStore } from './createStore.js';

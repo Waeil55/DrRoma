@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useState } from 'react';
 
 /**
- * MARIAM PRO — SplitPane Component
+ * MARIAM PRO  SplitPane Component
  * Resizable desktop split pane with draggable divider.
  */
 export default function SplitPane({ left, right, defaultSplit = 55, minLeft = 30, minRight = 20, className = '' }) {

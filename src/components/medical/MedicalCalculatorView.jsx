@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const CALCULATORS = [
@@ -18,9 +18,9 @@ const CALCULATORS = [
       const ratio = cr / kappa;
       const gfr = 142 * Math.pow(Math.min(ratio, 1), alpha) * Math.pow(Math.max(ratio, 1), -1.200) * Math.pow(0.9938, age) * (isFemale ? 1.012 : 1);
       const r = Math.round(gfr);
-      const stage = r >= 90 ? 'G1 — Normal' : r >= 60 ? 'G2 — Mildly Decreased' : r >= 45 ? 'G3a — Mild-Moderate' : r >= 30 ? 'G3b — Moderate-Severe' : r >= 15 ? 'G4 — Severely Decreased' : 'G5 — Kidney Failure';
+      const stage = r >= 90 ? 'G1  Normal' : r >= 60 ? 'G2  Mildly Decreased' : r >= 45 ? 'G3a  Mild-Moderate' : r >= 30 ? 'G3b  Moderate-Severe' : r >= 15 ? 'G4  Severely Decreased' : 'G5  Kidney Failure';
       const color = r >= 60 ? '#10b981' : r >= 45 ? '#f59e0b' : r >= 30 ? '#f97316' : '#ef4444';
-      return { value: `${r} mL/min/1.73m²`, stage, color, detail: `CKD Stage: ${stage}` };
+      return { value: `${r} mL/min/1.73m`, stage, color, detail: `CKD Stage: ${stage}` };
     },
   },
   {
@@ -36,16 +36,16 @@ const CALCULATORS = [
       const bmi = w / (h * h); const r = bmi.toFixed(1);
       const cls = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal weight' : bmi < 30 ? 'Overweight' : bmi < 35 ? 'Obese Class I' : bmi < 40 ? 'Obese Class II' : 'Obese Class III';
       const color = bmi < 18.5 ? '#06b6d4' : bmi < 25 ? '#10b981' : bmi < 30 ? '#f59e0b' : '#ef4444';
-      return { value: `${r} kg/m²`, stage: cls, color, detail: `Classification: ${cls}` };
+      return { value: `${r} kg/m`, stage: cls, color, detail: `Classification: ${cls}` };
     },
   },
   {
-    id: 'chadsvasc', title: 'CHA₂DS₂-VASc', category: 'Cardiology', icon: '',
+    id: 'chadsvasc', title: 'CHADS-VASc', category: 'Cardiology', icon: '',
     desc: 'Stroke risk in non-valvular atrial fibrillation',
     fields: [
       { key: 'chf', label: 'Congestive Heart Failure', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
       { key: 'htn', label: 'Hypertension', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
-      { key: 'age75', label: 'Age ≥ 75', unit: '', type: 'select', options: ['No (0)', 'Yes (+2)'] },
+      { key: 'age75', label: 'Age  75', unit: '', type: 'select', options: ['No (0)', 'Yes (+2)'] },
       { key: 'dm', label: 'Diabetes Mellitus', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
       { key: 'stroke', label: 'Stroke / TIA history', unit: '', type: 'select', options: ['No (0)', 'Yes (+2)'] },
       { key: 'vasc', label: 'Vascular disease', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
@@ -58,7 +58,7 @@ const CALCULATORS = [
       const risk = score === 0 ? '0% (Low)' : score === 1 ? '1.3%' : score === 2 ? '2.2%' : score === 3 ? '3.2%' : score === 4 ? '4.0%' : score === 5 ? '6.7%' : score === 6 ? '9.8%' : score === 7 ? '9.6%' : '6.7%+';
       const color = score <= 1 ? '#10b981' : score <= 3 ? '#f59e0b' : '#ef4444';
       const rec = score >= 2 ? 'Anticoagulation recommended' : score === 1 ? 'Consider anticoagulation' : 'No anticoagulation indicated';
-      return { value: `Score: ${score}`, stage: rec, color, detail: `Stroke risk: ${risk}/year — ${rec}` };
+      return { value: `Score: ${score}`, stage: rec, color, detail: `Stroke risk: ${risk}/year  ${rec}` };
     },
   },
   {
@@ -73,38 +73,38 @@ const CALCULATORS = [
       { key: 'calf', label: 'Calf swelling > 3 cm', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
       { key: 'pitting', label: 'Pitting edema', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
       { key: 'collateral', label: 'Collateral superficial veins', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
-      { key: 'alt_dx', label: 'Alternative diagnosis as likely', unit: '', type: 'select', options: ['No (0)', 'Yes (−2)'] },
+      { key: 'alt_dx', label: 'Alternative diagnosis as likely', unit: '', type: 'select', options: ['No (0)', 'Yes (2)'] },
     ],
     calc: (v) => {
       let score = Object.entries(v).filter(([k]) => k !== 'alt_dx').reduce((s, [, val]) => s + (val?.startsWith('Yes') ? 1 : 0), 0);
       if (v.alt_dx?.startsWith('Yes')) score -= 2;
       const prob = score <= 0 ? 'Low (3%)' : score <= 2 ? 'Moderate (17%)' : 'High (75%)';
       const color = score <= 0 ? '#10b981' : score <= 2 ? '#f59e0b' : '#ef4444';
-      const action = score <= 0 ? 'D-dimer → if negative, no US needed' : 'Compression ultrasonography recommended';
-      return { value: `Score: ${score}`, stage: prob, color, detail: `DVT probability: ${prob} — ${action}` };
+      const action = score <= 0 ? 'D-dimer  if negative, no US needed' : 'Compression ultrasonography recommended';
+      return { value: `Score: ${score}`, stage: prob, color, detail: `DVT probability: ${prob}  ${action}` };
     },
   },
   {
     id: 'sofa', title: 'SOFA Score', category: 'Critical Care', icon: '',
-    desc: 'Sequential Organ Failure Assessment — sepsis severity',
+    desc: 'Sequential Organ Failure Assessment  sepsis severity',
     fields: [
-      { key: 'pf', label: 'PaO₂/FiO₂ ratio', unit: '', type: 'select', options: ['≥400 (0)', '300–399 (+1)', '200–299 (+2)', '100–199 (+3)', '<100 (+4)'] },
-      { key: 'plt', label: 'Platelets', unit: 'x10³/μL', type: 'select', options: ['≥150 (0)', '100–149 (+1)', '50–99 (+2)', '20–49 (+3)', '<20 (+4)'] },
-      { key: 'bili', label: 'Bilirubin', unit: 'mg/dL', type: 'select', options: ['<1.2 (0)', '1.2–1.9 (+1)', '2.0–5.9 (+2)', '6.0–11.9 (+3)', '≥12 (+4)'] },
-      { key: 'map', label: 'MAP / vasopressors', unit: '', type: 'select', options: ['MAP ≥70 (0)', 'MAP <70 (+1)', 'DA ≤5 or Dobu (+2)', 'DA >5 or Epi/NE ≤0.1 (+3)', 'DA >15 or Epi/NE >0.1 (+4)'] },
-      { key: 'gcs', label: 'Glasgow Coma Scale', unit: '', type: 'select', options: ['15 (0)', '13–14 (+1)', '10–12 (+2)', '6–9 (+3)', '<6 (+4)'] },
-      { key: 'cr', label: 'Creatinine / urine output', unit: '', type: 'select', options: ['<1.2 (0)', '1.2–1.9 (+1)', '2.0–3.4 (+2)', '3.5–4.9 (+3)', '>5.0 (+4)'] },
+      { key: 'pf', label: 'PaO/FiO ratio', unit: '', type: 'select', options: ['400 (0)', '300399 (+1)', '200299 (+2)', '100199 (+3)', '<100 (+4)'] },
+      { key: 'plt', label: 'Platelets', unit: 'x10/L', type: 'select', options: ['150 (0)', '100149 (+1)', '5099 (+2)', '2049 (+3)', '<20 (+4)'] },
+      { key: 'bili', label: 'Bilirubin', unit: 'mg/dL', type: 'select', options: ['<1.2 (0)', '1.21.9 (+1)', '2.05.9 (+2)', '6.011.9 (+3)', '12 (+4)'] },
+      { key: 'map', label: 'MAP / vasopressors', unit: '', type: 'select', options: ['MAP 70 (0)', 'MAP <70 (+1)', 'DA 5 or Dobu (+2)', 'DA >5 or Epi/NE 0.1 (+3)', 'DA >15 or Epi/NE >0.1 (+4)'] },
+      { key: 'gcs', label: 'Glasgow Coma Scale', unit: '', type: 'select', options: ['15 (0)', '1314 (+1)', '1012 (+2)', '69 (+3)', '<6 (+4)'] },
+      { key: 'cr', label: 'Creatinine / urine output', unit: '', type: 'select', options: ['<1.2 (0)', '1.21.9 (+1)', '2.03.4 (+2)', '3.54.9 (+3)', '>5.0 (+4)'] },
     ],
     calc: (v) => {
       const score = Object.values(v).reduce((s, val) => { const m = val?.match(/\+(\d)/); return s + (m ? parseInt(m[1]) : 0); }, 0);
-      const mort = score < 7 ? '<10%' : score < 10 ? '15–20%' : score < 13 ? '40–50%' : '>80%';
+      const mort = score < 7 ? '<10%' : score < 10 ? '1520%' : score < 13 ? '4050%' : '>80%';
       const color = score < 7 ? '#10b981' : score < 10 ? '#f59e0b' : score < 13 ? '#f97316' : '#ef4444';
       return { value: `Score: ${score}/24`, stage: `Mortality ~${mort}`, color, detail: `Predicted mortality: ${mort}` };
     },
   },
   {
     id: 'glasgow', title: 'Glasgow Coma Scale', category: 'Neurology', icon: '',
-    desc: 'Neurological status — eye, verbal, motor',
+    desc: 'Neurological status  eye, verbal, motor',
     fields: [
       { key: 'eye', label: 'Eye Opening', unit: '', type: 'select', options: ['Spontaneous (4)', 'To voice (3)', 'To pain (2)', 'None (1)'] },
       { key: 'verbal', label: 'Verbal Response', unit: '', type: 'select', options: ['Oriented (5)', 'Confused (4)', 'Inappropriate words (3)', 'Sounds (2)', 'None (1)'] },
@@ -112,14 +112,14 @@ const CALCULATORS = [
     ],
     calc: (v) => {
       const score = Object.values(v).reduce((s, val) => { const m = val?.match(/\((\d)\)/); return s + (m ? parseInt(m[1]) : 0); }, 0);
-      const cls = score >= 14 ? 'Mild (14-15)' : score >= 9 ? 'Moderate (9-13)' : 'Severe (≤8)';
+      const cls = score >= 14 ? 'Mild (14-15)' : score >= 9 ? 'Moderate (9-13)' : 'Severe (8)';
       const color = score >= 14 ? '#10b981' : score >= 9 ? '#f59e0b' : '#ef4444';
-      return { value: `${score}/15`, stage: cls, color, detail: `GCS ${score}: ${cls} — ${score <= 8 ? 'Consider intubation' : score <= 13 ? 'Close monitoring' : 'Normal consciousness'}` };
+      return { value: `${score}/15`, stage: cls, color, detail: `GCS ${score}: ${cls}  ${score <= 8 ? 'Consider intubation' : score <= 13 ? 'Close monitoring' : 'Normal consciousness'}` };
     },
   },
   {
     id: 'meld', title: 'MELD Score', category: 'Gastroenterology', icon: '',
-    desc: 'Model for End-Stage Liver Disease — liver transplant priority',
+    desc: 'Model for End-Stage Liver Disease  liver transplant priority',
     fields: [
       { key: 'bili', label: 'Bilirubin', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
       { key: 'cr', label: 'Creatinine', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
@@ -134,7 +134,7 @@ const CALCULATORS = [
       const meldNa = Math.round(meld - na - (0.025 * Math.round(meld) * (140 - na)) + 140);
       const mort = meldNa < 10 ? '4%' : meldNa < 20 ? '27%' : meldNa < 30 ? '76%' : '>90%';
       const color = meldNa < 10 ? '#10b981' : meldNa < 20 ? '#f59e0b' : meldNa < 30 ? '#f97316' : '#ef4444';
-      return { value: `MELD-Na: ${meldNa}`, stage: `3-month mortality: ${mort}`, color, detail: `MELD: ${Math.round(meld)} — MELD-Na: ${meldNa} — Transplant priority score` };
+      return { value: `MELD-Na: ${meldNa}`, stage: `3-month mortality: ${mort}`, color, detail: `MELD: ${Math.round(meld)}  MELD-Na: ${meldNa}  Transplant priority score` };
     },
   },
   {
@@ -142,7 +142,7 @@ const CALCULATORS = [
     desc: 'Newborn health assessment at 1 and 5 minutes',
     fields: [
       { key: 'activity', label: 'Muscle Tone (Activity)', unit: '', type: 'select', options: ['Limp (0)', 'Some flexion (1)', 'Active motion (2)'] },
-      { key: 'pulse', label: 'Pulse', unit: '', type: 'select', options: ['Absent (0)', '<100/min (1)', '≥100/min (2)'] },
+      { key: 'pulse', label: 'Pulse', unit: '', type: 'select', options: ['Absent (0)', '<100/min (1)', '100/min (2)'] },
       { key: 'grimace', label: 'Grimace (Reflex)', unit: '', type: 'select', options: ['No response (0)', 'Grimace (1)', 'Cry / cough (2)'] },
       { key: 'appearance', label: 'Appearance (Color)', unit: '', type: 'select', options: ['Blue all over (0)', 'Blue extremities (1)', 'Pink all over (2)'] },
       { key: 'respiration', label: 'Respiration', unit: '', type: 'select', options: ['Absent (0)', 'Weak/irregular (1)', 'Strong cry (2)'] },

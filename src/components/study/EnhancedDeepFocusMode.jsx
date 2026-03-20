@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Focus, Play, Pause, RotateCcw, Brain } from 'lucide-react';
 
 export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exams }) {
@@ -142,7 +142,7 @@ export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exam
           <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
             <p className="text-xs font-black opacity-40 mb-2 uppercase tracking-widest">Focus Notes</p>
             <textarea value={notes} onChange={e => setNotes(e.target.value)}
-              placeholder="Jot down insights, questions, key concepts…"
+              placeholder="Jot down insights, questions, key concepts"
               className="w-full bg-transparent text-sm outline-none resize-none leading-relaxed"
               style={{ minHeight: 80, color: 'var(--text)' }} />
           </div>

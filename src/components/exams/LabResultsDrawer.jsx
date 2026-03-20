@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — LabResultsDrawer
+ * MARIAM PRO  LabResultsDrawer
  * Mobile bottom-sheet drawer for viewing lab results / imaging during an exam.
  */
 import React, { useState } from 'react';

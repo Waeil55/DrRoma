@@ -1,9 +1,9 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const PROCEDURE_CHECKLISTS = [
   { id: 'central_line', title: 'Central Venous Catheter (IJ)', cat: 'Critical Care', difficulty: 'Advanced', time: '30-45 min',
-    equipment: ['CVC kit (triple lumen)', 'Ultrasound + sterile probe cover', 'Sterile gown, gloves, drapes', 'Chlorhexidine prep', 'Lidocaine 1%', 'Sterile saline flush × 3', 'Suture material (silk 2-0)', 'Sterile dressing (tegaderm)'],
+    equipment: ['CVC kit (triple lumen)', 'Ultrasound + sterile probe cover', 'Sterile gown, gloves, drapes', 'Chlorhexidine prep', 'Lidocaine 1%', 'Sterile saline flush  3', 'Suture material (silk 2-0)', 'Sterile dressing (tegaderm)'],
     steps: [
       { text: 'Obtain informed consent', critical: false },
       { text: 'Position: Trendelenburg, head turned contralateral', critical: false },
@@ -22,9 +22,9 @@ const PROCEDURE_CHECKLISTS = [
       { text: 'Secure with suture and apply sterile dressing', critical: false },
       { text: 'Confirm placement with CXR (tip at cavo-atrial junction)', critical: true },
     ],
-    pearls: ['ALWAYS confirm wire removed before leaving bedside', 'CXR mandatory to rule out pneumothorax', 'Never force the wire — if resistance, reposition', 'Right IJ preferred (straight path to SVC)'] },
+    pearls: ['ALWAYS confirm wire removed before leaving bedside', 'CXR mandatory to rule out pneumothorax', 'Never force the wire  if resistance, reposition', 'Right IJ preferred (straight path to SVC)'] },
   { id: 'lumbar_puncture', title: 'Lumbar Puncture', cat: 'Neurology', difficulty: 'Intermediate', time: '20-30 min',
-    equipment: ['LP kit (spinal needle 20-22G, manometer)', 'Sterile drapes, gown, gloves', 'Chlorhexidine prep', 'Lidocaine 1%', 'Collection tubes × 4', 'Sterile dressing'],
+    equipment: ['LP kit (spinal needle 20-22G, manometer)', 'Sterile drapes, gown, gloves', 'Chlorhexidine prep', 'Lidocaine 1%', 'Collection tubes  4', 'Sterile dressing'],
     steps: [
       { text: 'Check: CT head if indicated (papilledema, focal neuro signs, immunocompromised)', critical: true },
       { text: 'Check platelet count and coagulation (INR <1.5, Plt >50k)', critical: true },
@@ -33,33 +33,33 @@ const PROCEDURE_CHECKLISTS = [
       { text: 'Full sterile prep and drape', critical: true },
       { text: 'Anesthetize skin and deeper tissues with lidocaine', critical: false },
       { text: 'Insert spinal needle bevel up (midline, angled slightly cephalad)', critical: false },
-      { text: 'Advance through ligamentum flavum — feel "pop" into subarachnoid space', critical: false },
+      { text: 'Advance through ligamentum flavum  feel "pop" into subarachnoid space', critical: false },
       { text: 'Remove stylet, observe CSF flow', critical: false },
-      { text: 'Measure opening pressure with manometer (normal 6-20 cmH₂O)', critical: true },
+      { text: 'Measure opening pressure with manometer (normal 6-20 cmHO)', critical: true },
       { text: 'Collect 1-2 mL in each of 4 tubes (cell count, glucose/protein, micro, cytology/special)', critical: false },
       { text: 'Replace stylet, remove needle, apply dressing', critical: false },
-      { text: 'Patient supine × 1 hour (reduces post-LP headache)', critical: false },
+      { text: 'Patient supine  1 hour (reduces post-LP headache)', critical: false },
     ],
     pearls: ['Tube 1: cell count + protein. Tube 4: cell count (compare for traumatic tap vs SAH)', 'Post-LP headache: positional, improved lying flat. Blood patch if persistent', 'Send CSF glucose WITH serum glucose (ratio is key)', 'Xanthochromia (yellow CSF) = subarachnoid hemorrhage >6h old'] },
   { id: 'intubation', title: 'Endotracheal Intubation (RSI)', cat: 'Emergency', difficulty: 'Advanced', time: '10-15 min',
-    equipment: ['Laryngoscope (Mac 3-4 or video laryngoscope)', 'ETT (7.0-7.5 women, 8.0-8.5 men)', 'BVM + O₂ source', 'Suction (Yankauer)', 'Stylet', 'Induction agent: Ketamine 1-2mg/kg or Propofol 1-2mg/kg', 'Paralytic: Succinylcholine 1.5mg/kg or Rocuronium 1.2mg/kg', 'Bougie', 'End-tidal CO₂ detector', 'Syringe for cuff (10 mL)'],
+    equipment: ['Laryngoscope (Mac 3-4 or video laryngoscope)', 'ETT (7.0-7.5 women, 8.0-8.5 men)', 'BVM + O source', 'Suction (Yankauer)', 'Stylet', 'Induction agent: Ketamine 1-2mg/kg or Propofol 1-2mg/kg', 'Paralytic: Succinylcholine 1.5mg/kg or Rocuronium 1.2mg/kg', 'Bougie', 'End-tidal CO detector', 'Syringe for cuff (10 mL)'],
     steps: [
       { text: 'Assess airway: LEMON (Look, Evaluate 3-3-2, Mallampati, Obstruction, Neck mobility)', critical: true },
-      { text: 'Pre-oxygenate: 100% O₂ × 3 min (or 8 vital capacity breaths)', critical: true },
+      { text: 'Pre-oxygenate: 100% O  3 min (or 8 vital capacity breaths)', critical: true },
       { text: 'Position: sniffing position (ear to sternal notch alignment)', critical: false },
       { text: 'Prepare backup plan: bougie, supraglottic airway (LMA), surgical cricothyrotomy kit', critical: true },
       { text: 'Push induction agent (Ketamine if hypotensive, Propofol if stable)', critical: false },
       { text: 'Push paralytic (Succinylcholine or Rocuronium)', critical: false },
       { text: 'Wait 45-60 seconds for full paralysis', critical: false },
-      { text: 'Laryngoscopy: insert blade, lift epiglottis (Mac) →identify vocal cords', critical: false },
-      { text: 'Pass ETT through cords — stop when cuff is 2 cm past cords', critical: true },
+      { text: 'Laryngoscopy: insert blade, lift epiglottis (Mac) identify vocal cords', critical: false },
+      { text: 'Pass ETT through cords  stop when cuff is 2 cm past cords', critical: true },
       { text: 'Inflate cuff, remove stylet', critical: false },
-      { text: 'Confirm placement: EtCO₂ (GOLD STANDARD), bilateral breath sounds, no epigastric sounds, chest rise', critical: true },
+      { text: 'Confirm placement: EtCO (GOLD STANDARD), bilateral breath sounds, no epigastric sounds, chest rise', critical: true },
       { text: 'Secure tube and note depth at teeth (21-23 cm for adult)', critical: false },
       { text: 'Obtain CXR for tube position (tip 2-4 cm above carina)', critical: false },
-      { text: 'Start ventilator settings (TV 6-8 mL/kg IBW, RR 14-16, FiO₂ 100% → titrate)', critical: false },
+      { text: 'Start ventilator settings (TV 6-8 mL/kg IBW, RR 14-16, FiO 100%  titrate)', critical: false },
     ],
-    pearls: ['END-TIDAL CO₂ is the ONLY reliable confirmation', 'Rocuronium preferred if succinylcholine contraindicated (hyperkalemia, burns, denervation)', 'BURP maneuver (backward, upward, rightward pressure) improves view', 'If can\'t intubate, can\'t oxygenate → surgical airway (cricothyrotomy)'] },
+    pearls: ['END-TIDAL CO is the ONLY reliable confirmation', 'Rocuronium preferred if succinylcholine contraindicated (hyperkalemia, burns, denervation)', 'BURP maneuver (backward, upward, rightward pressure) improves view', 'If can\'t intubate, can\'t oxygenate  surgical airway (cricothyrotomy)'] },
   { id: 'paracentesis', title: 'Paracentesis', cat: 'Gastroenterology', difficulty: 'Intermediate', time: '15-20 min',
     equipment: ['Paracentesis kit or 18G needle + syringe', 'Sterile drapes, gloves', 'Chlorhexidine', 'Lidocaine 1%', 'Specimen tubes', 'Vacuum bottles (if therapeutic, 4-6L)', 'Albumin (if removing >5L: give 6-8g per L removed)'],
     steps: [
@@ -76,7 +76,7 @@ const PROCEDURE_CHECKLISTS = [
       { text: 'Remove needle, apply dressing', critical: false },
       { text: 'If >5L removed: give IV albumin 6-8g per liter removed', critical: true },
     ],
-    pearls: ['SAAG ≥1.1 = portal hypertension. PMN ≥250 = spontaneous bacterial peritonitis (SBP)', 'No need to correct INR/platelets before paracentesis in cirrhosis', 'Z-track prevents post-procedure ascites leak', 'Always check cell count — even if fluid looks clear (SBP can be clear)'] },
+    pearls: ['SAAG 1.1 = portal hypertension. PMN 250 = spontaneous bacterial peritonitis (SBP)', 'No need to correct INR/platelets before paracentesis in cirrhosis', 'Z-track prevents post-procedure ascites leak', 'Always check cell count  even if fluid looks clear (SBP can be clear)'] },
 ];
 
 export default function ProcedureChecklistView() {
@@ -123,7 +123,7 @@ export default function ProcedureChecklistView() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {active.equipment.map((eq, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs py-1">
-                    <span style={{ color: 'var(--accent)' }}>▪</span>
+                    <span style={{ color: 'var(--accent)' }}></span>
                     <span className="opacity-70">{eq}</span>
                   </div>
                 ))}
@@ -156,7 +156,7 @@ export default function ProcedureChecklistView() {
             {active.pearls?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
                 <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Clinical Pearls</h3>
-                {active.pearls.map((p, i) => <div key={i} className="flex gap-2 text-xs py-1"><span style={{ color: '#f59e0b' }}>▸</span><span className="opacity-70 leading-relaxed">{p}</span></div>)}
+                {active.pearls.map((p, i) => <div key={i} className="flex gap-2 text-xs py-1"><span style={{ color: '#f59e0b' }}></span><span className="opacity-70 leading-relaxed">{p}</span></div>)}
               </div>
             )}
           </div>

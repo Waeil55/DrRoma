@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — Button Component
+ * MARIAM PRO  Button Component
  * Theme-aware button with variants.
  */
 export default function Button({ children, onClick, variant = 'primary', size = 'md', disabled = false, className = '', icon: Icon, ariaLabel, ...rest }) {

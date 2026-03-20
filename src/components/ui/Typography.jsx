@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — Typography Component
+ * MARIAM PRO  Typography Component
  * All font tokens + responsive scale utility.
  */
 const VARIANTS = {

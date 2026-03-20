@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — LabTable
+ * MARIAM PRO  LabTable
  * Styled table for lab results with H/L/C flags.
  */
 import React from 'react';

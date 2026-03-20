@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function FSRSFlashcardReview({ set, onUpdate, onClose }) {

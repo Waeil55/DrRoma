@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — ProgressRing Component
+ * MARIAM PRO  ProgressRing Component
  * Circular SVG progress indicator with mastery percentage.
  */
 export default function ProgressRing({ progress = 0, size = 64, strokeWidth = 5, color = 'var(--accent)', label, className = '' }) {

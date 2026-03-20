@@ -1,6 +1,6 @@
-﻿/**
- * MARIAM PRO — LibraryMergedView
- * Main home/library page — hero, stats, BG tasks, documents grid/list, drag-drop, quick actions.
+/**
+ * MARIAM PRO  LibraryMergedView
+ * Main home/library page  hero, stats, BG tasks, documents grid/list, drag-drop, quick actions.
  */
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import {
@@ -146,10 +146,10 @@ export default function LibraryMergedView({ docs, uploading, onUpload, onOpen, o
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30" size={13} />
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search docs…" className="glass-input rounded-xl pl-9 pr-3 py-2 text-sm w-44 focus:w-56 transition-all" />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search docs" className="glass-input rounded-xl pl-9 pr-3 py-2 text-sm w-44 focus:w-56 transition-all" />
               </div>
               <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="glass-input rounded-xl px-3 py-2 text-sm font-semibold cursor-pointer">
-                <option value="date">Newest</option><option value="name">Name A–Z</option><option value="type">Type</option>
+                <option value="date">Newest</option><option value="name">Name AZ</option><option value="type">Type</option>
               </select>
               <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border2,var(--border))' }}>
                 <button onClick={() => setViewMode('grid')} className="p-2 transition-colors" style={viewMode === 'grid' ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}><Grid size={16} /></button>
@@ -157,7 +157,7 @@ export default function LibraryMergedView({ docs, uploading, onUpload, onOpen, o
               </div>
               <label className={`btn-accent flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black cursor-pointer ${uploading ? 'opacity-60' : ''}`}>
                 {uploading ? <Loader2 size={15} className="animate-spin" /> : <FileUp size={15} />}
-                {uploading ? 'Uploading…' : 'Import'}
+                {uploading ? 'Uploading' : 'Import'}
                 <input ref={inputRef} type="file" multiple className="hidden" onChange={onUpload} disabled={uploading}
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.md,.js,.ts,.jsx,.tsx,.py,.png,.jpg,.jpeg,.gif,.webp" />
               </label>

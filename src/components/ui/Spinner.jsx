@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — Spinner Component
+ * MARIAM PRO  Spinner Component
  */
 export default function Spinner({ size = 24, color = 'var(--accent)', className = '' }) {
   return (

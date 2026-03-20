@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — SwipeGestureHandler
+ * MARIAM PRO  SwipeGestureHandler
  * Wraps a child element with Tinder-style swipe (left/right/up) using pointer events.
  */
 import React, { useRef, useState, useCallback } from 'react';

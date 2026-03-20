@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, PenLine, Download, Trash2, Sparkles, Loader2, ChevronLeft, X } from 'lucide-react';
 import { callAIStreaming } from '../../services/ai/callAIStreaming';
 
@@ -88,11 +88,11 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
         <input value={draft.title} onChange={e => setDraft(p => ({ ...p, title: e.target.value }))}
-          placeholder="Note title…"
+          placeholder="Note title"
           className="w-full glass-input rounded-xl px-4 py-3 font-black text-lg outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         <textarea value={draft.content} onChange={e => setDraft(p => ({ ...p, content: e.target.value }))}
-          placeholder="Write your notes here… Use markdown for formatting."
+          placeholder="Write your notes here Use markdown for formatting."
           className="w-full glass-input rounded-xl px-4 py-3 text-sm outline-none resize-none leading-relaxed"
           style={{ minHeight: 280, background: 'var(--surface,var(--card))', border: '1px solid var(--border)', fontFamily: 'inherit' }} />
         <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
@@ -108,7 +108,7 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
           <div className="flex gap-2">
             <input value={tagInput} onChange={e => setTagInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(); } }}
-              placeholder="Add tag (enter to add)…" className="flex-1 glass-input rounded-lg px-3 py-1.5 text-xs outline-none" />
+              placeholder="Add tag (enter to add)" className="flex-1 glass-input rounded-lg px-3 py-1.5 text-xs outline-none" />
             <button onClick={addTag} className="glass px-3 py-1.5 rounded-lg text-xs font-black" style={{ color: 'var(--accent)' }}>+ Add</button>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
           </button>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search notes…"
+          placeholder="Search notes"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         {allTags.length > 0 && (

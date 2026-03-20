@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — ExamPlayer Component
+ * MARIAM PRO  ExamPlayer Component
  * Handles the active exam-taking experience (one question at a time).
  */
 import React, { useState, useCallback } from 'react';
@@ -97,14 +97,14 @@ export default function ExamPlayer({ exam, onExit, onComplete, addToast }) {
           ) : qi < exam.questions.length - 1 ? (
             <button onClick={next}
               className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">
-              Next Question →
+              Next Question 
             </button>
           ) : (
             <button onClick={() => {
               const sc = answers.filter(a => a.correct).length;
               onComplete?.(sc, exam.questions.length, answers);
             }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">
-              See Results →
+              See Results 
             </button>
           )}
         </div>

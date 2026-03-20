@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Task Store
+ * MARIAM PRO  Task Store
  * Full task management with all fields from the data model.
  */
 import { createStore } from './createStore.js';

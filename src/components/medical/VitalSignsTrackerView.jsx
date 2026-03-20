@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Trash2, Activity } from 'lucide-react';
 
 const FIELDS = [
@@ -7,7 +7,7 @@ const FIELDS = [
   { key: 'hr', label: 'HR', unit: 'bpm', placeholder: '80', warn: (v) => v > 100 || v < 60 },
   { key: 'rr', label: 'RR', unit: '/min', placeholder: '16', warn: (v) => v > 20 || v < 12 },
   { key: 'temp', label: 'Temp', unit: '°C', placeholder: '37.0', warn: (v) => v > 38.0 || v < 36.0 },
-  { key: 'spo2', label: 'SpO₂', unit: '%', placeholder: '98', warn: (v) => v < 95 },
+  { key: 'spo2', label: 'SpO', unit: '%', placeholder: '98', warn: (v) => v < 95 },
   { key: 'weight', label: 'Weight', unit: 'kg', placeholder: '70', warn: () => false },
 ];
 
@@ -106,7 +106,7 @@ export default function VitalSignsTrackerView({ addToast }) {
                 v.hr && { label: 'HR', value: v.hr, unit: 'bpm', warn: parseFloat(v.hr) > 100 || parseFloat(v.hr) < 60 },
                 v.rr && { label: 'RR', value: v.rr, unit: '/min', warn: parseFloat(v.rr) > 20 },
                 v.temp && { label: 'Temp', value: v.temp, unit: '°C', warn: parseFloat(v.temp) > 38 },
-                v.spo2 && { label: 'SpO₂', value: v.spo2, unit: '%', warn: parseFloat(v.spo2) < 95 },
+                v.spo2 && { label: 'SpO', value: v.spo2, unit: '%', warn: parseFloat(v.spo2) < 95 },
                 v.weight && { label: 'Wt', value: v.weight, unit: 'kg', warn: false },
               ].filter(Boolean).map(item => (
                 <div key={item.label} className="px-3 py-2 rounded-xl text-center" style={{ background: 'var(--surface,var(--card))' }}>

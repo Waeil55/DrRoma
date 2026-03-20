@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — File Category Detection & Icons
+ * MARIAM PRO  File Category Detection & Icons
  * Extracted from App.jsx.
  */
 
@@ -23,7 +23,7 @@ export const getFileCategory = (file) => {
 
 /**
  * Icon/color mapping for each file category.
- * References Lucide icon names — the consuming component should
+ * References Lucide icon names  the consuming component should
  * import the actual icons and replace the string references.
  */
 export const FILE_ICON_CONFIG = {

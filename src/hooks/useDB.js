@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useDB Hook
+ * MARIAM PRO  useDB Hook
  * Provides IndexedDB operations as React-friendly functions.
  */
 import { useCallback } from 'react';

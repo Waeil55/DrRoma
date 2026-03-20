@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── GOODDESIGN AESTHETIC (Inter font) ─────────────────────────────────────── */
+/*  GOODDESIGN AESTHETIC (Inter font)  */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* ─── ROOT HEIGHT LOCK ─────────────────────────────────────────────────────── */
-/* ── ROOT RESET ── */
+/*  ROOT HEIGHT LOCK  */
+/*  ROOT RESET  */
 html,
 body,
 #root {
@@ -23,7 +23,7 @@ body,
 }
 
 
-/* ─── CUSTOM SCROLLBAR (clean & thin) ─────────────────────────────────────── */
+/*  CUSTOM SCROLLBAR (clean & thin)  */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -42,7 +42,7 @@ body,
   background: rgba(156, 163, 175, 0.7);
 }
 
-/* ─── TOAST ANIMATION ──────────────────────────────────────────────────────── */
+/*  TOAST ANIMATION  */
 @keyframes slide-in {
   from {
     opacity: 0;

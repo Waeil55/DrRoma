@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useSwipe Hook
+ * MARIAM PRO  useSwipe Hook
  * Tinder-style pointer swipe with real-time transform feedback,
  * animated card exit (fly-off), and directional box-shadow glows.
  */
@@ -54,7 +54,7 @@ export function useSwipe({ onSwipeLeft, onSwipeRight, onSwipeUp, onTap, threshol
     }
   }, [onSwipeLeft, onSwipeRight, onSwipeUp, onTap, threshold]);
 
-  // Intensity 0→1 based on distance to threshold
+  // Intensity 01 based on distance to threshold
   const intensity = Math.min(1, Math.abs(offset.x) / threshold);
 
   // Animated card exit fly-off or live drag feedback

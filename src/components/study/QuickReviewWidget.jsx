@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { X, GripVertical } from 'lucide-react';
 
 export default function QuickReviewWidget({ flashcards, setFlashcards, onClose }) {

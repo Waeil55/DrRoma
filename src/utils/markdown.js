@@ -1,11 +1,11 @@
-﻿/**
- * MARIAM PRO — Markdown Rendering Utilities
+/**
+ * MARIAM PRO  Markdown Rendering Utilities
  * Extracts renderMdInline, renderMarkdown, UiTable, UiFlowchart,
  * UiCallout, and renderAIContent from App.jsx for reuse.
  */
 import React from 'react';
 
-/* ── Inline markdown → React elements ── */
+/*  Inline markdown  React elements  */
 export const renderMdInline = (text) => {
   if (!text) return [];
   const parts = [];
@@ -25,7 +25,7 @@ export const renderMdInline = (text) => {
   return parts.length ? parts : [text];
 };
 
-/* ── Block markdown → React elements ── */
+/*  Block markdown  React elements  */
 export const renderMarkdown = (text) => {
   if (!text) return null;
   const lines = text.split('\n');
@@ -42,7 +42,7 @@ export const renderMarkdown = (text) => {
     if (h2) { flushList(); out.push(<p key={idx} style={{ fontWeight: 800, fontSize: '1.05em', margin: '10px 0 3px' }}>{renderMdInline(h2[1])}</p>); return; }
     const h1 = line.match(/^# (.+)$/);
     if (h1) { flushList(); out.push(<p key={idx} style={{ fontWeight: 900, fontSize: '1.1em', margin: '12px 0 4px' }}>{renderMdInline(h1[1])}</p>); return; }
-    const li = line.match(/^\s*[-*•+] (.+)$/) || line.match(/^\s*\d+\.\s+(.+)$/);
+    const li = line.match(/^\s*[-*+] (.+)$/) || line.match(/^\s*\d+\.\s+(.+)$/);
     if (li) { listItems.push(<li key={idx} style={{ marginBottom: 2, lineHeight: 1.5 }}>{renderMdInline(li[1])}</li>); return; }
     if (/^---+$/.test(line.trim())) { flushList(); out.push(<hr key={idx} style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.15)', margin: '8px 0' }} />); return; }
     if (!line.trim()) { flushList(); if (out.length) out.push(<div key={idx} style={{ height: 6 }} />); return; }
@@ -53,7 +53,7 @@ export const renderMarkdown = (text) => {
   return <>{out}</>;
 };
 
-/* ── UI Table Component ── */
+/*  UI Table Component  */
 export const UiTable = ({ html }) => {
   const rows = [];
   const rowRe = /<ui-row>([\s\S]*?)<\/ui-row>/g;
@@ -97,7 +97,7 @@ export const UiTable = ({ html }) => {
   );
 };
 
-/* ── UI Flowchart Component ── */
+/*  UI Flowchart Component  */
 const UI_NODE_COLORS = { blue: '#3b82f6', purple: '#8b5cf6', green: '#10b981', red: '#ef4444', orange: '#f97316', yellow: '#f59e0b', pink: '#ec4899', cyan: '#06b6d4', gray: '#6b7280' };
 
 export const UiFlowchart = ({ html }) => {
@@ -157,7 +157,7 @@ export const UiFlowchart = ({ html }) => {
   );
 };
 
-/* ── UI Callout Component ── */
+/*  UI Callout Component  */
 export const UiCallout = ({ type, children }) => {
   const map = {
     warning: { bg: 'rgba(245,158,11,.1)', border: 'rgba(245,158,11,.35)', color: '#f59e0b', icon: '' },
@@ -174,7 +174,7 @@ export const UiCallout = ({ type, children }) => {
   );
 };
 
-/* ── renderAIContent: parses custom XML tags + standard markdown ── */
+/*  renderAIContent: parses custom XML tags + standard markdown  */
 export const renderAIContent = (text) => {
   if (!text) return null;
   const segments = [];

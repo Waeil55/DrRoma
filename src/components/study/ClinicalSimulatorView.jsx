@@ -1,13 +1,13 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Loader2, Sparkles, ChevronLeft, Send, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
 const STARTER_CASES = [
   { id: 'chest_pain', title: 'Chest Pain in ER', specialty: 'Cardiology', difficulty: 'Hard',
-    presentation: '58M with crushing chest pain radiating to left arm, diaphoresis, 3/10→9/10 pain over 2 hours. PMH: HTN, DM2, smoker.',
+    presentation: '58M with crushing chest pain radiating to left arm, diaphoresis, 3/109/10 pain over 2 hours. PMH: HTN, DM2, smoker.',
     vitals: { BP: '165/95', HR: '102', RR: '22', Temp: '37.1', SpO2: '96%', Weight: '88 kg' },
     correctDx: 'STEMI', keyFindings: ['ST elevation V1-V4', 'Troponin elevated', 'Hyperlipidemia history'],
-    aiContext: 'Patient is a 58-year-old male with STEMI. He is anxious and sweating. Respond as this patient to medical student questions. ECG shows ST elevation V1–V4.' },
+    aiContext: 'Patient is a 58-year-old male with STEMI. He is anxious and sweating. Respond as this patient to medical student questions. ECG shows ST elevation V1V4.' },
   { id: 'sob', title: 'Shortness of Breath', specialty: 'Pulmonology', difficulty: 'Medium',
     presentation: '34F with sudden onset SOB, pleuritic chest pain, 4 days after long-haul flight. No fever.',
     vitals: { BP: '118/78', HR: '118', RR: '28', Temp: '37.4', SpO2: '92%', Weight: '62 kg' },
@@ -130,11 +130,11 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => setPhase('select')} className="glass w-9 h-9 rounded-xl flex items-center justify-center"><ChevronLeft size={16} /></button>
-        <h2 className="font-black text-lg">{selectedCase.title} — Feedback</h2>
+        <h2 className="font-black text-lg">{selectedCase.title}  Feedback</h2>
       </div>
       <div className="glass rounded-3xl p-6 text-center" style={{ border: `2px solid ${score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444'}40` }}>
         <div className="text-5xl font-black mb-2" style={{ color: score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444' }}>{score?.score}%</div>
-        <div className="text-lg font-black mb-4">{score?.correct ? ' Correct Diagnosis!' : score?.nearMiss ? ' Close — Near Miss' : ' Incorrect'}</div>
+        <div className="text-lg font-black mb-4">{score?.correct ? ' Correct Diagnosis!' : score?.nearMiss ? ' Close  Near Miss' : ' Incorrect'}</div>
         <div className="text-sm font-black mb-1">Correct: <span style={{ color: '#10b981' }}>{selectedCase.correctDx}</span></div>
         <div className="text-sm mb-4 opacity-60">Your answer: {userDx}</div>
         <p className="text-sm opacity-70 leading-relaxed">{score?.feedback}</p>
@@ -142,7 +142,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
       {score?.keyPoints?.length > 0 && (
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
           <h3 className="font-black text-sm mb-3">Key Teaching Points</h3>
-          {score.keyPoints.map((p, i) => <div key={i} className="flex gap-3 text-sm py-1.5"><span style={{ color: 'var(--accent)' }}>•</span><span className="opacity-70">{p}</span></div>)}
+          {score.keyPoints.map((p, i) => <div key={i} className="flex gap-3 text-sm py-1.5"><span style={{ color: 'var(--accent)' }}></span><span className="opacity-70">{p}</span></div>)}
         </div>
       )}
       {score?.differentials?.length > 0 && (
@@ -162,7 +162,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
         <button onClick={() => setPhase('select')} className="glass w-9 h-9 rounded-xl flex items-center justify-center shrink-0"><ChevronLeft size={16} /></button>
         <div className="flex-1 min-w-0">
           <h3 className="font-black truncate">{selectedCase.title}</h3>
-          <p className="text-xs opacity-40 truncate">{selectedCase.presentation.slice(0, 60)}…</p>
+          <p className="text-xs opacity-40 truncate">{selectedCase.presentation.slice(0, 60)}</p>
         </div>
       </div>
 
@@ -195,7 +195,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
             <h3 className="font-black mb-3">Your Diagnosis</h3>
             <p className="text-xs opacity-50 mb-3">Based on your history, exam findings, and orders, what is the most likely diagnosis?</p>
             <input value={userDx} onChange={e => setUserDx(e.target.value)}
-              placeholder="e.g. Acute Appendicitis, STEMI, Pulmonary Embolism…"
+              placeholder="e.g. Acute Appendicitis, STEMI, Pulmonary Embolism"
               className="w-full glass-input rounded-xl px-4 py-3 text-sm outline-none mb-4"
               style={{ border: '1px solid var(--border)' }} />
             <div className="glass rounded-xl p-3 mb-4" style={{ border: '1px solid var(--border)' }}>
@@ -225,7 +225,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
             <div className="flex gap-2">
               <input value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                placeholder={phase === 'hx' ? 'Ask the patient about symptoms, history…' : phase === 'exam' ? 'Describe your exam approach…' : 'Place an order (CBC, ECG, CT…)'}
+                placeholder={phase === 'hx' ? 'Ask the patient about symptoms, history' : phase === 'exam' ? 'Describe your exam approach' : 'Place an order (CBC, ECG, CT)'}
                 className="flex-1 glass-input rounded-2xl px-4 py-3 text-sm outline-none"
                 style={{ border: '1px solid var(--border)' }} />
               <button onClick={sendMessage} disabled={loading || !input.trim()} className="btn-accent w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">

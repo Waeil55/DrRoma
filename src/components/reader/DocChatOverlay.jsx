@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — DocChatOverlay
+ * MARIAM PRO  DocChatOverlay
  * Floating chat overlay for asking AI about the current document.
  * Appears as a slide-up panel inside the document workspace.
  */

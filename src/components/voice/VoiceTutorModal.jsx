@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — VoiceTutorModal Component
+ * MARIAM PRO  VoiceTutorModal Component
  * Full-screen voice tutor with always-on recognition, ProsodyEngine TTS,
  * bottom toolbar, and session summary on close.
  */
@@ -154,10 +154,10 @@ export default function VoiceTutorModal({ settings, onClose, callAIStreaming }) 
   };
 
   const PHASE_CONFIG = {
-    idle: { label: 'Starting…', color: 'var(--accent)', icon: Mic },
-    listening: { label: 'Listening…', color: 'var(--danger)', icon: Mic },
-    thinking: { label: 'Thinking…', color: 'var(--warning)', icon: Brain },
-    speaking: { label: 'Speaking… (tap to interrupt)', color: 'var(--success)', icon: Volume2 },
+    idle: { label: 'Starting', color: 'var(--accent)', icon: Mic },
+    listening: { label: 'Listening', color: 'var(--danger)', icon: Mic },
+    thinking: { label: 'Thinking', color: 'var(--warning)', icon: Brain },
+    speaking: { label: 'Speaking (tap to interrupt)', color: 'var(--success)', icon: Volume2 },
   };
   const pc = PHASE_CONFIG[phase];
   const PhaseIcon = pc.icon;
@@ -228,7 +228,7 @@ export default function VoiceTutorModal({ settings, onClose, callAIStreaming }) 
         {phase === 'thinking' && (
           <div className="flex justify-start">
             <div className="px-4 py-3 rounded-2xl text-sm text-white/50" style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <span className="animate-pulse">Thinking…</span>
+              <span className="animate-pulse">Thinking</span>
             </div>
           </div>
         )}
@@ -260,13 +260,13 @@ export default function VoiceTutorModal({ settings, onClose, callAIStreaming }) 
         <div className="px-5 py-3 shrink-0 flex gap-2">
           <input type="text" value={textDraft} onChange={e => setTextDraft(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleTextSubmit()}
-            placeholder="Type your message…"
+            placeholder="Type your message"
             className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none placeholder-white/30 border border-white/10 focus:border-white/30" />
           <button onClick={handleTextSubmit} className="btn-accent px-4 py-3 rounded-xl font-black text-sm">Send</button>
         </div>
       )}
 
-      {/* Bottom toolbar — 4 buttons */}
+      {/* Bottom toolbar  4 buttons */}
       <div className="shrink-0 flex items-center justify-around px-4 py-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={interrupt} aria-label="Hold to override"
           className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition-opacity">

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 function ObGynCalculatorsView() {
   const [tab, setTab] = useState('edd');
@@ -23,8 +23,8 @@ function ObGynCalculatorsView() {
   const bishopTotal = Object.values(bishopScores).reduce((a, b) => a + b, 0);
 
   const bishopCriteria = [
-    { key: 'dilation', label: 'Dilation (cm)', options: [{ v: 0, l: 'Closed' }, { v: 1, l: '1-2 cm' }, { v: 2, l: '3-4 cm' }, { v: 3, l: '≥5 cm' }] },
-    { key: 'effacement', label: 'Effacement (%)', options: [{ v: 0, l: '0-30%' }, { v: 1, l: '40-50%' }, { v: 2, l: '60-70%' }, { v: 3, l: '≥80%' }] },
+    { key: 'dilation', label: 'Dilation (cm)', options: [{ v: 0, l: 'Closed' }, { v: 1, l: '1-2 cm' }, { v: 2, l: '3-4 cm' }, { v: 3, l: '5 cm' }] },
+    { key: 'effacement', label: 'Effacement (%)', options: [{ v: 0, l: '0-30%' }, { v: 1, l: '40-50%' }, { v: 2, l: '60-70%' }, { v: 3, l: '80%' }] },
     { key: 'station', label: 'Station', options: [{ v: 0, l: '-3' }, { v: 1, l: '-2' }, { v: 2, l: '-1,0' }, { v: 3, l: '+1,+2' }] },
     { key: 'consistency', label: 'Consistency', options: [{ v: 0, l: 'Firm' }, { v: 1, l: 'Medium' }, { v: 2, l: 'Soft' }] },
     { key: 'position', label: 'Position', options: [{ v: 0, l: 'Posterior' }, { v: 1, l: 'Mid' }, { v: 2, l: 'Anterior' }] },
@@ -32,7 +32,7 @@ function ObGynCalculatorsView() {
 
   const apgarCriteria = [
     { key: 'appearance', label: 'Appearance (Color)', options: [{ v: 0, l: 'Blue/pale all over' }, { v: 1, l: 'Body pink, extremities blue' }, { v: 2, l: 'Completely pink' }] },
-    { key: 'pulse', label: 'Pulse (Heart Rate)', options: [{ v: 0, l: 'Absent' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '≥100 bpm' }] },
+    { key: 'pulse', label: 'Pulse (Heart Rate)', options: [{ v: 0, l: 'Absent' }, { v: 1, l: '<100 bpm' }, { v: 2, l: '100 bpm' }] },
     { key: 'grimace', label: 'Grimace (Reflex)', options: [{ v: 0, l: 'No response' }, { v: 1, l: 'Grimace' }, { v: 2, l: 'Cry/active withdrawal' }] },
     { key: 'activity', label: 'Activity (Muscle Tone)', options: [{ v: 0, l: 'Limp' }, { v: 1, l: 'Some flexion' }, { v: 2, l: 'Active motion' }] },
     { key: 'respiration', label: 'Respiration', options: [{ v: 0, l: 'Absent' }, { v: 1, l: 'Slow/irregular' }, { v: 2, l: 'Good cry' }] },
@@ -79,7 +79,7 @@ function ObGynCalculatorsView() {
                 <div className="mt-3 text-xs space-y-1 opacity-60">
                   <div>Trimester: {gestAge.weeks < 13 ? '1st (weeks 1-12)' : gestAge.weeks < 28 ? '2nd (weeks 13-27)' : '3rd (weeks 28-40)'}</div>
                   <div>Viability: {gestAge.weeks >= 24 ? ' Past viability threshold (24 weeks)' : ' Pre-viable (<24 weeks)'}</div>
-                  <div>Term: {gestAge.weeks >= 37 ? ' Term (≥37 weeks)' : gestAge.weeks >= 34 ? 'Late preterm (34-36w)' : 'Preterm (<34 weeks)'}</div>
+                  <div>Term: {gestAge.weeks >= 37 ? ' Term (37 weeks)' : gestAge.weeks >= 34 ? 'Late preterm (34-36w)' : 'Preterm (<34 weeks)'}</div>
                 </div>
               </div>
             )}
@@ -89,7 +89,7 @@ function ObGynCalculatorsView() {
         {tab === 'bishop' && (
           <div className="space-y-4 animate-fade-in-up">
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-black text-sm mb-3">Bishop Score — Cervical Favorability</h3>
+              <h3 className="font-black text-sm mb-3">Bishop Score  Cervical Favorability</h3>
               {bishopCriteria.map(c => (
                 <div key={c.key} className="mb-3">
                   <label className="text-xs font-black opacity-40 block mb-1.5">{c.label}</label>
@@ -109,9 +109,9 @@ function ObGynCalculatorsView() {
               <div className="text-center">
                 <div className="text-4xl font-black" style={{ color: bishopTotal >= 8 ? '#10b981' : bishopTotal >= 6 ? '#f59e0b' : '#ef4444' }}>{bishopTotal}/13</div>
                 <div className="text-sm font-black mt-1" style={{ color: bishopTotal >= 8 ? '#10b981' : bishopTotal >= 6 ? '#f59e0b' : '#ef4444' }}>
-                  {bishopTotal >= 8 ? 'Favorable cervix — induction likely successful' : bishopTotal >= 6 ? 'Moderately favorable — consider ripening' : 'Unfavorable cervix — cervical ripening recommended'}
+                  {bishopTotal >= 8 ? 'Favorable cervix  induction likely successful' : bishopTotal >= 6 ? 'Moderately favorable  consider ripening' : 'Unfavorable cervix  cervical ripening recommended'}
                 </div>
-                <div className="text-xs opacity-40 mt-2">Score ≥8: favorable, high success of vaginal delivery. Score &lt;6: consider cervical ripening (misoprostol, dinoprostone, or Foley balloon).</div>
+                <div className="text-xs opacity-40 mt-2">Score 8: favorable, high success of vaginal delivery. Score &lt;6: consider cervical ripening (misoprostol, dinoprostone, or Foley balloon).</div>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@ function ObGynCalculatorsView() {
         {tab === 'apgar' && (
           <div className="space-y-4 animate-fade-in-up">
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-black text-sm mb-3">APGAR Score — Neonatal Assessment</h3>
+              <h3 className="font-black text-sm mb-3">APGAR Score  Neonatal Assessment</h3>
               {apgarCriteria.map(c => (
                 <div key={c.key} className="mb-3">
                   <label className="text-xs font-black opacity-40 block mb-1.5">{c.label}</label>
@@ -140,7 +140,7 @@ function ObGynCalculatorsView() {
               <div className="text-center">
                 <div className="text-4xl font-black" style={{ color: apgarTotal >= 7 ? '#10b981' : apgarTotal >= 4 ? '#f59e0b' : '#ef4444' }}>{apgarTotal}/10</div>
                 <div className="text-sm font-black mt-1" style={{ color: apgarTotal >= 7 ? '#10b981' : apgarTotal >= 4 ? '#f59e0b' : '#ef4444' }}>
-                  {apgarTotal >= 7 ? 'Normal — reassuring' : apgarTotal >= 4 ? 'Moderately depressed — needs intervention' : 'Severely depressed — aggressive resuscitation'}
+                  {apgarTotal >= 7 ? 'Normal  reassuring' : apgarTotal >= 4 ? 'Moderately depressed  needs intervention' : 'Severely depressed  aggressive resuscitation'}
                 </div>
                 <div className="text-xs opacity-40 mt-2">Assessed at 1 min and 5 min of life. 1-min: need for resuscitation. 5-min: response to resuscitation. 7-10: normal. 4-6: needs intervention. 0-3: needs aggressive resuscitation.</div>
               </div>

@@ -610,7 +610,7 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_100",
     "q": "Labetalol",
-    "a": "Brand: N/A\nIndication: hypertension\nClass: α/β-adrenergic blocker\nCounseling Points:\n- may cause low blood pressure\n- may cause dizziness; rise slowly from sitting or lying position\n- avoid alcohol\n- may mask symptoms of low blood sugar\n- do not suddenly discontinue",
+    "a": "Brand: N/A\nIndication: hypertension\nClass: /-adrenergic blocker\nCounseling Points:\n- may cause low blood pressure\n- may cause dizziness; rise slowly from sitting or lying position\n- avoid alcohol\n- may mask symptoms of low blood sugar\n- do not suddenly discontinue",
     "nextReview": 0
   },
   {
@@ -754,7 +754,7 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_124",
     "q": "Metoprolol",
-    "a": "Brand: Lopressor, Toprol XL\nIndication: hypertension\nClass: β-adrenergic blocker, cardioselective\nCounseling Points:\n- take on empty stomach\n- bradycardia can occur\n- avoid alcohol\n- avoid abrupt discontinuation\n- may mask signs of hypoglycemia",
+    "a": "Brand: Lopressor, Toprol XL\nIndication: hypertension\nClass: -adrenergic blocker, cardioselective\nCounseling Points:\n- take on empty stomach\n- bradycardia can occur\n- avoid alcohol\n- avoid abrupt discontinuation\n- may mask signs of hypoglycemia",
     "nextReview": 0
   },
   {
@@ -808,7 +808,7 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_133",
     "q": "Nebivolol",
-    "a": "Brand: Bystolic\nIndication: hypertension\nClass: β-adrenergic blocker, cardioselective, B1 selective\nCounseling Points:\n- may mask symptoms of hypoglycemia\n- do not discontinue abruptly, may cause rebound angina",
+    "a": "Brand: Bystolic\nIndication: hypertension\nClass: -adrenergic blocker, cardioselective, B1 selective\nCounseling Points:\n- may mask symptoms of hypoglycemia\n- do not discontinue abruptly, may cause rebound angina",
     "nextReview": 0
   },
   {
@@ -970,7 +970,7 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_160",
     "q": "Propranolol",
-    "a": "Brand: Inderal, Inderal LA, Inderal XL\nIndication: hypertension\nClass: β-adrenergic blocker, nonselective\nCounseling Points:\n- taking IR tablets on an empty stomach; ER can be taken with or without food but consistently\n- avoid alcohol\n- avoid abrupt discontinuation\n- may cause dizziness\n- may mask symptoms of hypoglycemia",
+    "a": "Brand: Inderal, Inderal LA, Inderal XL\nIndication: hypertension\nClass: -adrenergic blocker, nonselective\nCounseling Points:\n- taking IR tablets on an empty stomach; ER can be taken with or without food but consistently\n- avoid alcohol\n- avoid abrupt discontinuation\n- may cause dizziness\n- may mask symptoms of hypoglycemia",
     "nextReview": 0
   },
   {
@@ -1060,13 +1060,13 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_175",
     "q": "Tamsulosin",
-    "a": "Brand: Flomax\nIndication: BPH (benign prostatic hyperplasia)\nClass: α1-adrenergic blocker\nCounseling Points:\n- administer 30 minutes after same meal daily\n- may cause vertigo or dizziness; avoid driving until effects known\n- rise slowly from a sitting or lying position\n- syncope is possible with first dose or dose increases",
+    "a": "Brand: Flomax\nIndication: BPH (benign prostatic hyperplasia)\nClass: 1-adrenergic blocker\nCounseling Points:\n- administer 30 minutes after same meal daily\n- may cause vertigo or dizziness; avoid driving until effects known\n- rise slowly from a sitting or lying position\n- syncope is possible with first dose or dose increases",
     "nextReview": 0
   },
   {
     "id": "drug_fc_176",
     "q": "Penicillin VK",
-    "a": "Brand: N/A\nIndication: BPH (benign prostatic hyperplasia, HTN (hypertension)\nClass: α1-adrenergic blocker\nCounseling Points:\n- avoid abrupt discontinuation\n- may cause vertigo or dizziness; avoid driving until effects known\n- rise slowly from a sitting or lying position\n- syncope is possible with first dose or dose increases",
+    "a": "Brand: N/A\nIndication: BPH (benign prostatic hyperplasia, HTN (hypertension)\nClass: 1-adrenergic blocker\nCounseling Points:\n- avoid abrupt discontinuation\n- may cause vertigo or dizziness; avoid driving until effects known\n- rise slowly from a sitting or lying position\n- syncope is possible with first dose or dose increases",
     "nextReview": 0
   },
   {
@@ -1096,7 +1096,7 @@ export const drugFlashcards = [{
   {
     "id": "drug_fc_181",
     "q": "Tizanidine",
-    "a": "Brand: Zanaflex\nIndication: pain\nClass: Centrally acting skeletal muscle relaxant, α2-agonist\nCounseling Points:\n- May cause dizziness and somnolence; avoid driving until effects known\n- May cause dry mouth and weakness\n- Rise slowly from sitting/standing position",
+    "a": "Brand: Zanaflex\nIndication: pain\nClass: Centrally acting skeletal muscle relaxant, 2-agonist\nCounseling Points:\n- May cause dizziness and somnolence; avoid driving until effects known\n- May cause dry mouth and weakness\n- Rise slowly from sitting/standing position",
     "nextReview": 0
   },
   {
@@ -2296,7 +2296,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_100",
-    "q": "Which medication is indicated for hypertension and is classified as a(n) α/β-adrenergic blocker?",
+    "q": "Which medication is indicated for hypertension and is classified as a(n) /-adrenergic blocker?",
     "options": [
       "Diltiazem ER",
       "Morphine ER",
@@ -2560,7 +2560,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_124",
-    "q": "Which medication is indicated for hypertension and is classified as a(n) β-adrenergic blocker, cardioselective?",
+    "q": "Which medication is indicated for hypertension and is classified as a(n) -adrenergic blocker, cardioselective?",
     "options": [
       "Ibuprofen",
       "Etonogestrel/Ethinyl estradiol vaginal ring",
@@ -2659,7 +2659,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_133",
-    "q": "Which medication is indicated for hypertension and is classified as a(n) β-adrenergic blocker, cardioselective, b1 selective?",
+    "q": "Which medication is indicated for hypertension and is classified as a(n) -adrenergic blocker, cardioselective, b1 selective?",
     "options": [
       "Methotrexate",
       "Cetirizine",
@@ -2956,7 +2956,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_160",
-    "q": "Which medication is indicated for hypertension and is classified as a(n) β-adrenergic blocker, nonselective?",
+    "q": "Which medication is indicated for hypertension and is classified as a(n) -adrenergic blocker, nonselective?",
     "options": [
       "Naproxen",
       "Lovastatin",
@@ -3121,7 +3121,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_175",
-    "q": "Which medication is indicated for bph (benign prostatic hyperplasia) and is classified as a(n) α1-adrenergic blocker?",
+    "q": "Which medication is indicated for bph (benign prostatic hyperplasia) and is classified as a(n) 1-adrenergic blocker?",
     "options": [
       "Mirtazapine",
       "Tamsulosin",
@@ -3132,7 +3132,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_176",
-    "q": "Which medication is indicated for bph (benign prostatic hyperplasia, htn (hypertension) and is classified as a(n) α1-adrenergic blocker?",
+    "q": "Which medication is indicated for bph (benign prostatic hyperplasia, htn (hypertension) and is classified as a(n) 1-adrenergic blocker?",
     "options": [
       "Penicillin VK",
       "Meloxicam",
@@ -3187,7 +3187,7 @@ export const drugExams = [{
   },
   {
     "id": "drug_ex_181",
-    "q": "Which medication is indicated for pain and is classified as a(n) centrally acting skeletal muscle relaxant, α2-agonist?",
+    "q": "Which medication is indicated for pain and is classified as a(n) centrally acting skeletal muscle relaxant, 2-agonist?",
     "options": [
       "Cefdinir",
       "Etonogestrel/Ethinyl estradiol vaginal ring",

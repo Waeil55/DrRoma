@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Generic IndexedDB Operation Wrapper
+ * MARIAM PRO  Generic IndexedDB Operation Wrapper
  * Full error handling with Safari/iOS hardening.
  */
 import { openDB } from './openDB.js';

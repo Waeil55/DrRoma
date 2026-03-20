@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useMediaQuery Hook
+ * MARIAM PRO  useMediaQuery Hook
  * Reactive CSS media query matching.
  * Extracted from App.jsx.
  */

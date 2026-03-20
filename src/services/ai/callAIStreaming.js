@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — AI Streaming Call
+ * MARIAM PRO  AI Streaming Call
  * Handles SSE streaming from Anthropic + fallback typing effect for other providers.
  * Includes safe chunk buffer that handles fragmented JSON, code blocks, and tables.
  */
@@ -14,7 +14,7 @@ import { callAI } from './callAI.js';
 export function parseSSEBuffer(buffer, provider = 'anthropic') {
   const lines = buffer.split('\n');
   const events = [];
-  // Last element may be incomplete — carry over
+  // Last element may be incomplete  carry over
   const remaining = lines.pop() ?? '';
 
   for (const line of lines) {
@@ -34,7 +34,7 @@ export function parseSSEBuffer(buffer, provider = 'anthropic') {
         events.push({ type: 'text', text: parsed.choices[0].delta.content });
       }
     } catch {
-      // Malformed JSON — append to remaining for next read
+      // Malformed JSON  append to remaining for next read
     }
   }
 

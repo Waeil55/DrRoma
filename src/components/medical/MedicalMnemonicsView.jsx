@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, Trash2 } from 'lucide-react';
 
 const BUILTIN_MNEMONICS = [
@@ -22,10 +22,10 @@ const BUILTIN_MNEMONICS = [
   {
     title: 'SOCRATES', topic: 'Pain History Taking', category: 'Clinical Skills',
     letters: [
-      ['S', 'Site — Where is the pain?'], ['O', 'Onset — When did it start? Sudden or gradual?'],
-      ['C', 'Character — Sharp, dull, burning, colicky?'], ['R', 'Radiation — Does it go anywhere?'],
-      ['A', 'Associated symptoms — Nausea, vomiting, fever?'], ['T', 'Timing — Constant, intermittent, duration?'],
-      ['E', 'Exacerbating / Relieving factors'], ['S', 'Severity — Pain scale 0-10'],
+      ['S', 'Site  Where is the pain?'], ['O', 'Onset  When did it start? Sudden or gradual?'],
+      ['C', 'Character  Sharp, dull, burning, colicky?'], ['R', 'Radiation  Does it go anywhere?'],
+      ['A', 'Associated symptoms  Nausea, vomiting, fever?'], ['T', 'Timing  Constant, intermittent, duration?'],
+      ['E', 'Exacerbating / Relieving factors'], ['S', 'Severity  Pain scale 0-10'],
     ],
   },
   {
@@ -42,10 +42,10 @@ const BUILTIN_MNEMONICS = [
   {
     title: '4 T\'s (HIT)', topic: 'HIT Probability Score', category: 'Hematology',
     letters: [
-      ['T', 'Thrombocytopenia — Degree of platelet fall'],
-      ['T', 'Timing — Onset of platelet drop (5-10 days typical)'],
-      ['T', 'Thrombosis — New thrombosis or skin necrosis'],
-      ['T', 'oTher causes — Other causes of thrombocytopenia excluded?'],
+      ['T', 'Thrombocytopenia  Degree of platelet fall'],
+      ['T', 'Timing  Onset of platelet drop (5-10 days typical)'],
+      ['T', 'Thrombosis  New thrombosis or skin necrosis'],
+      ['T', 'oTher causes  Other causes of thrombocytopenia excluded?'],
     ],
   },
   {
@@ -72,10 +72,10 @@ const BUILTIN_MNEMONICS = [
   {
     title: 'CAGE', topic: 'Alcohol Screening', category: 'Psychiatry',
     letters: [
-      ['C', 'Cut down — Have you ever felt you should cut down?'],
-      ['A', 'Annoyed — Have people annoyed you by criticizing your drinking?'],
-      ['G', 'Guilty — Have you ever felt guilty about drinking?'],
-      ['E', 'Eye-opener — Have you ever had a drink first thing in the morning?'],
+      ['C', 'Cut down  Have you ever felt you should cut down?'],
+      ['A', 'Annoyed  Have people annoyed you by criticizing your drinking?'],
+      ['G', 'Guilty  Have you ever felt guilty about drinking?'],
+      ['E', 'Eye-opener  Have you ever had a drink first thing in the morning?'],
     ],
   },
   {
@@ -109,18 +109,18 @@ const BUILTIN_MNEMONICS = [
       ['P', 'Pain (sudden onset, severe)'],
       ['P', 'Pallor (white/mottled limb)'],
       ['P', 'Pulselessness (absent distal pulses)'],
-      ['P', 'Paraesthesia (tingling → numbness)'],
-      ['P', 'Paralysis (late sign — indicates severe ischemia)'],
+      ['P', 'Paraesthesia (tingling  numbness)'],
+      ['P', 'Paralysis (late sign  indicates severe ischemia)'],
     ],
   },
   {
     title: 'CURB-65', topic: 'Pneumonia Severity', category: 'Pulmonology',
     letters: [
-      ['C', 'Confusion (new mental confusion, AMT ≤ 8)'],
+      ['C', 'Confusion (new mental confusion, AMT  8)'],
       ['U', 'Urea > 7 mmol/L (BUN > 19 mg/dL)'],
-      ['R', 'Respiratory rate ≥ 30/min'],
-      ['B', 'Blood pressure: SBP < 90 or DBP ≤ 60 mmHg'],
-      ['65', 'Age ≥ 65 years'],
+      ['R', 'Respiratory rate  30/min'],
+      ['B', 'Blood pressure: SBP < 90 or DBP  60 mmHg'],
+      ['65', 'Age  65 years'],
     ],
   },
 ];
@@ -157,7 +157,7 @@ export default function MedicalMnemonicsView({ addToast }) {
       return;
     }
     const letters = newLetters.trim().split('\n').map(line => {
-      const sep = line.match(/[-–:]/);
+      const sep = line.match(/[-:]/);
       if (sep) {
         const idx = line.indexOf(sep[0]);
         return [line.slice(0, idx).trim(), line.slice(idx + 1).trim()];

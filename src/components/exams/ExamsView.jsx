@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — ExamsView orchestrator
+/**
+ * MARIAM PRO  ExamsView orchestrator
  * Switches between exam list, active exam, score screen, and review mode.
  * Includes inline AI tutor panel with draggable width.
  */
@@ -65,7 +65,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
   const handleExamTutorDrag = useCallback(x => { setExamTutorW(Math.max(280, Math.min(580, window.innerWidth - x))); }, []);
   const startExamTutorDrag = useDrag(handleExamTutorDrag, [handleExamTutorDrag]);
 
-  /* ═══ ACTIVE EXAM ═══ */
+  /*  ACTIVE EXAM  */
   if (selEx && score === null && !reviewMode) {
     const q = selEx.questions[qi];
     const progress = ((qi + 1) / selEx.questions.length) * 100;
@@ -118,8 +118,8 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
               {!submitted ?
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-black disabled:opacity-40 shadow-xl">Submit Answer</button> :
                 qi < selEx.questions.length - 1 ?
-                  <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question →</button> :
-                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); const xpGain = XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct; awardXP(xpGain); addToast(`+${xpGain} XP `, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
+                  <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question </button> :
+                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); const xpGain = XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct; awardXP(xpGain); addToast(`+${xpGain} XP `, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results </button>
               }
             </div>
             <div className="lg:hidden mt-4 flex-shrink-0">
@@ -156,14 +156,14 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
     );
   }
 
-  /* ═══ REVIEW MODE ═══ */
+  /*  REVIEW MODE  */
   if (reviewMode && selEx) {
     return (
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
         <div className="w-full p-6 lg:p-8">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setReviewMode(false)} className="glass px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2"><ChevronLeft size={18} />Back</button>
-            <h2 className="font-black text-lg">{selEx.title} — Review</h2>
+            <h2 className="font-black text-lg">{selEx.title}  Review</h2>
             <button onClick={() => handleExport(selEx)} disabled={exporting}
               className="ml-auto btn-accent px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-md">
               {exporting ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />}Print PDF
@@ -192,7 +192,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
     );
   }
 
-  /* ═══ SCORE SCREEN ═══ */
+  /*  SCORE SCREEN  */
   if (score !== null && selEx) {
     const pct = Math.round((score / selEx.questions.length) * 100);
     const grade = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
@@ -217,7 +217,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
     );
   }
 
-  /* ═══ EXAM LIST ═══ */
+  /*  EXAM LIST  */
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
       {showModal && <QuickGenerateModal type="exam" docs={docs || []} settings={settings}
@@ -236,7 +236,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
               {[
                 ['Total Exams', exams.length, '#3b82f6'],
                 ['Questions', exams.reduce((s, e) => s + (e.questions?.length || 0), 0), '#6366f1'],
-                ['Avg Score', ANALYTICS.scores.length ? `${Math.round(ANALYTICS.scores.reduce((s, r) => s + r.pct, 0) / ANALYTICS.scores.length)}%` : '—', '#10b981'],
+                ['Avg Score', ANALYTICS.scores.length ? `${Math.round(ANALYTICS.scores.reduce((s, r) => s + r.pct, 0) / ANALYTICS.scores.length)}%` : '', '#10b981'],
                 ['Attempts', ANALYTICS.scores.length, '#f59e0b'],
               ].map(([l, n, col]) => (
                 <div key={l} className="glass rounded-2xl p-3 text-center border border-[color:var(--border2,var(--border))]">

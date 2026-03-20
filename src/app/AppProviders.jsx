@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — AppProviders
+ * MARIAM PRO  AppProviders
  * All context providers and global initializations wrapped in one component.
  * Keeps the root App.jsx clean (~80 lines).
  */

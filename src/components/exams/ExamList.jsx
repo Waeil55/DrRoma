@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — ExamList Component
+/**
+ * MARIAM PRO  ExamList Component
  * Exam listing with stats, filters, and actions.
  */
 import React, { useState, useMemo } from 'react';
@@ -51,7 +51,7 @@ export default function ExamList({
               {[
                 ['Total Exams', exams.length, '#3b82f6'],
                 ['Questions', exams.reduce((s, e) => s + (e.questions?.length || 0), 0), '#6366f1'],
-                ['Avg Score', scores.length ? `${Math.round(scores.reduce((s, r) => s + r.pct, 0) / scores.length)}%` : '—', '#10b981'],
+                ['Avg Score', scores.length ? `${Math.round(scores.reduce((s, r) => s + r.pct, 0) / scores.length)}%` : '', '#10b981'],
                 ['Attempts', scores.length, '#f59e0b'],
               ].map(([l, n, col]) => (
                 <div key={l} className="glass rounded-2xl p-3 text-center border border-[color:var(--border2,var(--border))]">

@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — SidebarNav (Desktop)
+ * MARIAM PRO  SidebarNav (Desktop)
  * Desktop-only sidebar navigation.
  */
 export default function SidebarNav({ items, moreItems, activeView, onNavigate, compact = false }) {

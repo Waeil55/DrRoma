@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — App State Operations (IndexedDB 'appState' store)
+ * MARIAM PRO  App State Operations (IndexedDB 'appState' store)
  */
 import { dbOp } from './dbOp.js';
 

@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — FullDuplexVoiceManager
+ * MARIAM PRO  FullDuplexVoiceManager
  * Speech recognition + live transcription using Web Speech API.
  * Supports continuous/interruptible capture and silence detection.
  */
@@ -92,7 +92,7 @@ class FullDuplexVoiceManager {
 
     rec.onend = () => {
       if (this._listening) {
-        // Browser stopped unexpectedly — restart if still supposed to listen
+        // Browser stopped unexpectedly  restart if still supposed to listen
         try { rec.start(); } catch (_) { this._cleanup(); }
       }
     };
@@ -170,7 +170,7 @@ class FullDuplexVoiceManager {
   }
 }
 
-// ── Singleton export ──────────────────────────────────────────────────
+//  Singleton export 
 let _instance = null;
 
 export function getVoiceManager() {

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 const PAIN_DATA = {
   ladder: [
@@ -12,14 +12,14 @@ const PAIN_DATA = {
     { step: 2, title: 'Weak Opioids + Non-Opioid', color: '#f59e0b',
       drugs: [
         { name: 'Tramadol', dose: '50-100 mg Q4-6h', max: '400mg/day', notes: 'Weak mu-agonist + NE/5-HT reuptake inhibitor. Seizure risk. Serotonin syndrome with SSRIs.' },
-        { name: 'Codeine', dose: '15-60 mg Q4-6h', max: '360mg/day', notes: 'Prodrug (→ morphine via CYP2D6). Ultra-rapid metabolizers: toxicity risk. Poor metabolizers: no effect.' },
+        { name: 'Codeine', dose: '15-60 mg Q4-6h', max: '360mg/day', notes: 'Prodrug ( morphine via CYP2D6). Ultra-rapid metabolizers: toxicity risk. Poor metabolizers: no effect.' },
       ]},
     { step: 3, title: 'Strong Opioids + Non-Opioid', color: '#ef4444',
       drugs: [
         { name: 'Morphine', dose: '5-15 mg PO Q4h', max: 'No ceiling; titrate to effect', notes: 'Gold standard. Active metabolite M6G accumulates in renal failure. Histamine release.' },
         { name: 'Oxycodone', dose: '5-15 mg PO Q4-6h', max: 'Titrate to effect', notes: 'Fewer histamine effects than morphine. Available as ER formulation (OxyContin).' },
-        { name: 'Hydromorphone', dose: '1-4 mg PO Q4-6h or 0.5-1 mg IV', max: 'Titrate to effect', notes: '5-7× more potent than morphine. No active metabolites — preferred in renal failure.' },
-        { name: 'Fentanyl', dose: 'Patch: 12-25 mcg/hr Q72h', max: 'Titrate', notes: '80-100× morphine potency. Transdermal, IV, buccal. NOT for opioid-naïve patients (patches).' },
+        { name: 'Hydromorphone', dose: '1-4 mg PO Q4-6h or 0.5-1 mg IV', max: 'Titrate to effect', notes: '5-7 more potent than morphine. No active metabolites  preferred in renal failure.' },
+        { name: 'Fentanyl', dose: 'Patch: 12-25 mcg/hr Q72h', max: 'Titrate', notes: '80-100 morphine potency. Transdermal, IV, buccal. NOT for opioid-nave patients (patches).' },
       ]},
   ],
   equivalence: [
@@ -28,7 +28,7 @@ const PAIN_DATA = {
     { drug: 'Oxycodone PO', factor: 1.5 },
     { drug: 'Hydromorphone PO', factor: 4 },
     { drug: 'Hydromorphone IV', factor: 20 },
-    { drug: 'Fentanyl transdermal (mcg/hr)', factor: 'Fentanyl patch mcg/hr ≈ morphine PO mg/day ÷ 2' },
+    { drug: 'Fentanyl transdermal (mcg/hr)', factor: 'Fentanyl patch mcg/hr  morphine PO mg/day  2' },
     { drug: 'Tramadol PO', factor: 0.1 },
     { drug: 'Codeine PO', factor: 0.15 },
   ],
@@ -36,7 +36,7 @@ const PAIN_DATA = {
     { cat: 'Neuropathic Pain', drugs: 'Gabapentin (100-3600 mg/day), Pregabalin (50-600 mg/day), Duloxetine (30-120 mg/day), Amitriptyline (10-75 mg qHS)', notes: 'First-line for neuropathic pain. Gabapentin/Pregabalin for DPN, PHN, fibromyalgia. Duloxetine for DPN, fibromyalgia, musculoskeletal.' },
     { cat: 'Bone Pain', drugs: 'Bisphosphonates, Denosumab, Radiation therapy, NSAIDs', notes: 'Bone mets: radiation for focal pain. Bisphosphonates reduce skeletal events.' },
     { cat: 'Spasticity', drugs: 'Baclofen (5-20 mg TID), Tizanidine (2-8 mg TID), Diazepam, Dantrolene', notes: 'Baclofen: GABA-B agonist. Do NOT abruptly discontinue (withdrawal seizures). Intrathecal baclofen pump for severe spasticity.' },
-    { cat: 'Procedural Pain', drugs: 'Lidocaine (local/IV), Ketamine (sub-dissociative 0.1-0.3 mg/kg), N₂O, Propofol', notes: 'IV lidocaine: 1.5 mg/kg bolus can be opioid-sparing. Ketamine: maintains airway reflexes, useful in opioid-tolerant patients.' },
+    { cat: 'Procedural Pain', drugs: 'Lidocaine (local/IV), Ketamine (sub-dissociative 0.1-0.3 mg/kg), NO, Propofol', notes: 'IV lidocaine: 1.5 mg/kg bolus can be opioid-sparing. Ketamine: maintains airway reflexes, useful in opioid-tolerant patients.' },
   ],
 };
 
@@ -91,7 +91,7 @@ function PainManagementView() {
                 {PAIN_DATA.equivalence.map((e, i) => (
                   <div key={i} className="flex items-center justify-between py-2 px-3 rounded-lg" style={{ background: i % 2 === 0 ? 'transparent' : 'var(--surface,var(--card))' }}>
                     <span className="text-sm font-bold">{e.drug}</span>
-                    <span className="text-xs font-black" style={{ color: 'var(--accent)' }}>{typeof e.factor === 'number' ? `×${e.factor}` : e.factor}</span>
+                    <span className="text-xs font-black" style={{ color: 'var(--accent)' }}>{typeof e.factor === 'number' ? `${e.factor}` : e.factor}</span>
                   </div>
                 ))}
               </div>
@@ -100,11 +100,11 @@ function PainManagementView() {
               <h3 className="font-black text-sm mb-2" style={{ color: '#ef4444' }}> Conversion Safety</h3>
               {[
                 'When rotating opioids, reduce calculated equianalgesic dose by 25-50% (incomplete cross-tolerance)',
-                'Methadone conversion is NOT linear — use specific conversion ratios (highly variable, requires specialist)',
+                'Methadone conversion is NOT linear  use specific conversion ratios (highly variable, requires specialist)',
                 'Always consider renal/hepatic function, drug interactions, and patient factors',
                 'Breakthrough dose: typically 10-20% of total 24h opioid as Q1-2h PRN',
               ].map((t, i) => (
-                <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#ef4444' }}>▸</span><span className="opacity-70 leading-relaxed">{t}</span></div>
+                <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#ef4444' }}></span><span className="opacity-70 leading-relaxed">{t}</span></div>
               ))}
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * MARIAM PRO — BottomNav (Mobile Pill Navigation)
+ * MARIAM PRO  BottomNav (Mobile Pill Navigation)
  * 4-tab core navigation: Home, Study, Tutor, More
  */
 export default function BottomNav({ items, activeView, onNavigate, isKeyboardOpen }) {

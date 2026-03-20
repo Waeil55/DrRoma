@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Notification Store
+ * MARIAM PRO  Notification Store
  */
 import { createStore } from './createStore.js';
 

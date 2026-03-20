@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Loader2, Sparkles, Copy, Save } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -59,7 +59,7 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
         <div className="glass rounded-2xl p-5 space-y-4" style={{ border: '1px solid var(--border)' }}>
           <div>
             <label className="text-xs font-black opacity-40 uppercase tracking-widest block mb-2">Condition / Topic</label>
-            <input value={condition} onChange={e => setCondition(e.target.value)} placeholder="e.g. Type 2 Diabetes, Hypertension, Asthma…"
+            <input value={condition} onChange={e => setCondition(e.target.value)} placeholder="e.g. Type 2 Diabetes, Hypertension, Asthma"
               className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
           </div>
@@ -92,7 +92,7 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
           </div>
           <button onClick={generate} disabled={loading || !condition.trim()}
             className="btn-accent w-full py-3 rounded-xl font-black flex items-center justify-center gap-2">
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Generating…</> : <><Sparkles size={16} /> Generate Handout</>}
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Generating</> : <><Sparkles size={16} /> Generate Handout</>}
           </button>
         </div>
 

@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — IndexedDB Migration Logic
+ * MARIAM PRO  IndexedDB Migration Logic
  * All version-specific migration code isolated here.
  * Imported & executed by openDB.js during onupgradeneeded.
  */

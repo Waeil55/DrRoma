@@ -55,7 +55,7 @@ html.dark,
   position: sticky;
   top: 0;
   z-index: 50;
-  /* Visible frosted glass — white tint + strong blur + indigo border glow */
+  /* Visible frosted glass  white tint + strong blur + indigo border glow */
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.97) 0%,
@@ -87,7 +87,7 @@ html.dark .design-header,
   transform: translateY(-50%);
 }
 
-/* Top glass strip — covers notch / safe-area above header */
+/* Top glass strip  covers notch / safe-area above header */
 .design-top-glass {
   position: fixed;
   top: 0;
@@ -214,18 +214,18 @@ html.dark .design-nav-btn.active,
     padding-right: 20px;
   }
 
-  /* The sidebar nav code is superseded by App.jsx display:none — kept for reference only */
+  /* The sidebar nav code is superseded by App.jsx display:none  kept for reference only */
 
   /* Wider content area */
   .app-view { max-width: 1360px; padding: 24px 30px; }
 
-  /* Shell: no sidebar — no margin offset needed */
+  /* Shell: no sidebar  no margin offset needed */
   .design-main {
     padding-bottom: 24px !important;
     line-height: 1.58;
   }
 
-  /* Font sizes — all use rem and scale with root font-size setting */
+  /* Font sizes  all use rem and scale with root font-size setting */
   .design-main h1 { font-size: 1.55rem; font-weight: 700; }
   .design-main h2 { font-size: 1.3rem; font-weight: 700; }
   .design-main h3 { font-size: 1.1rem; font-weight: 600; }

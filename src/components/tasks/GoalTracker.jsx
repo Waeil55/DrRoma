@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Plus, Trash2, Check, Sparkles } from 'lucide-react';
 
 const DEFAULT_GOALS = [

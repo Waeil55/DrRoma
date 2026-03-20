@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — StudyStreakCard
+/**
+ * MARIAM PRO  StudyStreakCard
  * Visual streak tracker showing last 7 days plus milestone badges.
  */
 import React, { useMemo } from 'react';

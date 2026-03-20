@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const QI_SECTIONS = [
@@ -9,22 +9,22 @@ const QI_SECTIONS = [
       { heading: 'Study', items: ['Complete the data analysis', 'Compare results to predictions', 'Summarize what was learned', 'Was the change an improvement? How do you know?'] },
       { heading: 'Act', items: ['Adapt the change based on what was learned', 'Options: Adopt (implement), Adapt (modify and re-test), Abandon (try something else)', 'Plan the next cycle', 'Scale up successful changes gradually'] },
     ],
-    tips: ['Multiple rapid PDSA cycles > one large project', 'Start small (1 patient, 1 shift, 1 provider)', 'Test predictions — learning from failures is valuable', 'Engage frontline staff from the beginning'] },
+    tips: ['Multiple rapid PDSA cycles > one large project', 'Start small (1 patient, 1 shift, 1 provider)', 'Test predictions  learning from failures is valuable', 'Engage frontline staff from the beginning'] },
   { id: 'rca', title: 'Root Cause Analysis', icon: '',
     content: [
       { heading: 'When to Use RCA', items: ['Sentinel events (patient death, wrong-site surgery, retained foreign body)', 'Near-miss events with potential for harm', 'Patterns of recurring errors', 'Required by TJC (The Joint Commission) for sentinel events'] },
-      { heading: '5 Whys Technique', items: ['Ask "Why?" repeatedly to drill down to root cause', 'Example: Med error → nurse distracted → multiple patients → staffing shortage → budget cuts', 'Go beyond individual blame to SYSTEM factors', 'Usually 4-6 levels of "why" reach the root'] },
+      { heading: '5 Whys Technique', items: ['Ask "Why?" repeatedly to drill down to root cause', 'Example: Med error  nurse distracted  multiple patients  staffing shortage  budget cuts', 'Go beyond individual blame to SYSTEM factors', 'Usually 4-6 levels of "why" reach the root'] },
       { heading: 'Fishbone (Ishikawa) Diagram', items: ['Categories: People, Process, Equipment, Environment, Materials, Management', 'Brainstorm causes in each category', 'Identify the most likely root causes', 'Develop specific corrective actions for each'] },
       { heading: 'Swiss Cheese Model (Reason)', items: ['Multiple layers of defense, each with "holes" (weaknesses)', 'Error occurs when holes align through all layers', 'Solution: add/strengthen barriers (redundancy)', 'System design prevents errors rather than relying on individuals'] },
     ],
     tips: ['Focus on systems, not individuals', 'Ask "What?" and "Why?" not "Who?"', 'Involve all stakeholders in the analysis', 'Strong actions: physical/systemic changes. Weak actions: retraining, policies'] },
   { id: 'safety', title: 'Patient Safety', icon: '',
     content: [
-      { heading: 'High-Reliability Organization (HRO) Principles', items: ['Preoccupation with failure — report near-misses', 'Reluctance to simplify — don\'t accept easy explanations', 'Sensitivity to operations — situational awareness', 'Commitment to resilience — plan for errors, recover quickly', 'Deference to expertise — let frontline staff speak up'] },
+      { heading: 'High-Reliability Organization (HRO) Principles', items: ['Preoccupation with failure  report near-misses', 'Reluctance to simplify  don\'t accept easy explanations', 'Sensitivity to operations  situational awareness', 'Commitment to resilience  plan for errors, recover quickly', 'Deference to expertise  let frontline staff speak up'] },
       { heading: 'Safety Culture Elements', items: ['Just culture: distinguish between human error (console), at-risk behavior (coach), and reckless behavior (discipline)', 'Psychological safety: staff feel safe reporting errors', 'Non-punitive reporting systems (PSAs, safety huddles)', 'Learning from events: closed-loop feedback'] },
       { heading: 'Common Safety Interventions', items: ['SBAR communication (Situation, Background, Assessment, Recommendation)', 'Timeouts (preprocedural verification)', 'Checklists (WHO Surgical Safety Checklist reduced mortality 47%)', 'Handoff standardization (I-PASS: Illness, Patient summary, Action list, Situation awareness, Synthesis)', 'Medication reconciliation at transitions', 'Read-back for verbal/phone orders'] },
     ],
-    tips: ['Human error is inevitable — design systems to catch errors', 'Closed-loop communication: sender → receiver → receiver repeats back → sender confirms', 'CUS words: "I\'m Concerned / Uncomfortable / this is a Safety issue" — anyone can escalate'] },
+    tips: ['Human error is inevitable  design systems to catch errors', 'Closed-loop communication: sender  receiver  receiver repeats back  sender confirms', 'CUS words: "I\'m Concerned / Uncomfortable / this is a Safety issue"  anyone can escalate'] },
 ];
 
 function QualityImprovementView() {
@@ -52,7 +52,7 @@ function QualityImprovementView() {
                 </h3>
                 {sec.items.map((item, i) => (
                   <div key={i} className="flex items-start gap-2 text-xs py-0.5">
-                    <span className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }}>▸</span>
+                    <span className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }}></span>
                     <span className="opacity-70 leading-relaxed">{item}</span>
                   </div>
                 ))}
@@ -62,7 +62,7 @@ function QualityImprovementView() {
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
                 <h3 className="font-black text-sm mb-3" style={{ color: '#f59e0b' }}> Tips</h3>
                 {active.tips.map((t, i) => (
-                  <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#f59e0b' }}>▸</span><span className="opacity-70 leading-relaxed">{t}</span></div>
+                  <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#f59e0b' }}></span><span className="opacity-70 leading-relaxed">{t}</span></div>
                 ))}
               </div>
             )}

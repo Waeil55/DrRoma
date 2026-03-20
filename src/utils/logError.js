@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Centralized Error Logger
+ * MARIAM PRO  Centralized Error Logger
  * Swap console.error for Sentry.captureException etc.
  */
 

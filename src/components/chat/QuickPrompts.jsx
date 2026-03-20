@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — Quick Prompts / Starters
+/**
+ * MARIAM PRO  Quick Prompts / Starters
  * Conversation starter cards shown before first message.
  */
 import React from 'react';
@@ -26,7 +26,7 @@ export default function QuickPrompts({ onSelect }) {
           </div>
         </div>
         <h1 className="text-3xl font-black">What can I help you study?</h1>
-        <p className="text-base opacity-50 max-w-md">Your AI study assistant — medicine, sciences, and beyond</p>
+        <p className="text-base opacity-50 max-w-md">Your AI study assistant  medicine, sciences, and beyond</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full max-w-2xl">
         {STARTERS.map(s => (

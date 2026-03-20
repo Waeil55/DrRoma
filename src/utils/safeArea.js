@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Safe Area Utilities
+ * MARIAM PRO  Safe Area Utilities
  * Helpers for managing mobile safe areas and viewport height.
  */
 

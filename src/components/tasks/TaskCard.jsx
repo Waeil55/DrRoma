@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — TaskCard Component
+/**
+ * MARIAM PRO  TaskCard Component
  * Individual task card with toggle, edit, delete.
  */
 import React from 'react';

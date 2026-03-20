@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — SettingsView Component
+ * MARIAM PRO  SettingsView Component
  * Full settings page: AI provider, themes, appearance, generation.
  */
 import React, { useState } from 'react';
@@ -14,12 +14,12 @@ const MARIAM_IMG = 'https://raw.githubusercontent.com/Waeil55/DrMariam/main/M.jp
 const APP_VER = 'v6.0';
 
 const PROVIDERS = {
-  anthropic: { label: 'Claude (Anthropic)', note: 'Works built-in — no API key needed in Claude artifacts.', needsKey: false, defaultModel: 'claude-sonnet-4-20250514', baseUrl: '' },
+  anthropic: { label: 'Claude (Anthropic)', note: 'Works built-in  no API key needed in Claude artifacts.', needsKey: false, defaultModel: 'claude-sonnet-4-20250514', baseUrl: '' },
   openai: { label: 'OpenAI (GPT)', note: 'Requires an OpenAI API key.', needsKey: true, defaultModel: 'gpt-4o-mini', baseUrl: 'https://api.openai.com' },
   gemini: { label: 'Google Gemini', note: 'Requires a Google AI Studio API key.', needsKey: true, defaultModel: 'gemini-2.0-flash', baseUrl: '' },
   deepseek: { label: 'DeepSeek', note: 'Requires a DeepSeek API key.', needsKey: true, defaultModel: 'deepseek-chat', baseUrl: 'https://api.deepseek.com' },
   groq: { label: 'Groq (Ultra-fast)', note: 'Requires a Groq API key. Blazing fast inference.', needsKey: true, defaultModel: 'llama-3.3-70b-versatile', baseUrl: 'https://api.groq.com/openai' },
-  ollama: { label: 'Ollama (Local)', note: 'Local inference — no API key needed.', needsKey: false, defaultModel: 'llama3', baseUrl: 'http://localhost:11434/v1' },
+  ollama: { label: 'Ollama (Local)', note: 'Local inference  no API key needed.', needsKey: false, defaultModel: 'llama3', baseUrl: 'http://localhost:11434/v1' },
   custom: { label: 'Custom API', note: 'Any OpenAI-compatible endpoint.', needsKey: true, defaultModel: '', baseUrl: '' },
 };
 
@@ -123,7 +123,7 @@ export default function SettingsView({ settings, setSettings, installPrompt, onI
               {settings.apiKey && !editingKey ? (
                 <div className="flex items-center gap-2">
                   <div className="flex-1 glass rounded-xl px-4 py-3 font-mono text-xs border border-[color:var(--border2,var(--border))] text-[var(--text)] flex items-center gap-2">
-                    <span className="opacity-50">sk-…</span>
+                    <span className="opacity-50">sk-</span>
                     <span>{settings.apiKey.slice(-8)}</span>
                   </div>
                   <button onClick={() => { setEditingKey(true); setKeyDraft(''); }}
@@ -134,7 +134,7 @@ export default function SettingsView({ settings, setSettings, installPrompt, onI
               ) : (
                 <div className="flex items-center gap-2">
                   <input type={showKey ? 'text' : 'password'}
-                    placeholder="Paste your API key…"
+                    placeholder="Paste your API key"
                     value={editingKey ? keyDraft : (settings.apiKey || '')}
                     onChange={e => editingKey ? setKeyDraft(e.target.value) : setSettings(s => ({ ...s, apiKey: e.target.value }))}
                     className="flex-1 glass rounded-xl px-4 py-3 font-mono text-xs outline-none focus:border-[var(--accent)] border border-[color:var(--border2,var(--border))] text-[var(--text)]"
@@ -153,7 +153,7 @@ export default function SettingsView({ settings, setSettings, installPrompt, onI
                 <button onClick={testConnection} disabled={testing || !settings.apiKey}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black transition-all border border-[color:var(--border2,var(--border))] glass opacity-80 hover:opacity-100 disabled:opacity-40">
                   {testing ? <div className="w-3 h-3 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" /> : <Zap size={11} />}
-                  {testing ? 'Testing…' : 'Test Connection'}
+                  {testing ? 'Testing' : 'Test Connection'}
                 </button>
                 {testResult && (
                   <span className={`text-xs font-bold flex items-center gap-1 ${testResult.ok ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
@@ -246,7 +246,7 @@ export default function SettingsView({ settings, setSettings, installPrompt, onI
                 <button key={id} onClick={() => setSettings(s => ({ ...s, lineSpacing: id }))}
                   className="flex-1 py-2 rounded-lg font-black transition-all text-xs"
                   style={(settings.lineSpacing || 'normal') === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .6 }}>
-                  {label}<span style={{ fontSize: 8, display: 'block', opacity: .7 }}>×{lh}</span>
+                  {label}<span style={{ fontSize: 8, display: 'block', opacity: .7 }}>{lh}</span>
                 </button>
               ))}
             </div>

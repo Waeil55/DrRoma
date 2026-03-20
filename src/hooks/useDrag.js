@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useDrag Hook
+ * MARIAM PRO  useDrag Hook
  * Generic drag handler with non-passive touchstart support.
  * Extracted from App.jsx.
  */

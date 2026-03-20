@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Study Store
+ * MARIAM PRO  Study Store
  * Flashcards, exams, cases study state.
  */
 import { createStore } from './createStore.js';

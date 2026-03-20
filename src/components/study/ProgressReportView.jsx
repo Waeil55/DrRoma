@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Layers, CheckSquare, TrendingUp, Award, Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -86,7 +86,7 @@ Be specific, motivating, and educational. Max 200 words.`,
         {[
           { label: 'Cards Studied', value: cardsStudied, icon: Layers, color: '#8b5cf6' },
           { label: 'Exams Done', value: examsAttempted, icon: CheckSquare, color: '#3b82f6' },
-          { label: 'Avg Score', value: avgScore !== null ? `${avgScore}%` : '—', icon: TrendingUp, color: avgScore >= 80 ? '#10b981' : avgScore >= 60 ? '#f59e0b' : '#ef4444' },
+          { label: 'Avg Score', value: avgScore !== null ? `${avgScore}%` : '', icon: TrendingUp, color: avgScore >= 80 ? '#10b981' : avgScore >= 60 ? '#f59e0b' : '#ef4444' },
           { label: 'Mastered Cards', value: masteredCards, icon: Award, color: '#f59e0b' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
@@ -168,11 +168,11 @@ Be specific, motivating, and educational. Max 200 words.`,
             className="glass px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5"
             style={{ color: 'var(--accent)', border: '1px solid var(--accent)/30' }}>
             {generating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-            {generating ? 'Writing…' : showAiReport ? '↺ Refresh' : ' Generate'}
+            {generating ? 'Writing' : showAiReport ? ' Refresh' : ' Generate'}
           </button>
         </div>
         {showAiReport && (
-          <p className="text-sm opacity-70 leading-relaxed whitespace-pre-wrap">{aiReport || (generating ? 'Writing your report…' : '')}</p>
+          <p className="text-sm opacity-70 leading-relaxed whitespace-pre-wrap">{aiReport || (generating ? 'Writing your report' : '')}</p>
         )}
         {!showAiReport && <p className="text-xs opacity-30">Click Generate to get an AI-written analysis of your study performance.</p>}
       </div>

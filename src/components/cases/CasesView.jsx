@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — CasesView orchestrator
+/**
+ * MARIAM PRO  CasesView orchestrator
  * Three-panel case player (vignette+Q | lab results draggable | AI tutor draggable)
  * Mobile: accordion labs + FAB for tutor
  */
@@ -38,7 +38,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
   const startLabDrag = useDrag(handleLabDrag, [handleLabDrag]);
   const startTutorDrag = useDrag(handleTutorDrag, [handleTutorDrag]);
 
-  /* ═══ CASE PLAYER ═══ */
+  /*  CASE PLAYER  */
   if (selSet) {
     const cas = selSet.questions[ci];
     const q = cas.examQuestion || cas;
@@ -108,7 +108,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
               <div className="rounded-2xl p-5 space-y-2 animate-slide-up" style={{ background: 'var(--success-bg)', border: '1px solid var(--success-border)', borderLeft: '4px solid var(--success)' }}>
                 {cas.diagnosis && <p className="text-sm font-black flex items-center gap-2" style={{ color: 'var(--success)' }}><CheckCircle2 size={15} />Diagnosis: {cas.diagnosis}</p>}
                 {q.explanation && <p className="text-sm leading-relaxed">{q.explanation}</p>}
-                {q.evidence && <p className="text-xs italic pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}" — p.{q.sourcePage}</p>}
+                {q.evidence && <p className="text-xs italic pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}"  p.{q.sourcePage}</p>}
               </div>
             )}
 
@@ -132,7 +132,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
             </div>
           </div>
 
-          {/* Drag handle: left ↔ lab */}
+          {/* Drag handle: left  lab */}
           <div ref={startLabDrag.ref} onMouseDown={startLabDrag}
             className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 z-10 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
@@ -181,7 +181,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
             </div>
           </div>
 
-          {/* Drag handle: lab ↔ tutor */}
+          {/* Drag handle: lab  tutor */}
           <div ref={startTutorDrag.ref} onMouseDown={startTutorDrag}
             className="hidden lg:flex w-5 cursor-col-resize items-center justify-center hover:bg-[var(--accent)]/10 shrink-0 z-10 touch-none transition-colors group">
             <GripVertical size={14} className="opacity-20 group-hover:opacity-70 text-[var(--text)]" />
@@ -245,7 +245,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
     );
   }
 
-  /* ═══ CASE LIST ═══ */
+  /*  CASE LIST  */
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content" style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}>
       {showModal && <QuickGenerateModal type="cases" docs={docs || []} settings={settings}

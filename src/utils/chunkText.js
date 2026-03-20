@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Text Chunking Utility
+ * MARIAM PRO  Text Chunking Utility
  * Splits plain text into numbered virtual pages for the reader UI.
  * Extracted from App.jsx.
  */

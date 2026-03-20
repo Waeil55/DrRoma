@@ -33,7 +33,7 @@ class LazyErrorBoundary extends Component {
   }
 }
 
-// Lazy-load App — iOS Safari only parses React (~142KB) on first JS evaluation.
+// Lazy-load App  iOS Safari only parses React (~142KB) on first JS evaluation.
 // App.jsx chunk (~1MB) is fetched AFTER the loading screen renders, preventing
 // the iOS WatchDog timer from killing the process during initial parse.
 const App = lazy(() => import('./App.jsx'));

@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — HeatmapCalendar
+/**
+ * MARIAM PRO  HeatmapCalendar
  * GitHub-style contribution/mastery heatmap for flashcard review activity.
  * Desktop: 52-week grid. Mobile: last 90 days simplified.
  */
@@ -79,7 +79,7 @@ export default function HeatmapCalendar({ reviewHistory = {}, isMobile = false }
     );
   }
 
-  // Desktop: 52-week grid (7 rows × ~52 cols)
+  // Desktop: 52-week grid (7 rows  ~52 cols)
   const weeks = [];
   let week = [];
   days.forEach((d, i) => {

@@ -1,14 +1,14 @@
 /**
- * MARIAM PRO — File Extraction Utilities
+ * MARIAM PRO  File Extraction Utilities
  * Universal file extraction: PDF, Word, Spreadsheet, CSV, Image, Text.
  * Extracted from App.jsx.
  */
 import { chunkText } from './chunkText.js';
 import { getFileCategory } from './fileCategory.js';
 
-/* ═══════════════════════════════════════════════════════════════════
+/* 
    CDN SCRIPT LOADER
-═══════════════════════════════════════════════════════════════════ */
+ */
 const loadScript = (src) => new Promise((resolve, reject) => {
   const s = document.createElement('script');
   s.src = src; s.onload = resolve; s.onerror = reject;
@@ -56,9 +56,9 @@ const loadXLSX = async () => {
   return window.XLSX;
 };
 
-/* ═══════════════════════════════════════════════════════════════════
+/* 
    EXTRACTORS
-═══════════════════════════════════════════════════════════════════ */
+ */
 
 export const extractPdf = async (file, onProgress) => {
   const ab = await file.arrayBuffer();

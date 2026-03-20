@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Chat Sidebar
+ * MARIAM PRO  Chat Sidebar
  * Session list with search, pinning, projects, and context menus.
  */
 import React, { useState, useMemo } from 'react';
@@ -120,7 +120,7 @@ export default function ChatSidebar({
         <div className="px-3 py-2 shrink-0">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
-            <input value={sessSearch} onChange={e => setSessSearch(e.target.value)} placeholder="Search conversations…"
+            <input value={sessSearch} onChange={e => setSessSearch(e.target.value)} placeholder="Search conversations"
               className="w-full glass-input rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" />
           </div>
         </div>
@@ -173,7 +173,7 @@ export default function ChatSidebar({
               <div className="mx-3 mb-3 p-3 glass rounded-xl border border-[color:var(--border2,var(--border))] space-y-2">
                 <input value={newProjectName} onChange={e => setNewProjectName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && createProject()}
-                  placeholder="Project name…" autoFocus
+                  placeholder="Project name" autoFocus
                   className="w-full text-sm bg-transparent outline-none border-b border-[color:var(--border2,var(--border))] pb-1 text-[var(--text)]" />
                 <div className="flex gap-2">
                   <button onClick={createProject} className="flex-1 py-1.5 btn-accent rounded-lg text-xs font-black">Create</button>

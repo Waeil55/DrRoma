@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — QuestionVarietyEngine
+ * MARIAM PRO  QuestionVarietyEngine
  * Generates diverse exam questions across Bloom's taxonomy levels
  * and multiple question format types.
  */
@@ -69,7 +69,7 @@ export function buildVarietyInstruction(subject = 'default', count = 10, cogLeve
   const profile = SUBJECT_PROFILES[subject] || SUBJECT_PROFILES.default;
 
   const distribution = Object.entries(profile)
-    .map(([type, weight]) => `  • ${Math.max(1, Math.round(weight * count))} × ${type}`)
+    .map(([type, weight]) => `   ${Math.max(1, Math.round(weight * count))}  ${type}`)
     .join('\n');
 
   const levelClause = cogLevel
@@ -78,14 +78,14 @@ export function buildVarietyInstruction(subject = 'default', count = 10, cogLeve
 
   return `
 ## Question Variety Requirements${levelClause}
-Distribute the ${count} questions as follows (adjust ±1 to hit exact count):
+Distribute the ${count} questions as follows (adjust 1 to hit exact count):
 ${distribution}
 
 Rules:
-- MCQ must have exactly 4 options (A–D), one clearly correct.
-- Case-based must have a clinical/legal scenario ≥ 3 sentences then sub-questions.
+- MCQ must have exactly 4 options (AD), one clearly correct.
+- Case-based must have a clinical/legal scenario  3 sentences then sub-questions.
 - Fill-in-the-blank: use ___ (3 underscores) for the blank.
-- Matching: provide two columns (Term | Definition), 5–6 pairs.
+- Matching: provide two columns (Term | Definition), 56 pairs.
 - Ordering: provide steps out of order, ask to arrange correctly.
 - True/False: include a brief 1-sentence justification in the answer.
 - Each question must include a "difficulty" field: easy | medium | hard.

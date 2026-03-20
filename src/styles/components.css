@@ -1,9 +1,9 @@
-/* ╔══════════════════════════════════════════════════════════════════╗
- * ║  MARIAM PRO — Component Utility Styles                         ║
- * ║  Shared component patterns. Uses design tokens only.           ║
- * ╚══════════════════════════════════════════════════════════════════╝ */
+/* 
+ *   MARIAM PRO  Component Utility Styles                         
+ *   Shared component patterns. Uses design tokens only.           
+ *  */
 
-/* ── Glass card effect (frosted glass background) ── */
+/*  Glass card effect (frosted glass background)  */
 .glass {
   background: color-mix(in srgb, var(--surface, #1e1e2e) 80%, transparent);
   border: 1px solid var(--border, rgba(255,255,255,0.08));
@@ -18,7 +18,7 @@
   }
 }
 
-/* ── Floating Action Button ── */
+/*  Floating Action Button  */
 .fab {
   position: fixed;
   bottom: var(--content-bottom-clear);
@@ -40,7 +40,7 @@
   transform: scale(0.92);
 }
 
-/* ── Card base ── */
+/*  Card base  */
 .card-base {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -48,7 +48,7 @@
   padding: var(--space-4);
 }
 
-/* ── Pill badge ── */
+/*  Pill badge  */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -61,7 +61,7 @@
   color: var(--accent);
 }
 
-/* ── Touch target enforcement ── */
+/*  Touch target enforcement  */
 .touch-target {
   min-width: 44px;
   min-height: 44px;
@@ -70,7 +70,7 @@
   justify-content: center;
 }
 
-/* ── Scrollable content area ── */
+/*  Scrollable content area  */
 .view-scroll {
   flex: 1;
   min-height: 0;
@@ -80,7 +80,7 @@
   padding-bottom: var(--content-bottom-clear);
 }
 
-/* ── Flashcard 3D scene ── */
+/*  Flashcard 3D scene  */
 .flashcard-scene {
   perspective: 1200px;
   perspective-origin: 50% 40%;
@@ -109,7 +109,7 @@
   transform: rotateY(180deg);
 }
 
-/* ── Bottom sheet handle ── */
+/*  Bottom sheet handle  */
 .sheet-handle {
   width: 40px;
   height: 4px;
@@ -118,7 +118,7 @@
   margin: var(--space-2) auto var(--space-3);
 }
 
-/* ── Skeleton loading placeholder ── */
+/*  Skeleton loading placeholder  */
 .skeleton-line {
   height: 12px;
   border-radius: 6px;
@@ -129,13 +129,13 @@
   border-radius: var(--radius-md);
 }
 
-/* ── Focus visible outline ── */
+/*  Focus visible outline  */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* ── Reduced motion safe variants ── */
+/*  Reduced motion safe variants  */
 @media (prefers-reduced-motion: reduce) {
   .flashcard-inner {
     transition: opacity 0.2s ease;
@@ -146,7 +146,7 @@
   }
 }
 
-/* ── Goal Tracker Confetti ── */
+/*  Goal Tracker Confetti  */
 .goal-confetti-burst {
   position: absolute;
   inset: 0;
@@ -172,7 +172,7 @@
   .confetti-particle { animation: none; opacity: 0; }
 }
 
-/* ── Shake animation (MatchGame) ── */
+/*  Shake animation (MatchGame)  */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-8px); }
@@ -185,7 +185,7 @@
   .animate-shake { animation: none; }
 }
 
-/* ── Match fly-off animation (MatchGame matched pairs) ── */
+/*  Match fly-off animation (MatchGame matched pairs)  */
 @keyframes match-flyoff {
   0%   { transform: scale(1); opacity: 1; box-shadow: 0 0 0 rgba(16,185,129,0); }
   30%  { transform: scale(1.08); opacity: 1; box-shadow: 0 0 24px rgba(16,185,129,0.6); }
@@ -199,7 +199,7 @@
   .animate-match-flyoff { animation: none; opacity: 0.5; }
 }
 
-/* ── Scale-in animation (cards/tiles appearing) ── */
+/*  Scale-in animation (cards/tiles appearing)  */
 @keyframes scale-in {
   from { transform: scale(0); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
@@ -211,7 +211,7 @@
   .animate-scale-in { animation: none; }
 }
 
-/* ── prefers-reduced-motion: disable 3D flip, swipe, streaming cursor ── */
+/*  prefers-reduced-motion: disable 3D flip, swipe, streaming cursor  */
 @media (prefers-reduced-motion: reduce) {
   .flashcard-inner { transition: opacity 0.3s ease !important; }
   .flashcard-inner.flipped { transform: none !important; opacity: 1; }

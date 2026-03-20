@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Bookmark, FileText, PenLine, Trash2 } from 'lucide-react';
 
 export default function DocumentAnnotationsView({ docs, notes, setNotes, addToast, setView, setActiveId }) {
@@ -43,7 +43,7 @@ export default function DocumentAnnotationsView({ docs, notes, setNotes, addToas
           <span className="text-xs opacity-40">{annotations.length} total</span>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search annotations…"
+          placeholder="Search annotations"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         <div className="flex gap-2 overflow-x-auto pb-1">

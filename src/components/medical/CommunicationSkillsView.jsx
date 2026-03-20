@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const COMM_FRAMEWORKS = [
@@ -25,7 +25,7 @@ const COMM_FRAMEWORKS = [
       'Develop discrepancy between current behavior and goals',
       'Roll with resistance (don\'t argue)',
       'Support self-efficacy ("What do you think would work for you?")',
-      '"On a scale of 1-10, how important is this change to you?" → explore both sides',
+      '"On a scale of 1-10, how important is this change to you?"  explore both sides',
     ],
   },
   { id: 'consent', title: 'Informed Consent', icon: '', description: 'Elements of valid consent',
@@ -40,8 +40,8 @@ const COMM_FRAMEWORKS = [
     extras: [
       'Exceptions to informed consent: emergency (implied consent), therapeutic privilege (rare), waiver (patient declines info)',
       'Minors: generally need parental consent. Exceptions: emancipated minors, emergencies, STIs, contraception, substance abuse, mental health (varies by state)',
-      'Capacity ≠ competency (legal determination by court)',
-      'Capacity can fluctuate — reassess as needed (delirium, medications, time of day)',
+      'Capacity  competency (legal determination by court)',
+      'Capacity can fluctuate  reassess as needed (delirium, medications, time of day)',
     ],
   },
 ];
@@ -82,7 +82,7 @@ export default function CommunicationSkillsView() {
                 <h3 className="font-black text-sm mb-3" style={{ color: '#10b981' }}> Key Points</h3>
                 {active.extras.map((e, i) => (
                   <div key={i} className="flex items-start gap-2 text-xs py-1">
-                    <span className="shrink-0 mt-0.5" style={{ color: '#10b981' }}>▸</span>
+                    <span className="shrink-0 mt-0.5" style={{ color: '#10b981' }}></span>
                     <span className="opacity-70 leading-relaxed">{e}</span>
                   </div>
                 ))}

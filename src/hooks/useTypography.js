@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useTypography Hook
+ * MARIAM PRO  useTypography Hook
  * Font-scale management synced to document root.
  */
 import { useCallback } from 'react';

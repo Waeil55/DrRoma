@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — TasksView Component
+ * MARIAM PRO  TasksView Component
  * Task manager with Overdue/Today/Upcoming/Done sections, swipe gestures, and NLP parsing.
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -8,7 +8,7 @@ import TaskCard, { TASK_PRIORITIES } from './TaskCard';
 import { getState, saveState } from '../../services/db/stateOps';
 import BottomSheet from '../ui/BottomSheet';
 
-/* ── NLP quick-parse for natural language task input ── */
+/*  NLP quick-parse for natural language task input  */
 function parseNaturalInput(text) {
   const result = { title: text.trim(), dueDate: '', dueTime: '', type: 'personal', priority: 'medium' };
   const now = new Date();
@@ -60,7 +60,7 @@ function parseNaturalInput(text) {
   return result;
 }
 
-/* ── Section grouping ── */
+/*  Section grouping  */
 function groupTasks(tasks) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
@@ -243,7 +243,7 @@ export default function TasksView({ addToast }) {
         {tasks.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 gap-3 opacity-40">
             <CheckCircle2 size={40} />
-            <p className="text-sm font-medium">No tasks yet — add one!</p>
+            <p className="text-sm font-medium">No tasks yet  add one!</p>
           </div>
         )}
         {renderSection('Overdue', sections.overdue, 'var(--danger,#ef4444)')}
@@ -280,9 +280,9 @@ export default function TasksView({ addToast }) {
       <BottomSheet isOpen={sheet} onClose={() => setSheet(false)} title={editing ? 'Edit Task' : 'New Task'}>
         <div className="flex flex-col gap-3 pb-4">
           <input className="w-full rounded-xl px-3 py-2.5 text-sm font-medium bg-[var(--input-bg)] border border-[var(--border)] focus:outline-none focus:border-[var(--accent)]"
-            placeholder="Task title…" value={title} onChange={e => setTitle(e.target.value)} autoFocus />
+            placeholder="Task title" value={title} onChange={e => setTitle(e.target.value)} autoFocus />
           <textarea className="w-full rounded-xl px-3 py-2.5 text-sm bg-[var(--input-bg)] border border-[var(--border)] focus:outline-none focus:border-[var(--accent)] resize-none"
-            placeholder="Notes (optional)…" rows={2} value={notes} onChange={e => setNotes(e.target.value)} />
+            placeholder="Notes (optional)" rows={2} value={notes} onChange={e => setNotes(e.target.value)} />
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-xs font-bold uppercase opacity-40 block mb-1">Due Date</label>
@@ -310,7 +310,7 @@ export default function TasksView({ addToast }) {
   );
 }
 
-/* ── Swipeable wrapper for TaskCard ── */
+/*  Swipeable wrapper for TaskCard  */
 function SwipeableTaskCard({ task, onToggle, onDelete, onEdit, onSwipeRight, onSwipeLeft }) {
   const ref = useRef(null);
   const startX = useRef(0);

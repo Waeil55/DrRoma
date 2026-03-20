@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — IndexedDB Open + Migration
+ * MARIAM PRO  IndexedDB Open + Migration
  * Centralised database opener with versioned migration strategy.
  */
 
@@ -54,7 +54,7 @@ export const openDB = () => new Promise((resolve, reject) => {
     }
   };
   request.onblocked = () => {
-    logError('openDB', 'Database upgrade blocked — close other tabs running this app.');
+    logError('openDB', 'Database upgrade blocked  close other tabs running this app.');
   };
 });
 

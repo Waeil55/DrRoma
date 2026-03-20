@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — FSRS scheduling facade
+ * MARIAM PRO  FSRS scheduling facade
  * Wraps the FSRS-5 engine into the FSRS object expected by views.
  */
 import { scheduleCard as fsrs5Schedule, DEFAULT_W as FSRS5_W } from '../services/analytics/fsrsEngine';

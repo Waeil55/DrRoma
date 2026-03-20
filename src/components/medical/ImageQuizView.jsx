@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 
 const IMAGE_QUIZ_QUESTIONS = [
   { id: 1, desc: 'A 45-year-old woman presents with a "butterfly-shaped" erythematous rash across both cheeks and the bridge of the nose, sparing the nasolabial folds. She also reports joint pain and fatigue.',
@@ -11,27 +11,27 @@ const IMAGE_QUIZ_QUESTIONS = [
     category: 'Dermatology' },
   { id: 3, desc: 'A 65-year-old man on warfarin presents with painful purple discoloration of his toes bilaterally. Pulses are palpable. He recently underwent cardiac catheterization.',
     finding: 'Blue/purple toes with palpable pulses (post-catheterization)', diagnosis: 'Cholesterol Crystal Embolism (Trash Foot / Blue Toe Syndrome)',
-    explanation: 'Atherosclerotic plaque disruption during catheterization showers cholesterol crystals to distal arteries. Palpable pulses distinguish from thrombotic occlusion. May see livedo reticularis, eosinophilia, ↑ ESR. Treatment: supportive, statins.',
+    explanation: 'Atherosclerotic plaque disruption during catheterization showers cholesterol crystals to distal arteries. Palpable pulses distinguish from thrombotic occlusion. May see livedo reticularis, eosinophilia,  ESR. Treatment: supportive, statins.',
     category: 'Vascular' },
   { id: 4, desc: 'A 70-year-old presents with sudden onset of painless, complete vision loss in the right eye described as "a curtain coming down." Fundoscopy shows a pale retina with a "cherry red spot" at the macula.',
     finding: 'Pale retina with cherry red spot', diagnosis: 'Central Retinal Artery Occlusion (CRAO)',
-    explanation: 'Embolic occlusion of central retinal artery. Cherry red spot = fovea (thin retina, choroidal vessels visible) against pale infarcted retina. Ophthalmologic emergency — treatment within 90 min: ocular massage, paracentesis, thrombolytics. Check carotids (embolic source).',
+    explanation: 'Embolic occlusion of central retinal artery. Cherry red spot = fovea (thin retina, choroidal vessels visible) against pale infarcted retina. Ophthalmologic emergency  treatment within 90 min: ocular massage, paracentesis, thrombolytics. Check carotids (embolic source).',
     category: 'Ophthalmology' },
   { id: 5, desc: 'A 35-year-old male presents with tender red nodules on his shins bilaterally. He has had a persistent cough for 3 weeks. CXR shows bilateral hilar lymphadenopathy.',
-    finding: 'Tender pretibial nodules + bilateral hilar lymphadenopathy', diagnosis: 'Erythema Nodosum (likely Sarcoidosis — Löfgren Syndrome)',
-    explanation: 'Löfgren syndrome = classic triad: bilateral hilar lymphadenopathy + erythema nodosum + polyarthralgia/fever. Acute presentation of sarcoidosis with good prognosis. EN is also seen with strep, TB, IBD, oral contraceptives, sulfonamides.',
+    finding: 'Tender pretibial nodules + bilateral hilar lymphadenopathy', diagnosis: 'Erythema Nodosum (likely Sarcoidosis  Lfgren Syndrome)',
+    explanation: 'Lfgren syndrome = classic triad: bilateral hilar lymphadenopathy + erythema nodosum + polyarthralgia/fever. Acute presentation of sarcoidosis with good prognosis. EN is also seen with strep, TB, IBD, oral contraceptives, sulfonamides.',
     category: 'Rheumatology' },
   { id: 6, desc: 'A 50-year-old woman presents with progressive symmetric thickening and tightening of the skin on her fingers (sclerodactyly) and face. She has Raynaud phenomenon and telangiectasias on her face.',
-    finding: 'Sclerodactyly + Raynaud + facial skin tightening + telangiectasia', diagnosis: 'Systemic Sclerosis (Scleroderma) — Limited (CREST)',
+    finding: 'Sclerodactyly + Raynaud + facial skin tightening + telangiectasia', diagnosis: 'Systemic Sclerosis (Scleroderma)  Limited (CREST)',
     explanation: 'CREST: Calcinosis, Raynaud, Esophageal dysmotility, Sclerodactyly, Telangiectasia. Anti-centromere antibody positive. Diffuse type: anti-Scl-70 (topoisomerase), worse prognosis, pulmonary fibrosis, renal crisis.',
     category: 'Rheumatology' },
   { id: 7, desc: 'A 28-year-old presents with a painless, hard, irregular lump in the anterior neck that moves with swallowing. Labs show normal TSH. Ultrasound shows a hypervascular solid nodule with microcalcifications.',
     finding: 'Solid thyroid nodule with microcalcifications, hypervascular', diagnosis: 'Papillary Thyroid Carcinoma (most likely)',
-    explanation: 'Most common thyroid cancer (80%). Microcalcifications (psammoma bodies) and irregular borders on US are concerning. FNA biopsy → Bethesda classification. Psammoma bodies also seen in serous ovarian cystadenocarcinoma, meningioma, mesothelioma.',
+    explanation: 'Most common thyroid cancer (80%). Microcalcifications (psammoma bodies) and irregular borders on US are concerning. FNA biopsy  Bethesda classification. Psammoma bodies also seen in serous ovarian cystadenocarcinoma, meningioma, mesothelioma.',
     category: 'Endocrinology' },
   { id: 8, desc: 'A 3-year-old child presents with a large, firm abdominal mass crossing the midline. CT shows a mass arising from the adrenal gland with calcifications and encasement of major vessels.',
     finding: 'Adrenal mass crossing midline in a child', diagnosis: 'Neuroblastoma',
-    explanation: 'Most common extracranial solid tumor in children. Arises from neural crest cells (adrenal medulla most common). CROSSES MIDLINE (vs Wilms tumor which does NOT). ↑ homovanillic acid (HVA) and vanillylmandelic acid (VMA) in urine. Prognosis varies by age and MYCN amplification.',
+    explanation: 'Most common extracranial solid tumor in children. Arises from neural crest cells (adrenal medulla most common). CROSSES MIDLINE (vs Wilms tumor which does NOT).  homovanillic acid (HVA) and vanillylmandelic acid (VMA) in urine. Prognosis varies by age and MYCN amplification.',
     category: 'Pediatrics' },
 ];
 
@@ -80,7 +80,7 @@ export default function ImageQuizView() {
               <label className="text-xs font-black opacity-40 block mb-2">Your Diagnosis</label>
               <input value={guess} onChange={e => setGuess(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && guess.trim() && checkAnswer()}
-                placeholder="Type your diagnosis…"
+                placeholder="Type your diagnosis"
                 className="w-full glass-input rounded-xl px-4 py-3 text-sm outline-none"
                 style={{ border: '1px solid var(--border)' }} />
             </div>
@@ -106,7 +106,7 @@ export default function ImageQuizView() {
               <p className="text-sm opacity-70 leading-relaxed">{q.explanation}</p>
             </div>
             <button onClick={nextQ} className="btn-accent w-full py-3 rounded-xl font-black">
-              Next Question →
+              Next Question 
             </button>
           </div>
         )}

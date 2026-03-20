@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — DashboardView Component
+/**
+ * MARIAM PRO  DashboardView Component
  * Main dashboard with stats, recent docs, study progress, quick actions.
  */
 import React from 'react';
@@ -137,7 +137,7 @@ export default function DashboardView({
               <h2 className="text-xs font-black uppercase tracking-widest flex items-center gap-2" style={{ color: 'var(--text3)' }}>
                 <History size={13} style={{ color: 'var(--accent)' }} /> Recent Documents
               </h2>
-              <button onClick={() => setView('library')} className="text-xs font-bold transition-all" style={{ color: 'var(--accent)', opacity: .7 }}>View all →</button>
+              <button onClick={() => setView('library')} className="text-xs font-bold transition-all" style={{ color: 'var(--accent)', opacity: .7 }}>View all </button>
             </div>
             {recentDocs.length === 0 ? (
               <div className="empty-state">

@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — ChatPanel Component
+ * MARIAM PRO  ChatPanel Component
  * The doc-chat panel used inside DocWorkspace (page/document context).
  */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -9,7 +9,7 @@ import { renderAIContent } from '../../utils/markdown.js';
 const MARIAM_IMG = 'https://i.ibb.co/gbL3pSCw/mariam.png';
 
 export default function ChatPanel({ callAI, callAIStreaming, settings, pagesText, currentPage, totalPages }) {
-  const [msgs, setMsgs] = useState([{ role: 'assistant', content: "Hi! I'm your MARIAM AI assistant. Ask me anything about this document — I'll explain, quiz you, or dive deep into any topic." }]);
+  const [msgs, setMsgs] = useState([{ role: 'assistant', content: "Hi! I'm your MARIAM AI assistant. Ask me anything about this document  I'll explain, quiz you, or dive deep into any topic." }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('page');
@@ -83,7 +83,7 @@ export default function ChatPanel({ callAI, callAIStreaming, settings, pagesText
             </div>
             <div className={`px-3.5 py-2.5 text-xs leading-relaxed max-w-[84%] rounded-2xl
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'glass rounded-tl-sm'}`}>
-              {m.content ? renderAIContent(m.content) : <span className="opacity-30">▊</span>}
+              {m.content ? renderAIContent(m.content) : <span className="opacity-30"></span>}
             </div>
           </div>
         ))}
@@ -96,7 +96,7 @@ export default function ChatPanel({ callAI, callAIStreaming, settings, pagesText
         <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/50">
           <textarea value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Ask about this document…" disabled={loading} rows={1}
+            placeholder="Ask about this document" disabled={loading} rows={1}
             className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24" />
           <button onClick={toggleVoice}
             className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all glass"

@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useNotifications Hook
+ * MARIAM PRO  useNotifications Hook
  * Wraps NotificationService for React components.
  */
 import { useCallback, useEffect } from 'react';

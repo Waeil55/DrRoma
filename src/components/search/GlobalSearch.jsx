@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — GlobalSearch overlay
+ * MARIAM PRO  GlobalSearch overlay
  * Full-text search across docs, flashcards, exams, cases, notes.
  */
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -48,7 +48,7 @@ export default function GlobalSearch({ docs, flashcards, exams, cases, notes, on
         <div className="flex items-center gap-3 px-5 py-4 border-b border-[color:var(--border2,var(--border))]">
           <Search size={20} className="text-[var(--accent)] shrink-0" />
           <input ref={inputRef} value={q} onChange={e => setQ(e.target.value)}
-            placeholder="Search everything — documents, cards, questions, cases, notes…"
+            placeholder="Search everything  documents, cards, questions, cases, notes"
             className="flex-1 bg-transparent text-sm outline-none font-medium placeholder:opacity-40 text-[var(--text)]" />
           <kbd className="text-xs font-black opacity-30 px-2 py-1 glass rounded-lg">ESC</kbd>
           <button onClick={onClose} className="opacity-40 hover:opacity-80"><X size={18} /></button>

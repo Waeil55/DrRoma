@@ -1,8 +1,8 @@
-/* ══════════════════════════════════════════════════════════════════
-   SYMPTOMS DATABASE — 30 high-yield symptoms with full DDx + MCQs
+/* 
+   SYMPTOMS DATABASE  30 high-yield symptoms with full DDx + MCQs
    Each entry: full characterization, emergency flags, differentials,
    diagnostic algorithm, MCQ question bank
-   ══════════════════════════════════════════════════════════════════ */
+    */
 
 const EXPANDED_SYMPTOMS_DB = [
   {
@@ -43,16 +43,16 @@ const EXPANDED_SYMPTOMS_DB = [
     },
     differentials: {
       emergent: [
-        { condition: 'STEMI', features: 'ST elevation ≥1mm in ≥2 contiguous leads; crushing pain, diaphoresis', test: 'ECG + troponin', management: 'Emergent PCI < 90 min', mortality: '~10% without treatment' },
+        { condition: 'STEMI', features: 'ST elevation 1mm in 2 contiguous leads; crushing pain, diaphoresis', test: 'ECG + troponin', management: 'Emergent PCI < 90 min', mortality: '~10% without treatment' },
         { condition: 'Aortic Dissection', features: 'Tearing to back, BP asymmetry, pulse deficit, mediastinal widening', test: 'CT angiography chest', management: 'BP control, emergent surgery for Type A', mortality: '1-2%/hour if untreated' },
         { condition: 'Massive PE', features: 'Pleuritic, dyspnea, tachycardia, hypoxia, hemodynamic instability', test: 'CT-PA, echo', management: 'Systemic thrombolysis / embolectomy', mortality: '30% without treatment' },
-        { condition: 'Tension Pneumothorax', features: 'Absent breath sounds, tracheal deviation, JVD, hypotension', test: 'Clinical diagnosis — decompress immediately', management: 'Needle decompression → chest tube', mortality: 'Minutes without treatment' },
+        { condition: 'Tension Pneumothorax', features: 'Absent breath sounds, tracheal deviation, JVD, hypotension', test: 'Clinical diagnosis  decompress immediately', management: 'Needle decompression  chest tube', mortality: 'Minutes without treatment' },
         { condition: 'Cardiac Tamponade', features: "Beck's triad: hypotension + JVD + muffled heart sounds; pulsus paradoxus", test: 'Echo (gold standard)', management: 'Pericardiocentesis', mortality: 'High without drainage' },
       ],
       urgent: [
         { condition: 'NSTEMI/Unstable Angina', features: 'Similar to STEMI but no persistent ST elevation; troponin may rise', test: 'Serial troponins + ECG', management: 'Dual antiplatelet + anticoagulation, PCI within 24-72h' },
         { condition: 'Myopericarditis', features: 'Sharp, positional, young patient, pleuritic, positional relief (lean forward)', test: 'Troponin, Echo, cardiac MRI', management: 'NSAIDs, avoid exercise, colchicine' },
-        { condition: 'Submassive PE', features: 'Pleuritic, dyspnea, tachycardia, RV strain on echo/ECG', test: 'CT-PA, BNP, troponin', management: 'Anticoagulation ± thrombolytics' },
+        { condition: 'Submassive PE', features: 'Pleuritic, dyspnea, tachycardia, RV strain on echo/ECG', test: 'CT-PA, BNP, troponin', management: 'Anticoagulation  thrombolytics' },
       ],
       nonUrgent: [
         { condition: 'GERD / Esophageal', features: 'Burning, postprandial, responds to antacids, worse lying down', test: 'Clinical; upper endoscopy if refractory', management: 'PPI, lifestyle' },
@@ -70,8 +70,8 @@ const EXPANDED_SYMPTOMS_DB = [
       imaging: ['CXR (all patients)', 'CT angio chest (dissection/PE)', 'Echo (tamponade, regional wall motion)', 'CT coronary CTA (intermediate risk, stable)'],
     },
     mnemonics: [
-      'PQRST — Provocation, Quality, Radiation, Severity, Timing',
-      'OPQRST — Onset, Provocation, Quality, Radiation, Severity, Timing',
+      'PQRST  Provocation, Quality, Radiation, Severity, Timing',
+      'OPQRST  Onset, Provocation, Quality, Radiation, Severity, Timing',
       'AORTA mnemonic for dissection: Asymmetric BP, Onset sudden, Radiation to back, Tearing quality, Aorta widened',
     ],
     questions: [
@@ -88,11 +88,11 @@ const EXPANDED_SYMPTOMS_DB = [
         correctAnswer: 'B',
         explanation: {
           correct: 'B is CORRECT. This is an inferior STEMI (ST elevation in II, III, aVF = RCA territory). Primary PCI is the gold standard for STEMI with door-to-balloon time target < 90 minutes. Every minute of delay increases myocardial necrosis. The catheterization lab must be activated immediately. Aspirin 325mg (loading dose) + P2Y12 inhibitor + anticoagulation should be given concurrently while the lab is being prepared.',
-          whyNotA: 'A is INCORRECT. Morphine was historically used but recent data (CRUSADE registry, MONA acronym) shows morphine may worsen outcomes in ACS by delaying drug absorption and potentially reducing antiplatelet efficacy. It should NOT be the priority — reperfusion is. Additionally, morphine may mask ischemic pain without treating the underlying cause.',
+          whyNotA: 'A is INCORRECT. Morphine was historically used but recent data (CRUSADE registry, MONA acronym) shows morphine may worsen outcomes in ACS by delaying drug absorption and potentially reducing antiplatelet efficacy. It should NOT be the priority  reperfusion is. Additionally, morphine may mask ischemic pain without treating the underlying cause.',
           whyNotC: 'C is INCORRECT in this scenario because primary PCI is available and superior to thrombolytics when PCI can be performed within 90 minutes (door-to-balloon). Thrombolytics are used when PCI is unavailable or will be significantly delayed (>120 min). Thrombolytics carry risk of intracranial hemorrhage (0.5-1%) which primary PCI avoids.',
-          whyNotD: 'D is INCORRECT. Cardiac MRI is a non-emergent imaging modality used for tissue characterization, myocarditis evaluation, or viability assessment. It is NEVER the priority in acute STEMI. The diagnosis is already clear from the ECG, and time is myocardium — MRI would cause unacceptable delay.',
+          whyNotD: 'D is INCORRECT. Cardiac MRI is a non-emergent imaging modality used for tissue characterization, myocarditis evaluation, or viability assessment. It is NEVER the priority in acute STEMI. The diagnosis is already clear from the ECG, and time is myocardium  MRI would cause unacceptable delay.',
           whyNotE: 'E is INCORRECT. Observation for 2 hours is appropriate for NSTEMI or unstable angina with intermediate risk, not for STEMI. STEMI requires emergent reperfusion within 90 minutes of first medical contact. Anticoagulation alone without reperfusion is inadequate.',
-          keyTakeaway: 'STEMI = emergent primary PCI < 90 min (door-to-balloon). ST elevation in II, III, aVF = inferior MI (RCA/LCx). Check right-sided leads (V3R/V4R) for RV involvement — avoid nitrates if RV infarct suspected (preload dependent).',
+          keyTakeaway: 'STEMI = emergent primary PCI < 90 min (door-to-balloon). ST elevation in II, III, aVF = inferior MI (RCA/LCx). Check right-sided leads (V3R/V4R) for RV involvement  avoid nitrates if RV infarct suspected (preload dependent).',
         },
       },
       {
@@ -108,8 +108,8 @@ const EXPANDED_SYMPTOMS_DB = [
         correctAnswer: 'B',
         explanation: {
           correct: 'B is CORRECT. CT angiography of the chest (CT-A) is the gold standard for diagnosing aortic dissection. This patient has the classic triad: (1) tearing/ripping quality chest pain, (2) hypertension as risk factor, (3) pulse/pressure differential between arms (>20 mmHg difference is classic for dissection). CT-A identifies the type (Type A = ascending, surgical emergency; Type B = descending, medical management), extent, branch involvement, and complications.',
-          whyNotA: 'A is INCORRECT as the primary test. Troponin may be mildly elevated in dissection if the dissection extends to the coronary ostia, but it is not diagnostic and can mislead the clinician toward ACS. The key distinguishing feature here is the BP differential and tearing quality — CT-A should be prioritized.',
-          whyNotC: 'C is PARTIALLY CORRECT — echocardiography (especially TEE — transesophageal echo) can diagnose dissection and is useful when the patient is too unstable for CT. However, TTE has poor sensitivity for dissection (< 60%), while CT-A is > 95% sensitive. In a stable patient, CT-A is preferred.',
+          whyNotA: 'A is INCORRECT as the primary test. Troponin may be mildly elevated in dissection if the dissection extends to the coronary ostia, but it is not diagnostic and can mislead the clinician toward ACS. The key distinguishing feature here is the BP differential and tearing quality  CT-A should be prioritized.',
+          whyNotC: 'C is PARTIALLY CORRECT  echocardiography (especially TEE  transesophageal echo) can diagnose dissection and is useful when the patient is too unstable for CT. However, TTE has poor sensitivity for dissection (< 60%), while CT-A is > 95% sensitive. In a stable patient, CT-A is preferred.',
           whyNotD: 'D is INCORRECT. D-dimer is used to rule out PE (high sensitivity, low specificity). In aortic dissection, D-dimer may be elevated but is neither sensitive nor specific enough to rule in dissection. D-dimer is not part of the dissection diagnostic algorithm.',
           whyNotE: 'E is INCORRECT. V/Q scan is used for PE diagnosis when CT-PA is contraindicated (contrast allergy, renal failure). There is no respiratory component or PE risk factors in this presentation.',
           keyTakeaway: 'Aortic dissection: tearing pain radiating to back + BP asymmetry > 20 mmHg between arms = CT angio chest is the test of choice. Type A (ascending) = emergency surgery. Type B (descending) = medical management with BP control (target SBP 100-120 mmHg) with IV labetalol or nitroprusside.',
@@ -129,10 +129,10 @@ const EXPANDED_SYMPTOMS_DB = [
         explanation: {
           correct: 'C is CORRECT. Pericarditis classically presents with: (1) sharp positional chest pain worse supine, improved leaning forward (pericardial friction rub position), (2) pleuritic component (worse with inspiration), (3) post-viral onset (typically Coxsackievirus B), (4) DIFFUSE ST elevation (saddle-shaped, not focal like STEMI) with PR depression. Treatment: NSAIDs + colchicine. Avoid exercise for 3 months. Look for pericardial effusion on echo.',
           whyNotA: 'A is INCORRECT. STEMI causes FOCAL ST elevation in contiguous leads (e.g., V1-V4 for anterior, II/III/aVF for inferior), not DIFFUSE ST elevation across all leads. STEMI pain is typically crushing, not pleuritic or positional. Age 25 with viral antecedent = pericarditis.',
-          whyNotB: 'B is INCORRECT. Pleuritis causes pleuritic chest pain but does NOT cause ECG changes. Pleuritis is pleural inflammation (lung border), whereas pericarditis involves the pericardial sac around the heart — hence the cardiac ECG changes.',
-          whyNotD: 'D is INCORRECT. PE causes pleuritic chest pain and can show ECG changes (S1Q3T3 pattern, sinus tachycardia, right heart strain — NOT diffuse ST elevation). PE rarely occurs in healthy young adults without risk factors.',
-          whyNotE: 'E is INCORRECT. Aortic dissection causes tearing pain radiating to the back. It does not cause diffuse ST elevation. Dissection in a 25-year-old would suggest connective tissue disease (Marfan syndrome) — look for tall stature, arm span > height, arachnodactyly.',
-          keyTakeaway: 'Pericarditis: viral antecedent + pleuritic positional pain + DIFFUSE (not focal) saddle-shaped ST elevation + PR depression. Treatment: NSAIDs 500mg TID × 2 weeks + colchicine 0.5mg BID × 3 months. No sports for 3 months.',
+          whyNotB: 'B is INCORRECT. Pleuritis causes pleuritic chest pain but does NOT cause ECG changes. Pleuritis is pleural inflammation (lung border), whereas pericarditis involves the pericardial sac around the heart  hence the cardiac ECG changes.',
+          whyNotD: 'D is INCORRECT. PE causes pleuritic chest pain and can show ECG changes (S1Q3T3 pattern, sinus tachycardia, right heart strain  NOT diffuse ST elevation). PE rarely occurs in healthy young adults without risk factors.',
+          whyNotE: 'E is INCORRECT. Aortic dissection causes tearing pain radiating to the back. It does not cause diffuse ST elevation. Dissection in a 25-year-old would suggest connective tissue disease (Marfan syndrome)  look for tall stature, arm span > height, arachnodactyly.',
+          keyTakeaway: 'Pericarditis: viral antecedent + pleuritic positional pain + DIFFUSE (not focal) saddle-shaped ST elevation + PR depression. Treatment: NSAIDs 500mg TID  2 weeks + colchicine 0.5mg BID  3 months. No sports for 3 months.',
         },
       },
     ],
@@ -179,12 +179,12 @@ const EXPANDED_SYMPTOMS_DB = [
       urgent: [
         { condition: 'Heart Failure Exacerbation', features: 'Orthopnea, PND, JVD, bilateral crackles, BNP elevated', management: 'Furosemide IV, nitrates, ACEI' },
         { condition: 'Pneumonia', features: 'Fever, productive cough, focal infiltrate on CXR', management: 'Antibiotics, O2 support' },
-        { condition: 'COPD Exacerbation', features: 'Chronic smoker, wheeze, ↑ sputum production', management: 'Bronchodilators, steroids, antibiotics if bacterial' },
+        { condition: 'COPD Exacerbation', features: 'Chronic smoker, wheeze,  sputum production', management: 'Bronchodilators, steroids, antibiotics if bacterial' },
         { condition: 'Acute Asthma', features: 'Young patient, wheeze, peak flow < 50% predicted', management: 'SABA + systemic steroids' },
       ],
       nonUrgent: [
         { condition: 'Anemia', features: 'Pallor, fatigue, tachycardia, exertional dyspnea', management: 'Identify cause, iron/B12/folate, transfusion if severe' },
-        { condition: 'Pleural Effusion', features: 'Dullness to percussion, ↓ breath sounds at base', management: 'Thoracentesis for diagnosis and relief' },
+        { condition: 'Pleural Effusion', features: 'Dullness to percussion,  breath sounds at base', management: 'Thoracentesis for diagnosis and relief' },
         { condition: 'Deconditioning', features: 'Sedentary history, no hypoxia, improvement with exercise program', management: 'Cardiac/pulmonary rehab' },
       ],
     },
@@ -194,7 +194,7 @@ const EXPANDED_SYMPTOMS_DB = [
       imaging: ['CXR (first-line)', 'CT-PA (if PE suspected)', 'Echocardiogram (if HF/tamponade)', 'CT high-resolution (if ILD)'],
       functionalTests: ['Peak flow (asthma)', 'Spirometry (COPD, ILD)'],
     },
-    mnemonics: ['COPD FEAR — COPD, Obstruction (asthma), PE, Decompensated HF, Foreign body, Effusion, Anemia, Respiratory infection'],
+    mnemonics: ['COPD FEAR  COPD, Obstruction (asthma), PE, Decompensated HF, Foreign body, Effusion, Anemia, Respiratory infection'],
     questions: [
       {
         id: 'dyspnea_q001', category: 'diagnosis', difficulty: 'medium',
@@ -211,7 +211,7 @@ const EXPANDED_SYMPTOMS_DB = [
           correct: "C is CORRECT. S3 gallop (ventricular filling sound early in diastole, heard best at apex) is highly SPECIFIC for volume-overloaded heart failure with reduced ejection fraction (HFrEF). It represents rapid ventricular filling against a non-compliant, dilated ventricle. Sensitivity is low (~30%) but specificity is > 90% for elevated filling pressures. It is the pathognomonic heart failure sign.",
           whyNotA: 'A is INCORRECT as the most specific. Bilateral crackles are common in pneumonia, pulmonary fibrosis, and heart failure. They are sensitive but not highly specific for cardiac dyspnea. In HF, they represent transudated fluid in alveoli.',
           whyNotB: 'B is INCORRECT as the most specific. Orthopnea (dyspnea worse when flat, improved sitting) is strongly suggestive of HF but can also occur in severe COPD, obesity, or abdominal ascites. It is more specific than most symptoms but less specific than S3.',
-          whyNotD: 'D is INCORRECT as the MOST specific — though BNP is highly useful diagnostically. BNP > 400 pg/mL has 90%+ sensitivity for HF but is also elevated in PE, sepsis, acute kidney injury, and right heart failure. The S3 is more specific to LV dysfunction.',
+          whyNotD: 'D is INCORRECT as the MOST specific  though BNP is highly useful diagnostically. BNP > 400 pg/mL has 90%+ sensitivity for HF but is also elevated in PE, sepsis, acute kidney injury, and right heart failure. The S3 is more specific to LV dysfunction.',
           whyNotE: 'E is INCORRECT. Hypoxia (SpO2 91%) occurs in virtually any respiratory or cardiac cause of dyspnea and has zero specificity for etiology.',
           keyTakeaway: 'S3 gallop = most specific for HF. BNP > 400 = strong diagnostic support. Orthopnea + PND + JVD = classic HF constellation. Echocardiography is the gold standard for confirming HF and measuring EF.',
         },
@@ -228,12 +228,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. CT-PA is the gold standard investigation for suspected pulmonary embolism. This patient has high pretest probability (young woman: OCP? post-immobilization from flight, tachycardia, hypoxia, pleuritic pain, S1Q3T3 pattern, elevated D-dimer = Wells score ≥ 5 = high probability). CT-PA is rapid (available 24/7), provides definitive diagnosis, and can identify alternative diagnoses. Sensitivity 95-98%, specificity 97%.',
+          correct: 'B is CORRECT. CT-PA is the gold standard investigation for suspected pulmonary embolism. This patient has high pretest probability (young woman: OCP? post-immobilization from flight, tachycardia, hypoxia, pleuritic pain, S1Q3T3 pattern, elevated D-dimer = Wells score  5 = high probability). CT-PA is rapid (available 24/7), provides definitive diagnosis, and can identify alternative diagnoses. Sensitivity 95-98%, specificity 97%.',
           whyNotA: 'A is INCORRECT as the primary test. Doppler US legs is useful to detect DVT but only ~50% of PE patients have detectable DVT, so a negative leg US does not exclude PE. It is a complementary test, not the primary diagnostic. In hemodynamically stable patients with suspected PE, CT-PA is prioritized.',
           whyNotC: 'C is INCORRECT in most modern centers. V/Q scan is an alternative when CT-PA is contraindicated (contrast allergy, renal failure, pregnancy). It is less available, provides indeterminate results in > 30% of cases, and takes longer. CT-PA is preferred when available.',
           whyNotD: 'D is PARTIALLY CORRECT as an action (when imaging is delayed, anticoagulation can be started based on clinical probability), but NOT the most complete immediate step. Guidelines recommend imaging confirmation before committing to long-term anticoagulation unless the patient is hemodynamically unstable.',
           whyNotE: 'E is INCORRECT as the primary diagnostic. Echo is useful for risk stratification (RV strain = submassive or massive PE) and when the patient is too unstable for CT. It is NOT the first-line diagnostic for PE and may not visualize emboli directly.',
-          keyTakeaway: 'PE: Wells score ≥ 5 = high probability → CT-PA directly. Wells 2-4 + D-dimer positive → CT-PA. D-dimer alone rules OUT PE in low-probability patients (NPV > 99%). S1Q3T3 is classic ECG finding. Treatment: anticoagulation (LMWH/DOAC). Massive PE with hemodynamic instability → systemic thrombolytics.',
+          keyTakeaway: 'PE: Wells score  5 = high probability  CT-PA directly. Wells 2-4 + D-dimer positive  CT-PA. D-dimer alone rules OUT PE in low-probability patients (NPV > 99%). S1Q3T3 is classic ECG finding. Treatment: anticoagulation (LMWH/DOAC). Massive PE with hemodynamic instability  systemic thrombolytics.',
         },
       },
     ],
@@ -263,11 +263,11 @@ const EXPANDED_SYMPTOMS_DB = [
       ],
       urgent: [
         { condition: 'Neurocardiogenic (Vasovagal)', features: 'Prodrome (nausea, warmth, diaphoresis), triggered by pain/emotion/standing, quick recovery', management: 'Avoid triggers, increase fluids/salt, compression stockings' },
-        { condition: 'Orthostatic Hypotension', features: 'Drop SBP ≥ 20 or DBP ≥ 10 mmHg within 3 min standing, dehydration, medications', management: 'Identify cause, fluids, midodrine, fludrocortisone' },
+        { condition: 'Orthostatic Hypotension', features: 'Drop SBP  20 or DBP  10 mmHg within 3 min standing, dehydration, medications', management: 'Identify cause, fluids, midodrine, fludrocortisone' },
         { condition: 'Carotid Sinus Hypersensitivity', features: 'Elderly, turning head, shaving, tight collar', management: 'Avoid triggers, pacemaker if severe' },
       ],
       nonEmergent: [
-        { condition: 'Situational Syncope', features: 'Cough, micturition, defecation — Valsalva maneuver mechanism', management: 'Avoid precipitants' },
+        { condition: 'Situational Syncope', features: 'Cough, micturition, defecation  Valsalva maneuver mechanism', management: 'Avoid precipitants' },
         { condition: 'Seizure (mimics syncope)', features: 'Tonic-clonic movements, post-ictal confusion, tongue bite, urinary incontinence', management: 'EEG, neurology, antiepileptics' },
       ],
     },
@@ -281,8 +281,8 @@ const EXPANDED_SYMPTOMS_DB = [
       imaging: ['12-lead ECG (all patients)', 'Echocardiogram if structural suspected', 'Holter/event monitor for arrhythmia', 'Tilt table test for neurocardiogenic', 'CT head only if trauma or focal neuro deficits'],
     },
     mnemonics: [
-      'CHESS — CHF, Hematocrit, ECG abnormal, SOB, SBP < 90 (San Francisco rule)',
-      'CARDIAC — Cardiomyopathy, Aortic stenosis, Rhythm, Dysautonomia, Inherited, Aortic dissection/Coronary disease',
+      'CHESS  CHF, Hematocrit, ECG abnormal, SOB, SBP < 90 (San Francisco rule)',
+      'CARDIAC  Cardiomyopathy, Aortic stenosis, Rhythm, Dysautonomia, Inherited, Aortic dissection/Coronary disease',
     ],
     questions: [
       {
@@ -297,10 +297,10 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: 'C is CORRECT. This patient has multiple high-risk features: (1) exertional syncope without prodrome (cardiac arrhythmia until proven otherwise), (2) prolonged QTc > 460ms (QTc 490ms = severely prolonged), (3) family history of sudden death < 50 years (likely familial Long QT syndrome or HCM). This combination warrants urgent cardiology evaluation. Long QT syndrome can cause life-threatening Torsades de Pointes → ventricular fibrillation → sudden cardiac death. ICD implantation may be life-saving. The patient should NOT return to play until fully evaluated.',
+          correct: 'C is CORRECT. This patient has multiple high-risk features: (1) exertional syncope without prodrome (cardiac arrhythmia until proven otherwise), (2) prolonged QTc > 460ms (QTc 490ms = severely prolonged), (3) family history of sudden death < 50 years (likely familial Long QT syndrome or HCM). This combination warrants urgent cardiology evaluation. Long QT syndrome can cause life-threatening Torsades de Pointes  ventricular fibrillation  sudden cardiac death. ICD implantation may be life-saving. The patient should NOT return to play until fully evaluated.',
           whyNotA: 'A is INCORRECT and potentially dangerous. Discharging this patient without urgent workup risks sudden cardiac death. The combination of exertional syncope + long QTc + family SCD history = high-risk presentation that cannot be managed with outpatient monitoring alone.',
           whyNotB: 'B is INCORRECT and potentially hazardous. Stress testing could precipitate ventricular arrhythmia in a patient with suspected LQTS or HCM. Exercise increases adrenergic tone which can trigger Torsades in LQTS. Stress testing should ONLY occur after the underlying condition is identified and deemed safe by cardiology.',
-          whyNotD: 'D is INCORRECT. Tilt table testing is used to diagnose vasovagal/neurocardiogenic syncope — which presents with prodrome and occurs in non-athletic older individuals. This patient has exertional syncope without warning in a young athlete with ECG abnormalities — the opposite clinical picture.',
+          whyNotD: 'D is INCORRECT. Tilt table testing is used to diagnose vasovagal/neurocardiogenic syncope  which presents with prodrome and occurs in non-athletic older individuals. This patient has exertional syncope without warning in a young athlete with ECG abnormalities  the opposite clinical picture.',
           whyNotE: 'E is INCORRECT as the PRIMARY step. While neurology and EEG are needed if seizure cannot be excluded, the cardiac features (ECG, family history, exertional pattern) are the dominant concern and must be addressed first. Cardiac causes of syncope are far more dangerous than seizures and must be prioritized.',
           keyTakeaway: 'Exertional syncope + prolonged QTc + family SCD = LQTS until proven otherwise. Management: Avoid QT-prolonging drugs (clarithromycin, antipsychotics, methadone), avoid competitive sports, beta-blocker, consider ICD. QTc > 440ms (men) or > 460ms (women) is abnormal. QTc > 500ms = high risk.',
         },
@@ -315,7 +315,7 @@ const EXPANDED_SYMPTOMS_DB = [
     icd10: 'R51',
     clinicalImportance: 'Affects > 90% of the population. Must rapidly distinguish emergent from benign with a focused history and targeted examination.',
     redFlags: [
-      'Thunderclap onset — worst headache of life',
+      'Thunderclap onset  worst headache of life',
       'New severe headache in > 50 years old (GCA, SAH)',
       'Headache with fever + neck stiffness + photophobia (meningitis)',
       'Headache with focal neurological deficits',
@@ -326,26 +326,26 @@ const EXPANDED_SYMPTOMS_DB = [
     ],
     differentials: {
       emergent: [
-        { condition: 'Subarachnoid Hemorrhage (SAH)', features: '"Thunderclap" — worst headache of life, sudden onset, neck stiffness, photophobia', test: 'CT non-contrast head (95% sensitive in 12h), then LP if CT negative', management: 'Neurosurgery consultation, nimodipine, prevent rebleeding' },
-        { condition: 'Bacterial Meningitis', features: 'Fever + severe headache + neck stiffness (Kernig/Brudzinski +) + photophobia', test: 'Blood cultures → LP (if no mass on CT)', management: 'Empiric antibiotics IMMEDIATELY (vancomycin + ceftriaxone ± ampicillin)' },
-        { condition: 'Hypertensive Emergency', features: 'BP ≥ 180/120 with target organ damage (headache, AMS, vision changes, chest pain)', test: 'BP measurement, fundoscopy, UA, troponin', management: 'IV labetalol or nicardipine — reduce MAP by 25% in 1h' },
+        { condition: 'Subarachnoid Hemorrhage (SAH)', features: '"Thunderclap"  worst headache of life, sudden onset, neck stiffness, photophobia', test: 'CT non-contrast head (95% sensitive in 12h), then LP if CT negative', management: 'Neurosurgery consultation, nimodipine, prevent rebleeding' },
+        { condition: 'Bacterial Meningitis', features: 'Fever + severe headache + neck stiffness (Kernig/Brudzinski +) + photophobia', test: 'Blood cultures  LP (if no mass on CT)', management: 'Empiric antibiotics IMMEDIATELY (vancomycin + ceftriaxone  ampicillin)' },
+        { condition: 'Hypertensive Emergency', features: 'BP  180/120 with target organ damage (headache, AMS, vision changes, chest pain)', test: 'BP measurement, fundoscopy, UA, troponin', management: 'IV labetalol or nicardipine  reduce MAP by 25% in 1h' },
         { condition: 'Intracranial Mass / Bleed', features: 'Progressive, worse in morning, nausea/vomiting, papilledema', test: 'CT head with/without contrast, then MRI', management: 'Dexamethasone, neurosurgery' },
         { condition: 'Giant Cell Arteritis (GCA)', features: '>50 years, temporal tenderness, jaw claudication, ESR > 50', test: 'ESR + CRP, temporal artery biopsy', management: 'Prednisone 1mg/kg IMMEDIATELY (vision loss risk)' },
       ],
       benign: [
         { condition: 'Migraine', features: 'Unilateral, pulsating, 4-72h, nausea, photophobia/phonophobia, aura in 25%', management: 'Triptans (sumatriptan), NSAIDs, anti-emetics, prophylaxis if > 4/month' },
         { condition: 'Tension Headache', features: 'Bilateral, band-like pressure, no nausea/photophobia, most common type', management: 'NSAIDs, acetaminophen, stress management' },
-        { condition: 'Cluster Headache', features: 'Unilateral orbital boring pain, periorbital autonomic (ptosis, rhinorrhea, lacrimation) — men, smokers, alcohol-triggered', management: '100% O2 (first-line for acute), sumatriptan SC, verapamil for prevention' },
+        { condition: 'Cluster Headache', features: 'Unilateral orbital boring pain, periorbital autonomic (ptosis, rhinorrhea, lacrimation)  men, smokers, alcohol-triggered', management: '100% O2 (first-line for acute), sumatriptan SC, verapamil for prevention' },
       ],
     },
     diagnosticApproach: {
-      immediateSteps: ['Full history (OPQRST + red flags)', 'BP measurement (hypertensive emergency)', 'Neurological exam (focal deficits)', 'Fundoscopy (papilledema = ↑ ICP)'],
+      immediateSteps: ['Full history (OPQRST + red flags)', 'BP measurement (hypertensive emergency)', 'Neurological exam (focal deficits)', 'Fundoscopy (papilledema =  ICP)'],
       whenToCTHead: ['Thunderclap onset', 'Focal neuro deficits', 'Papilledema', 'New headache > 50 years', 'Immunocompromised', 'Anticoagulated', 'Trauma'],
       LPWhenIndicated: 'LP after CT negative for SAH diagnosis; xanthochromia persists up to 2 weeks post-SAH',
     },
     mnemonics: [
-      'SNOOP — Systemic symptoms, Neurologic signs, Onset sudden, Onset > 40, Pattern change',
-      'POUND — Pulsating, 4-72 hours, Unilateral, Nausea, Disabling (migraine criteria — 4/5 = likely migraine)',
+      'SNOOP  Systemic symptoms, Neurologic signs, Onset sudden, Onset > 40, Pattern change',
+      'POUND  Pulsating, 4-72 hours, Unilateral, Nausea, Disabling (migraine criteria  4/5 = likely migraine)',
     ],
     questions: [
       {
@@ -365,7 +365,7 @@ const EXPANDED_SYMPTOMS_DB = [
           whyNotC: 'C is INCORRECT as the immediate next step. MRI is more sensitive than CT for some SAH but is LESS readily available, takes longer, and FLAIR sequences may miss acute blood. CT remains first-line; LP follows if CT is negative. MRI is useful for delayed subarachnoid blood (FLAIR) but not the immediate emergency investigation.',
           whyNotD: 'D is INCORRECT as immediate management. CT angiography is appropriate AFTER SAH is CONFIRMED by CT or LP to identify the bleeding aneurysm (present in 85% of SAH). It should not precede LP when CT is negative.',
           whyNotE: 'E is INCORRECT. Triptans are effective for migraine but are CONTRAINDICATED in thunderclap headache until SAH is excluded. Giving triptans without ruling out SAH creates a false sense of security (if it "works," it might still be SAH or migraine was coincidental).',
-          keyTakeaway: 'Thunderclap headache algorithm: CT head → if negative → lumbar puncture (RBCs non-clearing + xanthochromia = SAH). Then CT angio to locate aneurysm. SAH treatment: nimodipine (60mg q4h × 21 days for vasospasm prevention), neurosurgery (coiling or clipping).',
+          keyTakeaway: 'Thunderclap headache algorithm: CT head  if negative  lumbar puncture (RBCs non-clearing + xanthochromia = SAH). Then CT angio to locate aneurysm. SAH treatment: nimodipine (60mg q4h  21 days for vasospasm prevention), neurosurgery (coiling or clipping).',
         },
       },
       {
@@ -383,9 +383,9 @@ const EXPANDED_SYMPTOMS_DB = [
           correct: 'C is CORRECT. The classic triad of increased intracranial pressure (ICP) is present: (1) progressive headache worse in the morning (positional, worse with recumbency when CSF drainage is impaired), (2) projectile vomiting WITHOUT nausea (direct brainstem vomiting center stimulation), (3) papilledema on fundoscopy (disc elevation with blurred margins = elevated optic nerve sheath pressure). This triad in a 58-year-old man with weeks of progression = intracranial mass (metastatic disease most common at this age, primary CNS tumor, or abscess). Urgent CT/MRI with contrast is mandatory.',
           whyNotA: 'A is INCORRECT. Migraine has NO papilledema, is episodic (not progressive weeks), associated with nausea first then vomiting (not projectile), and typically 4-72 hours in duration. Migraine does not cause disc edema. Morning worsening and fundoscopic findings exclude migraine.',
           whyNotB: 'B is INCORRECT. Tension headache does NOT cause papilledema, vomiting, or morning prominence. It is bilateral, band-like, associated with stress, and fully reversible without any objective signs.',
-          whyNotD: 'D is INCORRECT. SAH presents as thunderclap (sudden, within seconds to minutes) — NOT progressive over 3 weeks. SAH may show early papilledema but the clinical course is entirely different.',
+          whyNotD: 'D is INCORRECT. SAH presents as thunderclap (sudden, within seconds to minutes)  NOT progressive over 3 weeks. SAH may show early papilledema but the clinical course is entirely different.',
           whyNotE: 'E is INCORRECT. Cluster headache is unilateral, periorbital, extremely severe but brief (15-180 min), with ipsilateral autonomic features (ptosis, rhinorrhea, lacrimation). No papilledema. Occurs in middle-aged men but with a distinctly episodic pattern, not progressive.',
-          keyTakeaway: 'ICP triad: Morning headache (worse supine) + Projectile vomiting + Papilledema = INTRACRANIAL MASS until proven otherwise. Action: CT head with contrast → MRI → LP ONLY after mass excluded. Dexamethasone reduces cerebral edema. Emergent neurosurgery if mass effect with midline shift.',
+          keyTakeaway: 'ICP triad: Morning headache (worse supine) + Projectile vomiting + Papilledema = INTRACRANIAL MASS until proven otherwise. Action: CT head with contrast  MRI  LP ONLY after mass excluded. Dexamethasone reduces cerebral edema. Emergent neurosurgery if mass effect with midline shift.',
         },
       },
     ],
@@ -411,22 +411,22 @@ const EXPANDED_SYMPTOMS_DB = [
           { condition: 'Acute Cholecystitis', features: 'Murphy sign +, fatty meal trigger, fever, leukocytosis', test: 'Ultrasound (gold standard)', management: 'NPO, IV fluids, antibiotics, cholecystectomy' },
           { condition: 'Choledocholithiasis', features: 'RUQ pain + jaundice + CBD dilatation on ultrasound', test: 'USS, MRCP', management: 'ERCP for stone removal' },
           { condition: 'Cholangitis (Charcot\'s triad)', features: 'RUQ pain + fever + jaundice; Reynold\'s adds AMS + hypotension', test: 'Blood cultures, USS, MRCP', management: 'IV antibiotics + ERCP URGENTLY' },
-          { condition: 'Hepatitis', features: 'Tender liver, jaundice, elevated transaminases', test: 'LFTs, hepatitis panel', management: 'Supportive ± antivirals' },
+          { condition: 'Hepatitis', features: 'Tender liver, jaundice, elevated transaminases', test: 'LFTs, hepatitis panel', management: 'Supportive  antivirals' },
         ],
         'RLQ': [
-          { condition: 'Appendicitis', features: 'Migration from periumbilical → RLQ, Rovsing/psoas/obturator signs, leukocytosis, anorexia', test: 'CT abdomen/pelvis (gold standard), ultrasound in pregnancy/children', management: 'Appendectomy or antibiotics (in selected cases)' },
+          { condition: 'Appendicitis', features: 'Migration from periumbilical  RLQ, Rovsing/psoas/obturator signs, leukocytosis, anorexia', test: 'CT abdomen/pelvis (gold standard), ultrasound in pregnancy/children', management: 'Appendectomy or antibiotics (in selected cases)' },
           { condition: 'Ovarian Cyst / TOA', features: 'Female patient, pelvic pain, ultrasound shows cystic mass', test: 'Pelvic ultrasound, beta-hCG', management: 'Depends on findings; rupture = surgical emergency' },
           { condition: 'Ectopic Pregnancy', features: 'Beta-hCG positive, no IUP on ultrasound, vaginal bleeding, hemodynamic instability', test: 'Beta-hCG + transvaginal USS', management: 'Methotrexate (stable) or surgery (unstable)' },
-          { condition: 'Inguinal Hernia', features: 'Groin mass, worse with Valsalva', test: 'Clinical ± ultrasound', management: 'Elective repair; emergent if strangulated' },
+          { condition: 'Inguinal Hernia', features: 'Groin mass, worse with Valsalva', test: 'Clinical  ultrasound', management: 'Elective repair; emergent if strangulated' },
         ],
         'Epigastric': [
-          { condition: 'Acute Pancreatitis', features: 'Epigastric pain radiating to back, nausea, lipase > 3× ULN, alcohol/gallstones common causes', test: 'Lipase, CT abdomen (if diagnosis unclear or severe)', management: 'NPO, aggressive IV fluids, analgesia' },
+          { condition: 'Acute Pancreatitis', features: 'Epigastric pain radiating to back, nausea, lipase > 3 ULN, alcohol/gallstones common causes', test: 'Lipase, CT abdomen (if diagnosis unclear or severe)', management: 'NPO, aggressive IV fluids, analgesia' },
           { condition: 'Peptic Ulcer Disease', features: 'Burning epigastric pain, worse with hunger (DU) or eating (GU), H. pylori/NSAIDs', test: 'Upper endoscopy (gold standard)', management: 'PPI, H. pylori eradication' },
           { condition: 'GERD', features: 'Heartburn, regurgitation, worse postprandial and supine', test: 'Clinical; pH monitoring/endoscopy if refractory', management: 'PPI, lifestyle' },
           { condition: 'Aortic Aneurysm (AAA)', features: 'Pulsatile epigastric mass, sudden severe back/flank pain = rupture!', test: 'Ultrasound (stable) or CT angio (unstable/suspicious)', management: 'Emergency surgery if ruptured' },
         ],
         'LLQ': [
-          { condition: 'Diverticulitis', features: 'Left lower quadrant pain, fever, leukocytosis, ± constipation (LLQ = "left-sided appendicitis")', test: 'CT abdomen with contrast', management: 'Antibiotics (outpatient if uncomplicated), IV for severe' },
+          { condition: 'Diverticulitis', features: 'Left lower quadrant pain, fever, leukocytosis,  constipation (LLQ = "left-sided appendicitis")', test: 'CT abdomen with contrast', management: 'Antibiotics (outpatient if uncomplicated), IV for severe' },
           { condition: 'Sigmoid Volvulus', features: 'Elderly, twisted loop, "coffee bean sign" on CXR/CT, high-pitched bowel sounds', test: 'CT or contrast enema', management: 'Sigmoidoscopic decompression' },
         ],
         'Diffuse': [
@@ -442,9 +442,9 @@ const EXPANDED_SYMPTOMS_DB = [
       imaging: ['CXR upright (free air for perforation)', 'CT abdomen/pelvis with contrast (most informative for acute abdomen)', 'Ultrasound (biliary, pregnancy, ovarian)', 'CT angio (AAA, mesenteric ischemia)'],
     },
     mnemonics: [
-      'VITAMINS — Vascular, Inflammatory, Toxins/metabolic, Anatomic, Mechanical, Infectious, Neurogenic, Systemic',
-      'Murphy sign — RUQ pain with arrest of inspiration on palpation = cholecystitis',
-      '4 Fs of cholecystitis — Fat, Female, Forty, Fertile',
+      'VITAMINS  Vascular, Inflammatory, Toxins/metabolic, Anatomic, Mechanical, Infectious, Neurogenic, Systemic',
+      'Murphy sign  RUQ pain with arrest of inspiration on palpation = cholecystitis',
+      '4 Fs of cholecystitis  Fat, Female, Forty, Fertile',
     ],
     questions: [
       {
@@ -459,12 +459,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: "C is CORRECT. CT abdomen/pelvis with contrast is the gold standard diagnostic test for suspected appendicitis in adult males. This patient has Alvarado score ≥ 6 (migration of pain, RLQ tenderness at McBurney, rebound, nausea/anorexia, fever, leukocytosis) = high probability of appendicitis. CT: sensitivity 97%, specificity 95%. It confirms diagnosis, identifies complications (perforation, pericecal abscess, fecalith), and excludes alternatives. CT helps avoid unnecessary surgery in equivocal cases.",
-          whyNotA: 'A is INCORRECT. Discharging this patient risks missing appendicitis or allowing progression to perforation. Perforation rate doubles after 24-36 hours. This presentation is high-probability appendicitis — discharge without imaging is inappropriate.',
-          whyNotB: 'B is INCORRECT. Upper endoscopy examines the esophagus, stomach, and duodenum — not appropriate for RLQ pathology. This presentation has nothing to suggest PUD or gastric pathology.',
+          correct: "C is CORRECT. CT abdomen/pelvis with contrast is the gold standard diagnostic test for suspected appendicitis in adult males. This patient has Alvarado score  6 (migration of pain, RLQ tenderness at McBurney, rebound, nausea/anorexia, fever, leukocytosis) = high probability of appendicitis. CT: sensitivity 97%, specificity 95%. It confirms diagnosis, identifies complications (perforation, pericecal abscess, fecalith), and excludes alternatives. CT helps avoid unnecessary surgery in equivocal cases.",
+          whyNotA: 'A is INCORRECT. Discharging this patient risks missing appendicitis or allowing progression to perforation. Perforation rate doubles after 24-36 hours. This presentation is high-probability appendicitis  discharge without imaging is inappropriate.',
+          whyNotB: 'B is INCORRECT. Upper endoscopy examines the esophagus, stomach, and duodenum  not appropriate for RLQ pathology. This presentation has nothing to suggest PUD or gastric pathology.',
           whyNotD: 'D is INCORRECT regarding immediate surgery. While antibiotics can be used in uncomplicated appendicitis (as a non-operative strategy in selected patients), imaging FIRST is needed to: (1) confirm the diagnosis, (2) assess for complications, (3) exclude alternative pathology. Operating on an unconfirmed diagnosis is inappropriate.',
           whyNotE: 'E is INCORRECT. KUB (abdominal X-ray) has very low sensitivity for appendicitis (fecalith visible in < 15%). It is inadequate for soft tissue evaluation and should not be the primary imaging modality for suspected appendicitis.',
-          keyTakeaway: 'Appendicitis: migration of pain to RLQ + anorexia + McBurney tenderness + fever + leukocytosis = classic. CT is gold standard in adults. Ultrasound preferred in children and pregnant women (avoid radiation). Treatment: appendectomy (laparoscopic = gold). Perforated appendicitis: antibiotics + drain ± delayed appendectomy.',
+          keyTakeaway: 'Appendicitis: migration of pain to RLQ + anorexia + McBurney tenderness + fever + leukocytosis = classic. CT is gold standard in adults. Ultrasound preferred in children and pregnant women (avoid radiation). Treatment: appendectomy (laparoscopic = gold). Perforated appendicitis: antibiotics + drain  delayed appendectomy.',
         },
       },
       {
@@ -479,10 +479,10 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: 'C is CORRECT. This is a classic presentation of acute mesenteric ischemia (AMI): (1) severe abdominal pain OUT OF PROPORTION to physical findings (key classic teaching point — the exam looks deceptively benign despite catastrophic ischemia), (2) atrial fibrillation as source of embolus to SMA (most common cause = arterial embolism from AF → SMA), (3) shock (BP 88/60, HR 120), (4) markedly elevated lactate (6.2 = severe ischemia/necrosis). AMI has mortality > 60-80%. CT angiography identifies the occlusion. Emergent surgery or intervention is required.',
-          whyNotA: 'A is INCORRECT. Appendicitis presents in the RLQ, not diffusely. Appendicitis rarely causes hemodynamic shock unless perforated with sepsis. An 80-year-old with AF → the mechanism is vascular, not appendiceal.',
+          correct: 'C is CORRECT. This is a classic presentation of acute mesenteric ischemia (AMI): (1) severe abdominal pain OUT OF PROPORTION to physical findings (key classic teaching point  the exam looks deceptively benign despite catastrophic ischemia), (2) atrial fibrillation as source of embolus to SMA (most common cause = arterial embolism from AF  SMA), (3) shock (BP 88/60, HR 120), (4) markedly elevated lactate (6.2 = severe ischemia/necrosis). AMI has mortality > 60-80%. CT angiography identifies the occlusion. Emergent surgery or intervention is required.',
+          whyNotA: 'A is INCORRECT. Appendicitis presents in the RLQ, not diffusely. Appendicitis rarely causes hemodynamic shock unless perforated with sepsis. An 80-year-old with AF  the mechanism is vascular, not appendiceal.',
           whyNotB: 'B is INCORRECT. Perforated PUD causes BOARD-LIKE rigidity and peritoneal signs (absent here). Free air would be seen under the diaphragm on CXR. The exam would NOT be mild in perforation.',
-          whyNotD: 'D is INCORRECT. Diverticulitis typically presents in the LLQ with fever and leukocytosis — not shock and severe diffuse pain. It is not usually associated with AF or hemodynamic instability in its typical presentation.',
+          whyNotD: 'D is INCORRECT. Diverticulitis typically presents in the LLQ with fever and leukocytosis  not shock and severe diffuse pain. It is not usually associated with AF or hemodynamic instability in its typical presentation.',
           whyNotE: 'E is INCORRECT. Bowel obstruction causes colicky pain (crampy, intermittent) with vomiting and distension, NOT severe constant diffuse pain. Hemodynamic collapse would only occur with strangulation (which could overlap with mesenteric ischemia).',
           keyTakeaway: 'Mesenteric ischemia: "Pain out of proportion to exam" is CLASSIC and HIGH-YIELD. Risk factors: AF (embolic), atherosclerosis (thrombotic), vasopressors (non-occlusive). CT angio = test of choice. Treatment: emergent revascularization + bowel resection if necrotic. Mortality > 60%. Give heparin, emergent surgery consultation immediately.',
         },
@@ -497,7 +497,7 @@ const EXPANDED_SYMPTOMS_DB = [
     icd10: 'R50',
     clinicalImportance: 'Fever is a vital sign of inflammation, infection, or systemic disease. The pattern and associated findings direct the diagnosis.',
     redFlags: [
-      'Fever > 40°C (104°F) or < 36°C (hypothermia — may indicate sepsis)',
+      'Fever > 40°C (104°F) or < 36°C (hypothermia  may indicate sepsis)',
       'Fever + altered mental status',
       'Fever + petechial/purpuric rash (meningococcemia)',
       'Fever + hemodynamic instability (septic shock)',
@@ -508,9 +508,9 @@ const EXPANDED_SYMPTOMS_DB = [
       infectious: [
         { condition: 'Bacterial Pneumonia', features: 'Productive cough, egophony, dullness to percussion, CXR: consolidation', management: 'Antibiotics per CURB-65 severity' },
         { condition: 'UTI / Pyelonephritis', features: 'Dysuria, frequency, CVA tenderness, bacteriuria', management: 'TMP-SMX or fluoroquinolone' },
-        { condition: 'Sepsis', features: 'SOFA score ≥ 2, infection source, organ dysfunction', management: 'Hour-1 bundle: lactate, blood cultures, broad-spectrum antibiotics, 30mL/kg IV fluids, vasopressors if refractory' },
+        { condition: 'Sepsis', features: 'SOFA score  2, infection source, organ dysfunction', management: 'Hour-1 bundle: lactate, blood cultures, broad-spectrum antibiotics, 30mL/kg IV fluids, vasopressors if refractory' },
         { condition: 'Meningitis', features: 'Fever + headache + neck stiffness + photophobia', management: 'EMPIRIC antibiotics IMMEDIATELY, then LP' },
-        { condition: 'Endocarditis', features: 'Fever + new murmur + peripheral stigmata (Osler nodes, Janeway lesions, Roth spots, splinter hemorrhages)', management: '≥ 3 blood cultures THEN 4-6 weeks parenteral antibiotics' },
+        { condition: 'Endocarditis', features: 'Fever + new murmur + peripheral stigmata (Osler nodes, Janeway lesions, Roth spots, splinter hemorrhages)', management: ' 3 blood cultures THEN 4-6 weeks parenteral antibiotics' },
         { condition: 'Meningococcemia', features: 'Fever + non-blanching petechial/purpuric rash = EMERGENCY', management: 'IV ceftriaxone immediately (before any imaging)' },
       ],
       nonInfectious: [
@@ -521,10 +521,10 @@ const EXPANDED_SYMPTOMS_DB = [
       ],
     },
     diagnosticApproach: {
-      generalWorkup: ['CBC with differential', 'CMP', 'Blood cultures ×2', 'CXR', 'Urinalysis + urine culture', 'Lactate if sepsis suspected'],
+      generalWorkup: ['CBC with differential', 'CMP', 'Blood cultures 2', 'CXR', 'Urinalysis + urine culture', 'Lactate if sepsis suspected'],
       specializedWorkup: {
         FUO: ['CT chest/abdomen/pelvis', 'Echo', 'PET scan', 'Bone marrow biopsy', 'Temporal artery biopsy if GCA suspected'],
-        neutropenic: ['Blood cultures ×2', 'CXR', 'Urine culture', 'Empiric piperacillin-tazobactam or cefepime IMMEDIATELY'],
+        neutropenic: ['Blood cultures 2', 'CXR', 'Urine culture', 'Empiric piperacillin-tazobactam or cefepime IMMEDIATELY'],
       },
     },
     mnemonics: [
@@ -537,19 +537,19 @@ const EXPANDED_SYMPTOMS_DB = [
         question: 'A 19-year-old college student presents with sudden-onset fever (39.8°C), severe headache, and photophobia. On exam, there is a non-blanching petechial rash spreading across the trunk and lower extremities. What is the MOST CRITICAL immediate action?',
         choices: [
           { id: 'A', text: 'CT head, then lumbar puncture, then antibiotics' },
-          { id: 'B', text: 'Blood cultures × 2, then start ceftriaxone IV immediately' },
+          { id: 'B', text: 'Blood cultures  2, then start ceftriaxone IV immediately' },
           { id: 'C', text: 'Lumbar puncture first, then antibiotics' },
           { id: 'D', text: 'Isolate the patient and wait for blood culture results' },
           { id: 'E', text: 'Give IV dexamethasone, then CT, then LP' },
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. This is meningococcemia (Neisseria meningitidis septicemia) — a true medical emergency with mortality > 50% if untreated. The non-blanching petechial/purpuric rash in febrile illness = meningococcal disease until proven otherwise. Blood cultures should be drawn (takes < 5 minutes) and then IV ceftriaxone 2g should be given IMMEDIATELY. Do NOT wait for LP or imaging. Every 30 minutes of antibiotic delay worsens mortality. The rash will progress to purpura fulminans → DIC → amputation → death within hours without treatment.',
-          whyNotA: 'A is INCORRECT. This sequence (CT → LP → antibiotics) would take 1-2+ hours. A patient with suspected meningococcemia cannot wait. Antibiotics must be given BEFORE LP if there is any delay, and DEFINITELY before CT. The LP can follow antibiotics — meningococcal CSF remains positive for antibiotics for hours.',
-          whyNotC: 'C is INCORRECT. While LP provides definitive diagnosis, the rash alone (non-blanching + fever) is sufficient clinical diagnosis to start antibiotics. LP should NOT delay antibiotic administration. Start antibiotics → then LP.',
+          correct: 'B is CORRECT. This is meningococcemia (Neisseria meningitidis septicemia)  a true medical emergency with mortality > 50% if untreated. The non-blanching petechial/purpuric rash in febrile illness = meningococcal disease until proven otherwise. Blood cultures should be drawn (takes < 5 minutes) and then IV ceftriaxone 2g should be given IMMEDIATELY. Do NOT wait for LP or imaging. Every 30 minutes of antibiotic delay worsens mortality. The rash will progress to purpura fulminans  DIC  amputation  death within hours without treatment.',
+          whyNotA: 'A is INCORRECT. This sequence (CT  LP  antibiotics) would take 1-2+ hours. A patient with suspected meningococcemia cannot wait. Antibiotics must be given BEFORE LP if there is any delay, and DEFINITELY before CT. The LP can follow antibiotics  meningococcal CSF remains positive for antibiotics for hours.',
+          whyNotC: 'C is INCORRECT. While LP provides definitive diagnosis, the rash alone (non-blanching + fever) is sufficient clinical diagnosis to start antibiotics. LP should NOT delay antibiotic administration. Start antibiotics  then LP.',
           whyNotD: 'D is INCORRECT. Waiting for culture results with active meningococcemia is potentially fatal. Blood cultures grow in 12-48+ hours; the patient could die within hours of the rash appearing.',
-          whyNotE: 'E is PARTIALLY CORRECT (dexamethasone IS recommended in bacterial meningitis) but should ideally be given WITH the first antibiotic dose, not before it. Starting antibiotics must not be delayed for any reason — including steroid administration.',
-          keyTakeaway: 'Non-blanching petechial rash + fever = meningococcemia until proven otherwise → blood cultures → IV ceftriaxone IMMEDIATELY. Do NOT delay antibiotics for any investigation. Add dexamethasone with or just before first antibiotic dose. Contacts: prophylactic rifampin or ciprofloxacin.',
+          whyNotE: 'E is PARTIALLY CORRECT (dexamethasone IS recommended in bacterial meningitis) but should ideally be given WITH the first antibiotic dose, not before it. Starting antibiotics must not be delayed for any reason  including steroid administration.',
+          keyTakeaway: 'Non-blanching petechial rash + fever = meningococcemia until proven otherwise  blood cultures  IV ceftriaxone IMMEDIATELY. Do NOT delay antibiotics for any investigation. Add dexamethasone with or just before first antibiotic dose. Contacts: prophylactic rifampin or ciprofloxacin.',
         },
       },
     ],
@@ -571,11 +571,11 @@ const EXPANDED_SYMPTOMS_DB = [
     ],
     differentials: {
       cardiac: [
-        { condition: 'Atrial Fibrillation', features: 'Irregularly irregular pulse, no P waves on ECG, stroke risk', management: 'Rate control (metoprolol/diltiazem), anticoagulation if CHA₂DS₂-VASc ≥ 2, cardioversion' },
+        { condition: 'Atrial Fibrillation', features: 'Irregularly irregular pulse, no P waves on ECG, stroke risk', management: 'Rate control (metoprolol/diltiazem), anticoagulation if CHADS-VASc  2, cardioversion' },
         { condition: 'SVT (AVNRT)', features: 'Sudden onset/offset, regular, rate 150-250, P waves retrograde', management: 'Vagal maneuvers, adenosine 6mg IV (drug of choice)' },
         { condition: 'Ventricular Tachycardia', features: 'Wide complex, regular, structural heart disease, hemodynamic instability', management: 'Amiodarone IV or synchronized cardioversion' },
         { condition: 'PVCs', features: 'Pounding sensation, irregular, usually benign, worse with caffeine', management: 'Reassure, reduce triggers; treat if symptomatic or frequent (> 10%)' },
-        { condition: 'WPW Syndrome', features: 'Young patient, delta waves on ECG (short PR + slurred QRS upstroke)', management: 'AVOID AV nodal blockers (adenosine, diltiazem, digoxin) if AF — causes VF. Procainamide or ablation.' },
+        { condition: 'WPW Syndrome', features: 'Young patient, delta waves on ECG (short PR + slurred QRS upstroke)', management: 'AVOID AV nodal blockers (adenosine, diltiazem, digoxin) if AF  causes VF. Procainamide or ablation.' },
       ],
       noncardiac: [
         { condition: 'Hyperthyroidism', features: 'Weight loss, tremor, heat intolerance, TSH suppressed', management: 'Methimazole, beta-blocker for symptoms' },
@@ -589,9 +589,9 @@ const EXPANDED_SYMPTOMS_DB = [
       immediateECG: 'ECG is the first-line test if palpitations are occurring or just resolved',
       holterMonitor: '24-48h Holter for symptomatic palpitations without capture on resting ECG',
       eventRecorder: '30-day event recorder for infrequent symptoms',
-      labs: ['TSH (rule out hyperthyroidism)', 'CBC (anemia)', 'BMP (electrolytes — K+, Mg2+)', 'Glucose'],
+      labs: ['TSH (rule out hyperthyroidism)', 'CBC (anemia)', 'BMP (electrolytes  K+, Mg2+)', 'Glucose'],
     },
-    mnemonics: ['CHA₂DS₂-VASc for AF stroke risk: CHF, HTN, Age ≥75²,Diabetes, Stroke²,Vascular disease, Age 65-74, Sex female'],
+    mnemonics: ['CHADS-VASc for AF stroke risk: CHF, HTN, Age 75,Diabetes, Stroke,Vascular disease, Age 65-74, Sex female'],
     questions: [
       {
         id: 'palpitations_q001', category: 'pharmacology', difficulty: 'hard',
@@ -605,12 +605,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. Narrow complex tachycardia at 210 bpm with retrograde P waves = AVNRT (AV nodal reentrant tachycardia — the most common SVT). The treatment algorithm for stable narrow complex SVT: (1) Vagal maneuvers first (Valsalva, carotid massage), then (2) Adenosine 6mg rapid IV push (must be pushed rapidly into large vein = AC or central — followed immediately by 20mL NS flush). Adenosine blocks AV node transiently, terminates re-entry circuit. If unsuccessful: repeat 12mg. Adenosine is effective in > 90% of SVT.',
-          whyNotA: 'A is PARTIALLY CORRECT — metoprolol IV can terminate AVNRT and is an alternative but is slower acting and not first-line for acute termination based on ACLS guidelines. Adenosine works within seconds — metoprolol takes minutes.',
+          correct: 'B is CORRECT. Narrow complex tachycardia at 210 bpm with retrograde P waves = AVNRT (AV nodal reentrant tachycardia  the most common SVT). The treatment algorithm for stable narrow complex SVT: (1) Vagal maneuvers first (Valsalva, carotid massage), then (2) Adenosine 6mg rapid IV push (must be pushed rapidly into large vein = AC or central  followed immediately by 20mL NS flush). Adenosine blocks AV node transiently, terminates re-entry circuit. If unsuccessful: repeat 12mg. Adenosine is effective in > 90% of SVT.',
+          whyNotA: 'A is PARTIALLY CORRECT  metoprolol IV can terminate AVNRT and is an alternative but is slower acting and not first-line for acute termination based on ACLS guidelines. Adenosine works within seconds  metoprolol takes minutes.',
           whyNotC: 'C is INCORRECT. Amiodarone is used for ventricular arrhythmias, AF rate control, or when first-line SVT treatments fail. It is not first-line for AVNRT and has significant side effects with chronic use (pulmonary toxicity, thyroid dysfunction, hepatotoxicity).',
           whyNotD: 'D is INCORRECT. Digoxin is not used for acute SVT termination. It is used for rate control in chronic AF. It has a narrow therapeutic index and is rarely used for acute arrhythmia management in modern practice.',
-          whyNotE: 'E is INCORRECT for a HEMODYNAMICALLY STABLE patient. Cardioversion is reserved for hemodynamically UNSTABLE patients (hypotension with SBP < 90, altered mental status, severe chest pain, signs of shock). This patient has BP 100/70 and no instability — follow the medical algorithm first.',
-          keyTakeaway: 'SVT (AVNRT) treatment: Stable → Vagal maneuvers → Adenosine 6mg IV (then 12mg) → Metoprolol/diltiazem IV → Cardioversion if refractory. Unstable → synchronized cardioversion 50-100J immediately. AVOID adenosine in WPW with AF (can precipitate VF).',
+          whyNotE: 'E is INCORRECT for a HEMODYNAMICALLY STABLE patient. Cardioversion is reserved for hemodynamically UNSTABLE patients (hypotension with SBP < 90, altered mental status, severe chest pain, signs of shock). This patient has BP 100/70 and no instability  follow the medical algorithm first.',
+          keyTakeaway: 'SVT (AVNRT) treatment: Stable  Vagal maneuvers  Adenosine 6mg IV (then 12mg)  Metoprolol/diltiazem IV  Cardioversion if refractory. Unstable  synchronized cardioversion 50-100J immediately. AVOID adenosine in WPW with AF (can precipitate VF).',
         },
       },
     ],
@@ -638,7 +638,7 @@ const EXPANDED_SYMPTOMS_DB = [
         { condition: 'Pyelonephritis', features: 'Fever, chills, CVA tenderness, dysuria, bacteriuria', management: 'IV antibiotics if severe, oral FQ if mild-moderate' },
       ],
       benign: [
-        { condition: 'UTI / Cystitis', features: 'Dysuria, frequency, urgency, suprapubic pain', management: 'TMP-SMX or nitrofurantoin × 3-7 days' },
+        { condition: 'UTI / Cystitis', features: 'Dysuria, frequency, urgency, suprapubic pain', management: 'TMP-SMX or nitrofurantoin  3-7 days' },
         { condition: 'BPH with hematuria', features: 'Elderly man, obstructive symptoms, prostate enlarged on DRE', management: 'Alpha-blocker, finasteride; urology referral' },
         { condition: 'Menstrual contamination', features: 'Female patient, menstruating, repeat UA after menstruation' },
       ],
@@ -646,7 +646,7 @@ const EXPANDED_SYMPTOMS_DB = [
     diagnosticApproach: {
       initialWorkup: ['Urinalysis with microscopy', 'Urine culture', 'CBC', 'BUN/Cr', 'PSA in men > 50', 'Urine cytology if smoking history/recurrent'],
       imaging: ['CT urogram (non-contrast phase for stones, contrast phases for masses) = gold standard for upper tract', 'Renal ultrasound (pregnant, renal failure)', 'Cystoscopy (lower tract, gold standard for bladder)'],
-      rule: 'Painless gross hematuria in adult > 40 = MALIGNANCY until proven otherwise — NEVER dismiss',
+      rule: 'Painless gross hematuria in adult > 40 = MALIGNANCY until proven otherwise  NEVER dismiss',
     },
     questions: [
       {
@@ -661,10 +661,10 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. Painless gross hematuria in a male smoker > 40 years old = bladder cancer or upper tract urothelial carcinoma until PROVEN otherwise. The workup must be comprehensive. CT urogram (including unenhanced, corticomedullary, and nephrogenic phases) is the gold standard for upper tract evaluation. It identifies: renal masses, urothelial tumors, stones, and anatomic abnormalities. Cystoscopy will follow to evaluate the bladder (lower tract) — together, CT urogram + cystoscopy = complete hematuria workup.',
-          whyNotA: 'A is INCORRECT as primary study. Urine culture is appropriate to rule out infection but this patient has NO infection features (no WBCs, no nitrites, no fever, no dysuria). Culture has NO role in diagnosing malignancy — the primary concern here.',
-          whyNotC: 'C is INCORRECT. Renal ultrasound alone is insufficient — it misses urothelial tumors (transitional cell carcinoma of ureter/renal pelvis), misses small renal masses, and cannot evaluate the entire urinary tract like CT urogram. AUA guidelines recommend CT urogram.',
-          whyNotD: 'D is INCORRECT and dangerous. Antibiotics treat infection — this patient does NOT have infection. This approach would delay cancer diagnosis by weeks and allow an already advanced cancer to progress further. NEVER assume "UTI" in an adult with painless gross hematuria without ruling out malignancy.',
+          correct: 'B is CORRECT. Painless gross hematuria in a male smoker > 40 years old = bladder cancer or upper tract urothelial carcinoma until PROVEN otherwise. The workup must be comprehensive. CT urogram (including unenhanced, corticomedullary, and nephrogenic phases) is the gold standard for upper tract evaluation. It identifies: renal masses, urothelial tumors, stones, and anatomic abnormalities. Cystoscopy will follow to evaluate the bladder (lower tract)  together, CT urogram + cystoscopy = complete hematuria workup.',
+          whyNotA: 'A is INCORRECT as primary study. Urine culture is appropriate to rule out infection but this patient has NO infection features (no WBCs, no nitrites, no fever, no dysuria). Culture has NO role in diagnosing malignancy  the primary concern here.',
+          whyNotC: 'C is INCORRECT. Renal ultrasound alone is insufficient  it misses urothelial tumors (transitional cell carcinoma of ureter/renal pelvis), misses small renal masses, and cannot evaluate the entire urinary tract like CT urogram. AUA guidelines recommend CT urogram.',
+          whyNotD: 'D is INCORRECT and dangerous. Antibiotics treat infection  this patient does NOT have infection. This approach would delay cancer diagnosis by weeks and allow an already advanced cancer to progress further. NEVER assume "UTI" in an adult with painless gross hematuria without ruling out malignancy.',
           whyNotE: 'E is INCORRECT as the primary study. PSA evaluates the prostate but this patient\'s symptoms suggest bladder or urothelial malignancy (painless hematuria > prostatic symptoms). PSA is a prostate marker, not a bladder cancer marker. Urothelial carcinoma would not cause PSA elevation.',
           keyTakeaway: 'Painless gross hematuria in adult > 40 + smoking history = HIGH suspicion for bladder cancer and urothelial carcinoma. Workup: CT urogram + cystoscopy. Bladder cancer = most common urothelial malignancy. Risk factors: smoking (60% of cases), aniline dyes, schistosomiasis. Transitional cell carcinoma = most common histology.',
         },
@@ -688,20 +688,20 @@ const EXPANDED_SYMPTOMS_DB = [
     differentials: {
       preHepatic: [
         { condition: 'Hemolytic Anemia', features: 'Elevated INDIRECT bilirubin, LDH, Haptoglobin low, Coombs test, anemia', causes: ['Autoimmune', 'G6PD deficiency', 'Sickle cell', 'Hereditary spherocytosis'] },
-        { condition: 'Gilbert Syndrome', features: 'Benign, unconjugated hyperbilirubinemia, no anemia, stress/fasting triggered, UGT1A1 gene mutation', management: 'No treatment needed — reassure patient' },
+        { condition: 'Gilbert Syndrome', features: 'Benign, unconjugated hyperbilirubinemia, no anemia, stress/fasting triggered, UGT1A1 gene mutation', management: 'No treatment needed  reassure patient' },
       ],
       hepatic: [
-        { condition: 'Viral Hepatitis A', features: 'Enteral spread, acute, self-limited, RUQ pain, fever prodrome, ALT 10-100× ULN', management: 'Supportive' },
+        { condition: 'Viral Hepatitis A', features: 'Enteral spread, acute, self-limited, RUQ pain, fever prodrome, ALT 10-100 ULN', management: 'Supportive' },
         { condition: 'Viral Hepatitis B', features: 'Blood/sexual transmission, chronic in 10% adults, HBsAg, anti-HBc, HBeAg', management: 'Monitoring; tenofovir/entecavir if indicated' },
-        { condition: 'Alcoholic Hepatitis', features: 'Heavy alcohol use, AST:ALT > 2:1, Maddrey score > 32 = severe', management: 'Stop alcohol, prednisolone 40mg × 28d if severe, pentoxifylline' },
-        { condition: 'Autoimmune Hepatitis', features: 'Young female, ↑ AST/ALT/IgG, ANA/Anti-smooth muscle Ab+, responds to steroids', management: 'Prednisone + azathioprine' },
+        { condition: 'Alcoholic Hepatitis', features: 'Heavy alcohol use, AST:ALT > 2:1, Maddrey score > 32 = severe', management: 'Stop alcohol, prednisolone 40mg  28d if severe, pentoxifylline' },
+        { condition: 'Autoimmune Hepatitis', features: 'Young female,  AST/ALT/IgG, ANA/Anti-smooth muscle Ab+, responds to steroids', management: 'Prednisone + azathioprine' },
         { condition: 'Drug-Induced Liver Injury (DILI)', features: 'New drug (acetaminophen most common), temporal relationship, exclusion of other causes', management: 'Stop offending drug; NAC if acetaminophen' },
       ],
       postHepatic: [
         { condition: 'Choledocholithiasis', features: 'CBD stone on USS or MRCP, direct/conjugated bilirubin elevated, ALP elevated, CBD > 8mm', management: 'ERCP for stone removal' },
-        { condition: 'Pancreatic Cancer', features: 'PAINLESS progressive jaundice + weight loss + palpable gallbladder (Courvoisier sign) — elderly', management: 'CT abdomen, Whipple procedure if resectable, < 20% are resectable' },
+        { condition: 'Pancreatic Cancer', features: 'PAINLESS progressive jaundice + weight loss + palpable gallbladder (Courvoisier sign)  elderly', management: 'CT abdomen, Whipple procedure if resectable, < 20% are resectable' },
         { condition: 'Ascending Cholangitis', features: 'Charcot triad: RUQ pain + fever + jaundice; Reynold adds AMS + hypotension', management: 'Blood cultures, IV antibiotics + ERCP within 24-48h' },
-        { condition: 'Primary Sclerosing Cholangitis (PSC)', features: 'Associated with UC, beaded biliary ducts on MRCP, ↑ALP, cholestasis', management: 'UDCA (controversial), liver transplant only cure' },
+        { condition: 'Primary Sclerosing Cholangitis (PSC)', features: 'Associated with UC, beaded biliary ducts on MRCP, ALP, cholestasis', management: 'UDCA (controversial), liver transplant only cure' },
       ],
     },
     diagnosticApproach: {
@@ -713,29 +713,29 @@ const EXPANDED_SYMPTOMS_DB = [
       },
     },
     mnemonics: [
-      'Pre-hepatic (UNCONJUGATED bilirubin): Urine — NO bilirubin (not water soluble), pale bile, dark urine NOT present',
-      'Post-hepatic (CONJUGATED bilirubin): Urine — YES bilirubin (dark urine), pale stools (no bile reaching gut)',
-      'Courvoisier\'s law: Enlarged palpable gallbladder + painless jaundice = malignancy (NOT stones — stones cause GB fibrosis/contraction)',
+      'Pre-hepatic (UNCONJUGATED bilirubin): Urine  NO bilirubin (not water soluble), pale bile, dark urine NOT present',
+      'Post-hepatic (CONJUGATED bilirubin): Urine  YES bilirubin (dark urine), pale stools (no bile reaching gut)',
+      'Courvoisier\'s law: Enlarged palpable gallbladder + painless jaundice = malignancy (NOT stones  stones cause GB fibrosis/contraction)',
     ],
     questions: [
       {
         id: 'jaundice_q001', category: 'diagnosis', difficulty: 'hard',
         question: 'A 70-year-old man presents with 6-week progressive jaundice, 8kg weight loss, and pruritus. He has no fever or pain. Exam: markedly icteric, palpable gallbladder, no hepatosplenomegaly. Labs: direct bilirubin 14 mg/dL, ALP 580 (N < 120), ALT 85 (mild), AST 90. Abdominal ultrasound shows dilated CBD (12mm) and pancreatic duct (8mm). What is the MOST LIKELY diagnosis and next best test?',
         choices: [
-          { id: 'A', text: 'Choledocholithiasis — ERCP for stone removal' },
-          { id: 'B', text: 'Viral hepatitis — hepatitis serology panel' },
-          { id: 'C', text: 'Pancreatic head cancer — CT abdomen with contrast (pancreatic protocol)' },
-          { id: 'D', text: 'Primary biliary cholangitis — AMA antibody' },
-          { id: 'E', text: 'Alcoholic hepatitis — AST:ALT ratio' },
+          { id: 'A', text: 'Choledocholithiasis  ERCP for stone removal' },
+          { id: 'B', text: 'Viral hepatitis  hepatitis serology panel' },
+          { id: 'C', text: 'Pancreatic head cancer  CT abdomen with contrast (pancreatic protocol)' },
+          { id: 'D', text: 'Primary biliary cholangitis  AMA antibody' },
+          { id: 'E', text: 'Alcoholic hepatitis  AST:ALT ratio' },
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: "C is CORRECT. This is the classic presentation of pancreatic HEAD carcinoma: (1) PAINLESS progressive jaundice (obstructive mechanism — head compresses CBD), (2) significant weight loss ≥ 5%, (3) pruritus (bile salts in skin), (4) palpable gallbladder (Courvoisier's law — gallbladder cannot contract around a malignant obstruction), (5) double duct sign (dilated CBD + dilated pancreatic duct on ultrasound = CLASSIC for pancreatic head malignancy), (6) cholestatic LFT pattern (very high ALP, mildly elevated hepatocellular enzymes). CT pancreatic protocol (triphasic CT) is the next best test for staging and surgical planning.",
-          whyNotA: 'A is INCORRECT. Choledocholithiasis causes painful obstructive jaundice (biliary colic + jaundice) or cholangitis (+ fever). Stones do NOT cause the double duct sign or a palpable gallbladder (Courvoisier). The palpable gallbladder EXCLUDES stones (chronic inflammation → fibrosis → cannot distend). Weight loss of 8kg and painless jaundice = malignancy.',
-          whyNotB: 'B is INCORRECT. Viral hepatitis causes a HEPATOCELLULAR pattern (ALT/AST dramatically elevated, 10-100× ULN) NOT a cholestatic pattern. This patient has ALP 580 with modestly elevated transaminases — a cholestatic/obstructive pattern. Viral hepatitis does NOT cause a palpable gallbladder or double duct sign.',
+          correct: "C is CORRECT. This is the classic presentation of pancreatic HEAD carcinoma: (1) PAINLESS progressive jaundice (obstructive mechanism  head compresses CBD), (2) significant weight loss  5%, (3) pruritus (bile salts in skin), (4) palpable gallbladder (Courvoisier's law  gallbladder cannot contract around a malignant obstruction), (5) double duct sign (dilated CBD + dilated pancreatic duct on ultrasound = CLASSIC for pancreatic head malignancy), (6) cholestatic LFT pattern (very high ALP, mildly elevated hepatocellular enzymes). CT pancreatic protocol (triphasic CT) is the next best test for staging and surgical planning.",
+          whyNotA: 'A is INCORRECT. Choledocholithiasis causes painful obstructive jaundice (biliary colic + jaundice) or cholangitis (+ fever). Stones do NOT cause the double duct sign or a palpable gallbladder (Courvoisier). The palpable gallbladder EXCLUDES stones (chronic inflammation  fibrosis  cannot distend). Weight loss of 8kg and painless jaundice = malignancy.',
+          whyNotB: 'B is INCORRECT. Viral hepatitis causes a HEPATOCELLULAR pattern (ALT/AST dramatically elevated, 10-100 ULN) NOT a cholestatic pattern. This patient has ALP 580 with modestly elevated transaminases  a cholestatic/obstructive pattern. Viral hepatitis does NOT cause a palpable gallbladder or double duct sign.',
           whyNotD: 'D is INCORRECT. Primary biliary cholangitis (PBC) is an autoimmune cholestatic condition affecting MIDDLE-AGED WOMEN (95%), with anti-mitochondrial antibody (AMA) positive > 95%. It does NOT cause dilated CBD or palpable gallbladder. The sex and presence of a pancreatic duct dilation exclude PBC here.',
           whyNotE: 'E is INCORRECT. Alcoholic hepatitis causes AST:ALT > 2:1 with values rarely > 300, associated with heavy alcohol use, NOT painless progressive jaundice with palpable gallbladder and double duct sign. There is no alcohol history given here.',
-          keyTakeaway: "Pancreatic cancer: Painless jaundice + weight loss + Courvoisier palpable GB + double duct sign on USS = PANCREATIC HEAD CANCER until proven otherwise. CA 19-9 marker but not diagnostic alone. CT pancreatic protocol for staging. Only 20% are resectable (Whipple procedure). 5-year survival < 10%. Remember Courvoisier's law: palpable GB + painless jaundice ≠ stones = malignancy.",
+          keyTakeaway: "Pancreatic cancer: Painless jaundice + weight loss + Courvoisier palpable GB + double duct sign on USS = PANCREATIC HEAD CANCER until proven otherwise. CA 19-9 marker but not diagnostic alone. CT pancreatic protocol for staging. Only 20% are resectable (Whipple procedure). 5-year survival < 10%. Remember Courvoisier's law: palpable GB + painless jaundice  stones = malignancy.",
         },
       },
     ],
@@ -768,7 +768,7 @@ const EXPANDED_SYMPTOMS_DB = [
       ],
       infectious: [
         { condition: 'HIV/AIDS', features: 'Risk factors, CD4 count, opportunistic infections, HIV ELISA + Western blot', management: 'ART (antiretroviral therapy)' },
-        { condition: 'Tuberculosis', features: 'Night sweats, cough, hemoptysis, upper lobe infiltrates, PPD/IGRA +', management: 'RIPE regimen × 6 months' },
+        { condition: 'Tuberculosis', features: 'Night sweats, cough, hemoptysis, upper lobe infiltrates, PPD/IGRA +', management: 'RIPE regimen  6 months' },
       ],
       other: [
         { condition: 'Depression/Psychiatric', features: 'Anhedonia, poor appetite, insomnia, social withdrawal', management: 'SSRIs + psychotherapy' },
@@ -778,7 +778,7 @@ const EXPANDED_SYMPTOMS_DB = [
     },
     diagnosticApproach: {
       initialWorkup: ['Complete history (dietary, social, psychiatric)', 'Physical exam (lymph nodes, organomegaly, masses)', 'CBC, CMP, LFTs, TSH', 'Urinalysis', 'CXR', 'HIV test', 'Age-appropriate cancer screening'],
-      targetedTesting: 'Based on history and initial workup — CT if malignancy suspected',
+      targetedTesting: 'Based on history and initial workup  CT if malignancy suspected',
     },
     questions: [
       {
@@ -793,12 +793,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. This presentation is classic for lymphoma: B symptoms (fever, night sweats, weight loss > 10%), generalized lymphadenopathy (cervical + axillary + inguinal = "three station adenopathy"), elevated LDH (indicator of lymphoma bulk/aggressiveness). Excisional lymph node biopsy is the GOLD STANDARD for lymphoma diagnosis — it provides the entire lymph node architecture (nodal architecture is critical for lymphoma subclass classification: follicular vs diffuse). FNA (choice A) is inadequate for lymphoma because it disrupts the architectural pattern needed for classification.',
-          whyNotA: 'A is INCORRECT. FNA of a lymph node is inadequate for lymphoma diagnosis. It yields only individual cells without preserving tissue architecture. Lymphoma subtype classification (Hodgkin vs non-Hodgkin, follicular vs diffuse large B-cell) REQUIRES the intact node architecture. FNA can suggest malignancy but cannot definitively diagnose/classify lymphoma — excisional biopsy is mandatory.',
-          whyNotC: 'C is INCORRECT as the FIRST step. CT staging is critically important but occurs AFTER histologic diagnosis. You must confirm lymphoma before staging. Staging without diagnosis is inappropriate. The order is: excisional biopsy → diagnosis → CT/PET staging → treatment.',
-          whyNotD: 'D is INCORRECT and dangerous. Empiric antibiotics are appropriate for REACTIVE lymphadenopathy (infectious cause, usually tender, mono-station, tender, < 2cm, improves with treatment). This patient has: generalized three-station adenopathy, rubbery (not tender), B symptoms, elevated LDH, 4-month duration — ALL point to lymphoma. Delaying biopsy by 4 weeks is unacceptable in suspected lymphoma.',
-          whyNotE: 'E is INCORRECT as first test. PET scan is used for STAGING known lymphoma (after diagnosis) and for response assessment. It cannot provide histologic diagnosis. PET lights up in many inflammatory and infectious conditions — biopsy is still required to confirm malignancy.',
-          keyTakeaway: "Lymphoma diagnosis: Excisional lymph node biopsy (NOT FNA) → histology → immunohistochemistry → classification. B symptoms: unintentional fever > 38°C + night sweats + weight loss > 10% in 6 months. Elevated LDH = bad prognosis. Three-station adenopathy = lymphoma until proven otherwise. Hodgkin: Reed-Sternberg cells ('owl eyes' bilobed nucleus).",
+          correct: 'B is CORRECT. This presentation is classic for lymphoma: B symptoms (fever, night sweats, weight loss > 10%), generalized lymphadenopathy (cervical + axillary + inguinal = "three station adenopathy"), elevated LDH (indicator of lymphoma bulk/aggressiveness). Excisional lymph node biopsy is the GOLD STANDARD for lymphoma diagnosis  it provides the entire lymph node architecture (nodal architecture is critical for lymphoma subclass classification: follicular vs diffuse). FNA (choice A) is inadequate for lymphoma because it disrupts the architectural pattern needed for classification.',
+          whyNotA: 'A is INCORRECT. FNA of a lymph node is inadequate for lymphoma diagnosis. It yields only individual cells without preserving tissue architecture. Lymphoma subtype classification (Hodgkin vs non-Hodgkin, follicular vs diffuse large B-cell) REQUIRES the intact node architecture. FNA can suggest malignancy but cannot definitively diagnose/classify lymphoma  excisional biopsy is mandatory.',
+          whyNotC: 'C is INCORRECT as the FIRST step. CT staging is critically important but occurs AFTER histologic diagnosis. You must confirm lymphoma before staging. Staging without diagnosis is inappropriate. The order is: excisional biopsy  diagnosis  CT/PET staging  treatment.',
+          whyNotD: 'D is INCORRECT and dangerous. Empiric antibiotics are appropriate for REACTIVE lymphadenopathy (infectious cause, usually tender, mono-station, tender, < 2cm, improves with treatment). This patient has: generalized three-station adenopathy, rubbery (not tender), B symptoms, elevated LDH, 4-month duration  ALL point to lymphoma. Delaying biopsy by 4 weeks is unacceptable in suspected lymphoma.',
+          whyNotE: 'E is INCORRECT as first test. PET scan is used for STAGING known lymphoma (after diagnosis) and for response assessment. It cannot provide histologic diagnosis. PET lights up in many inflammatory and infectious conditions  biopsy is still required to confirm malignancy.',
+          keyTakeaway: "Lymphoma diagnosis: Excisional lymph node biopsy (NOT FNA)  histology  immunohistochemistry  classification. B symptoms: unintentional fever > 38°C + night sweats + weight loss > 10% in 6 months. Elevated LDH = bad prognosis. Three-station adenopathy = lymphoma until proven otherwise. Hodgkin: Reed-Sternberg cells ('owl eyes' bilobed nucleus).",
         },
       },
     ],
@@ -822,13 +822,13 @@ const EXPANDED_SYMPTOMS_DB = [
       { condition: 'Hypothyroidism', features: 'Cold intolerance, weight gain, constipation, dry skin, hair loss, TSH elevated', management: 'Levothyroxine, start low and dose to TSH normal' },
       { condition: 'Depression', features: 'Anhedonia, sleep disturbance, hopelessness, poor concentration, PHQ-9 scoring', management: 'SSRI + CBT' },
       { condition: 'Diabetes Mellitus', features: 'Polyuria, polydipsia, blurred vision, HbA1c > 6.5%, FBG > 126', management: 'Glucose control, metformin first-line' },
-      { condition: 'Heart Failure', features: 'Exertional dyspnea, orthopnea, edema, BNP elevated, echo shows ↓EF', management: 'ACE-I, beta-blocker, diuretic, aldosterone antagonist' },
+      { condition: 'Heart Failure', features: 'Exertional dyspnea, orthopnea, edema, BNP elevated, echo shows EF', management: 'ACE-I, beta-blocker, diuretic, aldosterone antagonist' },
       { condition: 'Obstructive Sleep Apnea', features: 'Snorer, obese, morning headaches, daytime somnolence, witnessed apneas', management: 'CPAP, weight loss' },
-      { condition: 'Chronic Kidney Disease', features: 'Uremic symptoms, edema, anemia, ↑Cr/BUN, proteinuria', management: 'Manage CKD complications, dialysis when ESRD' },
+      { condition: 'Chronic Kidney Disease', features: 'Uremic symptoms, edema, anemia, Cr/BUN, proteinuria', management: 'Manage CKD complications, dialysis when ESRD' },
       { condition: 'Malignancy (paraneoplastic)', features: 'Associated weight loss, night sweats, adenopathy', management: 'Full cancer workup' },
     ],
     diagnosticApproach: {
-      initialWorkup: ['CBC with differential', 'CMP', 'TSH (high yield — common cause)', 'HbA1c + fasting glucose', 'Iron studies (ferritin, TIBC)', 'Vitamin B12 and folate', 'ESR/CRP (inflammatory)', 'UA'],
+      initialWorkup: ['CBC with differential', 'CMP', 'TSH (high yield  common cause)', 'HbA1c + fasting glucose', 'Iron studies (ferritin, TIBC)', 'Vitamin B12 and folate', 'ESR/CRP (inflammatory)', 'UA'],
     },
     questions: [
       {
@@ -843,12 +843,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'B',
         explanation: {
-          correct: 'B is CORRECT. This is a classic presentation of hypothyroidism: (1) Fatigue, (2) Cold intolerance (metabolic rate reduced), (3) Constipation (GI motility decreased), (4) Weight GAIN despite no dietary change (↓ metabolism), (5) Dry skin and hair loss (skin changes from myxedema). Very common in young to middle-aged women (10× more common in women). TSH will be ELEVATED (pituitary "calling" the thyroid that isn\'t producing enough T4). T4 will be LOW. Treatment: Levothyroxine, dose titrated to normalize TSH.',
-          whyNotA: 'A is PARTIALLY CORRECT — depression shares fatigue, weight changes. However, depression causes weight LOSS (anorexia) more often, and hot flashes or cold intolerance, constipation, hair loss, and dry skin are NOT depression features. The physical signs here point directly to thyroid dysfunction.',
+          correct: 'B is CORRECT. This is a classic presentation of hypothyroidism: (1) Fatigue, (2) Cold intolerance (metabolic rate reduced), (3) Constipation (GI motility decreased), (4) Weight GAIN despite no dietary change ( metabolism), (5) Dry skin and hair loss (skin changes from myxedema). Very common in young to middle-aged women (10 more common in women). TSH will be ELEVATED (pituitary "calling" the thyroid that isn\'t producing enough T4). T4 will be LOW. Treatment: Levothyroxine, dose titrated to normalize TSH.',
+          whyNotA: 'A is PARTIALLY CORRECT  depression shares fatigue, weight changes. However, depression causes weight LOSS (anorexia) more often, and hot flashes or cold intolerance, constipation, hair loss, and dry skin are NOT depression features. The physical signs here point directly to thyroid dysfunction.',
           whyNotC: 'C is INCORRECT as the primary diagnosis. Anemia causes fatigue and pallor but NOT cold intolerance, constipation, weight gain, or hair/skin changes. Anemia can CO-EXIST with hypothyroidism (thyroid hormone needed for erythropoiesis) but is not the underlying diagnosis.',
-          whyNotD: 'D is INCORRECT. Type 2 diabetes causes fatigue (hyperglycemia) but presents with WEIGHT LOSS (in T1DM or when symptomatic), polyuria, polydipsia, and blurred vision — NOT weight gain, cold intolerance, constipation, or hair loss.',
+          whyNotD: 'D is INCORRECT. Type 2 diabetes causes fatigue (hyperglycemia) but presents with WEIGHT LOSS (in T1DM or when symptomatic), polyuria, polydipsia, and blurred vision  NOT weight gain, cold intolerance, constipation, or hair loss.',
           whyNotE: 'E is INCORRECT. Chronic fatigue syndrome (CFS/ME) is a diagnosis of EXCLUSION requiring > 6 months of unexplained fatigue with post-exertional malaise. It does NOT cause the objective metabolic signs (cold intolerance, weight gain, hair loss, constipation) present here. Always exclude thyroid dysfunction first.',
-          keyTakeaway: 'Hypothyroidism mnemonic: SLOW — Slowed metabolism, Lethargy, Obesity tendency, Weight gain. Lab: TSH ↑ (most sensitive), free T4 ↓. Treatment: Levothyroxine (synthroid) start low (25-50mcg/day), titrate every 6 weeks. Hashimoto thyroiditis = most common cause in iodine-sufficient countries (anti-TPO antibodies).',
+          keyTakeaway: 'Hypothyroidism mnemonic: SLOW  Slowed metabolism, Lethargy, Obesity tendency, Weight gain. Lab: TSH  (most sensitive), free T4 . Treatment: Levothyroxine (synthroid) start low (25-50mcg/day), titrate every 6 weeks. Hashimoto thyroiditis = most common cause in iodine-sufficient countries (anti-TPO antibodies).',
         },
       },
     ],
@@ -861,7 +861,7 @@ const EXPANDED_SYMPTOMS_DB = [
     icd10: 'M54',
     clinicalImportance: 'Second most common cause of physician visits. 85-90% are non-specific mechanical and self-limited. Must identify serious causes (fracture, malignancy, cauda equina).',
     redFlags: [
-      'Bilateral leg weakness + urinary retention / fecal incontinence (cauda equina — EMERGENCY)',
+      'Bilateral leg weakness + urinary retention / fecal incontinence (cauda equina  EMERGENCY)',
       'Fever + back pain (epidural abscess, osteomyelitis)',
       'Back pain in cancer patient (metastases)',
       'Age < 20 or > 50 with new back pain (fracture, malignancy)',
@@ -872,7 +872,7 @@ const EXPANDED_SYMPTOMS_DB = [
     ],
     differentials: {
       emergent: [
-        { condition: 'Cauda Equina Syndrome', features: 'EMERGENCY: saddle anesthesia + bilateral leg weakness + urinary/bowel dysfunction', management: 'Emergent MRI, urgent neurosurgery — within 6-24 hours or permanent paralysis' },
+        { condition: 'Cauda Equina Syndrome', features: 'EMERGENCY: saddle anesthesia + bilateral leg weakness + urinary/bowel dysfunction', management: 'Emergent MRI, urgent neurosurgery  within 6-24 hours or permanent paralysis' },
         { condition: 'Epidural Abscess', features: 'Fever + back pain + point tenderness + local warmth; IVDU/immunocompromised risk', management: 'MRI spine, blood cultures, emergent surgical drainage + antibiotics' },
         { condition: 'Vertebral Osteomyelitis', features: 'Fever, localized vertebral tenderness, elevated ESR/CRP, IVDU or bacteremia history', management: 'MRI spine, prolonged IV antibiotics' },
         { condition: 'AAA Rupture / Leaking', features: 'Pulsatile mass, tearing back/flank pain, hemodynamic instability', management: 'Emergency surgery' },
@@ -892,12 +892,12 @@ const EXPANDED_SYMPTOMS_DB = [
       preferredImaging: {
         'Acute + red flags': 'MRI spine (gold standard for soft tissue, cord, infection, tumor)',
         'Fracture suspected': 'CT spine',
-        'No red flags': 'Conservative management — no imaging needed for 4-6 weeks',
+        'No red flags': 'Conservative management  no imaging needed for 4-6 weeks',
       },
     },
     mnemonics: [
       'VINDICATE for red flags: Vascular (AAA), Infection (osteomyelitis/abscess), Neoplasm, Drugs, Inflammation (AS), Cancer/Cauda equina, Anatomic, Trauma, Endocrine (osteoporotic fracture)',
-      'Cauda equina: S-A-D — Saddle anesthesia, Acute urinary retention, Deficit bilateral',
+      'Cauda equina: S-A-D  Saddle anesthesia, Acute urinary retention, Deficit bilateral',
     ],
     questions: [
       {
@@ -912,12 +912,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: 'C is CORRECT. This is spinal cord compression with cauda equina features (bilateral leg weakness + urinary dysfunction + saddle anesthesia in the perineum) in a patient with known metastatic breast cancer. This is a NEUROLOGICAL EMERGENCY. Immediate actions: (1) Dexamethasone 10mg IV loading dose → 4mg q6h to reduce cord edema AND (2) EMERGENT MRI spine (entire spine — multiple levels common in metastatic disease). Radiation therapy or surgical decompression within 24 hours is required to preserve neurological function. Every hour of delay increases risk of permanent paralysis.',
-          whyNotA: 'A is CATASTROPHICALLY INCORRECT. NSAIDs and physical therapy are for mechanical back pain — not for acute spinal cord compression. This patient has bilateral leg weakness + urinary dysfunction + perineal anesthesia in the context of metastatic cancer = spinal cord emergency. Conservative measures would lead to permanent paralysis.',
+          correct: 'C is CORRECT. This is spinal cord compression with cauda equina features (bilateral leg weakness + urinary dysfunction + saddle anesthesia in the perineum) in a patient with known metastatic breast cancer. This is a NEUROLOGICAL EMERGENCY. Immediate actions: (1) Dexamethasone 10mg IV loading dose  4mg q6h to reduce cord edema AND (2) EMERGENT MRI spine (entire spine  multiple levels common in metastatic disease). Radiation therapy or surgical decompression within 24 hours is required to preserve neurological function. Every hour of delay increases risk of permanent paralysis.',
+          whyNotA: 'A is CATASTROPHICALLY INCORRECT. NSAIDs and physical therapy are for mechanical back pain  not for acute spinal cord compression. This patient has bilateral leg weakness + urinary dysfunction + perineal anesthesia in the context of metastatic cancer = spinal cord emergency. Conservative measures would lead to permanent paralysis.',
           whyNotB: 'B is INCORRECT. Plain X-rays show bony metastases but provide no information about cord compression, epidural tumor extension, or soft tissue. MRI is the gold standard and must not be delayed by X-rays in this emergency.',
-          whyNotD: 'D is INCORRECT. Bone scan is for detecting bony metastases throughout the skeleton — it is a STAGING tool, not an emergency diagnostic test. Bone scan does not evaluate soft tissue/cord and takes hours to days between injection and imaging.',
-          whyNotE: 'E is INCORRECT. CT chest is for thoracic staging, not for evaluating spinal cord compression. The spinal cord is the emergency here — CT chest provides no actionable information for this emergency.',
-          keyTakeaway: 'Malignant spinal cord compression = oncological emergency. Presentation: cancer history + back pain + bilateral leg weakness + urinary/bowel dysfunction + saddle anesthesia. Treatment: dexamethasone immediately (10mg IV loading) → MRI spine → radiation or surgical decompression within 24h. Faster = better neurological outcome. "Time is spine."',
+          whyNotD: 'D is INCORRECT. Bone scan is for detecting bony metastases throughout the skeleton  it is a STAGING tool, not an emergency diagnostic test. Bone scan does not evaluate soft tissue/cord and takes hours to days between injection and imaging.',
+          whyNotE: 'E is INCORRECT. CT chest is for thoracic staging, not for evaluating spinal cord compression. The spinal cord is the emergency here  CT chest provides no actionable information for this emergency.',
+          keyTakeaway: 'Malignant spinal cord compression = oncological emergency. Presentation: cancer history + back pain + bilateral leg weakness + urinary/bowel dysfunction + saddle anesthesia. Treatment: dexamethasone immediately (10mg IV loading)  MRI spine  radiation or surgical decompression within 24h. Faster = better neurological outcome. "Time is spine."',
         },
       },
     ],
@@ -937,8 +937,8 @@ const EXPANDED_SYMPTOMS_DB = [
     ],
     differentials: [
       { condition: 'Diabetes Mellitus (Type 1 or 2)', features: 'Osmotic diuresis from hyperglycemia. Polydipsia, polyphagia, weight loss (T1DM). Glucose in urine.', test: 'FBG > 126, HbA1c > 6.5%', management: 'Insulin (T1DM), metformin + lifestyle (T2DM)' },
-      { condition: 'Central Diabetes Insipidus', features: 'ADH deficiency — dilute urine (Uosm < 200), serum Na elevated, head trauma/tumor/surgery/infiltrative disease', test: 'Water deprivation test → confirm with ADH administration', management: 'Desmopressin (DDAVP)' },
-      { condition: 'Nephrogenic Diabetes Insipidus', features: 'Kidney resistant to ADH — lithium, hypercalcemia, hypokalemia, hereditary', test: 'Water deprivation test: urine does NOT concentrate with ADH', management: 'Treat cause; hydrochlorothiazide + low-sodium diet' },
+      { condition: 'Central Diabetes Insipidus', features: 'ADH deficiency  dilute urine (Uosm < 200), serum Na elevated, head trauma/tumor/surgery/infiltrative disease', test: 'Water deprivation test  confirm with ADH administration', management: 'Desmopressin (DDAVP)' },
+      { condition: 'Nephrogenic Diabetes Insipidus', features: 'Kidney resistant to ADH  lithium, hypercalcemia, hypokalemia, hereditary', test: 'Water deprivation test: urine does NOT concentrate with ADH', management: 'Treat cause; hydrochlorothiazide + low-sodium diet' },
       { condition: 'Primary Polydipsia (Psychogenic)', features: 'Psychiatric patient, compulsive drinking, dilute SERUM sodium (not elevated), dilute urine', test: 'Water deprivation test: urine concentrates appropriately' },
       { condition: 'Hypercalcemia', features: '"Bones, stones, groans, psychic moans." Constipation, depression, polyuria from nephrogenic DI effect', test: 'Calcium, PTH, PTHrP' },
       { condition: 'Chronic Kidney Disease', features: 'Loss of concentrating ability, nocturia prominent, uremia symptoms', test: 'Cr, BUN, GFR, UA with casts' },
@@ -960,12 +960,12 @@ const EXPANDED_SYMPTOMS_DB = [
         ],
         correctAnswer: 'C',
         explanation: {
-          correct: "C is CORRECT. This is Nephrogenic Diabetes Insipidus (NDI) caused by LITHIUM toxicity — one of the most classic pharmacology boards questions. Lithium causes collecting duct insensitivity to ADH → cannot concentrate urine regardless of ADH levels. Key clues: (1) Lithium use for 8 years (accumulates and damages aquaporin-2 channels), (2) Dilute urine (Uosm 120 = very dilute, should be > 600-800 with water restriction), (3) Hypernatremia (serum Na 148 = water loss without adequate replacement), (4) Water deprivation does NOT concentrate urine, (5) ADH injection FAILS to concentrate urine (distinguishes nephrogenic from central DI). Treatment: STOP or reduce lithium if possible, low-sodium diet + HCTZ (paradoxically reduces urine volume) + amiloride.",
+          correct: "C is CORRECT. This is Nephrogenic Diabetes Insipidus (NDI) caused by LITHIUM toxicity  one of the most classic pharmacology boards questions. Lithium causes collecting duct insensitivity to ADH  cannot concentrate urine regardless of ADH levels. Key clues: (1) Lithium use for 8 years (accumulates and damages aquaporin-2 channels), (2) Dilute urine (Uosm 120 = very dilute, should be > 600-800 with water restriction), (3) Hypernatremia (serum Na 148 = water loss without adequate replacement), (4) Water deprivation does NOT concentrate urine, (5) ADH injection FAILS to concentrate urine (distinguishes nephrogenic from central DI). Treatment: STOP or reduce lithium if possible, low-sodium diet + HCTZ (paradoxically reduces urine volume) + amiloride.",
           whyNotA: 'A is INCORRECT. Primary (psychogenic) polydipsia: serum sodium would be LOW (diluted by excess water intake), urine concentrates normally with water deprivation, and ADH challenge increases urine osmolality. The HIGH sodium and failure to concentrate with ADH EXCLUDE primary polydipsia.',
-          whyNotB: 'B is INCORRECT. Central DI also has dilute urine + hypernatremia BUT the key difference is: Central DI RESPONDS to ADH (DDAVP) — urine concentrates. This patient DOES NOT respond to ADH = kidney is resistant = nephrogenic. Central DI causes: head trauma, pituitary tumors, neurosurgery, infiltrative diseases (sarcoidosis, histiocytosis).',
-          whyNotD: 'D is INCORRECT. DM causes osmotic diuresis from glycosuria (glucose in urine = glucose attracts water osmotically). Urine would not be maximally dilute — it would be concentrated or isosthenuric (mixed). Serum glucose would be elevated. Water deprivation would not prevent polyuria in DM.',
-          whyNotE: 'E is INCORRECT. SIADH causes LOW sodium (hyponatremia) from water retention — the OPPOSITE of this presentation. SIADH = concentrated urine + dilute serum. This patient has hypernatremia and dilute urine = DI picture.',
-          keyTakeaway: 'Lithium → Nephrogenic DI (aquaporin-2 damage). Water deprivation test: Central DI = responds to DDAVP; Nephrogenic DI = does NOT respond to DDAVP. Primary polydipsia = responds to water deprivation alone (urine concentrates). Treatment of NDI: HCTZ (volume depletion → ↑ proximal tubule water reabsorption → ↓urine volume paradoxically).',
+          whyNotB: 'B is INCORRECT. Central DI also has dilute urine + hypernatremia BUT the key difference is: Central DI RESPONDS to ADH (DDAVP)  urine concentrates. This patient DOES NOT respond to ADH = kidney is resistant = nephrogenic. Central DI causes: head trauma, pituitary tumors, neurosurgery, infiltrative diseases (sarcoidosis, histiocytosis).',
+          whyNotD: 'D is INCORRECT. DM causes osmotic diuresis from glycosuria (glucose in urine = glucose attracts water osmotically). Urine would not be maximally dilute  it would be concentrated or isosthenuric (mixed). Serum glucose would be elevated. Water deprivation would not prevent polyuria in DM.',
+          whyNotE: 'E is INCORRECT. SIADH causes LOW sodium (hyponatremia) from water retention  the OPPOSITE of this presentation. SIADH = concentrated urine + dilute serum. This patient has hypernatremia and dilute urine = DI picture.',
+          keyTakeaway: 'Lithium  Nephrogenic DI (aquaporin-2 damage). Water deprivation test: Central DI = responds to DDAVP; Nephrogenic DI = does NOT respond to DDAVP. Primary polydipsia = responds to water deprivation alone (urine concentrates). Treatment of NDI: HCTZ (volume depletion   proximal tubule water reabsorption  urine volume paradoxically).',
         },
       },
     ],

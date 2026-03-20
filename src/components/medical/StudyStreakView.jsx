@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const XP_TABLE = {
   card_studied: 5, card_mastered: 25, exam_correct: 10, exam_completed: 50,
@@ -97,14 +97,14 @@ export default function StudyStreakView({ flashcards, exams }) {
         <div className="bg-mesh absolute inset-0 opacity-10" />
         <div className="relative z-10">
           <div className="text-5xl mb-2"></div>
-          <div className="text-2xl font-black" style={{ color: 'var(--accent)' }}>Level {curLevel.n} — {curLevel.title}</div>
+          <div className="text-2xl font-black" style={{ color: 'var(--accent)' }}>Level {curLevel.n}  {curLevel.title}</div>
           <div className="text-sm opacity-50 mt-1">{xp.toLocaleString()} XP</div>
           <div className="mt-4 mx-auto max-w-xs">
             <div className="h-3 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div className="h-full rounded-full transition-all" style={{ width: `${levelPct}%`, background: 'var(--accent)' }} />
             </div>
             <p className="text-xs opacity-40 mt-1">
-              {nextLevel ? `${xpInLevel.toLocaleString()} / ${xpNeeded.toLocaleString()} XP → Level ${nextLevel.n} (${nextLevel.title})` : 'Max Level Reached '}
+              {nextLevel ? `${xpInLevel.toLocaleString()} / ${xpNeeded.toLocaleString()} XP  Level ${nextLevel.n} (${nextLevel.title})` : 'Max Level Reached '}
             </p>
           </div>
         </div>

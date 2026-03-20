@@ -1,7 +1,7 @@
 /**
- * MARIAM PRO — Root App Shell
+ * MARIAM PRO  Root App Shell
  * ~80 lines. No business logic, no prop drilling.
- * Wraps providers → error boundary → main app content.
+ * Wraps providers  error boundary  main app content.
  *
  * NOTE: The actual running app is still in /src/App.jsx (the monolith).
  * This shell is the target architecture for when migration is complete.
@@ -36,7 +36,7 @@ function SkeletonLoader() {
   );
 }
 
-// View router (maps view key → lazy component)
+// View router (maps view key  lazy component)
 const VIEW_MAP = {
   flashcards: FlashcardsView,
   exams: ExamsView,
@@ -53,7 +53,7 @@ function AppContent() {
   return (
     <div className="flex flex-col h-dvh" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       <Suspense fallback={<SkeletonLoader />}>
-        {/* Main content area — will be wired to the active view */}
+        {/* Main content area  will be wired to the active view */}
         <div className="flex-1 min-h-0 flex flex-col">
           <SkeletonLoader />
         </div>

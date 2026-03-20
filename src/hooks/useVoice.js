@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — useVoice Hook
+ * MARIAM PRO  useVoice Hook
  * Wraps ProsodyEngine for React components.
  */
 import { useState, useCallback, useRef, useEffect } from 'react';

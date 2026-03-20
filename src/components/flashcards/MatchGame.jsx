@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — Match Game Component
+/**
+ * MARIAM PRO  Match Game Component
  * Memory-style flashcard matching game with timer.
  */
 import React, { useState, useEffect, useMemo } from 'react';
@@ -54,7 +54,7 @@ export default function MatchGame({ set, onClose }) {
     if (newSel.length === 2) {
       setMoves(m => m + 1);
       if (newSel[0].pairId === newSel[1].pairId) {
-        // Green glow burst → then fly-off
+        // Green glow burst  then fly-off
         setMatched(m => new Set([...m, newSel[0].id, newSel[1].id]));
         setSelected([]);
       } else {
@@ -78,7 +78,7 @@ export default function MatchGame({ set, onClose }) {
     <div className="fixed inset-0 z-[9000] flex flex-col" style={{ background: 'var(--bg)' }}>
       <div className="flex items-center justify-between px-5 py-4 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
-          <h2 className="font-black">Match — {set.title}</h2>
+          <h2 className="font-black">Match  {set.title}</h2>
           <p className="text-xs opacity-40 mt-0.5">Tap a term, then its definition</p>
         </div>
         <div className="flex items-center gap-3">

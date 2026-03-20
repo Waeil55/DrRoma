@@ -1,5 +1,5 @@
 /**
- * MARIAM PRO — Lightweight Store (Zustand-like, zero dependencies)
+ * MARIAM PRO  Lightweight Store (Zustand-like, zero dependencies)
  * Uses useSyncExternalStore for tear-free reads.
  * Usage: const useAppStore = createStore(initialState)
  *        const value = useAppStore(state => state.flashcards)

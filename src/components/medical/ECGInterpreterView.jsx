@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const ECG_RHYTHMS = [
@@ -9,27 +9,27 @@ const ECG_RHYTHMS = [
   { name: 'Sinus Bradycardia', cat: 'Bradycardia', rate: '<60', regularity: 'Regular',
     pWave: 'Normal sinus P waves', prInterval: 'Normal', qrsDuration: 'Normal',
     description: 'Normal sinus rhythm at rate <60 bpm. Often physiologic in athletes or during sleep.',
-    criteria: ['Rate <60 bpm', 'Normal P waves before each QRS', 'Normal PR interval', 'Consider: athletes, medications (beta-blockers, CCB), hypothyroidism, ↑ ICP'] },
+    criteria: ['Rate <60 bpm', 'Normal P waves before each QRS', 'Normal PR interval', 'Consider: athletes, medications (beta-blockers, CCB), hypothyroidism,  ICP'] },
   { name: 'Sinus Tachycardia', cat: 'Tachycardia', rate: '100-150', regularity: 'Regular',
     pWave: 'Normal but may be buried in preceding T wave at high rates', prInterval: 'Normal', qrsDuration: 'Normal',
     description: 'Sinus rhythm at rate >100. Always look for underlying cause (pain, anxiety, hypovolemia, sepsis, PE, thyrotoxicosis).',
     criteria: ['Rate 100-150 bpm (rarely >150 in sinus tach at rest)', 'P waves present (may be hard to see at high rates)', 'Gradual onset and offset', 'Treat the cause, not the rhythm'] },
   { name: 'Atrial Fibrillation', cat: 'Arrhythmia', rate: 'Variable', regularity: 'Irregularly irregular',
-    pWave: 'Absent — fibrillatory baseline (f waves)', prInterval: 'None', qrsDuration: 'Usually normal (<120 ms)',
+    pWave: 'Absent  fibrillatory baseline (f waves)', prInterval: 'None', qrsDuration: 'Usually normal (<120 ms)',
     description: 'Most common sustained arrhythmia. Chaotic atrial activity, no organized P waves. Irregular R-R intervals.',
-    criteria: ['Irregularly irregular R-R intervals', 'No P waves — chaotic fibrillatory baseline', 'Variable ventricular rate (usually 80-160 if untreated)', 'Check CHA₂DS₂-VASc for stroke risk → anticoagulation', 'Rate control: beta-blocker or CCB (diltiazem)'] },
+    criteria: ['Irregularly irregular R-R intervals', 'No P waves  chaotic fibrillatory baseline', 'Variable ventricular rate (usually 80-160 if untreated)', 'Check CHADS-VASc for stroke risk  anticoagulation', 'Rate control: beta-blocker or CCB (diltiazem)'] },
   { name: 'Atrial Flutter', cat: 'Arrhythmia', rate: '~150 (2:1 block)', regularity: 'Regular (usually)',
     pWave: 'Sawtooth flutter waves (best in II, III, aVF, V1)', prInterval: 'Flutter interval ~300/min', qrsDuration: 'Normal',
-    description: 'Macro-reentrant circuit in right atrium at ~300 bpm. Usually 2:1 conduction → ventricular rate ~150.',
-    criteria: ['Sawtooth pattern (flutter waves) at ~300/min', 'Regular ventricular rate ~150 (2:1), ~100 (3:1), ~75 (4:1)', 'If rate exactly 150 → think flutter with 2:1 block', 'Treatment: rate control, cardioversion, ablation (very effective)'] },
+    description: 'Macro-reentrant circuit in right atrium at ~300 bpm. Usually 2:1 conduction  ventricular rate ~150.',
+    criteria: ['Sawtooth pattern (flutter waves) at ~300/min', 'Regular ventricular rate ~150 (2:1), ~100 (3:1), ~75 (4:1)', 'If rate exactly 150  think flutter with 2:1 block', 'Treatment: rate control, cardioversion, ablation (very effective)'] },
   { name: 'Ventricular Tachycardia', cat: 'Emergency', rate: '100-250', regularity: 'Usually regular',
     pWave: 'AV dissociation (P waves march through independently)', prInterval: 'None (dissociated)', qrsDuration: '>120 ms (wide QRS)',
     description: 'Life-threatening arrhythmia from ventricular focus. Wide complex tachycardia. Treat as VT until proven otherwise.',
-    criteria: ['Wide QRS >120 ms + rate >100', 'AV dissociation (most specific sign)', 'Fusion / capture beats (pathognomonic)', 'Positive/negative concordance in V1-V6', 'Northwest axis', 'Treatment: stable → amiodarone; unstable → synchronized cardioversion; pulseless → defibrillation'] },
+    criteria: ['Wide QRS >120 ms + rate >100', 'AV dissociation (most specific sign)', 'Fusion / capture beats (pathognomonic)', 'Positive/negative concordance in V1-V6', 'Northwest axis', 'Treatment: stable  amiodarone; unstable  synchronized cardioversion; pulseless  defibrillation'] },
   { name: 'Ventricular Fibrillation', cat: 'Emergency', rate: 'Chaotic', regularity: 'Chaotic',
-    pWave: 'None', prInterval: 'None', qrsDuration: 'None — chaotic waveform',
+    pWave: 'None', prInterval: 'None', qrsDuration: 'None  chaotic waveform',
     description: 'Cardiac arrest rhythm. No organized electrical activity. No cardiac output. Requires immediate defibrillation.',
-    criteria: ['Chaotic, irregular waveform with no discernible P, QRS, or T', 'No pulse → immediately defibrillate (shock first)', 'CPR 2 min → rhythm check → shock if shockable', 'Epinephrine 1 mg q3-5 min', 'Amiodarone 300 mg after 3rd shock'] },
+    criteria: ['Chaotic, irregular waveform with no discernible P, QRS, or T', 'No pulse  immediately defibrillate (shock first)', 'CPR 2 min  rhythm check  shock if shockable', 'Epinephrine 1 mg q3-5 min', 'Amiodarone 300 mg after 3rd shock'] },
   { name: '1st Degree AV Block', cat: 'Block', rate: 'Variable', regularity: 'Regular',
     pWave: 'Normal P before each QRS', prInterval: '>200 ms (>5 small boxes)', qrsDuration: 'Normal',
     description: 'Prolonged PR interval >200 ms. Every P wave is conducted. Usually benign and requires no treatment.',
@@ -37,15 +37,15 @@ const ECG_RHYTHMS = [
   { name: '2nd Degree AV Block - Mobitz I (Wenckebach)', cat: 'Block', rate: 'Variable', regularity: 'Irregular',
     pWave: 'More P waves than QRS', prInterval: 'Progressively prolonging until dropped QRS', qrsDuration: 'Usually normal',
     description: 'Progressive PR prolongation until a beat is dropped. Block is at AV node level. Usually benign.',
-    criteria: ['PR interval gets longer and longer then drops a QRS', 'Group beating pattern', 'R-R interval shortens before the dropped beat', 'Block at AV node → usually benign', 'Associated with inferior MI, medications'] },
+    criteria: ['PR interval gets longer and longer then drops a QRS', 'Group beating pattern', 'R-R interval shortens before the dropped beat', 'Block at AV node  usually benign', 'Associated with inferior MI, medications'] },
   { name: '3rd Degree (Complete) Heart Block', cat: 'Block', rate: '<45 (escape)', regularity: 'Regular (both atria and vent independently)',
     pWave: 'P waves present but dissociated from QRS', prInterval: 'Variable (no AV conduction)', qrsDuration: 'May be wide (ventricular escape) or narrow (junctional escape)',
-    description: 'Complete AV dissociation — no atrial impulses reach the ventricles. Relies on escape rhythm. Requires pacing.',
-    criteria: ['P waves and QRS complexes at independent rates', 'No relationship between P and QRS (AV dissociation)', 'Narrow escape = junctional (40-60 bpm)', 'Wide escape = ventricular (20-40 bpm)', 'Treatment: temporary pacing → permanent pacemaker', 'Atropine may work for junctional escape, NOT ventricular'] },
+    description: 'Complete AV dissociation  no atrial impulses reach the ventricles. Relies on escape rhythm. Requires pacing.',
+    criteria: ['P waves and QRS complexes at independent rates', 'No relationship between P and QRS (AV dissociation)', 'Narrow escape = junctional (40-60 bpm)', 'Wide escape = ventricular (20-40 bpm)', 'Treatment: temporary pacing  permanent pacemaker', 'Atropine may work for junctional escape, NOT ventricular'] },
   { name: 'STEMI (ST Elevation MI)', cat: 'Emergency', rate: 'Variable', regularity: 'Variable',
     pWave: 'Normal (unless concurrent arrhythmia)', prInterval: 'Normal', qrsDuration: 'May develop Q waves',
     description: 'Acute myocardial infarction with ST elevation indicating transmural ischemia. Emergent reperfusion needed.',
-    criteria: ['ST elevation ≥1 mm in ≥2 contiguous limb leads', 'ST elevation ≥2 mm in ≥2 contiguous precordial leads', 'Anterior: V1-V4 (LAD territory)', 'Inferior: II, III, aVF (RCA territory)', 'Lateral: I, aVL, V5-V6 (LCx territory)', 'Reciprocal ST depression opposite territory', 'EMERGENT PCI within 90 min or fibrinolysis within 30 min'] },
+    criteria: ['ST elevation 1 mm in 2 contiguous limb leads', 'ST elevation 2 mm in 2 contiguous precordial leads', 'Anterior: V1-V4 (LAD territory)', 'Inferior: II, III, aVF (RCA territory)', 'Lateral: I, aVL, V5-V6 (LCx territory)', 'Reciprocal ST depression opposite territory', 'EMERGENT PCI within 90 min or fibrinolysis within 30 min'] },
 ];
 
 const catColor = cat => ({ Normal: '#10b981', Bradycardia: '#3b82f6', Tachycardia: '#f59e0b', Arrhythmia: '#8b5cf6', Emergency: '#ef4444', Block: '#6b7280' }[cat] || 'var(--accent)');
@@ -63,7 +63,7 @@ export default function ECGInterpreterView() {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <h2 className="font-black text-xl flex items-center gap-2"> ECG Interpreter</h2>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search rhythms…"
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search rhythms"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         <div className="flex gap-2 overflow-x-auto pb-1">
           {categories.map(c => (
@@ -114,7 +114,7 @@ export default function ECGInterpreterView() {
                     <div className="space-y-1.5">
                       {ecg.criteria.map((c, i) => (
                         <div key={i} className="flex gap-2 text-xs">
-                          <span style={{ color: catColor(ecg.cat) }}>▸</span>
+                          <span style={{ color: catColor(ecg.cat) }}></span>
                           <span className="opacity-70 leading-relaxed">{c}</span>
                         </div>
                       ))}

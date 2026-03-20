@@ -1,6 +1,6 @@
-﻿/**
- * MARIAM PRO — TutorChat
- * Streaming AI tutor chat with voice input — used inside document reader & study views.
+/**
+ * MARIAM PRO  TutorChat
+ * Streaming AI tutor chat with voice input  used inside document reader & study views.
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { Brain, UserCircle2, Mic, MicOff, Send } from 'lucide-react';
@@ -70,7 +70,7 @@ export default function TutorChat({ context, settings, contextLabel = '' }) {
             </div>
             <div className={`px-3 py-2 text-xs leading-relaxed max-w-[85%] rounded-2xl
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'bg-[var(--surface,var(--card))] border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
-              {m.content ? renderAIContent(m.content) : <span className="opacity-40">thinking…</span>}
+              {m.content ? renderAIContent(m.content) : <span className="opacity-40">thinking</span>}
             </div>
           </div>
         ))}
@@ -80,7 +80,7 @@ export default function TutorChat({ context, settings, contextLabel = '' }) {
         <div className="flex gap-2 items-end">
           <textarea value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Ask tutor…" disabled={loading} rows={1}
+            placeholder="Ask tutor" disabled={loading} rows={1}
             className="flex-1 bg-[var(--bg)] border border-[color:var(--border2,var(--border))] rounded-xl px-3 py-2 text-xs outline-none resize-none focus:border-[var(--accent)] text-[var(--text)] min-h-[36px] max-h-24" />
           <button onClick={toggleVoice}
             className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all"

@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
- * MARIAM PRO — GlobalTaskIndicator
+ * MARIAM PRO  GlobalTaskIndicator
  * Fixed-position indicator showing background task progress.
  * Never overlaps bottom navigation. Renders null when no task running.
  */

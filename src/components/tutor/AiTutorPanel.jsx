@@ -1,5 +1,5 @@
-﻿/**
- * MARIAM PRO — AiTutorPanel Component
+/**
+ * MARIAM PRO  AiTutorPanel Component
  * Draggable AI tutor side panel for Flashcards, Exams, Cases.
  */
 import React, { useState, useRef, useEffect } from 'react';
@@ -75,7 +75,7 @@ export default function AiTutorPanel({ settings, context, onClose, width, onDrag
             </div>
             <div className={`px-3 py-2.5 text-sm leading-relaxed rounded-2xl max-w-[85%]
               ${m.role === 'user' ? 'bg-[var(--accent)] text-white rounded-tr-sm' : 'glass border border-[color:var(--border2,var(--border))] rounded-tl-sm'}`}>
-              {m.content ? renderAIContent(m.content) : <span className="opacity-30 animate-pulse">▊</span>}
+              {m.content ? renderAIContent(m.content) : <span className="opacity-30 animate-pulse"></span>}
             </div>
           </div>
         ))}
@@ -105,7 +105,7 @@ export default function AiTutorPanel({ settings, context, onClose, width, onDrag
         <div className="flex gap-2 items-end glass rounded-2xl p-2 border border-[color:var(--border2,var(--border))] focus-within:border-[var(--accent)]/50">
           <textarea value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder="Ask your tutor anything…" disabled={loading} rows={1}
+            placeholder="Ask your tutor anything" disabled={loading} rows={1}
             className="flex-1 bg-transparent p-1.5 text-sm outline-none resize-none max-h-32 custom-scrollbar text-[var(--text)] min-h-[36px]" />
           <button onClick={() => send()} disabled={loading || !input.trim()}
             className="w-9 h-9 bg-[var(--accent)] disabled:opacity-40 rounded-xl text-white flex items-center justify-center shrink-0 shadow-lg">

@@ -82,13 +82,13 @@ export const lawFlashcards = [{
   {
     "id": "law_fc_12",
     "q": "Question 13",
-    "a": "≤1.8 g per 100 mL OR ≤90 mg per dosage unit",
+    "a": "1.8 g per 100 mL OR 90 mg per dosage unit",
     "nextReview": 0
   },
   {
     "id": "law_fc_13",
     "q": "Question 14",
-    "a": "≤200 mg per 100 mL",
+    "a": "200 mg per 100 mL",
     "nextReview": 0
   },
   {
@@ -1774,7 +1774,7 @@ export const lawFlashcards = [{
   {
     "id": "law_fc_294",
     "q": "Question 295",
-    "a": "A low-income subsidy (≤150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
+    "a": "A low-income subsidy (150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
     "nextReview": 0
   },
   {
@@ -1984,7 +1984,7 @@ export const lawFlashcards = [{
   {
     "id": "law_fc_329",
     "q": "Question 330",
-    "a": "Individuals ≥65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
+    "a": "Individuals 65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
     "nextReview": 0
   },
   {
@@ -2050,19 +2050,19 @@ export const lawFlashcards = [{
   {
     "id": "law_fc_340",
     "q": "Question 341",
-    "a": "Children ≤19 and pregnant women",
+    "a": "Children 19 and pregnant women",
     "nextReview": 0
   },
   {
     "id": "law_fc_341",
     "q": "Question 342",
-    "a": "Ages 19-64 with income ≤ ~138% FPL",
+    "a": "Ages 19-64 with income  ~138% FPL",
     "nextReview": 0
   },
   {
     "id": "law_fc_342",
     "q": "Question 343",
-    "a": "Indiana residents ≥65 with income <150% FPL and enrolled in Part D",
+    "a": "Indiana residents 65 with income <150% FPL and enrolled in Part D",
     "nextReview": 0
   },
   {
@@ -2266,7 +2266,7 @@ export const lawExams = [{
     "id": "law_ex_12",
     "q": "What is a key point regarding this item?",
     "options": [
-      "≤1.8 g per 100 mL OR ≤90 mg per dosage unit",
+      "1.8 g per 100 mL OR 90 mg per dosage unit",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -2277,7 +2277,7 @@ export const lawExams = [{
     "id": "law_ex_13",
     "q": "What is a key point regarding this item?",
     "options": [
-      "≤200 mg per 100 mL",
+      "200 mg per 100 mL",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -5368,7 +5368,7 @@ export const lawExams = [{
     "id": "law_ex_294",
     "q": "What is a key point regarding this item?",
     "options": [
-      "A low-income subsidy (≤150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
+      "A low-income subsidy (150% FPL) that reduces Part D costs (e.g., low copays for generics and brands)",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -5753,7 +5753,7 @@ export const lawExams = [{
     "id": "law_ex_329",
     "q": "What is a key point regarding this item?",
     "options": [
-      "Individuals ≥65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
+      "Individuals 65 years of age, individuals with permanent disabilities, individuals with ESRD, individuals exposed to environmental hazards",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -5874,7 +5874,7 @@ export const lawExams = [{
     "id": "law_ex_340",
     "q": "What is a key point regarding this item?",
     "options": [
-      "Children ≤19 and pregnant women",
+      "Children 19 and pregnant women",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -5885,7 +5885,7 @@ export const lawExams = [{
     "id": "law_ex_341",
     "q": "What is a key point regarding this item?",
     "options": [
-      "Ages 19-64 with income ≤ ~138% FPL",
+      "Ages 19-64 with income  ~138% FPL",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"
@@ -5896,7 +5896,7 @@ export const lawExams = [{
     "id": "law_ex_342",
     "q": "What is a key point regarding this item?",
     "options": [
-      "Indiana residents ≥65 with income <150% FPL and enrolled in Part D",
+      "Indiana residents 65 with income <150% FPL and enrolled in Part D",
       "Incorrect Option A",
       "Incorrect Option B",
       "Incorrect Option C"

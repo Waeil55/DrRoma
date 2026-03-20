@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -166,7 +166,7 @@ Provide 6-10 differentials ranked by probability. Be thorough and clinically acc
                 background: 'rgba(99,102,241,0.15)', color: 'var(--accent, #6366f1)',
               }}>
                 {s}
-                <span onClick={() => removeSymptom(s)} style={{ cursor: 'pointer', opacity: 0.7, lineHeight: 1 }}>×</span>
+                <span onClick={() => removeSymptom(s)} style={{ cursor: 'pointer', opacity: 0.7, lineHeight: 1 }}></span>
               </span>
             ))}
           </div>
@@ -326,7 +326,7 @@ Provide 6-10 differentials ranked by probability. Be thorough and clinically acc
                   {h.symptoms.join(', ')}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#666' }}>
-                  {h.age ? `${h.age}yo ` : ''}{h.sex} — {new Date(h.date).toLocaleDateString()}
+                  {h.age ? `${h.age}yo ` : ''}{h.sex}  {new Date(h.date).toLocaleDateString()}
                 </div>
               </button>
             ))}

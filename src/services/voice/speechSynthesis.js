@@ -1,18 +1,18 @@
 /**
- * MARIAM PRO — ProsodyEngine
+ * MARIAM PRO  ProsodyEngine
  * Rich text-to-speech with intelligent prosody, pauses, and filler words.
- * Uses Web Speech API (SpeechSynthesis) — no external dependency.
+ * Uses Web Speech API (SpeechSynthesis)  no external dependency.
  */
 
 /** Medical/educational vocal fillers inserted at natural pause points */
 const VOICE_FILLERS = {
   thinking: ['Hmm, let me think about that...', "That's a great question...", "Let's see...", 'Good point, so...', 'Right, okay...'],
   confirming: ['Exactly!', "That's correct!", 'Perfect!', "You've got it!", 'Well done!'],
-  correcting: ['Not quite — let me clarify...', "Almost, but here's the key difference...", 'Let me walk you through that again...'],
+  correcting: ['Not quite  let me clarify...', "Almost, but here's the key difference...", 'Let me walk you through that again...'],
   transitioning: ['Now, moving on to...', 'Building on that...', "Here's something interesting...", "Let's take this further..."],
 };
 
-/** Punctuation → prosody mapping (pause, pitch, rate deltas) */
+/** Punctuation  prosody mapping (pause, pitch, rate deltas) */
 const PUNCTUATION_PROSODY = {
   '.':   { pauseMs: 350, pitchDelta: -0.08, rateDelta: -0.03 },
   '!':   { pauseMs: 250, pitchDelta: +0.05, rateDelta: +0.04 },
@@ -20,7 +20,7 @@ const PUNCTUATION_PROSODY = {
   ',':   { pauseMs: 150, pitchDelta: 0,     rateDelta: -0.02 },
   ':':   { pauseMs: 200, pitchDelta: -0.04, rateDelta: -0.03 },
   ';':   { pauseMs: 250, pitchDelta: -0.02, rateDelta: -0.02 },
-  '—':   { pauseMs: 220, pitchDelta: -0.02, rateDelta: -0.04 },
+  '':   { pauseMs: 220, pitchDelta: -0.02, rateDelta: -0.04 },
   '\n':  { pauseMs: 300, pitchDelta: 0,     rateDelta: 0 },
 };
 
@@ -219,7 +219,7 @@ class ProsodyEngine {
   /** Register an interrupt callback */
   set onInterrupt(fn) { this._onInterruptCallback = fn; }
 
-  /** Alias for speak() — matches Phase 4 spec naming */
+  /** Alias for speak()  matches Phase 4 spec naming */
   speakWithProsody(text, callbacks) {
     return this.speak(text, callbacks);
   }
@@ -243,7 +243,7 @@ class ProsodyEngine {
   }
 }
 
-// ── Singleton export ──────────────────────────────────────────────────
+//  Singleton export 
 let _instance = null;
 
 export function getProsodyEngine() {
@@ -253,7 +253,7 @@ export function getProsodyEngine() {
   return _instance;
 }
 
-/** Legacy shim — drop-in replacement for the old speakText(text) function */
+/** Legacy shim  drop-in replacement for the old speakText(text) function */
 export function speakText(text) {
   const engine = getProsodyEngine();
   if (!engine) return;
