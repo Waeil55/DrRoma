@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 
 const XP_TABLE = {
   card_studied: 5, card_mastered: 25, exam_correct: 10, exam_completed: 50,
@@ -90,13 +90,13 @@ export default function StudyStreakView({ flashcards, exams }) {
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
-      <h2 className="text-xl font-black flex items-center gap-2">🔥 Study Streak</h2>
+      <h2 className="text-xl font-black flex items-center gap-2"> Study Streak</h2>
 
       {/* Level card */}
       <div className="glass rounded-3xl p-6 text-center relative overflow-hidden" style={{ border: '1px solid var(--accent)/30' }}>
         <div className="bg-mesh absolute inset-0 opacity-10" />
         <div className="relative z-10">
-          <div className="text-5xl mb-2">🏆</div>
+          <div className="text-5xl mb-2"></div>
           <div className="text-2xl font-black" style={{ color: 'var(--accent)' }}>Level {curLevel.n} — {curLevel.title}</div>
           <div className="text-sm opacity-50 mt-1">{xp.toLocaleString()} XP</div>
           <div className="mt-4 mx-auto max-w-xs">
@@ -104,7 +104,7 @@ export default function StudyStreakView({ flashcards, exams }) {
               <div className="h-full rounded-full transition-all" style={{ width: `${levelPct}%`, background: 'var(--accent)' }} />
             </div>
             <p className="text-xs opacity-40 mt-1">
-              {nextLevel ? `${xpInLevel.toLocaleString()} / ${xpNeeded.toLocaleString()} XP → Level ${nextLevel.n} (${nextLevel.title})` : 'Max Level Reached 🎓'}
+              {nextLevel ? `${xpInLevel.toLocaleString()} / ${xpNeeded.toLocaleString()} XP → Level ${nextLevel.n} (${nextLevel.title})` : 'Max Level Reached '}
             </p>
           </div>
         </div>
@@ -113,15 +113,15 @@ export default function StudyStreakView({ flashcards, exams }) {
       {/* Streak stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
-          <div className="text-3xl font-black" style={{ color: currentStreak > 0 ? '#f59e0b' : 'var(--text-secondary)' }}>🔥 {currentStreak}</div>
+          <div className="text-3xl font-black" style={{ color: currentStreak > 0 ? '#f59e0b' : 'var(--text-secondary)' }}> {currentStreak}</div>
           <div className="text-xs opacity-40 mt-1">Current Streak</div>
         </div>
         <div className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
-          <div className="text-3xl font-black" style={{ color: '#8b5cf6' }}>⚡ {longestStreak}</div>
+          <div className="text-3xl font-black" style={{ color: '#8b5cf6' }}> {longestStreak}</div>
           <div className="text-xs opacity-40 mt-1">Longest Streak</div>
         </div>
         <div className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
-          <div className="text-3xl font-black" style={{ color: '#10b981' }}>📅 {dates.length}</div>
+          <div className="text-3xl font-black" style={{ color: '#10b981' }}> {dates.length}</div>
           <div className="text-xs opacity-40 mt-1">Days Studied</div>
         </div>
       </div>
@@ -147,10 +147,10 @@ export default function StudyStreakView({ flashcards, exams }) {
         <h3 className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">XP Breakdown</h3>
         <div className="space-y-2">
           {[
-            { label: 'Cards reviewed', count: totalCards, xp: totalCards * XP_TABLE.card_studied, icon: '📇' },
-            { label: 'Cards mastered', count: masteredCards, xp: masteredCards * (XP_TABLE.card_mastered - XP_TABLE.card_studied), icon: '⭐' },
-            { label: 'Exams completed', count: totalExams, xp: totalExams * XP_TABLE.exam_completed, icon: '📝' },
-            { label: 'Streak bonus', count: currentStreak + ' days', xp: currentStreak * XP_TABLE.streak_day, icon: '🔥' },
+            { label: 'Cards reviewed', count: totalCards, xp: totalCards * XP_TABLE.card_studied, icon: '' },
+            { label: 'Cards mastered', count: masteredCards, xp: masteredCards * (XP_TABLE.card_mastered - XP_TABLE.card_studied), icon: '' },
+            { label: 'Exams completed', count: totalExams, xp: totalExams * XP_TABLE.exam_completed, icon: '' },
+            { label: 'Streak bonus', count: currentStreak + ' days', xp: currentStreak * XP_TABLE.streak_day, icon: '' },
           ].map(item => (
             <div key={item.label} className="flex items-center justify-between px-3 py-2 rounded-xl" style={{ background: 'var(--surface,var(--card))' }}>
               <span className="text-sm">{item.icon} {item.label}</span>

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const RADIOLOGY_APPROACHES = [
-  { id: 'cxr', title: 'Chest X-Ray (CXR)', icon: '🫁',
+  { id: 'cxr', title: 'Chest X-Ray (CXR)', icon: '',
     systematic: [
       { area: 'Technical Quality (RIPE)', checks: ['Rotation: spinous processes equidistant between clavicle heads', 'Inspiration: 5-6 anterior ribs visible above diaphragm', 'Penetration: vertebral bodies just visible behind heart', 'Exposure: adequate brightness/contrast'] },
       { area: 'Airway', checks: ['Trachea: midline (deviation → tension pneumothorax, mass, collapse)', 'Carina: bifurcation at T4-T5', 'Main bronchi: right wider + more vertical', 'ETT if present: tip 2-4 cm above carina'] },
@@ -18,7 +18,7 @@ const RADIOLOGY_APPROACHES = [
       { finding: 'Bilateral diffuse infiltrates', ddx: 'ARDS, pulmonary edema, bilateral pneumonia, pulmonary hemorrhage' },
       { finding: 'Kerley B lines', ddx: 'Pulmonary edema (interstitial), lymphangitic carcinomatosis' },
     ]},
-  { id: 'axr', title: 'Abdominal X-Ray (AXR)', icon: '🫄',
+  { id: 'axr', title: 'Abdominal X-Ray (AXR)', icon: '',
     systematic: [
       { area: 'Technical', checks: ['Supine or erect', 'Adequate coverage: diaphragm to symphysis pubis', 'Patient ID and date'] },
       { area: 'Gas Pattern', checks: ['Small bowel: central, valvulae conniventes (cross entire lumen)', 'Large bowel: peripheral, haustra (do NOT cross entire lumen)', 'Small bowel obstruction: dilated >3 cm, multiple air-fluid levels (erect)', 'Large bowel obstruction: dilated >6 cm (>9 cm cecum = risk of perforation)'] },
@@ -41,7 +41,7 @@ export default function RadiologyInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🔬 Radiology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Radiology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Systematic approach to reading imaging</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -71,7 +71,7 @@ export default function RadiologyInterpreterView() {
 
             {active.commonFindings?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>📋 Common Findings & DDx</h3>
+                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Common Findings & DDx</h3>
                 {active.commonFindings.map((f, i) => (
                   <div key={i} className="py-2" style={{ borderBottom: i < active.commonFindings.length - 1 ? '1px solid var(--border)' : 'none' }}>
                     <div className="text-xs font-black mb-1">{f.finding}</div>

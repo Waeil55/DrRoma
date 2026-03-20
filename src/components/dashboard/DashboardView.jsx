@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — DashboardView Component
  * Main dashboard with stats, recent docs, study progress, quick actions.
  */
@@ -30,7 +30,7 @@ export default function DashboardView({
     { label: 'Exam Qs', value: totalQ, icon: CheckSquare, color: '#3b82f6', sub: `${exams.length} exams` },
     { label: 'Cases', value: totalCases, icon: Activity, color: '#06b6d4', sub: `${cases.length} sets` },
     { label: 'Notes', value: notes.length, icon: PenLine, color: '#f59e0b', sub: 'saved' },
-    { label: 'Study Streak', value: streak, icon: Flame, color: '#ef4444', sub: 'days 🔥', urgent: streak >= 3 },
+    { label: 'Study Streak', value: streak, icon: Flame, color: '#ef4444', sub: 'days ', urgent: streak >= 3 },
   ];
 
   const recentDocs = docs.slice(-4).reverse();
@@ -51,12 +51,12 @@ export default function DashboardView({
               <span className="badge text-xs">
                 {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </span>
-              {streak >= 3 && <span className="badge" style={{ color: '#f59e0b', borderColor: 'rgba(245,158,11,.3)', background: 'rgba(245,158,11,.1)' }}>🔥 {streak} day streak</span>}
-              <span className="badge" style={{ color: 'var(--accent)', borderColor: 'rgba(99,102,241,.3)', background: 'rgba(99,102,241,.1)' }}>🏆 Lv.{curLevel.n} {curLevel.title}</span>
+              {streak >= 3 && <span className="badge" style={{ color: '#f59e0b', borderColor: 'rgba(245,158,11,.3)', background: 'rgba(245,158,11,.1)' }}> {streak} day streak</span>}
+              <span className="badge" style={{ color: 'var(--accent)', borderColor: 'rgba(99,102,241,.3)', background: 'rgba(99,102,241,.1)' }}> Lv.{curLevel.n} {curLevel.title}</span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-black leading-tight"
               style={{ fontFamily: 'Plus Jakarta Sans,system-ui', color: 'var(--text)' }}>
-              {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'} 👋
+              {new Date().getHours() < 12 ? 'Good morning ' : new Date().getHours() < 17 ? 'Good afternoon ' : 'Good evening '} 
             </h1>
             <p className="text-base mt-1 font-medium" style={{ color: 'var(--text2)' }}>
               {docs.length === 0 ? 'Upload a document to get started' : 'Your AI-powered study command center'}

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const PSYCH_TOOLS = [
-  { id: 'phq9', title: 'PHQ-9 (Depression)', icon: '😔', description: 'Patient Health Questionnaire-9',
+  { id: 'phq9', title: 'PHQ-9 (Depression)', icon: '', description: 'Patient Health Questionnaire-9',
     questions: [
       'Little interest or pleasure in doing things',
       'Feeling down, depressed, or hopeless',
@@ -28,7 +28,7 @@ const PSYCH_TOOLS = [
       return { severity: 'Severe', color: '#dc2626', action: 'Immediate pharmacotherapy + psychotherapy, consider referral' };
     },
   },
-  { id: 'gad7', title: 'GAD-7 (Anxiety)', icon: '😰', description: 'Generalized Anxiety Disorder-7',
+  { id: 'gad7', title: 'GAD-7 (Anxiety)', icon: '', description: 'Generalized Anxiety Disorder-7',
     questions: [
       'Feeling nervous, anxious or on edge',
       'Not being able to stop or control worrying',
@@ -51,7 +51,7 @@ const PSYCH_TOOLS = [
       return { severity: 'Severe', color: '#ef4444', action: 'Active treatment recommended' };
     },
   },
-  { id: 'cage', title: 'CAGE (Alcohol)', icon: '🍺', description: 'Cut-Annoyed-Guilty-Eye-opener',
+  { id: 'cage', title: 'CAGE (Alcohol)', icon: '', description: 'Cut-Annoyed-Guilty-Eye-opener',
     questions: [
       'Have you ever felt you should Cut down on your drinking?',
       'Have people Annoyed you by criticizing your drinking?',
@@ -69,7 +69,7 @@ const PSYCH_TOOLS = [
       return { severity: 'Very High Suspicion', color: '#ef4444', action: 'Strongly suggestive of alcohol dependence' };
     },
   },
-  { id: 'mdq', title: 'MDQ (Bipolar)', icon: '🎭', description: 'Mood Disorder Questionnaire',
+  { id: 'mdq', title: 'MDQ (Bipolar)', icon: '', description: 'Mood Disorder Questionnaire',
     questions: [
       'Felt so good or hyper that others thought you were not your normal self',
       'Were so irritable that you shouted at people or started fights',
@@ -115,7 +115,7 @@ export default function PsychiatryScreeningView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🧠 Psychiatry Screening</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Psychiatry Screening</h2>
         <p className="text-xs opacity-40 mt-0.5">Validated screening instruments</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">

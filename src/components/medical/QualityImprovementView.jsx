@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const QI_SECTIONS = [
-  { id: 'pdsa', title: 'PDSA Cycle', icon: '🔄',
+  { id: 'pdsa', title: 'PDSA Cycle', icon: '',
     content: [
       { heading: 'Plan', items: ['State the objective of the test of change', 'Make predictions about what will happen and why', 'Develop a plan: Who? What? When? Where? What data to collect?', 'Plan is based on theory or observation that improvement is possible'] },
       { heading: 'Do', items: ['Carry out the test on a SMALL scale', 'Document problems and unexpected observations', 'Begin data collection and analysis', 'Keep the test small and rapid (days-weeks, not months)'] },
@@ -10,7 +10,7 @@ const QI_SECTIONS = [
       { heading: 'Act', items: ['Adapt the change based on what was learned', 'Options: Adopt (implement), Adapt (modify and re-test), Abandon (try something else)', 'Plan the next cycle', 'Scale up successful changes gradually'] },
     ],
     tips: ['Multiple rapid PDSA cycles > one large project', 'Start small (1 patient, 1 shift, 1 provider)', 'Test predictions — learning from failures is valuable', 'Engage frontline staff from the beginning'] },
-  { id: 'rca', title: 'Root Cause Analysis', icon: '🔍',
+  { id: 'rca', title: 'Root Cause Analysis', icon: '',
     content: [
       { heading: 'When to Use RCA', items: ['Sentinel events (patient death, wrong-site surgery, retained foreign body)', 'Near-miss events with potential for harm', 'Patterns of recurring errors', 'Required by TJC (The Joint Commission) for sentinel events'] },
       { heading: '5 Whys Technique', items: ['Ask "Why?" repeatedly to drill down to root cause', 'Example: Med error → nurse distracted → multiple patients → staffing shortage → budget cuts', 'Go beyond individual blame to SYSTEM factors', 'Usually 4-6 levels of "why" reach the root'] },
@@ -18,7 +18,7 @@ const QI_SECTIONS = [
       { heading: 'Swiss Cheese Model (Reason)', items: ['Multiple layers of defense, each with "holes" (weaknesses)', 'Error occurs when holes align through all layers', 'Solution: add/strengthen barriers (redundancy)', 'System design prevents errors rather than relying on individuals'] },
     ],
     tips: ['Focus on systems, not individuals', 'Ask "What?" and "Why?" not "Who?"', 'Involve all stakeholders in the analysis', 'Strong actions: physical/systemic changes. Weak actions: retraining, policies'] },
-  { id: 'safety', title: 'Patient Safety', icon: '🛡️',
+  { id: 'safety', title: 'Patient Safety', icon: '',
     content: [
       { heading: 'High-Reliability Organization (HRO) Principles', items: ['Preoccupation with failure — report near-misses', 'Reluctance to simplify — don\'t accept easy explanations', 'Sensitivity to operations — situational awareness', 'Commitment to resilience — plan for errors, recover quickly', 'Deference to expertise — let frontline staff speak up'] },
       { heading: 'Safety Culture Elements', items: ['Just culture: distinguish between human error (console), at-risk behavior (coach), and reckless behavior (discipline)', 'Psychological safety: staff feel safe reporting errors', 'Non-punitive reporting systems (PSAs, safety huddles)', 'Learning from events: closed-loop feedback'] },
@@ -34,7 +34,7 @@ function QualityImprovementView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">📋 Quality Improvement</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Quality Improvement</h2>
         <p className="text-xs opacity-40 mt-0.5">PDSA, root cause analysis & patient safety</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -60,7 +60,7 @@ function QualityImprovementView() {
             ))}
             {active.tips && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-black text-sm mb-3" style={{ color: '#f59e0b' }}>💡 Tips</h3>
+                <h3 className="font-black text-sm mb-3" style={{ color: '#f59e0b' }}> Tips</h3>
                 {active.tips.map((t, i) => (
                   <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#f59e0b' }}>▸</span><span className="opacity-70 leading-relaxed">{t}</span></div>
                 ))}

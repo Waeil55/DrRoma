@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 function ObGynCalculatorsView() {
   const [tab, setTab] = useState('edd');
@@ -44,7 +44,7 @@ function ObGynCalculatorsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🤰 OB/GYN Calculators</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> OB/GYN Calculators</h2>
         <div className="flex gap-1 mt-3">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -66,7 +66,7 @@ function ObGynCalculatorsView() {
             </div>
             {edd && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--accent)/30' }}>
-                <h3 className="font-black text-sm mb-3" style={{ color: 'var(--accent)' }}>📅 Estimated Due Date (Naegele's Rule)</h3>
+                <h3 className="font-black text-sm mb-3" style={{ color: 'var(--accent)' }}> Estimated Due Date (Naegele's Rule)</h3>
                 <div className="text-xl font-black" style={{ color: 'var(--accent)' }}>{edd}</div>
                 <div className="text-xs opacity-40 mt-1">LMP + 9 months + 7 days</div>
               </div>
@@ -78,8 +78,8 @@ function ObGynCalculatorsView() {
                 <div className="text-xs opacity-40 mt-1">({gestAge.total} days from LMP)</div>
                 <div className="mt-3 text-xs space-y-1 opacity-60">
                   <div>Trimester: {gestAge.weeks < 13 ? '1st (weeks 1-12)' : gestAge.weeks < 28 ? '2nd (weeks 13-27)' : '3rd (weeks 28-40)'}</div>
-                  <div>Viability: {gestAge.weeks >= 24 ? '✅ Past viability threshold (24 weeks)' : '⚠️ Pre-viable (<24 weeks)'}</div>
-                  <div>Term: {gestAge.weeks >= 37 ? '✅ Term (≥37 weeks)' : gestAge.weeks >= 34 ? 'Late preterm (34-36w)' : 'Preterm (<34 weeks)'}</div>
+                  <div>Viability: {gestAge.weeks >= 24 ? ' Past viability threshold (24 weeks)' : ' Pre-viable (<24 weeks)'}</div>
+                  <div>Term: {gestAge.weeks >= 37 ? ' Term (≥37 weeks)' : gestAge.weeks >= 34 ? 'Late preterm (34-36w)' : 'Preterm (<34 weeks)'}</div>
                 </div>
               </div>
             )}

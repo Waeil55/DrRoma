@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -85,7 +85,7 @@ Examiner response:`,
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🩺 OSCE Prep</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> OSCE Prep</h2>
         <p className="text-xs opacity-40 mt-0.5">Practice clinical examination stations</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -114,7 +114,7 @@ Examiner response:`,
                         color: m.role === 'student' ? '#fff' : 'inherit',
                         border: m.role === 'examiner' ? '1px solid var(--border)' : 'none'
                       }}>
-                        <span className="text-xs font-black opacity-50 block mb-1">{m.role === 'examiner' ? '🩺 Examiner' : '🧑‍⚕️ You'}</span>
+                        <span className="text-xs font-black opacity-50 block mb-1">{m.role === 'examiner' ? ' Examiner' : '‍ You'}</span>
                         {m.text}
                       </div>
                     </div>

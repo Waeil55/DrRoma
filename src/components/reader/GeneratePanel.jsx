@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — GeneratePanel
  * 16 AI tools with config, page range, count, difficulty, language, results preview + save.
  */
@@ -206,7 +206,7 @@ export default function GeneratePanel({ activeDoc, bgTask, onStart, onClear, set
       <button onClick={go} disabled={!!bgTask}
         className="w-full py-4 btn-accent rounded-2xl text-sm font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl">
         {bgTask ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} fill="currentColor" />}
-        {bgTask ? `${bgTask.msg}` : '⚡ Generate Now'}
+        {bgTask ? `${bgTask.msg}` : ' Generate Now'}
       </button>
 
       {bgTask && !bgTask.isFinished && (

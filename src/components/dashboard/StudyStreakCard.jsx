@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — StudyStreakCard
  * Visual streak tracker showing last 7 days plus milestone badges.
  */
@@ -68,7 +68,7 @@ export default function StudyStreakCard({ streakDays = 0, longestStreak = 0, dai
             {earnedMilestones.map(m => (
               <span key={m} className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
                 style={{ background: 'color-mix(in srgb, var(--accent) 20%, transparent)', color: 'var(--accent)' }}>
-                🏆{m}d
+                {m}d
               </span>
             ))}
           </div>

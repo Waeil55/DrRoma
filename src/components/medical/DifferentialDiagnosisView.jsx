@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -93,7 +93,7 @@ Provide 6-10 differentials ranked by probability. Be thorough and clinically acc
     <div style={{ padding: '1.5rem', maxWidth: 900, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>🩻 Differential Diagnosis</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}> Differential Diagnosis</h2>
         <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
           AI-powered clinical reasoning tool
         </p>
@@ -277,7 +277,7 @@ Provide 6-10 differentials ranked by probability. Be thorough and clinically acc
                       padding: '0.2rem 0.55rem', borderRadius: 10, fontSize: '0.75rem', fontWeight: 500,
                       background: 'rgba(239,68,68,0.1)', color: '#ef4444',
                     }}>
-                      🚩 {f}
+                       {f}
                     </span>
                   ))}
                 </div>

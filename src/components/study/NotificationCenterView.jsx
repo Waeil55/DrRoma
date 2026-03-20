@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Bell, Plus, Trash2, AlertCircle } from 'lucide-react';
 
 export default function NotificationCenterView({ flashcards, exams, addToast }) {
@@ -12,7 +12,7 @@ export default function NotificationCenterView({ flashcards, exams, addToast }) 
     setNotifs(updated);
     localStorage.setItem('mariam_notifs', JSON.stringify(updated));
     setShowNew(false);
-    addToast('Reminder set ✓', 'success');
+    addToast('Reminder set ', 'success');
     if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
   };
 

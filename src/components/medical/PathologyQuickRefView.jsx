@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const PATHOLOGY_DATA = [
-  { id: 'neoplasia', title: 'Neoplasia Basics', icon: '🔬',
+  { id: 'neoplasia', title: 'Neoplasia Basics', icon: '',
     items: [
       { term: 'Dysplasia', def: 'Disordered growth with loss of uniformity. Preneoplastic but potentially reversible. NOT cancer yet.', detail: 'Loss of polarity, ↑ mitoses, nuclear pleomorphism, ↑ N:C ratio. Confined to basement membrane.', pearl: 'CIN (cervical intraepithelial neoplasia) = classic example of graded dysplasia → carcinoma in situ → invasive.' },
       { term: 'Carcinoma in situ (CIS)', def: 'Full-thickness dysplasia confined above basement membrane. Pre-invasive malignancy.', detail: 'No stromal invasion = no metastatic potential. Basement membrane intact.', pearl: 'CIS of cervix (CIN III) treated with excision/LEEP. Ductal CIS (DCIS) of breast → risk of invasive ductal carcinoma.' },
@@ -10,7 +10,7 @@ const PATHOLOGY_DATA = [
       { term: 'Anaplasia', def: 'Lack of differentiation (undifferentiated). Hallmark of malignancy.', detail: 'Bizarre giant cells, tumor giant cells, abnormal mitoses, marked pleomorphism, N:C ratio approaches 1:1.', pearl: 'More anaplastic = higher grade = worse prognosis. Exception: seminoma is well-differentiated but still malignant.' },
       { term: 'Grading vs Staging', def: 'Grade = differentiation (how abnormal cells look). Stage = spread (how far).', detail: 'Grade: G1 well-diff, G2 moderate, G3 poor, G4 undifferentiated. Stage: TNM (Tumor size, Nodes, Metastasis).', pearl: 'Staging is the BEST predictor of prognosis, more important than grade.' },
     ]},
-  { id: 'histo', title: 'Classic Histopathology Findings', icon: '🧫',
+  { id: 'histo', title: 'Classic Histopathology Findings', icon: '',
     items: [
       { term: 'Reed-Sternberg cells', def: 'Owl-eye bilobed giant cells. Pathognomonic for Hodgkin lymphoma.', detail: 'CD15+, CD30+, CD20−. "Lacunar" variant = Nodular sclerosis subtype (most common).', pearl: 'RS cells are only ~1% of tumor mass. Background reactive cells (lymphocytes, eosinophils, plasma cells) make up the bulk.' },
       { term: 'Auer rods', def: 'Needle-shaped cytoplasmic inclusions in myeloblasts. Pathognomonic for AML (acute myeloid leukemia).', detail: 'Fused azurophilic granules. Especially prominent in APL (AML M3) = "faggot cells" (bundles of Auer rods).', pearl: 'APL (t(15;17) PML-RARA): medical emergency → DIC. Treat with ATRA + arsenic trioxide.' },
@@ -21,7 +21,7 @@ const PATHOLOGY_DATA = [
       { term: 'Birbeck granules', def: 'Tennis racquet-shaped organelles on EM. Pathognomonic for Langerhans cell histiocytosis (LCH).', detail: 'LCH cells are CD1a+ and S100+. Pentalaminar rod shape on electron microscopy.', pearl: 'LCH spectrum: Letterer-Siwe (disseminated, infants), Hand-Schüller-Christian (triad: skull lesions, DI, exophthalmos), Eosinophilic granuloma (localized bone).' },
       { term: 'Crescents on glomerular biopsy', def: 'Crescentic (RPGN) = rapidly progressive glomerulonephritis. Cellular crescents = proliferating parietal epithelial cells + macrophages in Bowman space.', detail: 'Type I: Anti-GBM (Goodpasture). Type II: Immune complex (SLE, IgA, post-strep). Type III: Pauci-immune (ANCA: GPA, MPA, EGPA).', pearl: 'Crescents = "broken" glomeruli → medical emergency. If >50% glomeruli affected, prognosis poor without aggressive immunosuppression.' },
     ]},
-  { id: 'inflammation', title: 'Inflammation & Repair', icon: '🔥',
+  { id: 'inflammation', title: 'Inflammation & Repair', icon: '',
     items: [
       { term: 'Granulomatous inflammation', def: 'Collection of activated macrophages (epithelioid cells) ± giant cells. Response to persistent stimuli.', detail: 'Caseating: TB, fungi (histo, coccidio). Non-caseating: Sarcoidosis, Crohn disease, Berylliosis, Cat scratch (Bartonella).', pearl: 'Sarcoid = non-caseating granulomas + ↑ ACE + ↑ Ca²⁺ + bilateral hilar LAD. TB = caseating + AFB+ on Ziehl-Neelsen stain.' },
       { term: 'Amyloidosis', def: 'Extracellular deposition of misfolded fibrillar protein. Congo red stain → apple-green birefringence under polarized light.', detail: 'AL (light chain): multiple myeloma, plasma cell disorders. AA (serum amyloid A): chronic inflammatory states (RA, IBD, FMF). ATTR: transthyretin (familial or senile cardiac).', pearl: 'AL amyloid: nephrotic syndrome, restrictive CMP, macroglossia, periorbital purpura (raccoon eyes), carpal tunnel. Treat underlying myeloma.' },
@@ -29,7 +29,7 @@ const PATHOLOGY_DATA = [
       { term: 'Coagulative necrosis', def: 'Cell death with preserved tissue architecture (ghost outlines). Most common. All organs except brain.', detail: 'Caused by ischemia (infarction). Proteins denatured → structure maintained. Eventually replaced by fibrosis.', pearl: 'Brain = liquefactive necrosis (enzymatic). Lung = can be either. TB = caseous (cheesy). Fat necrosis = pancreas (saponification).' },
       { term: 'Apoptosis', def: 'Programmed cell death. Energy-dependent. Single cell "drops out" without inflammation.', detail: 'Intrinsic pathway: mitochondrial (Bax/Bak → cytochrome c → caspase 9). Extrinsic pathway: Fas/FasL, TNF → caspase 8. Both → executioner caspases 3,6,7.', pearl: 'Bodies: Councilman (liver in viral hepatitis/yellow fever), Civatte (lichen planus), apoptotic bodies. Cancer evades apoptosis (Bcl-2 overexpression in follicular lymphoma t(14;18)).' },
     ]},
-  { id: 'stains', title: 'Special Stains & IHC', icon: '🎨',
+  { id: 'stains', title: 'Special Stains & IHC', icon: '',
     items: [
       { term: 'Congo Red', def: 'Amyloid → apple-green birefringence under polarized light.', detail: '', pearl: 'Gold standard for amyloid detection. Biopsy sites: abdominal fat pad, rectal mucosa, or affected organ.' },
       { term: 'PAS (Periodic Acid-Schiff)', def: 'Stains glycogen + basement membranes magenta/pink.', detail: 'Positive: Whipple disease (PAS+ macrophages), fungal cell walls, Ewing sarcoma (glycogen), renal BM (diabetic nephropathy).', pearl: 'PAS-D (diastase resistant): Whipple bacteria persist after diastase digestion. Glycogen is PAS+ but PAS-D negative.' },
@@ -50,7 +50,7 @@ export default function PathologyQuickRefView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🔬 Pathology Quick Ref</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Pathology Quick Ref</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search pathology terms…"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -65,7 +65,7 @@ export default function PathologyQuickRefView() {
               </div>
               <p className="text-sm opacity-70">{item.def}</p>
               {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
-              {item.pearl && <div className="flex items-start gap-2 text-xs" style={{ color: '#f59e0b' }}><span>💎</span><span className="leading-relaxed">{item.pearl}</span></div>}
+              {item.pearl && <div className="flex items-start gap-2 text-xs" style={{ color: '#f59e0b' }}><span></span><span className="leading-relaxed">{item.pearl}</span></div>}
             </div>
           )) : <div className="empty-state py-12"><p className="font-black mt-4">No results</p></div>
         ) : active ? (
@@ -81,7 +81,7 @@ export default function PathologyQuickRefView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>💎</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>

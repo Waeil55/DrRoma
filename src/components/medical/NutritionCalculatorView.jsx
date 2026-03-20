@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 export default function NutritionCalculatorView() {
   const [tab, setTab] = useState('bmr');
@@ -39,7 +39,7 @@ export default function NutritionCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🍎 Nutrition Calculator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Nutrition Calculator</h2>
         <div className="flex gap-1 mt-3 overflow-x-auto pb-1">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -75,7 +75,7 @@ export default function NutritionCalculatorView() {
                 {['male', 'female'].map(s => (
                   <button key={s} onClick={() => setSex(s)} className="flex-1 py-2 rounded-xl text-xs font-black transition-all"
                     style={sex === s ? { background: 'var(--accent)', color: '#fff' } : { background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }}>
-                    {s === 'male' ? '♂' : '♀'} {s}
+                    {s === 'male' ? '' : ''} {s}
                   </button>
                 ))}
               </div>
@@ -182,7 +182,7 @@ export default function NutritionCalculatorView() {
               )}
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-black text-sm mb-3">🏥 ICU Nutrition Guidelines</h3>
+              <h3 className="font-black text-sm mb-3"> ICU Nutrition Guidelines</h3>
               {[
                 'Start enteral nutrition (EN) within 24-48h of ICU admission if hemodynamically stable',
                 'Trophic feeds (10-20 mL/hr) initially, advance over 48-72h to goal',

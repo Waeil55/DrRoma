@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Plus, Trash2, Activity } from 'lucide-react';
 
 const FIELDS = [
@@ -25,7 +25,7 @@ export default function VitalSignsTrackerView({ addToast }) {
     localStorage.setItem('mariam_vitals_log', JSON.stringify(updated));
     setForm({ sbp: '', dbp: '', hr: '', rr: '', temp: '', spo2: '', weight: '' });
     setEditing(false);
-    addToast('Vitals logged ✓', 'success');
+    addToast('Vitals logged ', 'success');
   };
 
   const deleteEntry = (idx) => {
@@ -43,7 +43,7 @@ export default function VitalSignsTrackerView({ addToast }) {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
-          <h2 className="font-black text-xl flex items-center gap-2">❤️ Vitals Tracker</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Vitals Tracker</h2>
           <p className="text-xs opacity-40 mt-0.5"> {vitals.length} readings</p>
         </div>
         <button onClick={() => setEditing(p => !p)} className="btn-accent px-4 py-2 rounded-xl text-xs font-black flex items-center gap-1.5">

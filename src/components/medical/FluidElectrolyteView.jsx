@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 export default function FluidElectrolyteView() {
   const [tab, setTab] = useState('maintenance');
@@ -23,9 +23,9 @@ export default function FluidElectrolyteView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">💧 Fluids & Electrolytes</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Fluids & Electrolytes</h2>
         <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-          {[['maintenance', '💉 Maintenance'], ['sodium', '🧂 Sodium'], ['potassium', '⚡ Potassium'], ['deficit', '📐 Deficit Calculator']].map(([id, label]) => (
+          {[['maintenance', ' Maintenance'], ['sodium', ' Sodium'], ['potassium', ' Potassium'], ['deficit', ' Deficit Calculator']].map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}
               className="px-3 py-1.5 rounded-xl text-xs font-black shrink-0 whitespace-nowrap transition-all"
               style={tab === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
@@ -98,7 +98,7 @@ export default function FluidElectrolyteView() {
               </p>
               <div className="space-y-3">
                 <div className="glass rounded-xl p-4" style={{ background: '#ef444408', border: '1px solid #ef444420' }}>
-                  <h4 className="text-xs font-black" style={{ color: '#ef4444' }}>⚠️ Severe Hyponatremia (Na⁺ &lt;120, symptomatic)</h4>
+                  <h4 className="text-xs font-black" style={{ color: '#ef4444' }}> Severe Hyponatremia (Na⁺ &lt;120, symptomatic)</h4>
                   <p className="text-xs opacity-70 mt-1 leading-relaxed">Give 3% saline 100-150 mL bolus over 10-20 min. Raise Na⁺ by 4-6 mEq in first 6 hours. Max correction: 8-10 mEq/24h. Overcorrection → osmotic demyelination syndrome (ODS).</p>
                 </div>
                 <div className="glass rounded-xl p-4" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
@@ -112,15 +112,15 @@ export default function FluidElectrolyteView() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-black mb-1">Hypovolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>• Diuretics (thiazides)</p><p>• Vomiting/diarrhea</p><p>• Adrenal insufficiency</p><p>• Cerebral salt wasting</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>Diuretics (thiazides)</p><p>Vomiting/diarrhea</p><p>Adrenal insufficiency</p><p>Cerebral salt wasting</p></div>
                 </div>
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-black mb-1">Euvolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>• SIADH (#1 cause)</p><p>• Hypothyroidism</p><p>• Psychogenic polydipsia</p><p>• Beer potomania</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>SIADH (#1 cause)</p><p>Hypothyroidism</p><p>Psychogenic polydipsia</p><p>Beer potomania</p></div>
                 </div>
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-black mb-1">Hypervolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>• Heart failure</p><p>• Cirrhosis</p><p>• Nephrotic syndrome</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>Heart failure</p><p>Cirrhosis</p><p>Nephrotic syndrome</p></div>
                 </div>
               </div>
             </div>
@@ -159,14 +159,14 @@ export default function FluidElectrolyteView() {
                     <p>3. U waves</p>
                     <p>4. Prolonged QT</p>
                     <p className="mt-2"><strong>Causes:</strong></p>
-                    <p>• Diuretics (loop, thiazide)</p>
-                    <p>• Vomiting / NG suction</p>
-                    <p>• Diarrhea</p>
-                    <p>• Insulin / β₂-agonists (shift)</p>
-                    <p>• Renal tubular acidosis</p>
+                    <p>Diuretics (loop, thiazide)</p>
+                    <p>Vomiting / NG suction</p>
+                    <p>Diarrhea</p>
+                    <p>Insulin / β₂-agonists (shift)</p>
+                    <p>Renal tubular acidosis</p>
                     <p className="mt-2"><strong>Replacement:</strong></p>
                     <p>Oral preferred if able. IV: max 20 mEq/hr peripheral, 40 mEq/hr central.</p>
-                    <p>⚠️ Check Mg²⁺ — hypokalemia refractory to correction if Mg²⁺ is also low.</p>
+                    <p> Check Mg²⁺ — hypokalemia refractory to correction if Mg²⁺ is also low.</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function FluidElectrolyteView() {
                     <div className="text-xs font-black opacity-40 mb-1">Free Water Deficit</div>
                     <div className="text-2xl font-black" style={{ color: '#ef4444' }}>{freeWaterDeficit} L</div>
                     <p className="text-xs opacity-50 mt-1">TBW × ((Na⁺/140) – 1)</p>
-                    <p className="text-xs opacity-40 mt-2">⚠️ Replace slowly — max correction 10-12 mEq/24h</p>
+                    <p className="text-xs opacity-40 mt-2"> Replace slowly — max correction 10-12 mEq/24h</p>
                   </div>
                 )}
                 {parseFloat(serumNa) < 135 && naDeficit3Pct && (
@@ -223,7 +223,7 @@ export default function FluidElectrolyteView() {
                     <div className="text-xs font-black opacity-40 mb-1">Na⁺ Deficit (mEq)</div>
                     <div className="text-2xl font-black" style={{ color: '#3b82f6' }}>{naDeficit3Pct} mEq</div>
                     <p className="text-xs opacity-50 mt-1">(Target Na – Current Na) × TBW</p>
-                    <p className="text-xs opacity-40 mt-2">⚠️ Max correction 8-10 mEq/24h to avoid ODS</p>
+                    <p className="text-xs opacity-40 mt-2"> Max correction 8-10 mEq/24h to avoid ODS</p>
                   </div>
                 )}
               </div>

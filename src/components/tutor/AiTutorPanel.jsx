@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — AiTutorPanel Component
  * Draggable AI tutor side panel for Flashcards, Exams, Cases.
  */
@@ -19,7 +19,7 @@ const QUICK_PROMPTS = [
 export default function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOpen = false }) {
   const [msgs, setMsgs] = useState([{
     role: 'assistant',
-    content: "Hi! I'm your AI Tutor 🎓\nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!"
+    content: "Hi! I'm your AI Tutor \nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!"
   }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function AiTutorPanel({ settings, context, onClose, width, onDrag
         setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]);
       }, settings, 4000);
     } catch (e) {
-      setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `⚠️ ${e.message}` }]);
+      setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: ` ${e.message}` }]);
     } finally { setLoading(false); }
   };
 

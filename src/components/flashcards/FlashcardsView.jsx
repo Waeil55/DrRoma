@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — FlashcardsView orchestrator
  * Full flashcard study mode with Quizlet-style 3D flip, swipe gestures,
  * FSRS rating, inline AI tutor, deck list, and PDF export.
@@ -45,12 +45,12 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
     }));
     const xpGain = isMastered ? XP_TABLE.card_mastered : XP_TABLE.card_studied;
     awardXP(xpGain);
-    addToast(`+${xpGain} XP 📚`, 'success');
+    addToast(`+${xpGain} XP `, 'success');
     const insight = checkVariableReward();
     if (insight) setTimeout(() => addToast(insight, 'info'), 800);
     const nextIdx = idx + 1;
     if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); }
-    else { addToast('🎉 Set complete!', 'success'); setSelSet(null); setIdx(0); }
+    else { addToast(' Set complete!', 'success'); setSelSet(null); setIdx(0); }
   }, [selSet, idx, setFlashcards, addToast]);
 
   const handleExport = async (set) => {
@@ -103,13 +103,13 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
               {cardSwipe.swipeHint === 'right' && (
                 <div className="absolute inset-0 rounded-3xl z-10 flex items-center justify-start pl-8 pointer-events-none"
                   style={{ background: 'rgba(16,185,129,0.15)', border: '2px solid #10b981', borderRadius: '1.5rem' }}>
-                  <span className="text-2xl font-black" style={{ color: '#10b981' }}>⚡ Easy</span>
+                  <span className="text-2xl font-black" style={{ color: '#10b981' }}> Easy</span>
                 </div>
               )}
               {cardSwipe.swipeHint === 'left' && (
                 <div className="absolute inset-0 rounded-3xl z-10 flex items-center justify-end pr-8 pointer-events-none"
                   style={{ background: 'rgba(239,68,68,0.15)', border: '2px solid #ef4444', borderRadius: '1.5rem' }}>
-                  <span className="text-2xl font-black" style={{ color: '#ef4444' }}>🔁 Again</span>
+                  <span className="text-2xl font-black" style={{ color: '#ef4444' }}> Again</span>
                 </div>
               )}
               <div style={{ perspective: '1200px', ...cardSwipe.swipeStyle }} className="cursor-grab active:cursor-grabbing">
@@ -148,7 +148,7 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
             {/* Rating buttons */}
             {flipped ? (
               <div className="grid grid-cols-4 gap-3">
-                {[['Again', 0, '#ef4444', '🔁'], ['Hard', 2, '#f59e0b', '😓'], ['Good', 3, '#3b82f6', '👍'], ['Easy', 5, '#10b981', '⚡']].map(([l, q, col, em]) => (
+                {[['Again', 0, '#ef4444', ''], ['Hard', 2, '#f59e0b', ''], ['Good', 3, '#3b82f6', ''], ['Easy', 5, '#10b981', '']].map(([l, q, col, em]) => (
                   <button key={l} onClick={() => rateCard(q)}
                     className="text-white py-4 rounded-2xl text-sm font-black uppercase tracking-wide shadow-lg active:scale-95 transition-all flex flex-col items-center gap-1"
                     style={{ background: col }}>
@@ -251,11 +251,11 @@ export default function FlashcardsView({ flashcards, setFlashcards, settings, ad
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-black text-sm truncate">{set.title}</h3>
-                  {(set.isBuiltin || set.isBuiltIn) && <span className="text-xs font-black px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">📚 Built-in</span>}
+                  {(set.isBuiltin || set.isBuiltIn) && <span className="text-xs font-black px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0"> Built-in</span>}
                 </div>
                 <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {(set.isBuiltin || set.isBuiltIn) ? 'Always available' : new Date(set.createdAt).toLocaleDateString()}</p>
                 {set.docId && docs?.find(d => d.id === set.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === set.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === set.docId).name}</p>
                 )}
                 {set.cards?.some(c => !c.nextReview || c.nextReview <= Date.now()) && (
                   <span className="badge badge-warn mt-1 inline-flex">

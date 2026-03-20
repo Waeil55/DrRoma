@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const PEDS_DRUGS = [
@@ -26,7 +26,7 @@ export default function PediatricDosingView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">👶 Pediatric Dosing</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Pediatric Dosing</h2>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-black opacity-40 block mb-1">Weight (kg)</label>
@@ -89,7 +89,7 @@ export default function PediatricDosingView() {
                     </div>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                    <span className="text-xs font-black" style={{ color: '#f59e0b' }}>⚠️ Notes</span>
+                    <span className="text-xs font-black" style={{ color: '#f59e0b' }}> Notes</span>
                     <p className="text-xs opacity-70 mt-1 leading-relaxed">{drug.notes}</p>
                   </div>
                 </div>

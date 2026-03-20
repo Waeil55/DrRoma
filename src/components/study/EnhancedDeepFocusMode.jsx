@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Focus, Play, Pause, RotateCcw, Brain } from 'lucide-react';
 
 export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exams }) {
@@ -11,9 +11,9 @@ export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exam
   const [sessionGoal, setSessionGoal] = useState('');
 
   const POM_PHASES = {
-    work: { label: '🍅 Focus', mins: 25, color: 'var(--accent)' },
-    shortBreak: { label: '☕ Break', mins: 5, color: 'var(--success)' },
-    longBreak: { label: '🌿 Long Break', mins: 15, color: '#06b6d4' },
+    work: { label: ' Focus', mins: 25, color: 'var(--accent)' },
+    shortBreak: { label: ' Break', mins: 5, color: 'var(--success)' },
+    longBreak: { label: ' Long Break', mins: 15, color: '#06b6d4' },
   };
 
   useEffect(() => {
@@ -28,12 +28,12 @@ export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exam
             setPomPhase(nextPhase);
             setPomSecs(POM_PHASES[nextPhase].mins * 60);
             if ('Notification' in window && Notification.permission === 'granted')
-              new Notification('🍅 Pomodoro complete!', { body: 'Time for a break.' });
+              new Notification(' Pomodoro complete!', { body: 'Time for a break.' });
           } else {
             setPomPhase('work');
             setPomSecs(25 * 60);
             if ('Notification' in window && Notification.permission === 'granted')
-              new Notification('☕ Break over!', { body: 'Back to focus.' });
+              new Notification(' Break over!', { body: 'Back to focus.' });
           }
           return 0;
         }
@@ -69,7 +69,7 @@ export default function EnhancedDeepFocusMode({ active, onExit, flashcards, exam
         </div>
         <div className="flex items-center gap-3">
           <div className="flex gap-1">
-            {[['none', '🔇'], ['rain', '🌧️'], ['white', '📻'], ['focus', '🎵']].map(([m, emoji]) => (
+            {[['none', ''], ['rain', ''], ['white', ''], ['focus', '']].map(([m, emoji]) => (
               <button key={m} onClick={() => setAmbientMode(m)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all"
                 style={{ background: ambientMode === m ? 'var(--accent)/20' : 'transparent', border: ambientMode === m ? '1px solid var(--accent)/40' : '1px solid transparent' }}>

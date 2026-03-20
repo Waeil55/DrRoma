@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — CaseList Component
  * Clinical case set listing with stats and actions.
  */
@@ -65,7 +65,7 @@ export default function CaseList({ cases, setCases, docs, onStartCase, onShowMod
                     {set.questions?.length} cases · {new Date(set.createdAt || 0).toLocaleDateString()}
                   </p>
                   {set.docId && docs?.find(d => d.id === set.docId) && (
-                    <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === set.docId).name}</p>
+                    <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === set.docId).name}</p>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 const IMAGE_QUIZ_QUESTIONS = [
   { id: 1, desc: 'A 45-year-old woman presents with a "butterfly-shaped" erythematous rash across both cheeks and the bridge of the nose, sparing the nasolabial folds. She also reports joint pain and fatigue.',
@@ -58,7 +58,7 @@ export default function ImageQuizView() {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">🔍 Clinical Vignette Quiz</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Clinical Vignette Quiz</h2>
           <span className="text-sm font-black" style={{ color: 'var(--accent)' }}>{score.correct}/{score.total}</span>
         </div>
         <p className="text-xs opacity-40 mt-0.5">Visual diagnosis from clinical descriptions</p>
@@ -70,7 +70,7 @@ export default function ImageQuizView() {
         </div>
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-          <h3 className="font-black text-sm mb-3">📋 Clinical Vignette</h3>
+          <h3 className="font-black text-sm mb-3"> Clinical Vignette</h3>
           <p className="text-sm opacity-80 leading-relaxed">{q.desc}</p>
         </div>
 
@@ -94,15 +94,15 @@ export default function ImageQuizView() {
         ) : (
           <div className="space-y-4 animate-fade-in-up">
             <div className="glass rounded-2xl p-5" style={{ background: '#10b98108', border: '1px solid #10b98130' }}>
-              <h3 className="font-black text-sm mb-1" style={{ color: '#10b981' }}>✅ Key Finding</h3>
+              <h3 className="font-black text-sm mb-1" style={{ color: '#10b981' }}> Key Finding</h3>
               <p className="text-sm opacity-80">{q.finding}</p>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--accent)/30' }}>
-              <h3 className="font-black text-sm mb-1" style={{ color: 'var(--accent)' }}>🏥 Diagnosis</h3>
+              <h3 className="font-black text-sm mb-1" style={{ color: 'var(--accent)' }}> Diagnosis</h3>
               <p className="text-lg font-black">{q.diagnosis}</p>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-black text-sm mb-2">📖 Explanation</h3>
+              <h3 className="font-black text-sm mb-2"> Explanation</h3>
               <p className="text-sm opacity-70 leading-relaxed">{q.explanation}</p>
             </div>
             <button onClick={nextQ} className="btn-accent w-full py-3 rounded-xl font-black">

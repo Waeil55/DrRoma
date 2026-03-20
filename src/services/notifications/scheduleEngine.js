@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — Schedule Engine
  * FSRS-driven review scheduling + exam/task/streak notification triggers.
  * Wired to the NotificationService and FSRS engine.
@@ -27,7 +27,7 @@ export function scheduleFSRSReminders(allDecks) {
     const due = getDueCards(deck.cards || []);
     if (due.length > 0) {
       notifier.schedule(NOTIFICATION_TYPES.REVIEW_DUE, _msUntil('09:00'), {
-        title: `📚 ${due.length} cards due — ${deck.title}`,
+        title: ` ${due.length} cards due — ${deck.title}`,
         body: 'Keep your streak alive! Review now to maximize retention.',
         data: { view: 'flashcards', deckId: deck.id },
       });
@@ -48,13 +48,13 @@ export function scheduleExamReminder(examTitle, examDate) {
 
   if (dayBefore > 0) {
     notifier.schedule(NOTIFICATION_TYPES.EXAM_COUNTDOWN, dayBefore, {
-      title: `📝 Exam tomorrow: ${examTitle}`,
+      title: ` Exam tomorrow: ${examTitle}`,
       body: 'Get a good night\'s sleep! You\'ve prepared well.',
     });
   }
   if (hourBefore > 0) {
     notifier.schedule(NOTIFICATION_TYPES.EXAM_COUNTDOWN, hourBefore, {
-      title: `⏰ Exam in 1 hour: ${examTitle}`,
+      title: ` Exam in 1 hour: ${examTitle}`,
       body: 'Last-minute review? You\'ve got this!',
     });
   }
@@ -68,7 +68,7 @@ export function scheduleStreakAlert(streakDays) {
   const now = new Date();
   if (now.getHours() >= 21) return; // already past 9PM
   notifier.schedule(NOTIFICATION_TYPES.STREAK_ALERT, _msUntil('21:00'), {
-    title: `🔥 ${streakDays}-day streak at risk!`,
+    title: ` ${streakDays}-day streak at risk!`,
     body: 'Study for just 5 minutes to keep your streak alive.',
     data: { view: 'flashcards', requireInteraction: true },
   });
@@ -100,7 +100,7 @@ export function scheduleAllNotifications(state = {}) {
   const now = new Date();
   if (now.getDay() === 0) {
     notifier.schedule('weekly_report', _msUntil('10:00'), {
-      title: '🏆 Weekly Study Report',
+      title: ' Weekly Study Report',
       body: 'Check out your progress this week!',
       data: { view: 'analytics' },
     });
@@ -109,7 +109,7 @@ export function scheduleAllNotifications(state = {}) {
   // Type 6: Daily Study Goal
   if (!dailyGoalMet) {
     notifier.schedule(NOTIFICATION_TYPES.DAILY_GOAL, _msUntil('20:00'), {
-      title: '🎯 Daily Study Goal',
+      title: ' Daily Study Goal',
       body: 'You haven\'t met your daily goal yet. A few minutes can make a difference!',
       data: { view: 'flashcards' },
     });

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { Brain, Zap, Volume2, Mic, ChevronLeft } from 'lucide-react';
 import FSRSFlashcardReview from './FSRSFlashcardReview';
 import MatchGame from '../flashcards/MatchGame';
@@ -25,7 +25,7 @@ export default function SmartStudyMode({ flashcards, exams, cases, settings, add
         <div className="glass rounded-3xl p-6 relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
           <div className="bg-mesh absolute inset-0 opacity-20" />
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4"><div><p className="text-xs font-black uppercase tracking-widest opacity-40">FSRS Review Queue</p><h2 className="text-3xl font-black" style={{ color: 'var(--accent)' }}>{allDue} cards due</h2></div><div className="text-5xl">🧠</div></div>
+            <div className="flex items-center justify-between mb-4"><div><p className="text-xs font-black uppercase tracking-widest opacity-40">FSRS Review Queue</p><h2 className="text-3xl font-black" style={{ color: 'var(--accent)' }}>{allDue} cards due</h2></div><div className="text-5xl"></div></div>
             <div className="flex gap-3 flex-wrap">
               {flashcards.filter(s => (s.cards || []).some(c => !c.nextReview || c.nextReview <= Date.now())).slice(0, 4).map(set => {
                 const due = (set.cards || []).filter(c => !c.nextReview || c.nextReview <= Date.now()).length;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { Plus, PenLine, Download, Trash2, Sparkles, Loader2, ChevronLeft, X } from 'lucide-react';
 import { callAIStreaming } from '../../services/ai/callAIStreaming';
 
@@ -31,10 +31,10 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
     if (editingId === '__new__') {
       const n = { id: Date.now().toString(), title: draft.title || 'Untitled', content: draft.content, tags: draft.tags, createdAt: Date.now(), updatedAt: Date.now() };
       setNotes(p => [n, ...p]);
-      addToast('Note saved ✓', 'success');
+      addToast('Note saved ', 'success');
     } else {
       setNotes(p => p.map(n => n.id === editingId ? { ...n, ...draft, updatedAt: Date.now() } : n));
-      addToast('Note updated ✓', 'success');
+      addToast('Note updated ', 'success');
     }
     setEditingId(null); setShowNew(false);
   };
@@ -65,7 +65,7 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `${note.title.replace(/\s+/g, '-')}.md`; a.click();
     URL.revokeObjectURL(url);
-    addToast('Note exported ✓', 'success');
+    addToast('Note exported ', 'success');
   };
 
   const addTag = () => {
@@ -120,7 +120,7 @@ export default function NotesView({ notes, setNotes, docs, settings, addToast })
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center gap-3">
-          <h2 className="font-black text-lg flex-1">📓 Notes</h2>
+          <h2 className="font-black text-lg flex-1"> Notes</h2>
           <button onClick={openNew} className="btn-accent px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2">
             <Plus size={14} /> New Note
           </button>

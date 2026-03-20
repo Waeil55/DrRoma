@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — Match Game Component
  * Memory-style flashcard matching game with timer.
  */
@@ -93,7 +93,7 @@ export default function MatchGame({ set, onClose }) {
           </div>
           <div className="flex flex-col items-end">
             <span className="text-xs opacity-40">{moves} moves</span>
-            {personalBest !== null && <span className="text-xs font-black" style={{ color: 'var(--accent)' }}>🏆 {fmt(personalBest)}</span>}
+            {personalBest !== null && <span className="text-xs font-black" style={{ color: 'var(--accent)' }}> {fmt(personalBest)}</span>}
           </div>
           <button onClick={onClose} className="w-9 h-9 glass rounded-xl flex items-center justify-center"><X size={16} /></button>
         </div>
@@ -101,7 +101,7 @@ export default function MatchGame({ set, onClose }) {
 
       {done ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 animate-scale-in">
-          <div className="text-6xl">{newRecord ? '🏆' : '🎉'}</div>
+          <div className="text-6xl">{newRecord ? '' : ''}</div>
           <h2 className="text-3xl font-black gradient-text">{newRecord ? 'New Record!' : 'Complete!'}</h2>
           {newRecord && <p className="text-sm font-black" style={{ color: 'var(--accent)' }}>Personal Best: {fmt(elapsed)}</p>}
           <p className="text-sm opacity-50">{moves} moves · {fmt(elapsed)}</p>

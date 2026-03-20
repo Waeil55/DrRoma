@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Plus, Copy, PenLine, Trash2, Clipboard } from 'lucide-react';
 
 const ROUTES = ['PO', 'IV', 'IM', 'SC', 'SL', 'PR', 'Topical', 'Inhaled', 'Nasal', 'Ophthalmic', 'Otic'];
@@ -26,7 +26,7 @@ export default function PrescriptionPadView({ addToast }) {
     setRxList(updated);
     localStorage.setItem('mariam_rx_pad', JSON.stringify(updated));
     setEditing(null);
-    addToast('Prescription saved ✓', 'success');
+    addToast('Prescription saved ', 'success');
   };
 
   const deleteRx = (idx) => {
@@ -38,14 +38,14 @@ export default function PrescriptionPadView({ addToast }) {
   const copyRx = (rx) => {
     const text = `Rx: ${rx.drug}\nDose: ${rx.dose}\nRoute: ${rx.route}\nFrequency: ${rx.freq}\nDuration: ${rx.duration}\nInstructions: ${rx.instructions}\nRefills: ${rx.refills}`;
     navigator.clipboard?.writeText(text);
-    addToast('Copied to clipboard ✓', 'success');
+    addToast('Copied to clipboard ', 'success');
   };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
-          <h2 className="font-black text-xl flex items-center gap-2">📝 Prescription Pad</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Prescription Pad</h2>
           <p className="text-xs opacity-40 mt-0.5">{rxList.length} saved prescriptions</p>
         </div>
         <button onClick={() => { setEditing('new'); setForm({ drug: '', dose: '', route: 'PO', freq: 'OD', duration: '', instructions: '', refills: '0' }); }}
@@ -110,7 +110,7 @@ export default function PrescriptionPadView({ addToast }) {
                     <button key={t.drug} onClick={() => setForm(t)}
                       className="glass px-3 py-1.5 rounded-xl text-xs transition-all hover:opacity-80"
                       style={{ border: '1px solid var(--border)' }}>
-                      💊 {t.drug}
+                       {t.drug}
                     </button>
                   ))}
                 </div>

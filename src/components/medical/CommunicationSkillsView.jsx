@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const COMM_FRAMEWORKS = [
-  { id: 'spikes', title: 'SPIKES Protocol', icon: '💬', description: 'Breaking bad news',
+  { id: 'spikes', title: 'SPIKES Protocol', icon: '', description: 'Breaking bad news',
     steps: [
       { letter: 'S', title: 'Setting', desc: 'Private setting, sit down, involve significant others per patient preference. "Warning shot" that serious information is coming.' },
       { letter: 'P', title: 'Perception', desc: 'Assess what patient already knows/suspects. "What is your understanding of your condition so far?"' },
@@ -13,7 +13,7 @@ const COMM_FRAMEWORKS = [
     ],
     extras: [],
   },
-  { id: 'mi', title: 'Motivational Interviewing', icon: '🎯', description: 'OARS technique for behavior change',
+  { id: 'mi', title: 'Motivational Interviewing', icon: '', description: 'OARS technique for behavior change',
     steps: [
       { letter: 'O', title: 'Open-ended questions', desc: '"Tell me about your experience with..." (not yes/no)' },
       { letter: 'A', title: 'Affirmations', desc: 'Acknowledge strengths and efforts. "It took courage to come in today."' },
@@ -28,7 +28,7 @@ const COMM_FRAMEWORKS = [
       '"On a scale of 1-10, how important is this change to you?" → explore both sides',
     ],
   },
-  { id: 'consent', title: 'Informed Consent', icon: '📋', description: 'Elements of valid consent',
+  { id: 'consent', title: 'Informed Consent', icon: '', description: 'Elements of valid consent',
     steps: [
       { letter: 'D', title: 'Disclosure', desc: 'Diagnosis, proposed treatment, risks, benefits, alternatives (including no treatment), and prognosis.' },
       { letter: 'U', title: 'Understanding', desc: 'Patient must demonstrate understanding. Teach-back method: "Can you explain back what we discussed?"' },
@@ -53,7 +53,7 @@ export default function CommunicationSkillsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🗣️ Communication Skills</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Communication Skills</h2>
         <p className="text-xs opacity-40 mt-0.5">SPIKES, motivational interviewing & consent</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -79,7 +79,7 @@ export default function CommunicationSkillsView() {
             ))}
             {active.extras.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ background: '#10b98108', border: '1px solid #10b98120' }}>
-                <h3 className="font-black text-sm mb-3" style={{ color: '#10b981' }}>💡 Key Points</h3>
+                <h3 className="font-black text-sm mb-3" style={{ color: '#10b981' }}> Key Points</h3>
                 {active.extras.map((e, i) => (
                   <div key={i} className="flex items-start gap-2 text-xs py-1">
                     <span className="shrink-0 mt-0.5" style={{ color: '#10b981' }}>▸</span>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — CasesView orchestrator
  * Three-panel case player (vignette+Q | lab results draggable | AI tutor draggable)
  * Mobile: accordion labs + FAB for tutor
@@ -123,10 +123,10 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
                     className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl flex items-center justify-center gap-2">
                     <ChevronRight size={20} />Next Case
                   </button> :
-                  <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! 🏆', 'success'); }}
+                  <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! ', 'success'); }}
                     className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl"
                     style={{ background: 'var(--success)' }}>
-                    Finish Session 🎉
+                    Finish Session 
                   </button>
               }
             </div>
@@ -288,7 +288,7 @@ export default function CasesView({ cases, setCases, settings, addToast, docs, s
                 <h3 className="font-black text-sm truncate">{set.title}</h3>
                 <p className="text-xs opacity-40 mt-0.5">{set.questions?.length} cases · {new Date(set.createdAt || 0).toLocaleDateString()}</p>
                 {set.docId && docs?.find(d => d.id === set.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === set.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === set.docId).name}</p>
                 )}
               </div>
               <div className="flex gap-2 shrink-0">

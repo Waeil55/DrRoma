@@ -704,10 +704,10 @@ const UiFlowchart = ({ html }) => {
 
 const UiCallout = ({ type, children }) => {
   const map = {
-    warning: { bg: 'rgba(245,158,11,.1)', border: 'rgba(245,158,11,.35)', color: '#f59e0b', icon: 'âš ️' },
-    info:    { bg: 'rgba(14,165,233,.1)',  border: 'rgba(14,165,233,.35)', color: '#0ea5e9', icon: 'â„¹️' },
-    success: { bg: 'rgba(16,185,129,.1)',  border: 'rgba(16,185,129,.35)', color: '#10b981', icon: 'âœ…' },
-    danger:  { bg: 'rgba(244,63,94,.08)',  border: 'rgba(244,63,94,.35)', color: '#f43f5e', icon: 'ðŸš¨' },
+    warning: { bg: 'rgba(245,158,11,.1)', border: 'rgba(245,158,11,.35)', color: '#f59e0b', icon: '' },
+    info:    { bg: 'rgba(14,165,233,.1)',  border: 'rgba(14,165,233,.35)', color: '#0ea5e9', icon: '' },
+    success: { bg: 'rgba(16,185,129,.1)',  border: 'rgba(16,185,129,.35)', color: '#10b981', icon: '' },
+    danger:  { bg: 'rgba(244,63,94,.08)',  border: 'rgba(244,63,94,.35)', color: '#f43f5e', icon: '' },
   };
   const s = map[type] || map.info;
   return (
@@ -764,12 +764,12 @@ const getXPToNext = (xp) => {
 };
 
 const VARIABLE_REWARD_INSIGHTS = [
-  "🧠 You're in the top learning zone — keep this session going!",
-  "📈 Your review consistency is building long-term retention.",
-  "🔥 Spaced repetition is proven to outperform cramming by 200%.",
-  "💡 Each card you review strengthens the neural pathway.",
-  "⭐ You're building clinical intuition one card at a time.",
-  "🏆 Medical mastery is built through consistent daily practice.",
+  " You're in the top learning zone — keep this session going!",
+  " Your review consistency is building long-term retention.",
+  " Spaced repetition is proven to outperform cramming by 200%.",
+  " Each card you review strengthens the neural pathway.",
+  " You're building clinical intuition one card at a time.",
+  " Medical mastery is built through consistent daily practice.",
 ];
 
 /** Award XP and persist to localStorage. Returns new total XP. */
@@ -1347,7 +1347,7 @@ const exportToPDF = async (type, data, title, addToast) => {
     }
 
     doc.save(`${title.replace(/[^a-zA-Z0-9]/g, '_')}_${type}.pdf`);
-    if (addToast) addToast('PDF exported! ðŸ“„', 'success');
+    if (addToast) addToast('PDF exported! ', 'success');
   } catch (e) {
     console.error('PDF export error:', e);
     if (addToast) addToast(`PDF export failed: ${e.message}`, 'error');
@@ -1643,7 +1643,7 @@ function DashboardView({ docs, flashcards, exams, cases, notes, chatSessions, se
     { label: 'Exam Qs', value: totalQ, icon: CheckSquare, color: '#3b82f6', sub: `${exams.length} exams` },
     { label: 'Cases', value: totalCases, icon: Activity, color: '#06b6d4', sub: `${cases.length} sets` },
     { label: 'Notes', value: notes.length, icon: PenLine, color: '#f59e0b', sub: 'saved' },
-    { label: 'Study Streak', value: streak, icon: Flame, color: '#ef4444', sub: 'days ðŸ”¥', urgent: streak >= 3 },
+    { label: 'Study Streak', value: streak, icon: Flame, color: '#ef4444', sub: 'days ', urgent: streak >= 3 },
   ];
 
   const recentDocs = docs.slice(-4).reverse();
@@ -1660,10 +1660,10 @@ function DashboardView({ docs, flashcards, exams, cases, notes, chatSessions, se
               <span className="badge text-xs">
                 {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </span>
-              {streak >= 3 && <span className="badge" style={{ color: '#f59e0b', borderColor: 'rgba(245,158,11,.3)', background: 'rgba(245,158,11,.1)' }}>ðŸ”¥ {streak} day streak</span>}
+              {streak >= 3 && <span className="badge" style={{ color: '#f59e0b', borderColor: 'rgba(245,158,11,.3)', background: 'rgba(245,158,11,.1)' }}> {streak} day streak</span>}
             </div>
             <h1 className="text-2xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)]" style={{ fontFamily: 'Plus Jakarta Sans,system-ui', color: 'var(--text)' }}>
-              {new Date().getHours() < 12 ? 'Good morning â˜€️' : new Date().getHours() < 17 ? 'Good afternoon ðŸŒ¤' : 'Good evening ðŸŒ™'} ðŸ‘‹
+              {new Date().getHours() < 12 ? 'Good morning â˜€' : new Date().getHours() < 17 ? 'Good afternoon ' : 'Good evening '} 
             </h1>
             <p className="text-base mt-1 font-medium" style={{ color: 'var(--text2)' }}>
               {docs.length === 0 ? 'Upload a document to get started' : 'Your AI-powered study command center'}
@@ -2136,7 +2136,7 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
       setStartPage(1); setEndPage(data.totalPages);
       addToast(`"${file.name}" loaded!`, 'success');
       awardXPLocalStorage(XP_TABLE.file_uploaded);
-      addToast(`+${XP_TABLE.file_uploaded} XP 📁`, 'success');
+      addToast(`+${XP_TABLE.file_uploaded} XP `, 'success');
     } catch (e) { addToast(e.message, 'error'); }
     finally { setUploading(false); }
   };
@@ -2344,7 +2344,7 @@ function QuickGenerateModal({ type, docs, settings, onClose, onTaskStart, addToa
                   className={`py-2.5 rounded-xl text-xs font-bold border transition-all
                     ${difficulty === i + 1 ? 'text-white border-transparent shadow-md' : 'glass border-[color:var(--border2,var(--border))] opacity-60 hover:opacity-100'}`}
                   style={difficulty === i + 1 ? { background: ['#10b981', '#f59e0b', '#ef4444'][i] } : {}}>
-                  {['ðŸŸ¢', 'ðŸŸ¡', 'ðŸ”´'][i]} {l}
+                  {['', '', ''][i]} {l}
                 </button>
               ))}
             </div>
@@ -2468,7 +2468,7 @@ function AIDisclaimer() {
       border: '1px solid rgba(245,158,11,0.15)',
       color: 'var(--text)',
     }}>
-      âš ️ AI-generated educational content. Verify before clinical use. Not medical advice.
+      AI-generated educational content. Verify before clinical use. Not medical advice.
     </div>
   );
 }
@@ -2518,7 +2518,7 @@ function LegalAcceptanceModal({ onAccept }) {
           </div>
           <div className="rounded-xl p-3 mt-1" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
             <p className="text-xs font-bold leading-relaxed" style={{ color: '#ef4444' }}>
-              âš ️ MARIAM PRO is an educational tool for exam preparation ONLY.
+              MARIAM PRO is an educational tool for exam preparation ONLY.
               It is NOT a clinical decision support system and must NEVER be used for real patient care.
             </p>
           </div>
@@ -2550,7 +2550,7 @@ function LegalAcceptanceModal({ onAccept }) {
               cursor: allChecked ? 'pointer' : 'not-allowed',
               opacity: allChecked ? 1 : 0.5,
             }}>
-            {allChecked ? 'I Agree â€” Get Started ðŸŽ‰' : `Check all ${REQUIRED_CHECKBOXES.length} boxes to continue`}
+            {allChecked ? 'I Agree â€” Get Started ' : `Check all ${REQUIRED_CHECKBOXES.length} boxes to continue`}
           </button>
         </div>
       </div>
@@ -2567,7 +2567,7 @@ function CookieConsentBanner({ onAccept, onDecline }) {
       <div className="glass rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3"
         style={{ border: '1px solid var(--border)' }}>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-black mb-0.5" style={{ color: 'var(--text)' }}>ðŸª Cookie Preferences</p>
+          <p className="text-xs font-black mb-0.5" style={{ color: 'var(--text)' }}>Cookie Preferences</p>
           <p className="text-xs opacity-60 leading-relaxed">
             We use essential cookies to run the app, and optional analytics to improve it.
             Your choice is remembered.
@@ -2979,7 +2979,7 @@ function TutorChat({ context, settings, contextLabel = '' }) {
       const hist = newMsgs.slice(-20).map(m => `${m.role === 'user' ? 'STUDENT' : 'TUTOR'}: ${m.content}`).join('\n');
       const prompt = `Expert tutor. Document context:\n${JSON.stringify(context, null, 2)}\n\nConversation:\n${hist}\n\nStudent: ${msg}\n\nAnswer concisely but completely.`;
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 3000);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš ️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš  ${e.message}` }]); }
     finally { setLoading(false); }
   };
 
@@ -3264,7 +3264,7 @@ function SymptomsView({ settings }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm truncate">{sym.symptom || sym.name}</p>
                   <p className="text-xs opacity-50">{sym.system || ''}</p>
-                  {sym.redFlags?.length > 0 && <span className="text-xs font-bold" style={{ color: '#ef4444' }}>⚠ {sym.redFlags.length} red flags</span>}
+                  {sym.redFlags?.length > 0 && <span className="text-xs font-bold" style={{ color: '#ef4444' }}> {sym.redFlags.length} red flags</span>}
                 </div>
               </button>
             ))}
@@ -3294,7 +3294,7 @@ function SymptomsView({ settings }) {
                 <div className="space-y-4">
                   {selectedSymptom.redFlags?.length > 0 && (
                     <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.4)', background: 'rgba(239,68,68,0.06)' }}>
-                      <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>⚠ Red Flags</p>
+                      <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}> Red Flags</p>
                       {selectedSymptom.redFlags.map((f, i) => <div key={i} className="flex items-start gap-2 text-sm"><span className="text-red-400 shrink-0">•</span>{f}</div>)}
                     </div>
                   )}
@@ -3379,7 +3379,7 @@ function SymptomsView({ settings }) {
                     </div>
                     {quizState.revealed && q.explanation && (
                       <div className="glass rounded-2xl p-4 text-sm" style={{ border: `1px solid ${isCorrect ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                        <p className="font-bold mb-2" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+                        <p className="font-bold mb-2" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? ' Correct!' : ' Incorrect'}</p>
                         <p className="opacity-90">{q.explanation.correct}</p>
                         {q.explanation.keyTakeaway && <p className="text-xs opacity-70 mt-2 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}><span className="font-bold">Key Takeaway: </span>{q.explanation.keyTakeaway}</p>}
                       </div>
@@ -3517,7 +3517,7 @@ function CounselingTherapyView({ settings }) {
                   {selected.keyFacts?.length > 0 && (
                     <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(16,185,129,0.3)' }}>
                       <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#10b981' }}>Key Facts</p>
-                      {selected.keyFacts.map((f, i) => <div key={i} className="flex items-start gap-2 text-sm mb-1"><span style={{ color: '#10b981' }}>✓</span>{f}</div>)}
+                      {selected.keyFacts.map((f, i) => <div key={i} className="flex items-start gap-2 text-sm mb-1"><span style={{ color: '#10b981' }}></span>{f}</div>)}
                     </div>
                   )}
                   {selected.mnemonics?.length > 0 && (
@@ -3612,7 +3612,7 @@ function CounselingTherapyView({ settings }) {
                     </div>
                     {quizState.revealed && q.explanation && (
                       <div className="glass rounded-2xl p-4 text-sm" style={{ border: `1px solid ${isCorrect ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
-                        <p className="font-bold mb-2" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+                        <p className="font-bold mb-2" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? ' Correct!' : ' Incorrect'}</p>
                         <p className="opacity-90">{q.explanation.correct}</p>
                         {q.explanation.keyTakeaway && <p className="text-xs opacity-70 mt-2 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}><span className="font-bold">Key Takeaway: </span>{q.explanation.keyTakeaway}</p>}
                       </div>
@@ -3769,7 +3769,7 @@ function MedicinesView({ settings }) {
                     <div className="flex gap-2 flex-wrap mt-2">
                       <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={{ background: 'rgba(var(--acc-rgb,99,102,241),0.15)', color: 'var(--accent)' }}>{selectedDrug.drugClass}</span>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-lg" style={scheduleColor(selectedDrug.schedule)}>{selectedDrug.schedule || 'Rx Only'}</span>
-                      {selectedDrug.blackBoxWarning && <span className="text-xs font-black px-2 py-0.5 rounded-lg flex items-center gap-1" style={{ background: 'rgba(0,0,0,0.8)', color: '#fff' }}>â¬› BLACK BOX</span>}
+                      {selectedDrug.blackBoxWarning && <span className="text-xs font-black px-2 py-0.5 rounded-lg flex items-center gap-1" style={{ background: 'rgba(0,0,0,0.8)', color: '#fff' }}>BLACK BOX</span>}
                     </div>
                   </div>
                 </div>
@@ -3832,7 +3832,7 @@ function MedicinesView({ settings }) {
                     )}
                     {selectedDrug.mnemonics?.length > 0 && (
                       <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(139,92,246,0.3)', background: 'rgba(139,92,246,0.05)' }}>
-                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#8b5cf6' }}>ðŸ§  Mnemonics</p>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#8b5cf6' }}>Mnemonics</p>
                         {selectedDrug.mnemonics.map(m => (
                           <p key={m} className="text-sm font-medium mb-1.5">{m}</p>
                         ))}
@@ -3880,7 +3880,7 @@ function MedicinesView({ settings }) {
                     )}
                     {selectedDrug.sideEffects.serious?.length > 0 && (
                       <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }}>
-                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>âš ️ Serious / Severe</p>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>Serious / Severe</p>
                         <div className="space-y-1.5">
                           {selectedDrug.sideEffects.serious.map(s => (
                             <div key={s} className="flex items-start gap-2 text-sm">
@@ -3952,7 +3952,7 @@ function MedicinesView({ settings }) {
                 {activeTab === 'pharmacology' && selectedDrug.pharmacokinetics && (
                   <>
                     <div className="grid grid-cols-2 gap-3">
-                      {[{ key: 'absorption', label: 'Absorption', icon: 'â¬†️' }, { key: 'distribution', label: 'Distribution', icon: 'ðŸ”„' }, { key: 'metabolism', label: 'Metabolism', icon: 'âš—️' }, { key: 'elimination', label: 'Elimination', icon: 'â¬‡️' }].filter(({ key }) => selectedDrug.pharmacokinetics[key]).map(({ key, label, icon }) => (
+                      {[{ key: 'absorption', label: 'Absorption', icon: '' }, { key: 'distribution', label: 'Distribution', icon: '' }, { key: 'metabolism', label: 'Metabolism', icon: '' }, { key: 'elimination', label: 'Elimination', icon: '' }].filter(({ key }) => selectedDrug.pharmacokinetics[key]).map(({ key, label, icon }) => (
                         <div key={key} className="glass rounded-2xl p-4 col-span-1" style={{ border: '1px solid var(--border)' }}>
                           <p className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">{icon} {label}</p>
                           <p className="text-xs leading-relaxed">{selectedDrug.pharmacokinetics[key]}</p>
@@ -4028,7 +4028,7 @@ function MedicinesView({ settings }) {
                       </div>
                       {revealed && q.explanation && (
                         <div className="glass rounded-2xl p-4 text-sm space-y-2" style={{ border: `1px solid ${isCorrect ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}`, background: isCorrect ? 'rgba(16,185,129,0.05)' : 'rgba(239,68,68,0.05)' }}>
-                          <p className="font-bold" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
+                          <p className="font-bold" style={{ color: isCorrect ? '#10b981' : '#ef4444' }}>{isCorrect ? ' Correct!' : ' Incorrect'}</p>
                           <p className="opacity-90 leading-relaxed">{q.explanation.correct}</p>
                           {q.explanation.keyTakeaway && <p className="text-xs opacity-70 mt-2 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}><span className="font-bold">Key Takeaway: </span>{q.explanation.keyTakeaway}</p>}
                         </div>
@@ -4310,7 +4310,7 @@ function DiseaseExplorerView({ settings }) {
                   {d.icd10 && <p className="text-xs opacity-35 truncate">ICD-10: {d.icd10}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  {d.tags?.includes('emergency') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>âš ️</span>}
+                  {d.tags?.includes('emergency') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>âš </span>}
                   {d.tags?.includes('usmle-high-yield') && <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444' }}>HY</span>}
                 </div>
               </div>
@@ -4498,7 +4498,7 @@ function DiseaseExplorerView({ settings }) {
                   <>
                     {selectedDisease.treatment?.acute && (
                       <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.04)' }}>
-                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>ðŸš¨ Acute Management</p>
+                        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: '#ef4444' }}>Acute Management</p>
                         <div className="space-y-1.5">
                           {(selectedDisease.treatment.acute || []).map(t => (
                             <div key={t} className="flex items-start gap-2 text-sm">
@@ -4834,10 +4834,10 @@ function HomeHubView({ docs, uploading, onUpload, onOpen, onDelete, flashcards, 
                 <span className="text-xs font-bold uppercase tracking-[.15em] px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'rgba(255,255,255,.9)' }}>
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                 </span>
-                {streak >= 3 && <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}>ðŸ”¥ {streak} day streak</span>}
+                {streak >= 3 && <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}> {streak} day streak</span>}
               </div>
               <h1 className="text-base lg:text-lg font-bold text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans,system-ui' }}>
-                {new Date().getHours() < 12 ? 'Good morning â˜€️' : new Date().getHours() < 17 ? 'Good afternoon ðŸŒ¤' : 'Good evening ðŸŒ™'}
+                {new Date().getHours() < 12 ? 'Good morning â˜€' : new Date().getHours() < 17 ? 'Good afternoon ' : 'Good evening '}
               </h1>
               <p className="text-sm mt-1 text-white/70 font-medium">
                 {dueCards > 0 ? `${dueCards} cards due · ${docs.length} docs · ${totalQ} questions` : docs.length === 0 ? 'Upload your first document to get started' : `${totalCards} cards · ${totalQ} questions · ${totalCases} cases`}
@@ -5667,7 +5667,7 @@ function ChatPanel({ activeDoc, settings, currentPage }) {
       const hist = msgs.slice(-6).map(m => `${m.role === 'user' ? 'USER' : 'AI'}: ${m.content}`).join('\n');
       const prompt = `DOCUMENT:\n${textContext}\n\nCONVERSATION:\n${hist}\n\nQUESTION: ${msg}\n\nAnswer clearly and precisely.`;
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 4000);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš ️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš  ${e.message}` }]); }
     finally { setLoading(false); }
   };
 
@@ -5868,7 +5868,7 @@ function KeyInfoPanel({ card, examQ }) {
       {/* Header */}
       <div className="px-4 py-2.5 flex items-center gap-2 border-b" style={{ borderColor: 'var(--accent)', borderBottomWidth: 1, opacity: 0.85 }}>
         <BookOpen size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>ðŸ“‹ Key Reference</span>
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>Key Reference</span>
       </div>
       <div className="px-4 py-3 space-y-3">
         {/* Drug identity row */}
@@ -5901,7 +5901,7 @@ function KeyInfoPanel({ card, examQ }) {
         {/* Counseling points */}
         {counselingPoints.length > 0 && (
           <div className="pt-2 border-t" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
-            <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-2">⭐ Top Counseling Points</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider opacity-40 mb-2">Top Counseling Points</p>
             <ul className="space-y-1.5">
               {counselingPoints.map((pt, i) => (
                 <li key={i} className="flex gap-2 text-xs leading-relaxed">
@@ -5922,7 +5922,7 @@ function KeyInfoPanel({ card, examQ }) {
    AI TUTOR PANEL â€” draggable side panel for Flashcards, Exams, Cases
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function AiTutorPanel({ settings, context, onClose, width, onDragStart, alwaysOpen = false }) {
-  const [msgs, setMsgs] = useState([{ role: 'assistant', content: "Hi! I'm your AI Tutor ðŸŽ“\nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!" }]);
+  const [msgs, setMsgs] = useState([{ role: 'assistant', content: "Hi! I'm your AI Tutor \nAsk me anything about this question, the diagnosis, the explanation, or related concepts. I'm here to help you learn!" }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showQuicks, setShowQuicks] = useState(true);
@@ -5955,13 +5955,13 @@ CORE RESPONSE RULES:
 QUESTION-TYPE SPECIFIC RULES:
 - "Explain this in detail" â†’ Cover: definition/core concept, mechanism of action or pathophysiology, clinical significance, dosing/key numbers if applicable, 1-2 clinical pearls. Max 8 lines. Stay strictly on the exact topic above.
 - "Why is this the correct answer?" â†’ State the correct answer clearly. Explain the mechanism/reasoning in 4-5 lines. Then for each WRONG option explain exactly why it is incorrect. End with what makes this a high-yield exam point.
-- "What are common mistakes here?" â†’ List exactly 4-5 common student mistakes about THIS specific topic. Format each as: âŒ Mistake â†’ âœ… Correct fact. Be very specific to the context above.
+- "What are common mistakes here?" â†’ List exactly 4-5 common student mistakes about THIS specific topic. Format each as:  Mistake â†’ âœ… Correct fact. Be very specific to the context above.
 - "Give me a mnemonic" â†’ Provide 1-2 powerful mnemonics SPECIFIC to this topic. Explain each letter/element with its clinical meaning. Give a memory tip.
 - "What else should I know?" â†’ Give 6-8 high-yield additional facts: exam traps, monitoring parameters, contraindications, drug interactions, or clinical nuances that students commonly miss.
 - "Create a practice question" â†’ Write 1 USMLE-style MCQ with a clinical vignette, 4-5 options (A-E), the correct answer with a detailed explanation, and why each wrong answer is incorrect.
 
 MANDATORY KEY REFERENCE â€” add this after EVERY response (after a "---" divider):
-ðŸ“‹ **Key Reference**
+ **Key Reference**
 - If drug/counseling topic: **Brand:** [brand name] | **Generic:** [generic name] | **Class:** [drug class]
   **Top Counseling Points:** (bullet list of 3-4 most critical counseling points for this specific drug)
 - If disease topic: **Disease:** [name] | **Key Sx:** [2-3 classic symptoms] | **First-Line Tx:** [treatment] | **Pearl:** [must-remember fact]
@@ -5969,7 +5969,7 @@ MANDATORY KEY REFERENCE â€” add this after EVERY response (after a "---" di
 - If general concept: **Topic:** [name] | **Core Concept:** [1-line] | **High-Yield:** [most testable fact]`;
       const prompt = `${sysPrompt}\n\nConversation history:\n${hist}\n\nSTUDENT: ${msg}\n\nTUTOR:`;
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 5000);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš ️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš  ${e.message}` }]); }
     finally { setLoading(false); }
   };
 
@@ -6116,7 +6116,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
     const isMastered = q >= 5;
     const xpGain = isMastered ? XP_TABLE.card_mastered : XP_TABLE.card_studied;
     awardXPLocalStorage(xpGain);
-    addToast(`+${xpGain} XP 📚`, 'success');
+    addToast(`+${xpGain} XP `, 'success');
     // Variable reward insight: after every 10th card (40% chance)
     try {
       const count = parseInt(localStorage.getItem('mariam_cards_rated') || '0', 10) + 1;
@@ -6128,7 +6128,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
     } catch {}
     const nextIdx = idx + 1;
     if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); }
-    else { addToast('🎉 Set complete!', 'success'); setSelSet(null); setIdx(0); }
+    else { addToast(' Set complete!', 'success'); setSelSet(null); setIdx(0); }
   }, [selSet, idx, setFlashcards, addToast]);
 
   const handleExport = async (set) => {
@@ -6184,7 +6184,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
             {/* Rating buttons */}
             {flipped ? (
               <div className="grid grid-cols-4 gap-3">
-                {[['Again', 0, '#ef4444', 'ðŸ”'], ['Hard', 2, '#f59e0b', 'ðŸ˜“'], ['Good', 3, '#3b82f6', 'ðŸ‘'], ['Easy', 5, '#10b981', 'âš¡']].map(([l, q, col, em]) => (
+                {[['Again', 0, '#ef4444', ''], ['Hard', 2, '#f59e0b', ''], ['Good', 3, '#3b82f6', ''], ['Easy', 5, '#10b981', 'âš¡']].map(([l, q, col, em]) => (
                   <button key={l} onClick={() => rateCard(q)}
                     className="text-white py-4 rounded-2xl text-sm font-semibold uppercase tracking-wide shadow-lg active:scale-95 transition-all flex flex-col items-center gap-1"
                     style={{ background: col }}>
@@ -6286,11 +6286,11 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-sm truncate">{set.title}</h3>
-                  {(set.isBuiltin || set.isBuiltIn) && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">ðŸ“š Built-in</span>}
+                  {(set.isBuiltin || set.isBuiltIn) && <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/20 shrink-0">Built-in</span>}
                 </div>
                 <p className="text-xs opacity-40 mt-0.5">{set.cards?.length} cards · {(set.isBuiltin || set.isBuiltIn) ? 'Always available' : new Date(set.createdAt).toLocaleDateString()}</p>
                 {set.docId && docs?.find(d => d.id === set.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">ðŸ“„ {docs.find(d => d.id === set.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === set.docId).name}</p>
                 )}
                 {set.cards?.some(c => !c.nextReview || c.nextReview <= Date.now()) && (
                   <span className="badge badge-warn mt-1 inline-flex">
@@ -6414,7 +6414,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
             </div>
             {submitted && q.explanation && (
               <div className="rounded-2xl p-5 animate-slide-up" style={{ background: 'var(--info-bg)', border: '1px solid var(--info-border)', borderLeft: '4px solid var(--info)' }}>
-                <p className="text-xs font-bold mb-2 uppercase tracking-widest" style={{ color: 'var(--info)' }}>ðŸ“– Explanation</p>
+                <p className="text-xs font-bold mb-2 uppercase tracking-widest" style={{ color: 'var(--info)' }}>Explanation</p>
                 <p className="text-sm leading-relaxed">{q.explanation}</p>
                 {q.evidence && <p className="text-xs italic mt-3 pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}"</p>}
               </div>
@@ -6425,7 +6425,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-bold disabled:opacity-40 shadow-xl">Submit Answer</button> :
                 qi < selEx.questions.length - 1 ?
                   <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">Next Question â†’</button> :
-                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); awardXPLocalStorage(XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct); addToast(`+${XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct} XP 📝`, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">See Results â†’</button>
+                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); awardXPLocalStorage(XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct); addToast(`+${XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct} XP `, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl">See Results â†’</button>
               }
             </div>
 
@@ -6504,7 +6504,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
     const pct = Math.round((score / selEx.questions.length) * 100);
     const grade = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
     const scoreColor = pct >= 80 ? 'var(--success)' : pct >= 60 ? 'var(--warning)' : 'var(--danger)';
-    const scoreMsg = pct >= 90 ? 'Outstanding! ðŸ†' : pct >= 80 ? 'Excellent work! ðŸŽ‰' : pct >= 70 ? 'Good effort! ðŸ“š' : pct >= 60 ? 'Keep studying ðŸ’ª' : 'More review needed ðŸ”';
+    const scoreMsg = pct >= 90 ? 'Outstanding! ' : pct >= 80 ? 'Excellent work! ' : pct >= 70 ? 'Good effort! ' : pct >= 60 ? 'Keep studying ' : 'More review needed ';
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 bg-mesh">
         <div className="glass rounded-3xl p-10 text-center max-w-sm w-full animate-scale-in" style={{ border: '1px solid var(--border2,var(--border))' }}>
@@ -6585,11 +6585,11 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-sm truncate">{ex.title}</h3>
-                  {ex.isBuiltin && <span className="badge badge-success shrink-0">ðŸ“š Built-in</span>}
+                  {ex.isBuiltin && <span className="badge badge-success shrink-0">Built-in</span>}
                 </div>
                 <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {ex.isBuiltin ? 'Always available' : new Date(ex.createdAt).toLocaleDateString()}</p>
                 {ex.docId && docs?.find(d => d.id === ex.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">ðŸ“„ {docs.find(d => d.id === ex.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === ex.docId).name}</p>
                 )}
               </div>
               <div className="flex gap-2 shrink-0">
@@ -6731,10 +6731,10 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                     className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl flex items-center justify-center gap-2">
                     <ChevronRight size={20} />Next Case
                   </button> :
-                  <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! ðŸ†', 'success'); }}
+                  <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! ', 'success'); }}
                     className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl"
                     style={{ background: 'var(--success)' }}>
-                    Finish Session ðŸŽ‰
+                    Finish Session 
                   </button>
               }
             </div>
@@ -6907,7 +6907,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                 <h3 className="font-bold text-sm truncate">{set.title}</h3>
                 <p className="text-xs opacity-40 mt-0.5">{set.questions?.length} cases · {new Date(set.createdAt || 0).toLocaleDateString()}</p>
                 {set.docId && docs?.find(d => d.id === set.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">ðŸ“„ {docs.find(d => d.id === set.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === set.docId).name}</p>
                 )}
               </div>
               <div className="flex gap-2 shrink-0">
@@ -6956,12 +6956,12 @@ function ChatView({ settings, sessions, setSessions }) {
   }, [msgs, loading]);
 
   const STARTERS = [
-    { icon: 'ðŸ§¬', text: 'Explain a complex topic' },
-    { icon: 'ðŸ“‹', text: 'Create a study plan' },
-    { icon: 'â“', text: 'Quiz me on key concepts' },
-    { icon: 'ðŸ”', text: 'Compare and contrast' },
-    { icon: 'ðŸ“', text: 'Summarize main points' },
-    { icon: 'ðŸ’¡', text: 'Give me clinical pearls' },
+    { icon: '', text: 'Explain a complex topic' },
+    { icon: '', text: 'Create a study plan' },
+    { icon: '', text: 'Quiz me on key concepts' },
+    { icon: '', text: 'Compare and contrast' },
+    { icon: '', text: 'Summarize main points' },
+    { icon: '', text: 'Give me clinical pearls' },
   ];
 
   const toggleVoice = () => {
@@ -7060,7 +7060,7 @@ EXAMPLE CALLOUT:
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk, timestamp: Date.now() }]); }, settings, 6000);
       const finalMsgs = [...newMsgs.slice(0, -1), { ...newMsgs[newMsgs.length - 1] }];
       setTimeout(() => saveSession(finalMsgs, sessId), 300);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš ️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `âš  ${e.message}` }]); }
     finally { setLoading(false); }
   };
 
@@ -7938,7 +7938,7 @@ function App() {
     setupPWA();
     const handler = e => { e.preventDefault(); setInstallPrompt(e); };
     window.addEventListener('beforeinstallprompt', handler);
-    window.addEventListener('appinstalled', () => { setInstallPrompt(null); addToast('App installed! ðŸŽ‰', 'success'); });
+    window.addEventListener('appinstalled', () => { setInstallPrompt(null); addToast('App installed! ', 'success'); });
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
@@ -8047,7 +8047,7 @@ function App() {
           // PHI detection â€” warn user if file may contain patient identifiers
           const sampleText = Object.values(data.pagesText || {}).slice(0, 3).join(' ');
           if (detectPHI(sampleText)) {
-            addToast('âš ️ This file may contain patient identifiers (SSN, MRN, DOB). Please de-identify before uploading. MARIAM PRO is not HIPAA-compliant storage.', 'warn', 8000);
+            addToast('âš  This file may contain patient identifiers (SSN, MRN, DOB). Please de-identify before uploading. MARIAM PRO is not HIPAA-compliant storage.', 'warn', 8000);
           }
           // For images, store preview
           let imagePreview = null;
@@ -9337,7 +9337,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
               </button>
             )}
             {/* Pomodoro */}
-            <PomodoroWidget onComplete={() => addToast('⏰ Timer complete!', 'success')} />
+            <PomodoroWidget onComplete={() => addToast(' Timer complete!', 'success')} />
             {/* Deep Focus */}
             <button onClick={() => setDeepFocus(p => !p)}
               className="w-10 h-10 flex items-center justify-center rounded-full border transition-all"
@@ -9852,7 +9852,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
                   <div>
                     <span className="font-bold text-[15px] block" style={{ color: 'var(--text)' }}>AI Studio</span>
                     <span className="text-[11px] opacity-50 block mt-0.5 truncate max-w-[180px]" title={activeDoc?.name}>
-                      {activeDoc ? `ðŸ“„ ${activeDoc.name.length > 26 ? activeDoc.name.slice(0,26)+'â€¦' : activeDoc.name}` :
+                      {activeDoc ? ` ${activeDoc.name.length > 26 ? activeDoc.name.slice(0,26)+'â€¦' : activeDoc.name}` :
                        view === 'flashcards' ? 'Explaining current card' :
                        view === 'exams' ? 'Helping with question' :
                        view === 'cases' ? 'Analyzing case' : 'No document open'}
@@ -10172,7 +10172,7 @@ function PomodoroWidget({ onComplete }) {
           setMode(nextMode);
           setSecs(DURATIONS[nextMode]);
           onComplete?.();
-          try { new Notification('MARIAM Timer', { body: mode === 'work' ? 'ðŸŽ‰ Break time!' : 'ðŸ“š Back to work!', icon: '/M.jpeg' }); } catch {}
+          try { new Notification('MARIAM Timer', { body: mode === 'work' ? ' Break time!' : ' Back to work!', icon: '/M.jpeg' }); } catch {}
           return 0;
         }
         return s - 1;
@@ -10554,7 +10554,7 @@ function MasteryHeatmap() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-sm opacity-70">Study Activity â€” Last 91 Days</h2>
         <div className="flex gap-4 text-xs font-bold">
-          {streak > 0 && <span style={{ color: 'var(--accent)' }}>ðŸ”¥ {streak}d streak</span>}
+          {streak > 0 && <span style={{ color: 'var(--accent)' }}> {streak}d streak</span>}
           {bestStreak > 0 && <span className="opacity-40">Best: {bestStreak}d</span>}
         </div>
       </div>
@@ -10921,7 +10921,7 @@ function FSRSFlashcardReview({ set, onUpdate, onClose }) {
   if (done || !card) return (
     <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: 'var(--bg)', zIndex: 'var(--z-modal, 110)' }}>
       <div className="glass rounded-3xl p-10 text-center max-w-sm w-full mx-4 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
-        <div className="text-3xl mb-4">ðŸ†</div>
+        <div className="text-3xl mb-4"></div>
         <h2 className="text-xl font-bold gradient-text mb-2">Session Done!</h2>
         <p className="text-sm opacity-50 mb-6">{reviewed} cards reviewed</p>
         <button onClick={onClose} className="btn-accent px-8 py-3 rounded-2xl font-bold w-full">Continue</button>
@@ -11149,7 +11149,7 @@ function SmartStudyMode({ flashcards, exams, cases, settings, addToast, setFlash
                 <p className="text-xs font-bold uppercase tracking-widest opacity-40">FSRS Review Queue</p>
                 <h2 className="text-lg font-bold" style={{ color: 'var(--accent)' }}>{allDue} cards due</h2>
               </div>
-              <div className="text-3xl">ðŸ§ </div>
+              <div className="text-3xl"></div>
             </div>
             <div className="flex gap-3 flex-wrap">
               {flashcards.filter(s => (s.cards || []).some(c => !c.nextReview || c.nextReview <= Date.now())).slice(0, 4).map(set => {
@@ -11276,13 +11276,13 @@ function GoalTrackerView({ flashcards, exams, addToast, settings }) {
   const circ = 2 * Math.PI * 40;
 
   const MILESTONES = [
-    { days: 3, label: '3-Day Streak', icon: 'ðŸ”¥', color: '#f59e0b' },
-    { days: 7, label: 'Weekly Warrior', icon: 'âš¡', color: '#f97316' },
-    { days: 14, label: '2-Week Champion', icon: 'ðŸ…', color: '#8b5cf6' },
-    { days: 30, label: 'Monthly Master', icon: 'ðŸ¥‡', color: '#6366f1' },
-    { days: 60, label: '2-Month Legend', icon: 'ðŸ†', color: '#06b6d4' },
-    { days: 100, label: '100-Day Elite', icon: 'ðŸ’Ž', color: '#ec4899' },
-    { days: 365, label: 'Year-Long Scholar', icon: 'ðŸ‘‘', color: '#f43f5e' },
+    { days: 3, label: '3-Day Streak', icon: '', color: '#f59e0b' },
+    { days: 7, label: 'Weekly Warrior', icon: '', color: '#f97316' },
+    { days: 14, label: '2-Week Champion', icon: '', color: '#8b5cf6' },
+    { days: 30, label: 'Monthly Master', icon: '', color: '#6366f1' },
+    { days: 60, label: '2-Month Legend', icon: '', color: '#06b6d4' },
+    { days: 100, label: '100-Day Elite', icon: '', color: '#ec4899' },
+    { days: 365, label: 'Year-Long Scholar', icon: '', color: '#f43f5e' },
   ];
 
   return (
@@ -11292,7 +11292,7 @@ function GoalTrackerView({ flashcards, exams, addToast, settings }) {
         <h1 className="text-lg font-bold">Goal Tracker</h1>
         <button onClick={() => { setDraft(goals); setEditing(!editing); }}
           className="glass px-4 py-2 rounded-xl text-sm font-semibold" style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}>
-          {editing ? 'Cancel' : 'âœ️ Edit'}
+          {editing ? 'Cancel' : 'âœ Edit'}
         </button>
       </div>
 
@@ -11316,7 +11316,7 @@ function GoalTrackerView({ flashcards, exams, addToast, settings }) {
           </div>
           <div className="flex gap-8 mt-6 text-center">
             <div>
-              <div className="text-xl font-black" style={{ color: '#f59e0b' }}>ðŸ”¥ {streak}</div>
+              <div className="text-xl font-black" style={{ color: '#f59e0b' }}> {streak}</div>
               <div className="text-xs opacity-40 font-bold">Day Streak</div>
             </div>
             <div>
@@ -11374,7 +11374,7 @@ function GoalTrackerView({ flashcards, exams, addToast, settings }) {
             return (
               <div key={days} className="rounded-2xl p-4 text-center transition-all"
                 style={{ border: `1px solid ${unlocked ? color + '40' : 'var(--border)'}`, background: unlocked ? color + '10' : 'transparent', opacity: unlocked ? 1 : 0.45 }}>
-                <div className="text-2xl mb-2">{unlocked ? icon : 'ðŸ”’'}</div>
+                <div className="text-2xl mb-2">{unlocked ? icon : ''}</div>
                 <div className="text-xs font-bold" style={{ color: unlocked ? color : 'var(--text3)' }}>{label}</div>
                 <div className="text-xs opacity-40 mt-1">{days} days</div>
                 {!unlocked && streak > 0 && <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
@@ -11420,41 +11420,41 @@ function GoalTrackerView({ flashcards, exams, addToast, settings }) {
    ACHIEVEMENTS VIEW â€” badge collection and unlock tracker
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ACHIEVEMENT_DEFS = [
-  { id: 'first_upload', icon: 'ðŸ“„', label: 'First Upload', desc: 'Upload your first document', color: '#6366f1', check: (d, fc, ex) => d.length >= 1 },
-  { id: 'first_card', icon: 'ðŸƒ', label: 'Flashcard Pioneer', desc: 'Create your first flashcard deck', color: '#8b5cf6', check: (d, fc) => fc.filter(f => !f.isBuiltin).length >= 1 },
-  { id: 'first_exam', icon: 'ðŸ“', label: 'First Exam', desc: 'Complete your first exam', color: '#3b82f6', check: (d, fc, ex) => ex.some(e => e.lastScore !== undefined) },
-  { id: '10_cards', icon: 'ðŸ§ ', label: '10 Cards Studied', desc: 'Study 10 flashcards', color: '#6366f1',
+  { id: 'first_upload', icon: '', label: 'First Upload', desc: 'Upload your first document', color: '#6366f1', check: (d, fc, ex) => d.length >= 1 },
+  { id: 'first_card', icon: '', label: 'Flashcard Pioneer', desc: 'Create your first flashcard deck', color: '#8b5cf6', check: (d, fc) => fc.filter(f => !f.isBuiltin).length >= 1 },
+  { id: 'first_exam', icon: '', label: 'First Exam', desc: 'Complete your first exam', color: '#3b82f6', check: (d, fc, ex) => ex.some(e => e.lastScore !== undefined) },
+  { id: '10_cards', icon: '', label: '10 Cards Studied', desc: 'Study 10 flashcards', color: '#6366f1',
     check: (d, fc, ex) => fc.reduce((s, f) => s + (f.cards?.filter(c => c.lastReview).length || 0), 0) >= 10 },
-  { id: '50_cards', icon: 'âš¡', label: '50 Cards Mastered', desc: 'Study 50 flashcards', color: '#f59e0b',
+  { id: '50_cards', icon: '', label: '50 Cards Mastered', desc: 'Study 50 flashcards', color: '#f59e0b',
     check: (d, fc) => fc.reduce((s, f) => s + (f.cards?.filter(c => c.lastReview).length || 0), 0) >= 50 },
-  { id: '100_cards', icon: 'ðŸ†', label: '100 Cards Champion', desc: 'Study 100 flashcards', color: '#f97316',
+  { id: '100_cards', icon: '', label: '100 Cards Champion', desc: 'Study 100 flashcards', color: '#f97316',
     check: (d, fc) => fc.reduce((s, f) => s + (f.cards?.filter(c => c.lastReview).length || 0), 0) >= 100 },
-  { id: 'perfect_exam', icon: 'ðŸ’¯', label: 'Perfect Score', desc: 'Score 100% on any exam', color: '#10b981',
+  { id: 'perfect_exam', icon: '', label: 'Perfect Score', desc: 'Score 100% on any exam', color: '#10b981',
     check: (d, fc, ex) => ex.some(e => e.lastScore === 100) },
-  { id: '5_docs', icon: 'ðŸ“š', label: 'Library Builder', desc: 'Upload 5 documents', color: '#06b6d4', check: (d) => d.length >= 5 },
-  { id: 'streak_3', icon: 'ðŸ”¥', label: 'On Fire', desc: '3-day study streak', color: '#ef4444',
+  { id: '5_docs', icon: '', label: 'Library Builder', desc: 'Upload 5 documents', color: '#06b6d4', check: (d) => d.length >= 5 },
+  { id: 'streak_3', icon: '', label: 'On Fire', desc: '3-day study streak', color: '#ef4444',
     check: () => { let s = 0; for (let i = 0; i < 3; i++) { const d = new Date(); d.setDate(d.getDate() - i); const k = d.toISOString().slice(0, 10); if ((JSON.parse(localStorage.getItem(`mariam_daily_${k}`) || '{"cards":0}').cards || 0) >= 5) s++; else break; } return s >= 3; } },
-  { id: 'streak_7', icon: 'ðŸŒŸ', label: 'Week Warrior', desc: '7-day study streak', color: '#f59e0b',
+  { id: 'streak_7', icon: '', label: 'Week Warrior', desc: '7-day study streak', color: '#f59e0b',
     check: () => { let s = 0; for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); const k = d.toISOString().slice(0, 10); if ((JSON.parse(localStorage.getItem(`mariam_daily_${k}`) || '{"cards":0}').cards || 0) >= 5) s++; else break; } return s >= 7; } },
-  { id: 'ai_chat', icon: 'ðŸ¤–', label: 'AI Conversation', desc: 'Have your first AI chat', color: '#8b5cf6',
+  { id: 'ai_chat', icon: '', label: 'AI Conversation', desc: 'Have your first AI chat', color: '#8b5cf6',
     check: (d, fc, ex, ca, no, chats) => chats.length > 0 },
-  { id: 'notes_taker', icon: 'ðŸ““', label: 'Note Taker', desc: 'Create your first note', color: '#f59e0b',
+  { id: 'notes_taker', icon: '', label: 'Note Taker', desc: 'Create your first note', color: '#f59e0b',
     check: (d, fc, ex, ca, no) => no.length > 0 },
-  { id: 'multi_subject', icon: 'ðŸŽ“', label: 'Multi-Subject', desc: 'Have decks from 3 subjects', color: '#06b6d4',
+  { id: 'multi_subject', icon: '', label: 'Multi-Subject', desc: 'Have decks from 3 subjects', color: '#06b6d4',
     check: (d, fc) => new Set(fc.filter(f => !f.isBuiltin).map(f => f.subject || f.title?.split(':')[0])).size >= 3 },
-  { id: 'high_score', icon: 'ðŸŽ¯', label: 'Sharp Shooter', desc: 'Score 90%+ on an exam', color: '#3b82f6',
+  { id: 'high_score', icon: '', label: 'Sharp Shooter', desc: 'Score 90%+ on an exam', color: '#3b82f6',
     check: (d, fc, ex) => ex.some(e => (e.lastScore || 0) >= 90) },
-  { id: 'all_modes', icon: 'ðŸš€', label: 'Explorer', desc: 'Try all 4 study modes', color: '#ec4899',
+  { id: 'all_modes', icon: '', label: 'Explorer', desc: 'Try all 4 study modes', color: '#ec4899',
     check: () => { const t = JSON.parse(localStorage.getItem('mariam_modes_tried') || '[]'); return t.length >= 4; } },
-  { id: 'voice_tutor', icon: 'ðŸŽ™️', label: 'Voice Learner', desc: 'Use Voice Tutor once', color: '#10b981',
+  { id: 'voice_tutor', icon: '', label: 'Voice Learner', desc: 'Use Voice Tutor once', color: '#10b981',
     check: () => localStorage.getItem('mariam_voice_used') === 'true' },
-  { id: 'podcast_listener', icon: 'ðŸŽ§', label: 'Podcast Fan', desc: 'Listen to an AI podcast', color: '#06b6d4',
+  { id: 'podcast_listener', icon: '', label: 'Podcast Fan', desc: 'Listen to an AI podcast', color: '#06b6d4',
     check: () => localStorage.getItem('mariam_podcast_used') === 'true' },
-  { id: '500_cards', icon: 'ðŸ’Ž', label: 'Card Collector', desc: 'Study 500 flashcards', color: '#6366f1',
+  { id: '500_cards', icon: '', label: 'Card Collector', desc: 'Study 500 flashcards', color: '#6366f1',
     check: (d, fc) => fc.reduce((s, f) => s + (f.cards?.filter(c => c.lastReview).length || 0), 0) >= 500 },
-  { id: 'early_adopter', icon: 'ðŸ‘‘', label: 'Early Adopter', desc: 'First time using MARIAM PRO', color: '#f43f5e',
+  { id: 'early_adopter', icon: '', label: 'Early Adopter', desc: 'First time using MARIAM PRO', color: '#f43f5e',
     check: () => true },
-  { id: 'know_it_all', icon: 'ðŸ§ª', label: 'Know It All', desc: 'Master a full flashcard deck', color: '#a78bfa',
+  { id: 'know_it_all', icon: '', label: 'Know It All', desc: 'Master a full flashcard deck', color: '#a78bfa',
     check: (d, fc) => fc.some(f => (f.cards?.length || 0) > 5 && (f.cards || []).every(c => (c.stability || 0) >= 10)) },
 ];
 
@@ -11505,7 +11505,7 @@ function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions,
       <div className="glass rounded-3xl p-6 relative overflow-hidden" style={{ border: '1px solid var(--border)' }}>
         <div className="bg-mesh absolute inset-0 opacity-20" />
         <div className="relative z-10 flex items-center gap-6">
-          <div className="text-3xl">ðŸ†</div>
+          <div className="text-3xl"></div>
           <div className="flex-1">
             <h2 className="text-lg font-bold">Achievements</h2>
             <p className="text-sm opacity-50 mt-1">{unlocked.size} / {ACHIEVEMENT_DEFS.length} unlocked</p>
@@ -11524,10 +11524,10 @@ function AchievementsView({ docs, flashcards, exams, cases, notes, chatSessions,
           return (
             <div key={a.id} className="glass rounded-2xl p-4 flex flex-col items-center gap-2 text-center transition-all"
               style={{ border: `1px solid ${isUnlocked ? a.color + '40' : 'var(--border)'}`, background: isUnlocked ? a.color + '08' : 'transparent', opacity: isUnlocked ? 1 : 0.5 }}>
-              <div className="text-3xl">{isUnlocked ? a.icon : 'ðŸ”’'}</div>
+              <div className="text-3xl">{isUnlocked ? a.icon : ''}</div>
               <div className="text-xs font-bold" style={{ color: isUnlocked ? a.color : 'var(--text3)' }}>{a.label}</div>
               <div className="text-xs opacity-40 leading-tight">{a.desc}</div>
-              {isUnlocked && <div className="text-xs font-bold mt-1" style={{ color: a.color }}>âœ“ Unlocked</div>}
+              {isUnlocked && <div className="text-xs font-bold mt-1" style={{ color: a.color }}>Unlocked</div>}
             </div>
           );
         })}
@@ -11672,7 +11672,7 @@ function NotesView({ notes, setNotes, docs, settings, addToast }) {
       {/* Header */}
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center gap-3">
-          <h2 className="font-black text-lg flex-1">ðŸ““ Notes</h2>
+          <h2 className="font-black text-lg flex-1">Notes</h2>
           <button onClick={openNew} className="btn-accent px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
             <Plus size={14} /> New Note
           </button>
@@ -11879,11 +11879,11 @@ function OnboardingFlow({ onComplete, settings, setSettings }) {
   const [showKey, setShowKey] = useState(false);
 
   const STEPS = [
-    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: 'ðŸ‘©â€âš•️' },
-    { title: "What's your name?", subtitle: 'Personalize your experience', emoji: 'âœ️' },
-    { title: 'Connect Your AI', subtitle: 'Add an API key to unlock AI features', emoji: 'ðŸ”‘' },
-    { title: 'How it works', subtitle: 'Upload â†’ Generate â†’ Study', emoji: 'ðŸš€' },
-    { title: "You're all set!", subtitle: 'Start your learning journey', emoji: 'ðŸŽ‰' },
+    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: 'â€âš•' },
+    { title: "What's your name?", subtitle: 'Personalize your experience', emoji: 'âœ' },
+    { title: 'Connect Your AI', subtitle: 'Add an API key to unlock AI features', emoji: '' },
+    { title: 'How it works', subtitle: 'Upload â†’ Generate â†’ Study', emoji: '' },
+    { title: "You're all set!", subtitle: 'Start your learning journey', emoji: '' },
   ];
 
   const s = STEPS[step];
@@ -11960,7 +11960,7 @@ function OnboardingFlow({ onComplete, settings, setSettings }) {
 
         {step === 4 && (
           <div className="grid grid-cols-2 gap-3 w-full">
-            {[['ðŸ“„ Docs', 'PDF & Word support'], ['ðŸƒ Cards', 'FSRS spaced repetition'], ['ðŸ“ Exams', 'AI-generated tests'], ['ðŸŽ™️ Voice', 'AI voice tutor']].map(([title, desc]) => (
+            {[[' Docs', 'PDF & Word support'], [' Cards', 'FSRS spaced repetition'], [' Exams', 'AI-generated tests'], [' Voice', 'AI voice tutor']].map(([title, desc]) => (
               <div key={title} className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
                 <p className="font-bold text-sm">{title}</p>
                 <p className="text-xs opacity-40 mt-1">{desc}</p>
@@ -11972,7 +11972,7 @@ function OnboardingFlow({ onComplete, settings, setSettings }) {
         <div className="flex gap-3 w-full">
           {step > 0 && <button onClick={() => setStep(s => s - 1)} className="flex-1 glass py-3 rounded-2xl font-bold" style={{ border: '1px solid var(--border)' }}>Back</button>}
           <button onClick={next} className="flex-1 btn-accent py-3 rounded-2xl font-bold">
-            {step === STEPS.length - 1 ? "Let's Go! ðŸš€" : 'Continue â†’'}
+            {step === STEPS.length - 1 ? "Let's Go! " : 'Continue â†’'}
           </button>
         </div>
 
@@ -12030,7 +12030,7 @@ function QuickReviewWidget({ flashcards, setFlashcards, onClose }) {
   if (dueCards.length === 0 || done) return (
     <div className="fixed bottom-28 right-4 glass rounded-2xl p-4 shadow-2xl animate-scale-in" style={{ border: '1px solid var(--border)', minWidth: 200, zIndex: 'var(--z-modal, 110)' }}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-semibold">{done ? 'âœ… All done!' : 'ðŸŽ‰ No cards due!'}</span>
+        <span className="text-sm font-semibold">{done ? 'âœ… All done!' : ' No cards due!'}</span>
         <button onClick={onClose} aria-label="Close"><X size={14} /></button>
       </div>
       <p className="text-xs opacity-40">Come back later for more reviews</p>
@@ -12103,7 +12103,7 @@ function ShortcutsHelpOverlay({ onClose }) {
     <div className="fixed inset-0 flex items-center justify-center px-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)', zIndex: 'var(--z-modal, 110)' }} onClick={onClose}>
       <div className="glass rounded-3xl p-6 max-w-md w-full animate-scale-in" style={{ border: '1px solid var(--border)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-black text-xl flex items-center gap-2">âŒ¨️ Keyboard Shortcuts</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Keyboard Shortcuts</h2>
           <button onClick={onClose} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-50" aria-label="Close"><X size={14} /></button>
         </div>
         {groups.map(group => (
@@ -12283,9 +12283,9 @@ function EnhancedDeepFocusMode({ active, onExit, flashcards = [], exams = [] }) 
   const audioRef = useRef(null);
 
   const POM_PHASES = {
-    work: { label: 'ðŸ… Focus', mins: 25, color: 'var(--accent)' },
+    work: { label: ' Focus', mins: 25, color: 'var(--accent)' },
     shortBreak: { label: 'â˜• Break', mins: 5, color: 'var(--success)' },
-    longBreak: { label: 'ðŸŒ¿ Long Break', mins: 15, color: '#06b6d4' },
+    longBreak: { label: ' Long Break', mins: 15, color: '#06b6d4' },
   };
 
   useEffect(() => {
@@ -12300,7 +12300,7 @@ function EnhancedDeepFocusMode({ active, onExit, flashcards = [], exams = [] }) 
             setPomPhase(nextPhase);
             setPomSecs(POM_PHASES[nextPhase].mins * 60);
             if ('Notification' in window && Notification.permission === 'granted')
-              new Notification('ðŸ… Pomodoro complete!', { body: 'Time for a break.' });
+              new Notification(' Pomodoro complete!', { body: 'Time for a break.' });
           } else {
             setPomPhase('work');
             setPomSecs(25 * 60);
@@ -12344,7 +12344,7 @@ function EnhancedDeepFocusMode({ active, onExit, flashcards = [], exams = [] }) 
         <div className="flex items-center gap-3">
           {/* Ambient sounds */}
           <div className="flex gap-1">
-            {[['none', 'ðŸ”‡'], ['rain', 'ðŸŒ§️'], ['white', 'ðŸ“»'], ['focus', 'ðŸŽµ']].map(([m, emoji]) => (
+            {[['none', ''], ['rain', ''], ['white', ''], ['focus', '']].map(([m, emoji]) => (
               <button key={m} onClick={() => setAmbientMode(m)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all"
                 style={{ background: ambientMode === m ? 'var(--accent)/20' : 'transparent', border: ambientMode === m ? '1px solid var(--accent)/40' : '1px solid transparent' }}>
@@ -12628,7 +12628,7 @@ function EnhancedStudyPodcast({ flashcards, exams, settings, addToast }) {
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const CALCULATORS = [
   {
-    id: 'gfr', title: 'eGFR (CKD-EPI)', category: 'Nephrology', icon: 'ðŸ©º',
+    id: 'gfr', title: 'eGFR (CKD-EPI)', category: 'Nephrology', icon: '',
     desc: 'Estimated Glomerular Filtration Rate using CKD-EPI 2021 formula',
     fields: [
       { key: 'creatinine', label: 'Serum Creatinine', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
@@ -12649,7 +12649,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'bmi', title: 'BMI', category: 'General', icon: 'âš–️',
+    id: 'bmi', title: 'BMI', category: 'General', icon: '',
     desc: 'Body Mass Index with classification',
     fields: [
       { key: 'weight', label: 'Weight', unit: 'kg', type: 'number', min: 1, step: 0.1, placeholder: '70' },
@@ -12665,7 +12665,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'chadsvasc', title: 'CHAâ‚‚DSâ‚‚-VASc', category: 'Cardiology', icon: '❤️',
+    id: 'chadsvasc', title: 'CHAâ‚‚DSâ‚‚-VASc', category: 'Cardiology', icon: '',
     desc: 'Stroke risk in non-valvular atrial fibrillation',
     fields: [
       { key: 'chf', label: 'Congestive Heart Failure', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
@@ -12687,7 +12687,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'wells_dvt', title: 'Wells DVT Score', category: 'Hematology', icon: 'ðŸ¦µ',
+    id: 'wells_dvt', title: 'Wells DVT Score', category: 'Hematology', icon: '',
     desc: 'Pre-test probability for deep vein thrombosis',
     fields: [
       { key: 'cancer', label: 'Active cancer', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
@@ -12710,7 +12710,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'sofa', title: 'SOFA Score', category: 'Critical Care', icon: 'ðŸ¥',
+    id: 'sofa', title: 'SOFA Score', category: 'Critical Care', icon: '',
     desc: 'Sequential Organ Failure Assessment â€” sepsis severity',
     fields: [
       { key: 'pf', label: 'PaOâ‚‚/FiOâ‚‚ ratio', unit: '', type: 'select', options: ['â‰¥400 (0)', '300â€“399 (+1)', '200â€“299 (+2)', '100â€“199 (+3)', '<100 (+4)'] },
@@ -12728,7 +12728,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'glasgow', title: 'Glasgow Coma Scale', category: 'Neurology', icon: 'ðŸ§ ',
+    id: 'glasgow', title: 'Glasgow Coma Scale', category: 'Neurology', icon: '',
     desc: 'Neurological status â€” eye, verbal, motor',
     fields: [
       { key: 'eye', label: 'Eye Opening', unit: '', type: 'select', options: ['Spontaneous (4)', 'To voice (3)', 'To pain (2)', 'None (1)'] },
@@ -12743,7 +12743,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'meld', title: 'MELD Score', category: 'Gastroenterology', icon: 'ðŸ«€',
+    id: 'meld', title: 'MELD Score', category: 'Gastroenterology', icon: '',
     desc: 'Model for End-Stage Liver Disease â€” liver transplant priority',
     fields: [
       { key: 'bili', label: 'Bilirubin', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
@@ -12763,7 +12763,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'apgar', title: 'APGAR Score', category: 'Pediatrics', icon: 'ðŸ‘¶',
+    id: 'apgar', title: 'APGAR Score', category: 'Pediatrics', icon: '',
     desc: 'Newborn health assessment at 1 and 5 minutes',
     fields: [
       { key: 'activity', label: 'Muscle Tone (Activity)', unit: '', type: 'select', options: ['Limp (0)', 'Some flexion (1)', 'Active motion (2)'] },
@@ -12807,7 +12807,7 @@ function MedicalCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl mb-3 flex items-center gap-2">ðŸ©º Medical Calculators</h2>
+        <h2 className="font-black text-xl mb-3 flex items-center gap-2">Medical Calculators</h2>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {categories.map(c => (
             <button key={c} onClick={() => { setCategory(c); setActiveCalc(null); }}
@@ -12985,7 +12985,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ“… Study Plan</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Study Plan</h2>
           {plan && <button onClick={() => { setPlan(null); localStorage.removeItem('mariam_study_plan'); }} className="text-xs opacity-40 hover:opacity-70">Clear</button>}
         </div>
         <p className="text-xs opacity-40">AI-powered personalized study schedule</p>
@@ -13059,7 +13059,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
               <div className="relative z-10">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <h3 className="font-bold">ðŸ“‹ Your Study Plan</h3>
+                    <h3 className="font-bold">Your Study Plan</h3>
                     {plan.examDate && <p className="text-xs opacity-40 mt-0.5">Exam: {new Date(plan.examDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>}
                   </div>
                   <button onClick={generate} disabled={generating} className="glass px-3 py-1.5 rounded-xl text-xs font-bold shrink-0" style={{ color: 'var(--accent)' }}>
@@ -13124,7 +13124,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
                 <div className="space-y-2">
                   {plan.tips.map((tip, i) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
-                      <span style={{ color: 'var(--accent)' }}>ðŸ’¡</span>
+                      <span style={{ color: 'var(--accent)' }}></span>
                       <span className="opacity-70 leading-relaxed">{tip}</span>
                     </div>
                   ))}
@@ -13204,7 +13204,7 @@ function FlashcardTinderMode({ set, onClose, onUpdate }) {
   if (done) return (
     <div className="fixed inset-0 flex flex-col items-center justify-center gap-6 p-6"
       style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(10px)', zIndex: 'var(--z-modal, 110)' }}>
-      <div className="text-3xl">ðŸŽ‰</div>
+      <div className="text-3xl"></div>
       <div className="text-center">
         <h2 className="text-xl font-bold">Done!</h2>
         <p className="opacity-50 mt-2">{set.title} â€” {cards.length} cards</p>
@@ -13273,7 +13273,7 @@ function FlashcardTinderMode({ set, onClose, onUpdate }) {
           }}>
           <div className="glass rounded-3xl p-8 min-h-[280px] flex flex-col items-center justify-center text-center"
             style={{ border: '1px solid var(--border)', background: flipped ? 'var(--accent)/10' : 'var(--card,var(--surface))' }}>
-            <div className="text-xs font-bold uppercase tracking-widest opacity-30 mb-6">{flipped ? 'ðŸ’¡ Answer' : 'â“ Question'}</div>
+            <div className="text-xs font-bold uppercase tracking-widest opacity-30 mb-6">{flipped ? ' Answer' : ' Question'}</div>
             <p className="text-lg font-bold leading-relaxed mb-6">{flipped ? (curr.a || curr.back) : (curr.q || curr.front)}</p>
             {!flipped && <p className="text-xs opacity-30">Tap to reveal</p>}
           </div>
@@ -13400,7 +13400,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
   if (phase === 'select') return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¥ Clinical Simulator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Clinical Simulator</h2>
         <p className="text-xs opacity-40 mt-0.5">Interactive patient encounters with AI</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4">
@@ -13433,7 +13433,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
       </div>
       <div className="glass rounded-3xl p-6 text-center" style={{ border: `2px solid ${score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444'}40` }}>
         <div className="text-xl font-bold mb-2" style={{ color: score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444' }}>{score?.score}%</div>
-        <div className="text-lg font-black mb-4">{score?.correct ? 'âœ… Correct Diagnosis!' : score?.nearMiss ? 'âš ️ Close â€” Near Miss' : 'âŒ Incorrect'}</div>
+        <div className="text-lg font-black mb-4">{score?.correct ? 'âœ… Correct Diagnosis!' : score?.nearMiss ? 'âš  Close â€” Near Miss' : ' Incorrect'}</div>
         <div className="text-sm font-semibold mb-1">Correct: <span style={{ color: '#10b981' }}>{selectedCase.correctDx}</span></div>
         <div className="text-sm mb-4 opacity-60">Your answer: {userDx}</div>
         <p className="text-sm opacity-70 leading-relaxed">{score?.feedback}</p>
@@ -13479,7 +13479,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
 
       {/* Phase tabs */}
       <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        {[['hx', 'ðŸ—£ History'], ['exam', 'ðŸ©º Exam'], ['orders', 'ðŸ“‹ Orders'], ['dx', 'ðŸŽ¯ Diagnosis']].map(([id, lbl]) => (
+        {[['hx', ' History'], ['exam', ' Exam'], ['orders', ' Orders'], ['dx', ' Diagnosis']].map(([id, lbl]) => (
           <button key={id} onClick={() => setPhase(id)}
             className="flex-1 py-2 text-xs font-bold transition-all"
             style={phase === id ? { borderBottom: '2px solid var(--accent)', color: 'var(--accent)' } : { opacity: 0.45 }}>
@@ -13504,7 +13504,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
             </div>
             <button onClick={submitDiagnosis} disabled={!userDx.trim() || loading}
               className="btn-accent w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2">
-              {loading ? <Loader2 size={16} className="animate-spin" /> : 'ðŸŽ¯'} Submit Diagnosis
+              {loading ? <Loader2 size={16} className="animate-spin" /> : ''} Submit Diagnosis
             </button>
           </div>
         </div>
@@ -13513,7 +13513,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
           <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                {msg.role !== 'user' && <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm" style={{ background: msg.role === 'system-intro' ? 'var(--border)' : 'var(--accent)/15' }}>{msg.role === 'patient' ? 'ðŸ¤’' : msg.role === 'loading' ? '⏳' : 'ðŸ’¡'}</div>}
+                {msg.role !== 'user' && <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm" style={{ background: msg.role === 'system-intro' ? 'var(--border)' : 'var(--accent)/15' }}>{msg.role === 'patient' ? '' : msg.role === 'loading' ? '' : ''}</div>}
                 <div className="glass rounded-2xl px-4 py-3 text-sm max-w-[80%]" style={{ border: '1px solid var(--border)', background: msg.role === 'user' ? 'var(--accent)/10' : 'transparent' }}>
                   {msg.role === 'loading' ? <Loader2 size={14} className="animate-spin" /> : <p className="leading-relaxed">{msg.text}</p>}
                 </div>
@@ -13615,7 +13615,7 @@ Be specific, motivating, and educational. Max 200 words.`,
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-black flex items-center gap-2">ðŸ“Š Progress Report</h2>
+        <h2 className="text-xl font-black flex items-center gap-2">Progress Report</h2>
         <div className="flex gap-1.5">
           {PERIODS.map(p => (
             <button key={p.id} onClick={() => { setPeriod(p.id); setAiReport(''); setShowAiReport(false); }}
@@ -13768,7 +13768,7 @@ function DocumentAnnotationsView({ docs, notes, setNotes, addToast, setView, set
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ“Œ Annotations</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Annotations</h2>
           <span className="text-xs opacity-40">{annotations.length} total</span>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)}
@@ -13896,7 +13896,7 @@ function MedicalGlossaryView() {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ“– Medical Glossary</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Medical Glossary</h2>
           <span className="text-xs opacity-40">{filtered.length} terms</span>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)}
@@ -13993,7 +13993,7 @@ function LabReferenceView({ settings }) {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ”¬ Lab Reference</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Lab Reference</h2>
           <div className="flex gap-1">
             {['male', 'female'].map(s => (
               <button key={s} onClick={() => setSex(s)} className="px-3 py-1 rounded-lg text-xs font-bold"
@@ -14045,10 +14045,10 @@ function LabReferenceView({ settings }) {
                   <p className="text-sm opacity-70 leading-relaxed">{lab.notes}</p>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <div className="px-3 py-2 rounded-xl text-xs" style={{ background: 'var(--surface,var(--card))' }}>
-                      <span className="opacity-40">â™‚ Male: </span><span className="font-bold">{lab.male}</span>
+                      <span className="opacity-40">Male: </span><span className="font-bold">{lab.male}</span>
                     </div>
                     <div className="px-3 py-2 rounded-xl text-xs" style={{ background: 'var(--surface,var(--card))' }}>
-                      <span className="opacity-40">â™€ Female: </span><span className="font-bold">{lab.female}</span>
+                      <span className="opacity-40">Female: </span><span className="font-bold">{lab.female}</span>
                     </div>
                   </div>
                 </div>
@@ -14125,7 +14125,7 @@ List 6-10 differentials ordered by likelihood. Be thorough and clinically accura
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©» Differential Diagnosis</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Differential Diagnosis</h2>
         <p className="text-xs opacity-40 mt-0.5">AI-powered DDx builder from symptoms</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -14223,7 +14223,7 @@ List 6-10 differentials ordered by likelihood. Be thorough and clinically accura
                 {dx.redFlags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {dx.redFlags.map((f, j) => (
-                      <span key={j} className="px-2 py-0.5 rounded-lg text-xs" style={{ background: '#ef444410', color: '#ef4444' }}>ðŸš© {f}</span>
+                      <span key={j} className="px-2 py-0.5 rounded-lg text-xs" style={{ background: '#ef444410', color: '#ef4444' }}> {f}</span>
                     ))}
                   </div>
                 )}
@@ -14340,7 +14340,7 @@ function MedicalMnemonicsView({ addToast, settings }) {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ§  Mnemonics</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Mnemonics</h2>
           <button onClick={() => setAdding(p => !p)} className="glass px-3 py-1.5 rounded-xl text-xs font-bold"
             style={{ color: 'var(--accent)', border: '1px solid var(--accent)/30' }}>
             {adding ? 'Cancel' : '+ Add'}
@@ -14464,12 +14464,12 @@ Be thorough and clinically accurate. List ALL pairwise interactions found.`,
   };
 
   const SEV_COLORS = { major: '#ef4444', moderate: '#f59e0b', minor: '#10b981' };
-  const SEV_ICONS = { major: 'ðŸ”´', moderate: 'ðŸŸ¡', minor: 'ðŸŸ¢' };
+  const SEV_ICONS = { major: '', moderate: '', minor: '' };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’Š Drug Interactions</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Drug Interactions</h2>
         <p className="text-xs opacity-40 mt-0.5">Check multi-drug safety with AI</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -14486,7 +14486,7 @@ Be thorough and clinically accurate. List ALL pairwise interactions found.`,
               {drugs.map(d => (
                 <span key={d} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
                   style={{ background: 'var(--accent)/15', color: 'var(--accent)', border: '1px solid var(--accent)/30' }}>
-                  ðŸ’Š {d}
+                   {d}
                   <button onClick={() => setDrugs(p => p.filter(x => x !== d))} className="opacity-50 hover:opacity-100">Ã—</button>
                 </span>
               ))}
@@ -14511,7 +14511,7 @@ Be thorough and clinically accurate. List ALL pairwise interactions found.`,
           <div className="space-y-3 animate-fade-in-up">
             {result.summary && (
               <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
-                <p className="text-sm font-bold leading-relaxed">ðŸ“‹ {result.summary}</p>
+                <p className="text-sm font-bold leading-relaxed"> {result.summary}</p>
               </div>
             )}
 
@@ -14541,7 +14541,7 @@ Be thorough and clinically accurate. List ALL pairwise interactions found.`,
 
             {result.monitoring?.length > 0 && (
               <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
-                <h3 className="font-bold text-sm mb-2">ðŸ“Š Monitoring Parameters</h3>
+                <h3 className="font-bold text-sm mb-2">Monitoring Parameters</h3>
                 {result.monitoring.map((m, i) => <p key={i} className="text-sm opacity-70 py-1 flex gap-2"><span style={{ color: 'var(--accent)' }}>â€¢</span>{m}</p>)}
               </div>
             )}
@@ -14602,7 +14602,7 @@ function PrescriptionPadView({ addToast, settings }) {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ“ Prescription Pad</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Prescription Pad</h2>
           <p className="text-xs opacity-40 mt-0.5">{rxList.length} saved prescriptions</p>
         </div>
         <button onClick={() => { setEditing('new'); setForm({ drug: '', dose: '', route: 'PO', freq: 'OD', duration: '', instructions: '', refills: '0' }); }}
@@ -14667,7 +14667,7 @@ function PrescriptionPadView({ addToast, settings }) {
                     <button key={t.drug} onClick={() => setForm(t)}
                       className="glass px-3 py-1.5 rounded-xl text-xs transition-all hover:opacity-80"
                       style={{ border: '1px solid var(--border)' }}>
-                      ðŸ’Š {t.drug}
+                       {t.drug}
                     </button>
                   ))}
                 </div>
@@ -14756,7 +14756,7 @@ function VitalSignsTrackerView({ addToast }) {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
         <div>
-          <h2 className="font-black text-xl flex items-center gap-2">❤️ Vitals Tracker</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Vitals Tracker</h2>
           <p className="text-xs opacity-40 mt-0.5"> {vitals.length} readings</p>
         </div>
         <button onClick={() => setEditing(p => !p)} className="btn-accent px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
@@ -14921,7 +14921,7 @@ function PharmacologyQuickRefView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’Š Pharmacology</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Pharmacology</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search drug classesâ€¦"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -14944,7 +14944,7 @@ function PharmacologyQuickRefView() {
               <button onClick={() => setExpanded(e => e === p.cls ? null : p.cls)}
                 className="w-full p-4 text-left flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                  style={{ background: 'var(--accent)/10' }}>ðŸ’Š</div>
+                  style={{ background: 'var(--accent)/10' }}></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold">{p.cls}</h3>
                   <p className="text-xs opacity-40 mt-0.5">{p.cat} · {p.drugs.length} drugs</p>
@@ -14967,23 +14967,23 @@ function PharmacologyQuickRefView() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">âœ… Indications</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">Indications</h4>
                       <div className="space-y-1">{p.indications.map(ind => <div key={ind} className="flex gap-2 text-xs"><span style={{ color: '#10b981' }}>â€¢</span><span className="opacity-70">{ind}</span></div>)}</div>
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">âš ️ Side Effects</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">Side Effects</h4>
                       <div className="space-y-1">{p.sideEffects.map(se => <div key={se} className="flex gap-2 text-xs"><span style={{ color: '#f59e0b' }}>â€¢</span><span className="opacity-70">{se}</span></div>)}</div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">ðŸš« Contraindications</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-2">Contraindications</h4>
                     <div className="space-y-1">{p.contraindications.map(ci => <div key={ci} className="flex gap-2 text-xs"><span style={{ color: '#ef4444' }}>â€¢</span><span className="opacity-70">{ci}</span></div>)}</div>
                   </div>
 
                   {p.pearls?.length > 0 && (
                     <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                      <h4 className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#f59e0b' }}>ðŸ’Ž High-Yield Pearls</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#f59e0b' }}>High-Yield Pearls</h4>
                       {p.pearls.map((pearl, i) => <p key={i} className="text-xs opacity-70 leading-relaxed mt-1">{pearl}</p>)}
                     </div>
                   )}
@@ -15077,7 +15077,7 @@ function ClinicalGuidelinesView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“‹ Clinical Guidelines</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Clinical Guidelines</h2>
         <p className="text-xs opacity-40 mt-0.5">Evidence-based management protocols</p>
         {!active && (
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search guidelinesâ€¦"
@@ -15118,7 +15118,7 @@ function ClinicalGuidelinesView() {
 
             {/* Key points */}
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-              <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>ðŸ’¡ Key Points</h3>
+              <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>Key Points</h3>
               <div className="space-y-2">
                 {active.keyPoints.map((kp, i) => (
                   <div key={i} className="flex gap-2 text-xs">
@@ -15207,7 +15207,7 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“„ Patient Handouts</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Patient Handouts</h2>
         <p className="text-xs opacity-40 mt-0.5">AI-generated patient education materials</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -15254,7 +15254,7 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
         {handout && (
           <div className="glass rounded-2xl p-5 animate-fade-in-up" style={{ border: '1px solid var(--border)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-sm">ðŸ“„ {condition}</h3>
+              <h3 className="font-bold text-sm"> {condition}</h3>
               <div className="flex gap-2">
                 <button onClick={copyHandout} className="glass px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1"
                   style={{ border: '1px solid var(--border)' }}><Copy size={11} /> Copy</button>
@@ -15384,7 +15384,7 @@ function ProcedureChecklistView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">âœ… Procedure Checklists</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Procedure Checklists</h2>
         <p className="text-xs opacity-40 mt-0.5">Step-by-step clinical procedures</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -15408,7 +15408,7 @@ function ProcedureChecklistView() {
 
             {/* Equipment */}
             <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-3">ðŸ§° Equipment</h3>
+              <h3 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-3">Equipment</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {active.equipment.map((eq, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs py-1">
@@ -15444,7 +15444,7 @@ function ProcedureChecklistView() {
             {/* Pearls */}
             {active.pearls?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>ðŸ’Ž Clinical Pearls</h3>
+                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>Clinical Pearls</h3>
                 {active.pearls.map((p, i) => <div key={i} className="flex gap-2 text-xs py-1"><span style={{ color: '#f59e0b' }}>â–¸</span><span className="opacity-70 leading-relaxed">{p}</span></div>)}
               </div>
             )}
@@ -15560,7 +15560,7 @@ Keep response under 300 words. Be balanced â€” note strengths AND weaknesse
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“Š EBM Tools</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">EBM Tools</h2>
         <div className="flex gap-2 mt-3">
           {[['nnt', 'NNT Calculator'], ['pico', 'PICO Builder'], ['appraise', 'Study Appraisal']].map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}
@@ -15678,7 +15678,7 @@ Keep response under 300 words. Be balanced â€” note strengths AND weaknesse
    ANATOMY QUICK REFERENCE â€” body systems with key structures
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ANATOMY_SYSTEMS = [
-  { id: 'cardiac', name: 'Heart & Great Vessels', icon: '❤️',
+  { id: 'cardiac', name: 'Heart & Great Vessels', icon: '',
     structures: [
       { name: 'Right Atrium', details: 'Receives deoxygenated blood from SVC, IVC, coronary sinus. SA node (pacemaker) located here. Tricuspid valve â†’ RV.' },
       { name: 'Right Ventricle', details: 'Pumps to pulmonary artery via pulmonic valve. Wall thinner than LV (low-pressure circuit). Moderator band = landmark.' },
@@ -15694,7 +15694,7 @@ const ANATOMY_SYSTEMS = [
       'Beck triad (tamponade): hypotension, JVD, muffled heart sounds',
       'Atrial fibrillation: irregular irregularly, loss of P waves, f waves',
     ]},
-  { id: 'respiratory', name: 'Respiratory System', icon: 'ðŸ«',
+  { id: 'respiratory', name: 'Respiratory System', icon: '',
     structures: [
       { name: 'Trachea', details: 'C-shaped cartilage rings. Bifurcates at carina (T4-T5). Right main bronchus: wider, shorter, more vertical â†’ foreign body aspiration.' },
       { name: 'Right Lung', details: '3 lobes (upper, middle, lower), 2 fissures (oblique, horizontal). 10 bronchopulmonary segments. Slightly larger than left.' },
@@ -15709,7 +15709,7 @@ const ANATOMY_SYSTEMS = [
       'Pleural effusion: dullness to percussion, decreased breath sounds, meniscus on CXR',
       'Phrenic nerve palsy (C3-5): elevated hemidiaphragm on CXR',
     ]},
-  { id: 'neuro', name: 'Central Nervous System', icon: 'ðŸ§ ',
+  { id: 'neuro', name: 'Central Nervous System', icon: '',
     structures: [
       { name: 'Frontal Lobe', details: 'Motor cortex (precentral gyrus), Broca area (speech production, dominant hemisphere), prefrontal cortex (personality, judgment, executive function).' },
       { name: 'Parietal Lobe', details: 'Somatosensory cortex (postcentral gyrus). Spatial awareness, proprioception. Dominant: calculation, language. Non-dominant: neglect syndrome.' },
@@ -15727,7 +15727,7 @@ const ANATOMY_SYSTEMS = [
       'Wernicke aphasia (receptive): fluent but nonsensical speech, poor comprehension',
       'CN III palsy: "down and out" eye, ptosis, mydriasis â€” PComm aneurysm until proven otherwise',
     ]},
-  { id: 'gi', name: 'GI & Hepatobiliary', icon: 'ðŸ«„',
+  { id: 'gi', name: 'GI & Hepatobiliary', icon: '',
     structures: [
       { name: 'Esophagus', details: 'Upper 1/3 skeletal muscle, lower 2/3 smooth. LES prevents reflux. Barrett esophagus: intestinal metaplasia from chronic GERD â†’ â†‘ cancer risk.' },
       { name: 'Stomach', details: 'Fundus, body, antrum, pylorus. Parietal cells: HCl + intrinsic factor (B12 absorption). Chief cells: pepsinogen. G cells: gastrin.' },
@@ -15754,7 +15754,7 @@ function AnatomyQuickRefView({ settings }) {
     <div className="flex-1 min-h-0 flex overflow-hidden">
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ«€ Anatomy Reference</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Anatomy Reference</h2>
         <p className="text-xs opacity-40 mt-0.5">Body systems with clinical correlations</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -15777,7 +15777,7 @@ function AnatomyQuickRefView({ settings }) {
 
             {active.clinicalCorrelations?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>ðŸ¥ Clinical Correlations</h3>
+                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>Clinical Correlations</h3>
                 {active.clinicalCorrelations.map((cc, i) => (
                   <div key={i} className="flex gap-2 text-xs py-1.5">
                     <span style={{ color: '#f59e0b' }}>â–¸</span>
@@ -15894,7 +15894,7 @@ Examiner response:`,
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©º OSCE Prep</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">OSCE Prep</h2>
         <p className="text-xs opacity-40 mt-0.5">Practice clinical examination stations</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -15923,7 +15923,7 @@ Examiner response:`,
                         color: m.role === 'student' ? '#fff' : 'inherit',
                         border: m.role === 'examiner' ? '1px solid var(--border)' : 'none'
                       }}>
-                        <span className="text-xs font-bold opacity-50 block mb-1">{m.role === 'examiner' ? 'ðŸ©º Examiner' : 'ðŸ§‘â€âš•️ You'}</span>
+                        <span className="text-xs font-bold opacity-50 block mb-1">{m.role === 'examiner' ? ' Examiner' : 'â€âš• You'}</span>
                         {m.text}
                       </div>
                     </div>
@@ -16038,7 +16038,7 @@ function ECGInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’“ ECG Interpreter</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">ECG Interpreter</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search rhythmsâ€¦"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -16060,7 +16060,7 @@ function ECGInterpreterView() {
               <button onClick={() => setExpanded(e => e === ecg.name ? null : ecg.name)}
                 className="w-full p-4 text-left flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                  style={{ background: catColor(ecg.cat) + '15' }}>ðŸ’“</div>
+                  style={{ background: catColor(ecg.cat) + '15' }}></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-sm">{ecg.name}</h3>
                   <p className="text-xs opacity-40 mt-0.5">{ecg.cat} · Rate: {ecg.rate} · {ecg.regularity}</p>
@@ -16112,7 +16112,7 @@ function ECGInterpreterView() {
    RADIOLOGY INTERPRETER â€” systematic imaging approach
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const RADIOLOGY_APPROACHES = [
-  { id: 'cxr', title: 'Chest X-Ray (CXR)', icon: 'ðŸ«',
+  { id: 'cxr', title: 'Chest X-Ray (CXR)', icon: '',
     systematic: [
       { area: 'Technical Quality (RIPE)', checks: ['Rotation: spinous processes equidistant between clavicle heads', 'Inspiration: 5-6 anterior ribs visible above diaphragm', 'Penetration: vertebral bodies just visible behind heart', 'Exposure: adequate brightness/contrast'] },
       { area: 'Airway', checks: ['Trachea: midline (deviation â†’ tension pneumothorax, mass, collapse)', 'Carina: bifurcation at T4-T5', 'Main bronchi: right wider + more vertical', 'ETT if present: tip 2-4 cm above carina'] },
@@ -16128,7 +16128,7 @@ const RADIOLOGY_APPROACHES = [
       { finding: 'Bilateral diffuse infiltrates', ddx: 'ARDS, pulmonary edema, bilateral pneumonia, pulmonary hemorrhage' },
       { finding: 'Kerley B lines', ddx: 'Pulmonary edema (interstitial), lymphangitic carcinomatosis' },
     ]},
-  { id: 'axr', title: 'Abdominal X-Ray (AXR)', icon: 'ðŸ«„',
+  { id: 'axr', title: 'Abdominal X-Ray (AXR)', icon: '',
     systematic: [
       { area: 'Technical', checks: ['Supine or erect', 'Adequate coverage: diaphragm to symphysis pubis', 'Patient ID and date'] },
       { area: 'Gas Pattern', checks: ['Small bowel: central, valvulae conniventes (cross entire lumen)', 'Large bowel: peripheral, haustra (do NOT cross entire lumen)', 'Small bowel obstruction: dilated >3 cm, multiple air-fluid levels (erect)', 'Large bowel obstruction: dilated >6 cm (>9 cm cecum = risk of perforation)'] },
@@ -16151,7 +16151,7 @@ function RadiologyInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ”¬ Radiology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Radiology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Systematic approach to reading imaging</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -16181,7 +16181,7 @@ function RadiologyInterpreterView() {
 
             {active.commonFindings?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>ðŸ“‹ Common Findings & DDx</h3>
+                <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>Common Findings & DDx</h3>
                 {active.commonFindings.map((f, i) => (
                   <div key={i} className="py-2" style={{ borderBottom: i < active.commonFindings.length - 1 ? '1px solid var(--border)' : 'none' }}>
                     <div className="text-xs font-bold mb-1">{f.finding}</div>
@@ -16238,7 +16238,7 @@ function PediatricDosingView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ‘¶ Pediatric Dosing</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Pediatric Dosing</h2>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-bold opacity-40 block mb-1">Weight (kg)</label>
@@ -16301,7 +16301,7 @@ function PediatricDosingView() {
                     </div>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                    <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>âš ️ Notes</span>
+                    <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>Notes</span>
                     <p className="text-xs opacity-70 mt-1 leading-relaxed">{drug.notes}</p>
                   </div>
                 </div>
@@ -16342,9 +16342,9 @@ function FluidElectrolyteView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’§ Fluids & Electrolytes</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Fluids & Electrolytes</h2>
         <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-          {[['maintenance', 'ðŸ’‰ Maintenance'], ['sodium', 'ðŸ§‚ Sodium'], ['potassium', 'âš¡ Potassium'], ['deficit', 'ðŸ“ Deficit Calculator']].map(([id, label]) => (
+          {[['maintenance', ' Maintenance'], ['sodium', ' Sodium'], ['potassium', 'âš¡ Potassium'], ['deficit', ' Deficit Calculator']].map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}
               className="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 whitespace-nowrap transition-all"
               style={tab === id ? { background: 'var(--accent)', color: '#fff' } : { opacity: .5 }}>
@@ -16417,7 +16417,7 @@ function FluidElectrolyteView() {
               </p>
               <div className="space-y-3">
                 <div className="glass rounded-xl p-4" style={{ background: '#ef444408', border: '1px solid #ef444420' }}>
-                  <h4 className="text-xs font-bold" style={{ color: '#ef4444' }}>âš ️ Severe Hyponatremia (Na⁺ &lt;120, symptomatic)</h4>
+                  <h4 className="text-xs font-bold" style={{ color: '#ef4444' }}>Severe Hyponatremia (Na⁺ &lt;120, symptomatic)</h4>
                   <p className="text-xs opacity-70 mt-1 leading-relaxed">Give 3% saline 100-150 mL bolus over 10-20 min. Raise Na⁺ by 4-6 mEq in first 6 hours. Max correction: 8-10 mEq/24h. Overcorrection â†’ osmotic demyelination syndrome (ODS).</p>
                 </div>
                 <div className="glass rounded-xl p-4" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
@@ -16431,15 +16431,15 @@ function FluidElectrolyteView() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-bold mb-1">Hypovolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>â€¢ Diuretics (thiazides)</p><p>â€¢ Vomiting/diarrhea</p><p>â€¢ Adrenal insufficiency</p><p>â€¢ Cerebral salt wasting</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>Diuretics (thiazides)</p><p>Vomiting/diarrhea</p><p>Adrenal insufficiency</p><p>Cerebral salt wasting</p></div>
                 </div>
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-bold mb-1">Euvolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>â€¢ SIADH (#1 cause)</p><p>â€¢ Hypothyroidism</p><p>â€¢ Psychogenic polydipsia</p><p>â€¢ Beer potomania</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>SIADH (#1 cause)</p><p>Hypothyroidism</p><p>Psychogenic polydipsia</p><p>Beer potomania</p></div>
                 </div>
                 <div className="glass rounded-xl p-3" style={{ border: '1px solid var(--border)' }}>
                   <div className="font-bold mb-1">Hypervolemic</div>
-                  <div className="opacity-60 space-y-0.5"><p>â€¢ Heart failure</p><p>â€¢ Cirrhosis</p><p>â€¢ Nephrotic syndrome</p></div>
+                  <div className="opacity-60 space-y-0.5"><p>Heart failure</p><p>Cirrhosis</p><p>Nephrotic syndrome</p></div>
                 </div>
               </div>
             </div>
@@ -16478,14 +16478,14 @@ function FluidElectrolyteView() {
                     <p>3. U waves</p>
                     <p>4. Prolonged QT</p>
                     <p className="mt-2"><strong>Causes:</strong></p>
-                    <p>â€¢ Diuretics (loop, thiazide)</p>
-                    <p>â€¢ Vomiting / NG suction</p>
-                    <p>â€¢ Diarrhea</p>
-                    <p>â€¢ Insulin / βâ‚‚-agonists (shift)</p>
-                    <p>â€¢ Renal tubular acidosis</p>
+                    <p>Diuretics (loop, thiazide)</p>
+                    <p>Vomiting / NG suction</p>
+                    <p>Diarrhea</p>
+                    <p>Insulin / βâ‚‚-agonists (shift)</p>
+                    <p>Renal tubular acidosis</p>
                     <p className="mt-2"><strong>Replacement:</strong></p>
                     <p>Oral preferred if able. IV: max 20 mEq/hr peripheral, 40 mEq/hr central.</p>
-                    <p>âš ️ Check Mg²⁺ â€” hypokalemia refractory to correction if Mg²⁺ is also low.</p>
+                    <p>Check Mg²⁺ â€” hypokalemia refractory to correction if Mg²⁺ is also low.</p>
                   </div>
                 </div>
               </div>
@@ -16534,7 +16534,7 @@ function FluidElectrolyteView() {
                     <div className="text-xs font-bold opacity-40 mb-1">Free Water Deficit</div>
                     <div className="text-lg font-bold" style={{ color: '#ef4444' }}>{freeWaterDeficit} L</div>
                     <p className="text-xs opacity-50 mt-1">TBW Ã— ((Na⁺/140) â€“ 1)</p>
-                    <p className="text-xs opacity-40 mt-2">âš ️ Replace slowly â€” max correction 10-12 mEq/24h</p>
+                    <p className="text-xs opacity-40 mt-2">Replace slowly â€” max correction 10-12 mEq/24h</p>
                   </div>
                 )}
                 {parseFloat(serumNa) < 135 && naDeficit3Pct && (
@@ -16542,7 +16542,7 @@ function FluidElectrolyteView() {
                     <div className="text-xs font-bold opacity-40 mb-1">Na⁺ Deficit (mEq)</div>
                     <div className="text-lg font-bold" style={{ color: '#3b82f6' }}>{naDeficit3Pct} mEq</div>
                     <p className="text-xs opacity-50 mt-1">(Target Na â€“ Current Na) Ã— TBW</p>
-                    <p className="text-xs opacity-40 mt-2">âš ️ Max correction 8-10 mEq/24h to avoid ODS</p>
+                    <p className="text-xs opacity-40 mt-2">Max correction 8-10 mEq/24h to avoid ODS</p>
                   </div>
                 )}
               </div>
@@ -16616,7 +16616,7 @@ function ImageQuizView() {
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">ðŸ” Clinical Vignette Quiz</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Clinical Vignette Quiz</h2>
           <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>{score.correct}/{score.total}</span>
         </div>
         <p className="text-xs opacity-40 mt-0.5">Visual diagnosis from clinical descriptions</p>
@@ -16628,7 +16628,7 @@ function ImageQuizView() {
         </div>
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-          <h3 className="font-bold text-sm mb-3">ðŸ“‹ Clinical Vignette</h3>
+          <h3 className="font-bold text-sm mb-3">Clinical Vignette</h3>
           <p className="text-sm opacity-80 leading-relaxed">{q.desc}</p>
         </div>
 
@@ -16652,15 +16652,15 @@ function ImageQuizView() {
         ) : (
           <div className="space-y-4 animate-fade-in-up">
             <div className="glass rounded-2xl p-5" style={{ background: '#10b98108', border: '1px solid #10b98130' }}>
-              <h3 className="font-bold text-sm mb-1" style={{ color: '#10b981' }}>âœ… Key Finding</h3>
+              <h3 className="font-bold text-sm mb-1" style={{ color: '#10b981' }}>Key Finding</h3>
               <p className="text-sm opacity-80">{q.finding}</p>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--accent)/30' }}>
-              <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--accent)' }}>ðŸ¥ Diagnosis</h3>
+              <h3 className="font-bold text-sm mb-1" style={{ color: 'var(--accent)' }}>Diagnosis</h3>
               <p className="text-lg font-black">{q.diagnosis}</p>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-bold text-sm mb-2">ðŸ“– Explanation</h3>
+              <h3 className="font-bold text-sm mb-2">Explanation</h3>
               <p className="text-sm opacity-70 leading-relaxed">{q.explanation}</p>
             </div>
             <button onClick={nextQ} className="btn-accent w-full py-3 rounded-xl font-bold">
@@ -16678,7 +16678,7 @@ function ImageQuizView() {
    CRITICAL CARE PROTOCOLS â€” ICU management references
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ICU_PROTOCOLS = [
-  { id: 'vent', title: 'Mechanical Ventilation', cat: 'Respiratory', icon: 'ðŸ«',
+  { id: 'vent', title: 'Mechanical Ventilation', cat: 'Respiratory', icon: '',
     sections: [
       { heading: 'Initial Settings (Volume Control)',
         content: [
@@ -16720,7 +16720,7 @@ const ICU_PROTOCOLS = [
           'If desaturating: disconnect from vent â†’ BVM with 100% Oâ‚‚ â†’ systematic assessment',
         ]},
     ]},
-  { id: 'shock', title: 'Shock Management', cat: 'Hemodynamics', icon: 'ðŸ’‰',
+  { id: 'shock', title: 'Shock Management', cat: 'Hemodynamics', icon: '',
     sections: [
       { heading: 'Classification of Shock',
         content: [
@@ -16758,7 +16758,7 @@ const ICU_PROTOCOLS = [
           'SVR: 800-1200 dynes·sec/cm⁵ (low in distributive, high in cardiogenic)',
         ]},
     ]},
-  { id: 'sedation', title: 'ICU Sedation & Analgesia', cat: 'Neurology', icon: 'ðŸ’Š',
+  { id: 'sedation', title: 'ICU Sedation & Analgesia', cat: 'Neurology', icon: '',
     sections: [
       { heading: 'Pain-First Approach (eCASH)',
         content: [
@@ -16792,7 +16792,7 @@ const ICU_PROTOCOLS = [
           'Risk factors: age >65, dementia, severity of illness, BZD use, immobility, sleep deprivation',
         ]},
     ]},
-  { id: 'codes', title: 'Cardiac Arrest / ACLS', cat: 'Emergency', icon: 'ðŸš¨',
+  { id: 'codes', title: 'Cardiac Arrest / ACLS', cat: 'Emergency', icon: '',
     sections: [
       { heading: 'Shockable Rhythms (VF / pVT)',
         content: [
@@ -16844,7 +16844,7 @@ function CriticalCareProtocolsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¥ Critical Care Protocols</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Critical Care Protocols</h2>
         <p className="text-xs opacity-40 mt-0.5">ICU management references</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -16969,7 +16969,7 @@ function BloodGasInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©¸ ABG Interpreter</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">ABG Interpreter</h2>
         <p className="text-xs opacity-40 mt-0.5">Systematic arterial blood gas analysis</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -17024,7 +17024,7 @@ function BloodGasInterpreterView() {
         )}
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-          <h3 className="font-bold text-sm mb-3">ðŸ“‹ ABG Interpretation Steps</h3>
+          <h3 className="font-bold text-sm mb-3">ABG Interpretation Steps</h3>
           {[
             'Step 1: Look at pH â†’ Acidemia (<7.35) or Alkalemia (>7.45)?',
             'Step 2: Identify primary disorder â†’ pCOâ‚‚ (respiratory) or HCOâ‚ƒ⁻ (metabolic)?',
@@ -17108,7 +17108,7 @@ function InfectiousDiseaseGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¦  Infectious Disease Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Infectious Disease Guide</h2>
         {!active && (
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search infectionsâ€¦"
             className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
@@ -17153,7 +17153,7 @@ function InfectiousDiseaseGuideView() {
             </div>
 
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-              <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>ðŸ’¡ Key Points</h3>
+              <h3 className="font-bold text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>Key Points</h3>
               {active.keyPoints.map((kp, i) => (
                 <div key={i} className="flex gap-2 text-xs py-1">
                   <span style={{ color: '#f59e0b' }}>â–¸</span>
@@ -17196,12 +17196,12 @@ const TOXICOLOGY_DATA = [
     presentation: 'Classic triad: respiratory depression + miosis (pinpoint pupils) + altered consciousness. Hypotension, hypothermia, â†“ bowel sounds.',
     antidote: 'Naloxone (Narcan) â€” competitive mu-receptor antagonist',
     dosing: 'IV/IM/IN: Start 0.04-0.4 mg, repeat Q2-3 min up to 10 mg. Higher doses for synthetic opioids (fentanyl). Infusion: 2/3 of reversal dose per hour.',
-    keyPoints: ['Start LOW dose in opioid-dependent patients (precipitate withdrawal)', 'Naloxone duration (30-90 min) shorter than most opioids â†’ MUST observe for re-narcotization', 'Fentanyl may require higher/repeated naloxone doses', 'Intubate if not responding to naloxone', 'âš ️ Acute withdrawal is not life-threatening but is very uncomfortable'] },
+    keyPoints: ['Start LOW dose in opioid-dependent patients (precipitate withdrawal)', 'Naloxone duration (30-90 min) shorter than most opioids â†’ MUST observe for re-narcotization', 'Fentanyl may require higher/repeated naloxone doses', 'Intubate if not responding to naloxone', 'âš  Acute withdrawal is not life-threatening but is very uncomfortable'] },
   { toxin: 'Benzodiazepines', mechanism: 'GABA-A receptor positive allosteric modulator â†’ CNS depression',
     presentation: 'Sedation, slurred speech, ataxia, respiratory depression (especially combined with opioids/alcohol). Paradoxical agitation in elderly.',
     antidote: 'Flumazenil â€” competitive GABA-A antagonist',
     dosing: '0.2 mg IV over 30 sec, then 0.3 mg, then 0.5 mg at 1-min intervals. Max 3-5 mg.',
-    keyPoints: ['âš ️ AVOID flumazenil in chronic BZD users â†’ precipitates SEIZURES', 'Avoid in mixed ingestions (especially tricyclics)', 'BZD overdose alone rarely fatal â€” mainly fatal when combined with opioids/alcohol', 'Supportive care + airway management is usually sufficient'] },
+    keyPoints: ['âš  AVOID flumazenil in chronic BZD users â†’ precipitates SEIZURES', 'Avoid in mixed ingestions (especially tricyclics)', 'BZD overdose alone rarely fatal â€” mainly fatal when combined with opioids/alcohol', 'Supportive care + airway management is usually sufficient'] },
   { toxin: 'Organophosphates (Nerve Agents)', mechanism: 'Irreversible inhibition of acetylcholinesterase â†’ excess acetylcholine (muscarinic + nicotinic)',
     presentation: 'SLUDGE/BBB: Salivation, Lacrimation, Urination, Defecation, GI cramps, Emesis + Bronchospasm, Bradycardia, miosis (small pupils). KILLER Bs: Bradycardia, Bronchospasm, Bronchorrhea.',
     antidote: 'Atropine (muscarinic) + Pralidoxime/2-PAM (regenerates AChE)',
@@ -17237,7 +17237,7 @@ function ToxicologyView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">â˜ ️ Toxicology & Antidotes</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Toxicology & Antidotes</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search poisons / antidotesâ€¦"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -17249,7 +17249,7 @@ function ToxicologyView() {
             <div key={t.toxin} className="glass rounded-2xl overflow-hidden" style={{ border: `1px solid ${isOpen ? '#ef444440' : 'var(--border)'}` }}>
               <button onClick={() => setExpanded(e => e === t.toxin ? null : t.toxin)}
                 className="w-full p-4 text-left flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: '#ef444410' }}>â˜ ️</div>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: '#ef444410' }}>â˜ </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-sm">{t.toxin}</h3>
                   <p className="text-xs opacity-40 mt-0.5">Antidote: {t.antidote}</p>
@@ -17267,11 +17267,11 @@ function ToxicologyView() {
                     <p className="text-xs opacity-70 leading-relaxed">{t.presentation}</p>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#10b98108', border: '1px solid #10b98120' }}>
-                    <h4 className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#10b981' }}>ðŸ’‰ Antidote: {t.antidote}</h4>
+                    <h4 className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#10b981' }}>Antidote: {t.antidote}</h4>
                     <p className="text-xs opacity-70 leading-relaxed">{t.dosing}</p>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                    <h4 className="text-xs font-bold mb-2" style={{ color: '#f59e0b' }}>ðŸ’Ž Key Points</h4>
+                    <h4 className="text-xs font-bold mb-2" style={{ color: '#f59e0b' }}>Key Points</h4>
                     {t.keyPoints.map((kp, i) => (
                       <div key={i} className="flex gap-2 text-xs py-0.5">
                         <span style={{ color: '#f59e0b' }}>â–¸</span>
@@ -17295,7 +17295,7 @@ function ToxicologyView() {
    PATHOLOGY QUICK REFERENCE â€” common histopath patterns
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PATHOLOGY_DATA = [
-  { id: 'neoplasia', title: 'Neoplasia Basics', icon: 'ðŸ”¬',
+  { id: 'neoplasia', title: 'Neoplasia Basics', icon: '',
     items: [
       { term: 'Dysplasia', def: 'Disordered growth with loss of uniformity. Preneoplastic but potentially reversible. NOT cancer yet.', detail: 'Loss of polarity, â†‘ mitoses, nuclear pleomorphism, â†‘ N:C ratio. Confined to basement membrane.', pearl: 'CIN (cervical intraepithelial neoplasia) = classic example of graded dysplasia â†’ carcinoma in situ â†’ invasive.' },
       { term: 'Carcinoma in situ (CIS)', def: 'Full-thickness dysplasia confined above basement membrane. Pre-invasive malignancy.', detail: 'No stromal invasion = no metastatic potential. Basement membrane intact.', pearl: 'CIS of cervix (CIN III) treated with excision/LEEP. Ductal CIS (DCIS) of breast â†’ risk of invasive ductal carcinoma.' },
@@ -17303,7 +17303,7 @@ const PATHOLOGY_DATA = [
       { term: 'Anaplasia', def: 'Lack of differentiation (undifferentiated). Hallmark of malignancy.', detail: 'Bizarre giant cells, tumor giant cells, abnormal mitoses, marked pleomorphism, N:C ratio approaches 1:1.', pearl: 'More anaplastic = higher grade = worse prognosis. Exception: seminoma is well-differentiated but still malignant.' },
       { term: 'Grading vs Staging', def: 'Grade = differentiation (how abnormal cells look). Stage = spread (how far).', detail: 'Grade: G1 well-diff, G2 moderate, G3 poor, G4 undifferentiated. Stage: TNM (Tumor size, Nodes, Metastasis).', pearl: 'Staging is the BEST predictor of prognosis, more important than grade.' },
     ]},
-  { id: 'histo', title: 'Classic Histopathology Findings', icon: 'ðŸ§«',
+  { id: 'histo', title: 'Classic Histopathology Findings', icon: '',
     items: [
       { term: 'Reed-Sternberg cells', def: 'Owl-eye bilobed giant cells. Pathognomonic for Hodgkin lymphoma.', detail: 'CD15+, CD30+, CD20âˆ’. "Lacunar" variant = Nodular sclerosis subtype (most common).', pearl: 'RS cells are only ~1% of tumor mass. Background reactive cells (lymphocytes, eosinophils, plasma cells) make up the bulk.' },
       { term: 'Auer rods', def: 'Needle-shaped cytoplasmic inclusions in myeloblasts. Pathognomonic for AML (acute myeloid leukemia).', detail: 'Fused azurophilic granules. Especially prominent in APL (AML M3) = "faggot cells" (bundles of Auer rods).', pearl: 'APL (t(15;17) PML-RARA): medical emergency â†’ DIC. Treat with ATRA + arsenic trioxide.' },
@@ -17314,7 +17314,7 @@ const PATHOLOGY_DATA = [
       { term: 'Birbeck granules', def: 'Tennis racquet-shaped organelles on EM. Pathognomonic for Langerhans cell histiocytosis (LCH).', detail: 'LCH cells are CD1a+ and S100+. Pentalaminar rod shape on electron microscopy.', pearl: 'LCH spectrum: Letterer-Siwe (disseminated, infants), Hand-Schüller-Christian (triad: skull lesions, DI, exophthalmos), Eosinophilic granuloma (localized bone).' },
       { term: 'Crescents on glomerular biopsy', def: 'Crescentic (RPGN) = rapidly progressive glomerulonephritis. Cellular crescents = proliferating parietal epithelial cells + macrophages in Bowman space.', detail: 'Type I: Anti-GBM (Goodpasture). Type II: Immune complex (SLE, IgA, post-strep). Type III: Pauci-immune (ANCA: GPA, MPA, EGPA).', pearl: 'Crescents = "broken" glomeruli â†’ medical emergency. If >50% glomeruli affected, prognosis poor without aggressive immunosuppression.' },
     ]},
-  { id: 'inflammation', title: 'Inflammation & Repair', icon: 'ðŸ”¥',
+  { id: 'inflammation', title: 'Inflammation & Repair', icon: '',
     items: [
       { term: 'Granulomatous inflammation', def: 'Collection of activated macrophages (epithelioid cells) ± giant cells. Response to persistent stimuli.', detail: 'Caseating: TB, fungi (histo, coccidio). Non-caseating: Sarcoidosis, Crohn disease, Berylliosis, Cat scratch (Bartonella).', pearl: 'Sarcoid = non-caseating granulomas + â†‘ ACE + â†‘ Ca²⁺ + bilateral hilar LAD. TB = caseating + AFB+ on Ziehl-Neelsen stain.' },
       { term: 'Amyloidosis', def: 'Extracellular deposition of misfolded fibrillar protein. Congo red stain â†’ apple-green birefringence under polarized light.', detail: 'AL (light chain): multiple myeloma, plasma cell disorders. AA (serum amyloid A): chronic inflammatory states (RA, IBD, FMF). ATTR: transthyretin (familial or senile cardiac).', pearl: 'AL amyloid: nephrotic syndrome, restrictive CMP, macroglossia, periorbital purpura (raccoon eyes), carpal tunnel. Treat underlying myeloma.' },
@@ -17322,7 +17322,7 @@ const PATHOLOGY_DATA = [
       { term: 'Coagulative necrosis', def: 'Cell death with preserved tissue architecture (ghost outlines). Most common. All organs except brain.', detail: 'Caused by ischemia (infarction). Proteins denatured â†’ structure maintained. Eventually replaced by fibrosis.', pearl: 'Brain = liquefactive necrosis (enzymatic). Lung = can be either. TB = caseous (cheesy). Fat necrosis = pancreas (saponification).' },
       { term: 'Apoptosis', def: 'Programmed cell death. Energy-dependent. Single cell "drops out" without inflammation.', detail: 'Intrinsic pathway: mitochondrial (Bax/Bak â†’ cytochrome c â†’ caspase 9). Extrinsic pathway: Fas/FasL, TNF â†’ caspase 8. Both â†’ executioner caspases 3,6,7.', pearl: 'Bodies: Councilman (liver in viral hepatitis/yellow fever), Civatte (lichen planus), apoptotic bodies. Cancer evades apoptosis (Bcl-2 overexpression in follicular lymphoma t(14;18)).' },
     ]},
-  { id: 'stains', title: 'Special Stains & IHC', icon: 'ðŸŽ¨',
+  { id: 'stains', title: 'Special Stains & IHC', icon: '',
     items: [
       { term: 'Congo Red', def: 'Amyloid â†’ apple-green birefringence under polarized light.', detail: '', pearl: 'Gold standard for amyloid detection. Biopsy sites: abdominal fat pad, rectal mucosa, or affected organ.' },
       { term: 'PAS (Periodic Acid-Schiff)', def: 'Stains glycogen + basement membranes magenta/pink.', detail: 'Positive: Whipple disease (PAS+ macrophages), fungal cell walls, Ewing sarcoma (glycogen), renal BM (diabetic nephropathy).', pearl: 'PAS-D (diastase resistant): Whipple bacteria persist after diastase digestion. Glycogen is PAS+ but PAS-D negative.' },
@@ -17343,7 +17343,7 @@ function PathologyQuickRefView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ”¬ Pathology Quick Ref</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Pathology Quick Ref</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search pathology termsâ€¦"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -17358,7 +17358,7 @@ function PathologyQuickRefView() {
               </div>
               <p className="text-sm opacity-70">{item.def}</p>
               {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
-              {item.pearl && <div className="flex items-start gap-2 text-xs" style={{ color: '#f59e0b' }}><span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span></div>}
+              {item.pearl && <div className="flex items-start gap-2 text-xs" style={{ color: '#f59e0b' }}><span></span><span className="leading-relaxed">{item.pearl}</span></div>}
             </div>
           )) : <div className="empty-state py-12"><p className="font-bold mt-4">No results</p></div>
         ) : active ? (
@@ -17374,7 +17374,7 @@ function PathologyQuickRefView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -17403,7 +17403,7 @@ function PathologyQuickRefView() {
    MICROBIOLOGY GUIDE â€” organisms, gram stains, empiric therapy
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const MICRO_DATA = [
-  { cat: 'Gram-Positive Cocci', icon: 'ðŸŸ£', organisms: [
+  { cat: 'Gram-Positive Cocci', icon: '', organisms: [
     { name: 'Staphylococcus aureus', gram: 'GPC in clusters', catalase: '+', coagulase: '+',
       diseases: 'Skin infections (abscess, cellulitis, impetigo), bacteremia, endocarditis (acute), osteomyelitis, septic arthritis, pneumonia (post-influenza), TSS, food poisoning (preformed toxin)',
       key: 'MRSA: mecA gene â†’ altered PBP2a. Treat MRSA: Vancomycin, daptomycin, linezolid, TMP-SMX (skin). MSSA: Nafcillin/oxacillin (DOC).',
@@ -17421,7 +17421,7 @@ const MICRO_DATA = [
       key: 'γ-hemolytic (non-hemolytic), PYR+. Can grow in 6.5% NaCl + bile esculin+. VRE: treat with linezolid or daptomycin. E. faecium more resistant than E. faecalis.',
       virulence: 'Intrinsic low-level aminoglycoside resistance. Can acquire vanA/vanB â†’ VRE. Biofilm formation.' },
   ]},
-  { cat: 'Gram-Negative Rods', icon: 'ðŸ”´', organisms: [
+  { cat: 'Gram-Negative Rods', icon: '', organisms: [
     { name: 'Escherichia coli', gram: 'GNR', catalase: '+', coagulase: 'N/A',
       diseases: '#1 cause of UTI, #1 cause of gram-negative sepsis, neonatal meningitis (K1 capsule), traveler\'s diarrhea (ETEC), hemolytic uremic syndrome (EHEC O157:H7)',
       key: 'Lactose fermenter (pink on MacConkey). ESBL-producing: treat with carbapenems. EHEC: DO NOT give antibiotics â†’ â†‘ HUS risk.',
@@ -17439,7 +17439,7 @@ const MICRO_DATA = [
       key: 'Maltose+ and glucose+ fermenter (unlike N. gonorrhoeae which is glucose only). Capsular serotypes: A, B, C, W, Y. Vaccine: MenACWY (required for college dorms), MenB.',
       virulence: 'Polysaccharide capsule (serogroup B = poorly immunogenic â†’ sialylated), LPS/endotoxin (â†’ DIC, shock), IgA protease, pili' },
   ]},
-  { cat: 'Anaerobes', icon: 'ðŸŸ¤', organisms: [
+  { cat: 'Anaerobes', icon: '', organisms: [
     { name: 'Clostridium difficile', gram: 'GPR (anaerobic, spore-forming)', catalase: 'âˆ’', coagulase: 'N/A',
       diseases: 'Antibiotic-associated colitis (pseudomembranous colitis). "Yellow volcano-like" pseudomembranes on colonoscopy.',
       key: 'Toxin A (enterotoxin) + Toxin B (cytotoxin). Diagnose: Stool PCR or GDH + toxin EIA. Treat: Oral vancomycin (125 mg QID) for initial episode or fidaxomicin (preferred for recurrence). Stop offending antibiotic.',
@@ -17453,7 +17453,7 @@ const MICRO_DATA = [
       key: 'Botulinum toxin: blocks ACh release at NMJ (cleaves SNARE proteins). Descending paralysis: cranial nerves first (diplopia, dysphagia, dysarthria) â†’ respiratory failure. Treat: antitoxin (adult) + supportive care. Infant: BIG-IV (human Ig).',
       virulence: 'Most potent biological toxin known. Heat-labile (toxin destroyed by cooking). Spores are heat-resistant.' },
   ]},
-  { cat: 'Fungi', icon: 'ðŸ„', organisms: [
+  { cat: 'Fungi', icon: '', organisms: [
     { name: 'Candida albicans', gram: 'Yeast (GPC-sized)', catalase: 'N/A', coagulase: 'N/A',
       diseases: 'Oral thrush, vulvovaginal candidiasis, esophageal candidiasis (AIDS-defining, CD4 <100-200), candidemia, endocarditis (IVDU)',
       key: 'Germ tube test (+). Pseudohyphae at 37°C. Risk: immunosuppression, antibiotics, diabetes, steroids. Treat: Fluconazole (mucosal), echinocandin (invasive), amphotericin B (salvage).',
@@ -17480,7 +17480,7 @@ function MicrobiologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¦  Microbiology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Microbiology Guide</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search organismsâ€¦"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -17530,7 +17530,7 @@ function MicrobiologyGuideView() {
                         <p className="text-xs opacity-70 leading-relaxed">{o.virulence}</p>
                       </div>
                       <div className="glass rounded-xl p-3" style={{ background: '#10b98108', border: '1px solid #10b98120' }}>
-                        <h4 className="text-xs font-bold mb-1" style={{ color: '#10b981' }}>ðŸ’Š Key Treatment / Identification</h4>
+                        <h4 className="text-xs font-bold mb-1" style={{ color: '#10b981' }}>Key Treatment / Identification</h4>
                         <p className="text-xs opacity-70 leading-relaxed">{o.key}</p>
                       </div>
                     </div>
@@ -17606,7 +17606,7 @@ function NutritionCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸŽ Nutrition Calculator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Nutrition Calculator</h2>
         <div className="flex gap-1 mt-3 overflow-x-auto pb-1">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -17750,7 +17750,7 @@ function NutritionCalculatorView() {
               )}
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="font-bold text-sm mb-3">ðŸ¥ ICU Nutrition Guidelines</h3>
+              <h3 className="font-bold text-sm mb-3">ICU Nutrition Guidelines</h3>
               {[
                 'Start enteral nutrition (EN) within 24-48h of ICU admission if hemodynamically stable',
                 'Trophic feeds (10-20 mL/hr) initially, advance over 48-72h to goal',
@@ -17815,7 +17815,7 @@ function NutritionCalculatorView() {
    PSYCHIATRY SCREENING TOOLS â€” PHQ-9, GAD-7, CAGE, MDQ, PHQ-2
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PSYCH_TOOLS = [
-  { id: 'phq9', title: 'PHQ-9 (Depression)', icon: 'ðŸ˜”', description: 'Patient Health Questionnaire-9: screens for major depressive disorder. Score 0-27.',
+  { id: 'phq9', title: 'PHQ-9 (Depression)', icon: '', description: 'Patient Health Questionnaire-9: screens for major depressive disorder. Score 0-27.',
     questions: [
       'Little interest or pleasure in doing things',
       'Feeling down, depressed, or hopeless',
@@ -17839,7 +17839,7 @@ const PSYCH_TOOLS = [
       s <= 19 ? { cat: 'Moderately Severe', color: '#f97316', action: 'Pharmacotherapy + therapy (combination recommended)' } :
       { cat: 'Severe', color: '#ef4444', action: 'Immediate pharmacotherapy + therapy, consider referral to psychiatry' },
   },
-  { id: 'gad7', title: 'GAD-7 (Anxiety)', icon: 'ðŸ˜°', description: 'Generalized Anxiety Disorder 7-item scale. Score 0-21.',
+  { id: 'gad7', title: 'GAD-7 (Anxiety)', icon: '', description: 'Generalized Anxiety Disorder 7-item scale. Score 0-21.',
     questions: [
       'Feeling nervous, anxious, or on edge',
       'Not being able to stop or control worrying',
@@ -17860,7 +17860,7 @@ const PSYCH_TOOLS = [
       s <= 14 ? { cat: 'Moderate', color: '#f59e0b', action: 'Consider CBT + possible SSRI/SNRI' } :
       { cat: 'Severe', color: '#ef4444', action: 'SSRI/SNRI + CBT, consider psych referral. Assess for panic disorder, social anxiety.' },
   },
-  { id: 'cage', title: 'CAGE (Alcohol)', icon: 'ðŸº', description: 'CAGE screening for alcohol use disorder. Score â‰¥2 = positive screen.',
+  { id: 'cage', title: 'CAGE (Alcohol)', icon: '', description: 'CAGE screening for alcohol use disorder. Score â‰¥2 = positive screen.',
     questions: [
       'Have you ever felt you should CUT down on your drinking?',
       'Have people ANNOYED you by criticizing your drinking?',
@@ -17875,7 +17875,7 @@ const PSYCH_TOOLS = [
       s === 1 ? { cat: 'Possible concern', color: '#f59e0b', action: 'Further assessment recommended (AUDIT questionnaire for more detail)' } :
       { cat: 'Positive screen (â‰¥2)', color: '#ef4444', action: `Score: ${s}/4. High probability of alcohol use disorder. Full assessment recommended. Consider motivational interviewing, referral.` },
   },
-  { id: 'mdq', title: 'MDQ (Bipolar)', icon: 'ðŸ”„', description: 'Mood Disorder Questionnaire: screens for bipolar spectrum. 13 Yes/No questions.',
+  { id: 'mdq', title: 'MDQ (Bipolar)', icon: '', description: 'Mood Disorder Questionnaire: screens for bipolar spectrum. 13 Yes/No questions.',
     questions: [
       'Has there ever been a period of time when you were NOT your usual self and you felt so good or so hyper that other people thought you were not your normal self?',
       '...you were so irritable that you shouted at people or started fights or arguments?',
@@ -17915,7 +17915,7 @@ function PsychiatryScreeningView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ§  Psychiatry Screening</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Psychiatry Screening</h2>
         <p className="text-xs opacity-40 mt-0.5">Validated clinical screening tools</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -17989,7 +17989,7 @@ function PsychiatryScreeningView() {
    RESEARCH METHODS GUIDE â€” Study designs, bias, statistics
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const RESEARCH_SECTIONS = [
-  { id: 'designs', title: 'Study Designs', icon: 'ðŸ“Š',
+  { id: 'designs', title: 'Study Designs', icon: '',
     items: [
       { term: 'Randomized Controlled Trial (RCT)', def: 'Gold standard for therapeutic questions. Participants randomly assigned to intervention vs control.', detail: 'Strengths: minimizes confounding, establishes causation. Weaknesses: expensive, time-consuming, ethical constraints (can\'t randomize harmful exposures).', pearl: 'Intention-to-treat (ITT) analysis: analyzes by assigned group regardless of compliance â†’ preserves randomization, conservative. Per-protocol: only compliant patients â†’ biased but shows drug effect.' },
       { term: 'Cohort Study', def: 'Follows exposed vs unexposed groups over time â†’ measures incidence of outcome. Prospective or retrospective.', detail: 'Measure: Relative Risk (RR). Prospective: less recall bias, can measure incidence. Retrospective: faster, cheaper, uses existing records.', pearl: 'Framingham Heart Study = classic prospective cohort. Good for rare exposures, not good for rare diseases.' },
@@ -17998,7 +17998,7 @@ const RESEARCH_SECTIONS = [
       { term: 'Meta-Analysis', def: 'Statistically combines results of multiple studies. Highest level of evidence (when well done).', detail: 'Forest plot: each study as a line, diamond = pooled estimate. Tests for heterogeneity (I² statistic). Funnel plot: checks for publication bias.', pearl: 'Cochrane Reviews = systematic reviews ± meta-analyses. I² >50% = significant heterogeneity â†’ consider random-effects model.' },
       { term: 'Case Report / Series', def: 'Description of individual patient(s). Lowest level of evidence but important for rare/novel findings.', detail: 'No comparison group. Cannot establish causation. But important for: new diseases, rare side effects, unusual presentations.', pearl: 'First description of AIDS was case reports (1981 MMWR). Also useful for generating hypotheses.' },
     ]},
-  { id: 'bias', title: 'Bias & Confounding', icon: 'âš–️',
+  { id: 'bias', title: 'Bias & Confounding', icon: '',
     items: [
       { term: 'Selection Bias', def: 'Systematic error in selecting participants that distorts the association.', detail: 'Examples: Berkson bias (hospital admission rates), healthy worker effect, non-response bias, volunteer bias.', pearl: 'Prevention: random sampling, high participation rates, intention-to-treat analysis.' },
       { term: 'Information (Measurement) Bias', def: 'Systematic error in measuring exposure or outcome.', detail: 'Recall bias: cases remember exposures better than controls. Observer bias: assessor knowledge of exposure affects measurement.', pearl: 'Prevention: blinding (single, double, triple), standardized measurement, validated instruments.' },
@@ -18006,7 +18006,7 @@ const RESEARCH_SECTIONS = [
       { term: 'Lead-Time Bias', def: 'Screening detects disease earlier â†’ survival appears longer even if death time unchanged.', detail: 'Applies to screening studies. Patient seems to survive longer just because diagnosed earlier, not because they actually live longer.', pearl: 'Must use mortality rates (not survival time) to truly evaluate screening benefit.' },
       { term: 'Length-Time Bias', def: 'Screening preferentially detects slow-growing (less aggressive) disease â†’ overestimates screening benefit.', detail: 'Aggressive cancers: short preclinical phase â†’ less likely to be caught by periodic screening. Indolent cancers: long preclinical phase â†’ more likely detected.', pearl: 'Contributes to "overdiagnosis" â€” detecting cancers that may never have caused harm (e.g., some prostate, thyroid cancers).' },
     ]},
-  { id: 'stats', title: 'Biostatistics Essentials', icon: 'ðŸ“ˆ',
+  { id: 'stats', title: 'Biostatistics Essentials', icon: '',
     items: [
       { term: 'Sensitivity', def: 'True positive rate: TP/(TP+FN). Ability to correctly identify those WITH disease.', detail: 'High sensitivity â†’ few false negatives â†’ good for ruling OUT (SnNout: Sensitive test, Negative result, rules Out).', pearl: 'Screening tests need HIGH sensitivity (don\'t want to miss disease). Example: troponin for MI screening â€” very sensitive.' },
       { term: 'Specificity', def: 'True negative rate: TN/(TN+FP). Ability to correctly identify those WITHOUT disease.', detail: 'High specificity â†’ few false positives â†’ good for ruling IN (SpPin: Specific test, Positive result, rules In).', pearl: 'Confirmatory tests need HIGH specificity. Example: anti-CCP for RA â€” very specific (>95%).' },
@@ -18025,7 +18025,7 @@ function ResearchMethodsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“Š Research Methods</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Research Methods</h2>
         <p className="text-xs opacity-40 mt-0.5">Study designs, bias & biostatistics</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18042,7 +18042,7 @@ function ResearchMethodsView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -18071,7 +18071,7 @@ function ResearchMethodsView() {
    COMMUNICATION SKILLS â€” Breaking bad news, MI, etc.
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const COMM_FRAMEWORKS = [
-  { id: 'spikes', title: 'SPIKES â€” Breaking Bad News', icon: 'ðŸ’¬',
+  { id: 'spikes', title: 'SPIKES â€” Breaking Bad News', icon: '',
     steps: [
       { letter: 'S', name: 'Setting', items: ['Arrange privacy (close curtain, quiet room)', 'Sit at eye level', 'Involve significant others (per patient preference)', 'Make connection (eye contact, touch if appropriate)', 'Manage time: uninterrupted block', 'Turn off phone / pager if possible'] },
       { letter: 'P', name: 'Perception', items: ['Ask before telling: "What have you been told about your condition?"', '"What is your understanding of why we did the test?"', 'Assess level of understanding and expectations', 'Correct misinformation gently', 'Identify denial as a coping mechanism'] },
@@ -18080,7 +18080,7 @@ const COMM_FRAMEWORKS = [
       { letter: 'E', name: 'Emotions / Empathy', items: ['Allow silence â€” do not rush to fill it', 'Acknowledge emotion: "I can see this is upsettingâ€¦"', 'Validate: "It\'s completely understandable to feel angry"', 'Use NURSE statements: Name, Understand, Respect, Support, Explore', 'Offer tissues, water. Be present.'] },
       { letter: 'S', name: 'Strategy / Summary', items: ['Discuss next steps and treatment options', 'Check understanding: "Can you tell me what you\'ve taken from today?"', 'Arrange follow-up (specific date/time)', 'Provide written information / resources', 'Offer referrals: social work, pastoral care, support groups', '"I will be here for you throughout this process"'] },
     ]},
-  { id: 'mi', title: 'Motivational Interviewing', icon: 'ðŸŽ¯',
+  { id: 'mi', title: 'Motivational Interviewing', icon: '',
     steps: [
       { letter: 'O', name: 'Open-ended Questions', items: ['"Tell me about your experience withâ€¦"', '"What concerns you most aboutâ€¦?"', '"How would you like things to be different?"', 'Avoids yes/no answers', 'Gives patient control of the narrative'] },
       { letter: 'A', name: 'Affirmations', items: ['Acknowledge strengths and efforts', '"It takes courage to come in today"', '"You\'ve clearly been thinking about this carefully"', 'Reinforce positive behavior change talk', 'Build self-efficacy'] },
@@ -18094,7 +18094,7 @@ const COMM_FRAMEWORKS = [
       'Develop discrepancy: help patient see gap between current behavior and stated goals/values',
       'Readiness ruler: "On a scale of 1-10, how ready are you toâ€¦?" â†’ "Why not a lower number?"',
     ]},
-  { id: 'consent', title: 'Informed Consent', icon: 'ðŸ“‹',
+  { id: 'consent', title: 'Informed Consent', icon: '',
     steps: [
       { letter: 'D', name: 'Diagnosis / Condition', items: ['Explain the current condition clearly', 'Use layperson terms', 'Check understanding'] },
       { letter: 'P', name: 'Procedure / Treatment', items: ['Describe what will be done, step by step', 'Explain who will perform it', 'Duration and recovery expectations'] },
@@ -18118,7 +18118,7 @@ function CommunicationSkillsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ—£️ Communication Skills</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Communication Skills</h2>
         <p className="text-xs opacity-40 mt-0.5">Clinical communication frameworks</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18146,7 +18146,7 @@ function CommunicationSkillsView() {
             ))}
             {active.extras && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-bold text-sm mb-3" style={{ color: '#f59e0b' }}>ðŸ’¡ Key Points</h3>
+                <h3 className="font-bold text-sm mb-3" style={{ color: '#f59e0b' }}>Key Points</h3>
                 {active.extras.map((e, i) => (
                   <div key={i} className="flex gap-2 text-xs py-0.5">
                     <span style={{ color: '#f59e0b' }}>â–¸</span>
@@ -18179,7 +18179,7 @@ function CommunicationSkillsView() {
    QUALITY IMPROVEMENT â€” PDSA, Root Cause Analysis, Patient Safety
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const QI_SECTIONS = [
-  { id: 'pdsa', title: 'PDSA Cycle', icon: 'ðŸ”„',
+  { id: 'pdsa', title: 'PDSA Cycle', icon: '',
     content: [
       { heading: 'Plan', items: ['State the objective of the test of change', 'Make predictions about what will happen and why', 'Develop a plan: Who? What? When? Where? What data to collect?', 'Plan is based on theory or observation that improvement is possible'] },
       { heading: 'Do', items: ['Carry out the test on a SMALL scale', 'Document problems and unexpected observations', 'Begin data collection and analysis', 'Keep the test small and rapid (days-weeks, not months)'] },
@@ -18187,7 +18187,7 @@ const QI_SECTIONS = [
       { heading: 'Act', items: ['Adapt the change based on what was learned', 'Options: Adopt (implement), Adapt (modify and re-test), Abandon (try something else)', 'Plan the next cycle', 'Scale up successful changes gradually'] },
     ],
     tips: ['Multiple rapid PDSA cycles > one large project', 'Start small (1 patient, 1 shift, 1 provider)', 'Test predictions â€” learning from failures is valuable', 'Engage frontline staff from the beginning'] },
-  { id: 'rca', title: 'Root Cause Analysis', icon: 'ðŸ”',
+  { id: 'rca', title: 'Root Cause Analysis', icon: '',
     content: [
       { heading: 'When to Use RCA', items: ['Sentinel events (patient death, wrong-site surgery, retained foreign body)', 'Near-miss events with potential for harm', 'Patterns of recurring errors', 'Required by TJC (The Joint Commission) for sentinel events'] },
       { heading: '5 Whys Technique', items: ['Ask "Why?" repeatedly to drill down to root cause', 'Example: Med error â†’ nurse distracted â†’ multiple patients â†’ staffing shortage â†’ budget cuts', 'Go beyond individual blame to SYSTEM factors', 'Usually 4-6 levels of "why" reach the root'] },
@@ -18195,7 +18195,7 @@ const QI_SECTIONS = [
       { heading: 'Swiss Cheese Model (Reason)', items: ['Multiple layers of defense, each with "holes" (weaknesses)', 'Error occurs when holes align through all layers', 'Solution: add/strengthen barriers (redundancy)', 'System design prevents errors rather than relying on individuals'] },
     ],
     tips: ['Focus on systems, not individuals', 'Ask "What?" and "Why?" not "Who?"', 'Involve all stakeholders in the analysis', 'Strong actions: physical/systemic changes. Weak actions: retraining, policies'] },
-  { id: 'safety', title: 'Patient Safety', icon: 'ðŸ›¡️',
+  { id: 'safety', title: 'Patient Safety', icon: '',
     content: [
       { heading: 'High-Reliability Organization (HRO) Principles', items: ['Preoccupation with failure â€” report near-misses', 'Reluctance to simplify â€” don\'t accept easy explanations', 'Sensitivity to operations â€” situational awareness', 'Commitment to resilience â€” plan for errors, recover quickly', 'Deference to expertise â€” let frontline staff speak up'] },
       { heading: 'Safety Culture Elements', items: ['Just culture: distinguish between human error (console), at-risk behavior (coach), and reckless behavior (discipline)', 'Psychological safety: staff feel safe reporting errors', 'Non-punitive reporting systems (PSAs, safety huddles)', 'Learning from events: closed-loop feedback'] },
@@ -18211,7 +18211,7 @@ function QualityImprovementView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“‹ Quality Improvement</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Quality Improvement</h2>
         <p className="text-xs opacity-40 mt-0.5">PDSA, root cause analysis & patient safety</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18237,7 +18237,7 @@ function QualityImprovementView() {
             ))}
             {active.tips && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-bold text-sm mb-3" style={{ color: '#f59e0b' }}>ðŸ’¡ Tips</h3>
+                <h3 className="font-bold text-sm mb-3" style={{ color: '#f59e0b' }}>Tips</h3>
                 {active.tips.map((t, i) => (
                   <div key={i} className="flex gap-2 text-xs py-0.5"><span style={{ color: '#f59e0b' }}>â–¸</span><span className="opacity-70 leading-relaxed">{t}</span></div>
                 ))}
@@ -18311,7 +18311,7 @@ function ObGynCalculatorsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¤° OB/GYN Calculators</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">OB/GYN Calculators</h2>
         <div className="flex gap-1 mt-3">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -18333,7 +18333,7 @@ function ObGynCalculatorsView() {
             </div>
             {edd && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--accent)/30' }}>
-                <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--accent)' }}>ðŸ“… Estimated Due Date (Naegele\'s Rule)</h3>
+                <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--accent)' }}>Estimated Due Date (Naegele\'s Rule)</h3>
                 <div className="text-xl font-black" style={{ color: 'var(--accent)' }}>{edd}</div>
                 <div className="text-xs opacity-40 mt-1">LMP + 9 months + 7 days</div>
               </div>
@@ -18345,7 +18345,7 @@ function ObGynCalculatorsView() {
                 <div className="text-xs opacity-40 mt-1">({gestAge.total} days from LMP)</div>
                 <div className="mt-3 text-xs space-y-1 opacity-60">
                   <div>Trimester: {gestAge.weeks < 13 ? '1st (weeks 1-12)' : gestAge.weeks < 28 ? '2nd (weeks 13-27)' : '3rd (weeks 28-40)'}</div>
-                  <div>Viability: {gestAge.weeks >= 24 ? 'âœ… Past viability threshold (24 weeks)' : 'âš ️ Pre-viable (<24 weeks)'}</div>
+                  <div>Viability: {gestAge.weeks >= 24 ? 'âœ… Past viability threshold (24 weeks)' : 'âš  Pre-viable (<24 weeks)'}</div>
                   <div>Term: {gestAge.weeks >= 37 ? 'âœ… Term (â‰¥37 weeks)' : gestAge.weeks >= 34 ? 'Late preterm (34-36w)' : 'Preterm (<34 weeks)'}</div>
                 </div>
               </div>
@@ -18424,21 +18424,21 @@ function ObGynCalculatorsView() {
    MEDICAL ETHICS â€” Frameworks, consent, capacity, end-of-life
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ETHICS_SECTIONS = [
-  { id: 'principles', title: 'Core Ethical Principles', icon: 'âš–️',
+  { id: 'principles', title: 'Core Ethical Principles', icon: '',
     items: [
       { term: 'Autonomy', def: 'Respect for patient\'s right to make their own decisions. Informed consent is the practical application.', detail: 'Patients can refuse ANY treatment, even life-saving. Requires capacity: understand, appreciate, reason, communicate. Advance directives extend autonomy when patient cannot decide.', pearl: 'A competent patient\'s refusal of treatment must be respected, even if the physician disagrees. "Competent" is a legal term; "capacity" is the clinical assessment.' },
       { term: 'Beneficence', def: 'Duty to act in the patient\'s best interest. Obligation to provide benefit while minimizing harm.', detail: 'Differs from non-maleficence: beneficence = actively doing good. Includes: treating disease, providing comfort, sharing information. Must balance with patient autonomy.', pearl: 'Paternalism = overriding autonomy "for the patient\'s good." Generally unacceptable. Exception: emergency treatment of incapacitated patient.' },
       { term: 'Non-maleficence', def: '"First, do no harm" (primum non nocere). Duty to avoid causing unnecessary harm or suffering.', detail: 'Risk-benefit analysis: acceptable harm may be tolerated if benefits outweigh (e.g., chemotherapy side effects). Double effect: foreseen but unintended harm (e.g., morphine for pain â†’ hastens death).', pearl: 'Doctrine of Double Effect: action is ethical if: (1) action itself is good/neutral, (2) good effect is intended, (3) bad effect is foreseen but not intended, (4) good outweighs bad.' },
       { term: 'Justice', def: 'Fair distribution of healthcare resources. Treat similar patients similarly. Address health disparities.', detail: 'Distributive justice: allocation of scarce resources (organ transplantation, ICU beds, ventilators in pandemic). Procedural justice: fair processes for decision-making.', pearl: 'Triage in disaster: utilitarian approach (greatest good for greatest number) â€” differs from individual patient care. Allocation frameworks: lottery, first-come, sickest-first, youngest-first, maximize life-years.' },
     ]},
-  { id: 'eol', title: 'End-of-Life Ethics', icon: 'ðŸ•Š️',
+  { id: 'eol', title: 'End-of-Life Ethics', icon: '',
     items: [
       { term: 'Advance Directives', def: 'Legal documents expressing treatment preferences when patient lacks capacity.', detail: 'Living will: specifies treatments desired/refused. Healthcare proxy (DPOA): designates decision-maker. POLST (Physician Orders for Life-Sustaining Treatment): medical orders for seriously ill patients.', pearl: 'Healthcare proxy overrides living will if they conflict. Encourage patients to discuss values (not just specific treatments) with their proxy.' },
       { term: 'DNR / DNAR / AND', def: 'Do Not Resuscitate / Do Not Attempt Resuscitation / Allow Natural Death. No CPR if cardiac/respiratory arrest.', detail: 'DNR â‰  "do nothing." Full medical care continues (antibiotics, pressors, intubation for reversible causes) unless specified otherwise. Must be discussed, not assumed. Can be reversed by patient at any time.', pearl: 'Common misunderstanding: DNR does NOT mean comfort care only. It specifically means no CPR/defibrillation. All other treatments should be discussed separately.' },
       { term: 'Withdrawal of Care', def: 'Discontinuing life-sustaining treatment when it no longer serves the patient\'s goals. Ethically equivalent to withholding.', detail: 'Withdrawing = withholding (ethically and legally). Not considered killing or euthanasia. Based on patient\'s wishes (autonomy) or surrogate decision. Includes: extubation, stopping vasopressors, stopping dialysis, removing feeding tubes.', pearl: 'Ethical: Withdrawing care is not "giving up." It\'s shifting goals from cure to comfort. Ensure adequate symptom management during withdrawal. Family should be prepared for what to expect.' },
       { term: 'Brain Death', def: 'Irreversible cessation of ALL brain functions including brainstem. Legal death. Requires formal assessment.', detail: 'Criteria: known cause, exclude confounders (hypothermia, drugs, metabolic), absent brainstem reflexes (pupillary, corneal, oculocephalic, oculovestibular, gag, cough), absent respiratory drive (apnea test). Confirmatory: EEG, cerebral angiography (if clinical exam confounded).', pearl: 'Brain death = dead. No ethical obligation to continue treatment (including ventilator). Organ donation should be considered. Family may need time to process â€” compassion is key.' },
     ]},
-  { id: 'special', title: 'Special Ethical Situations', icon: 'ðŸ”',
+  { id: 'special', title: 'Special Ethical Situations', icon: '',
     items: [
       { term: 'Confidentiality & Exceptions', def: 'Patient information is confidential. Exceptions exist for safety and legal requirements.', detail: 'Exceptions to confidentiality: duty to warn (Tarasoff â€” imminent threat to identifiable third party), reportable diseases, child/elder abuse, gunshot/stab wounds, impaired drivers.', pearl: 'Tarasoff duty: if patient makes credible threat against identifiable person, physician must take reasonable steps to protect (warn intended victim, notify police, hospitalize).' },
       { term: 'Minors & Consent', def: 'Generally need parental consent. Exceptions: emancipated minor, mature minor, emergency, specific conditions.', detail: 'Emancipated: married, military, self-supporting, parent themselves. Mature minor: case-by-case, demonstrates understanding. Specific conditions (most states): STI/HIV, contraception, substance abuse, mental health, pregnancy-related care.', pearl: 'In emergency: treat first, consent later (implied consent). If parents refuse life-saving treatment for child: get court order. Child\'s best interest trumps parental autonomy.' },
@@ -18454,7 +18454,7 @@ function MedicalEthicsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">âš–️ Medical Ethics</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Medical Ethics</h2>
         <p className="text-xs opacity-40 mt-0.5">Ethical frameworks & clinical dilemmas</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18471,7 +18471,7 @@ function MedicalEthicsView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#8b5cf608', border: '1px solid #8b5cf620', color: '#8b5cf6' }}>
-                    <span>âš¡</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -18500,14 +18500,14 @@ function MedicalEthicsView() {
    WOUND CARE GUIDE â€” Classification, management, dressings
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const WOUND_SECTIONS = [
-  { id: 'classification', title: 'Wound Classification', icon: 'ðŸ©¹',
+  { id: 'classification', title: 'Wound Classification', icon: '',
     items: [
       { term: 'Clean (Class I)', def: 'Elective, no inflammation, no entry into respiratory/GI/GU tracts. Infection rate: <2%.', detail: 'Examples: thyroidectomy, hernia repair (without mesh), breast biopsy.', pearl: 'Prophylactic antibiotics generally NOT needed for clean wounds (exceptions: implant/prosthesis placement).' },
       { term: 'Clean-Contaminated (Class II)', def: 'Controlled entry into hollow viscus. Infection rate: 3-11%.', detail: 'Examples: cholecystectomy, elective colon surgery (with prep), hysterectomy, bronchoscopy with biopsy.', pearl: 'Single dose of prophylactic antibiotics within 60 min of incision. Cefazolin for most. Add metronidazole for colorectal.' },
       { term: 'Contaminated (Class III)', def: 'Open/fresh traumatic wound, major break in sterile technique, GI spillage. Infection rate: 10-17%.', detail: 'Examples: penetrating trauma <4h old, rectal surgery with gross spillage, open appendectomy for gangrenous appendicitis.', pearl: 'Prophylactic antibiotics indicated. Consider delayed primary closure if significant contamination.' },
       { term: 'Dirty/Infected (Class IV)', def: 'Old traumatic wound, existing infection, perforated viscus. Infection rate: >27%.', detail: 'Examples: traumatic wound >4h old, abscess drainage, perforated diverticulitis, devitalized tissue.', pearl: 'Therapeutic (not prophylactic) antibiotics. Debridement essential. Leave wound open (healing by secondary intention or delayed primary closure).' },
     ]},
-  { id: 'pressure', title: 'Pressure Injuries (Ulcers)', icon: 'ðŸ›️',
+  { id: 'pressure', title: 'Pressure Injuries (Ulcers)', icon: '',
     items: [
       { term: 'Stage 1', def: 'Non-blanchable erythema of intact skin. Skin may be warmer, cooler, firmer, softer than adjacent area.', detail: 'Management: relieve pressure (reposition Q2h), moisture barrier cream, optimize nutrition, pressure-redistribution mattress.', pearl: 'May be harder to detect in darker skin tones â€” look for color changes, temperature, edema, induration.' },
       { term: 'Stage 2', def: 'Partial-thickness loss with exposed dermis (pink/red wound bed). May present as intact/ruptured blister.', detail: 'Management: Moist wound healing â€” hydrocolloid for clean wounds, foam dressings for moderate exudate. Avoid betadine.', pearl: 'Should NOT have slough or eschar present. If present â†’ at least Stage 3 or unstageable.' },
@@ -18515,7 +18515,7 @@ const WOUND_SECTIONS = [
       { term: 'Stage 4', def: 'Full-thickness tissue loss with exposed bone, tendon, or muscle. Undermining/tunneling often present.', detail: 'Management: surgical debridement, often needs flap/graft closure. Rule out osteomyelitis (MRI, bone biopsy). Wound VAC as bridge.', pearl: 'Osteomyelitis risk high. Probe-to-bone test (+LR 6.4 for osteomyelitis). MRI is imaging of choice. Tx: 6 weeks antibiotics ± surgical debridement.' },
       { term: 'Unstageable', def: 'Cannot determine depth because wound bed is obscured by slough (yellow) or eschar (black). Full-thickness assumed.', detail: 'Stable eschar on heels should NOT be removed â€” it acts as a natural biological cover (unless infected).', pearl: 'Must debride to stage accurately. Exception: stable heel eschar â€” leave dry and intact unless infected (wet, draining, fluctuant, foul-smelling).' },
     ]},
-  { id: 'dressings', title: 'Wound Dressings Guide', icon: 'ðŸ©¹',
+  { id: 'dressings', title: 'Wound Dressings Guide', icon: '',
     items: [
       { term: 'Hydrocolloid (DuoDERM)', def: 'Occlusive, absorbs light-moderate exudate, autolytic debridement. For Stage 2, clean wounds.', detail: 'Change Q3-7 days. Creates moist environment. Waterproof outer layer. Not for infected wounds, heavy exudate, or deep cavities.', pearl: 'May cause a "melted" appearance when removed â€” this is normal gel, not infection.' },
       { term: 'Foam (Mepilex)', def: 'Highly absorbent, good for moderate-heavy exudate. Non-adherent, thermal insulation.', detail: 'Change daily or when saturated. Good for Stage 2-3, peri-wound protection. Can use as secondary dressing.', pearl: 'Excellent choice under negative pressure wound therapy (wound VAC). Silicone-faced foams reduce pain at dressing change.' },
@@ -18532,7 +18532,7 @@ function WoundCareGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©¹ Wound Care Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Wound Care Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Classification, staging & dressings</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18549,7 +18549,7 @@ function WoundCareGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -18624,7 +18624,7 @@ function PainManagementView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’Š Pain Management</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Pain Management</h2>
         <div className="flex gap-1 mt-3">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -18674,7 +18674,7 @@ function PainManagementView() {
               </div>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #ef444420', background: '#ef444405' }}>
-              <h3 className="font-bold text-sm mb-2" style={{ color: '#ef4444' }}>âš ️ Conversion Safety</h3>
+              <h3 className="font-bold text-sm mb-2" style={{ color: '#ef4444' }}>Conversion Safety</h3>
               {[
                 'When rotating opioids, reduce calculated equianalgesic dose by 25-50% (incomplete cross-tolerance)',
                 'Methadone conversion is NOT linear â€” use specific conversion ratios (highly variable, requires specialist)',
@@ -18708,7 +18708,7 @@ function PainManagementView() {
    GERIATRIC ASSESSMENT â€” Comprehensive Geriatric Assessment Tools
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const GERI_TOOLS = [
-  { id: 'falls', title: 'Falls Risk (Timed Up & Go)', icon: 'ðŸ¦½',
+  { id: 'falls', title: 'Falls Risk (Timed Up & Go)', icon: '',
     description: 'Patient rises from chair, walks 3 meters, turns, walks back, sits down.',
     scoring: [
       { range: '<10 seconds', cat: 'Normal', color: '#10b981' },
@@ -18717,7 +18717,7 @@ const GERI_TOOLS = [
       { range: 'â‰¥30 seconds', cat: 'Impaired mobility â€” fall risk', color: '#ef4444' },
     ],
     interventions: ['Home safety evaluation (grab bars, lighting, rugs)', 'Exercise program (Tai Chi, balance training)', 'Medication review â€” â†“ sedatives, orthostatic-causing agents', 'Vision correction', 'Vitamin D supplementation (800-1000 IU/day)', 'Assistive devices (cane, walker)', 'Annual fall risk screening for â‰¥65 years'] },
-  { id: 'mmse', title: 'Cognitive Screening', icon: 'ðŸ§ ',
+  { id: 'mmse', title: 'Cognitive Screening', icon: '',
     description: 'Mini-Mental State Exam (MMSE) â€” global cognitive function screen.',
     scoring: [
       { range: '24-30', cat: 'Normal', color: '#10b981' },
@@ -18726,14 +18726,14 @@ const GERI_TOOLS = [
       { range: '<10', cat: 'Severe dementia', color: '#ef4444' },
     ],
     interventions: ['MMSE components: Orientation (10), Registration (3), Attention/Calculation (5), Recall (3), Language (8), Visuospatial (1) = 30 total', 'Alternative: MoCA (Montreal Cognitive Assessment) â€” more sensitive for MCI, add 1 point if education â‰¤12 years', 'If abnormal: check reversible causes â€” B12, TSH, RPR, HIV, depression (pseudodementia), medications, delirium', 'Imaging: MRI preferred (hippocampal atrophy in Alzheimer). CT if MRI contraindicated.', 'Refer to neurology/geriatrics for comprehensive evaluation'] },
-  { id: 'adl', title: 'Functional Assessment (ADLs/IADLs)', icon: 'ðŸ ',
+  { id: 'adl', title: 'Functional Assessment (ADLs/IADLs)', icon: '',
     description: 'Activities of Daily Living measure functional independence.',
     scoring: [
       { range: 'ADLs (Katz Index)', cat: 'Basic self-care: Bathing, Dressing, Toileting, Transferring, Continence, Feeding', color: 'var(--accent)' },
       { range: 'IADLs (Lawton Scale)', cat: 'Complex tasks: Shopping, Cooking, Housework, Laundry, Transportation, Medications, Finances, Phone use', color: '#8b5cf6' },
     ],
     interventions: ['ADL dependence â†’ need for personal care assistance', 'IADL decline often earliest sign of cognitive impairment', 'Katz Index: score 0 (dependent) to 6 (independent) for each of 6 ADLs', 'Lawton Scale: score 0-8 (higher = more independent) for 8 IADLs', 'Functional decline: assess for delirium, depression, pain, deconditioning', 'Occupational therapy referral for ADL optimization', 'Consider level of care needed: home with support â†’ assisted living â†’ skilled nursing'] },
-  { id: 'delirium', title: 'Delirium (CAM)', icon: 'âš¡',
+  { id: 'delirium', title: 'Delirium (CAM)', icon: '',
     description: 'Confusion Assessment Method â€” gold standard for delirium screening. Requires ALL of Feature 1 and 2, PLUS either 3 or 4.',
     scoring: [
       { range: 'Feature 1', cat: 'Acute onset AND fluctuating course (REQUIRED)', color: '#ef4444' },
@@ -18742,7 +18742,7 @@ const GERI_TOOLS = [
       { range: 'Feature 4', cat: 'Altered level of consciousness â€” hyperalert, lethargic, stuporous, comatose', color: '#f59e0b' },
     ],
     interventions: ['CAM+: Features 1 + 2 + (3 or 4) = DELIRIUM', 'Delirium workup: infection (UA, CXR, blood cultures), metabolic (BMP, LFTs, TSH), medications (anticholinergics, opioids, sedatives), urinary retention, fecal impaction, pain', 'Treat underlying cause â€” delirium is a SYMPTOM, not a diagnosis', 'Non-pharmacologic: reorientation, sleep hygiene, early mobilization, hearing aids/glasses, minimize tethers (catheters, restraints)', 'Pharmacologic ONLY if agitation is a safety risk: haloperidol 0.5-1 mg IV/IM (avoid in Parkinson, QTc prolongation)', 'Avoid benzodiazepines (worsen delirium) EXCEPT in alcohol/BZD withdrawal'] },
-  { id: 'poly', title: 'Polypharmacy', icon: 'ðŸ’Š',
+  { id: 'poly', title: 'Polypharmacy', icon: '',
     description: 'Using â‰¥5 medications. Common in elderly. Increases risk of adverse drug events, drug interactions, falls, and functional decline.',
     scoring: [
       { range: '0-4 medications', cat: 'Normal', color: '#10b981' },
@@ -18759,7 +18759,7 @@ function GeriatricAssessmentView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ‘´ Geriatric Assessment</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Geriatric Assessment</h2>
         <p className="text-xs opacity-40 mt-0.5">Comprehensive assessment tools for elderly care</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18785,7 +18785,7 @@ function GeriatricAssessmentView() {
               ))}
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #10b98120', background: '#10b98105' }}>
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#10b981' }}>ðŸ’Š Management / Interventions</h3>
+              <h3 className="font-bold text-sm mb-3" style={{ color: '#10b981' }}>Management / Interventions</h3>
               {active.interventions.map((item, i) => (
                 <div key={i} className="flex items-start gap-2 text-xs py-0.5">
                   <span className="shrink-0 mt-0.5" style={{ color: '#10b981' }}>â–¸</span>
@@ -18817,7 +18817,7 @@ function GeriatricAssessmentView() {
    PALLIATIVE CARE â€” Symptom management, goals of care
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PALLIATIVE_SECTIONS = [
-  { id: 'symptom', title: 'Symptom Management', icon: 'ðŸ’',
+  { id: 'symptom', title: 'Symptom Management', icon: '',
     items: [
       { term: 'Pain', def: 'See WHO Analgesic Ladder. Key: "Total Pain" concept â€” physical + psychological + social + spiritual.', detail: 'Opioid-naïve: start morphine 5-10 mg PO Q4h + PRN. Titrate 25-50% daily until controlled. Always prescribe laxative with opioids.', pearl: 'Opioid-induced constipation: senna + docusate (start with opioid). If refractory: methylnaltrexone (peripheral mu-antagonist, doesn\'t cross BBB). Never "wait and see" â€” prescribe prophylactically.' },
       { term: 'Dyspnea', def: 'Subjective sensation of breathlessness. Very distressing symptom.', detail: 'Non-pharmacologic: fan directed at face, positioning (upright/leaning forward), oxygen (if hypoxic, questionable if normoxic), pursed-lip breathing.', pearl: 'Low-dose morphine (2-5 mg PO Q4h) is first-line pharmacotherapy for dyspnea in palliative care. Does NOT cause respiratory depression at these doses. Anxiolytics (lorazepam 0.5-1 mg) if anxiety component.' },
@@ -18825,13 +18825,13 @@ const PALLIATIVE_SECTIONS = [
       { term: 'Delirium / Terminal Agitation', def: 'Very common at end of life (up to 88%). Distressing to family.', detail: 'Workup reversible causes (same as any delirium). Terminal agitation may not have treatable cause.', pearl: 'Haloperidol 0.5-2 mg Q4h PRN is first-line. Midazolam 1-2 mg SQ Q1h PRN for refractory terminal agitation. Palliative sedation (continuous): propofol or midazolam infusion â€” for intractable suffering, ethically distinct from euthanasia.' },
       { term: 'Death Rattle', def: 'Noisy breathing from secretions pooling in pharynx. Common in last hours-days. Usually more distressing to family than patient.', detail: 'Reposition (lateral). Anticholinergics to dry secretions: glycopyrrolate 0.2 mg SQ Q4h, hyoscine (scopolamine) patch, atropine eye drops 1% sublingual.', pearl: 'Reassure family that patient is not "drowning" or suffering â€” the sound is from loss of swallowing reflex, not from distress. Suctioning is usually ineffective and uncomfortable.' },
     ]},
-  { id: 'goals', title: 'Goals of Care Discussion', icon: 'ðŸŽ¯',
+  { id: 'goals', title: 'Goals of Care Discussion', icon: '',
     items: [
       { term: 'REMAP Framework', def: 'Structured approach to serious illness conversations.', detail: 'R â€” Reframe (why this conversation matters now)\nE â€” Expect emotion (acknowledge, empathize)\nM â€” Map values ("What\'s most important to you?")\nA â€” Align with values (connect care plan to stated values)\nP â€” Plan (propose plan consistent with values)', pearl: '"I wish" statements: "I wish the situation were different" â€” shows empathy without giving false hope. Acknowledge uncertainty: "I hope for the best but want to prepare for the worst."' },
       { term: 'Prognostic Disclosure', def: 'Communicate expected trajectory with sensitivity.', detail: 'Ask permission: "Would it be helpful if I shared what I expect might happen?" Use time-based language: "hours to days," "days to weeks," "weeks to months." Avoid exact numbers.', pearl: 'Surprise question: "Would I be surprised if this patient died in the next 12 months?" If no â†’ initiate palliative care/GOC discussion. 70-80% sensitivity for 12-month mortality.' },
       { term: 'Code Status Discussion', def: 'Frame as recommendation in context of overall goals, not a menu of options.', detail: '"Given what you\'ve told me about your goals, I would recommend that we focus fully on your comfort and not attempt CPR, as it would very unlikely help and could cause suffering."', pearl: 'Avoid: "Do you want us to do everything?" (implies anything less is abandonment). Instead: frame as what you CAN do, not what you\'re taking away. "We will do everything to keep you comfortable."' },
     ]},
-  { id: 'hospice', title: 'Hospice & End-of-Life', icon: 'ðŸ•Š️',
+  { id: 'hospice', title: 'Hospice & End-of-Life', icon: '',
     items: [
       { term: 'Hospice Eligibility', def: 'Prognosis â‰¤6 months if disease runs its natural course. Patient elects comfort focus.', detail: 'Medicare Hospice Benefit: covers drugs for terminal dx, nursing, social work, chaplain, aide, DME, bereavement support. Patient can revoke at any time.', pearl: 'Hospice â‰  giving up. Early palliative care + hospice improves quality of life AND survival in some studies (Temel NEJM 2010: early palliative care in metastatic NSCLC â†’ 2.7 months longer survival).' },
       { term: 'Signs of Imminent Death', def: 'Days to hours before death. Important for family preparation.', detail: 'Breathing changes: Cheyne-Stokes, apneic periods, terminal secretions (death rattle). Decreased consciousness, mottling (livedo reticularis) starting peripherally, cool extremities, decreased urine output, loss of swallowing reflex.', pearl: 'Educate family: these are normal dying processes, not signs of suffering. Hearing may be last sense to go â€” continue talking, providing comfort. Physical presence is the most important thing.' },
@@ -18846,7 +18846,7 @@ function PalliativeCareView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ’œ Palliative Care</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Palliative Care</h2>
         <p className="text-xs opacity-40 mt-0.5">Symptom management & goals of care</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18863,7 +18863,7 @@ function PalliativeCareView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed whitespace-pre-line">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#a855f708', border: '1px solid #a855f720', color: '#a855f7' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -18892,20 +18892,20 @@ function PalliativeCareView() {
    SURGICAL ANATOMY â€” Key anatomical relationships for surgery
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const SURG_ANATOMY = [
-  { id: 'abd', title: 'Abdominal Surgery', icon: 'ðŸ”ª',
+  { id: 'abd', title: 'Abdominal Surgery', icon: '',
     items: [
       { term: 'Calot\'s Triangle (Hepatocystic)', def: 'Bounded by: cystic duct, common hepatic duct, inferior liver edge. Contains: cystic artery (from R. hepatic).', detail: 'Critical View of Safety (CVS): gold standard for identifying structures during laparoscopic cholecystectomy. Must clearly identify 2 structures (cystic duct + cystic artery) entering the gallbladder. Failure to achieve CVS â†’ consider subtotal cholecystectomy or open conversion.', pearl: 'Bile duct injury rate ~0.5%. Most common mechanism: misidentification of CBD as cystic duct. Always obtain CVS before clipping anything. If anatomy unclear â†’ "bail out" strategies save lives.' },
       { term: 'Hesselbach\'s Triangle', def: 'Bounded by: inguinal ligament (inferior), inferior epigastric vessels (lateral), lateral border of rectus abdominis (medial). Direct inguinal hernia passes through this triangle.', detail: 'Direct hernias: through Hesselbach\'s, medial to inferior epigastric vessels. Indirect hernias: through deep inguinal ring, lateral to inferior epigastric vessels. Indirect follows the cord through inguinal canal.', pearl: 'Mnemonic: "MDs don\'t LIe" â€” Medial = Direct, Lateral = Indirect. Most common hernia in BOTH sexes: indirect. Strangulation risk highest: femoral > indirect > direct.' },
       { term: 'Layers of Abdominal Wall', def: 'From superficial to deep: Skin â†’ Camper\'s fascia â†’ Scarpa\'s fascia â†’ External oblique â†’ Internal oblique â†’ Transversus abdominis â†’ Transversalis fascia â†’ Preperitoneal fat â†’ Parietal peritoneum', detail: 'McBurney\'s point: 1/3 from ASIS to umbilicus (appendix base). Arcuate line: where posterior rectus sheath ends (below umbilicus). Below arcuate: all aponeuroses pass anterior to rectus muscle.', pearl: 'Appendectomy uses muscle-splitting technique through oblique muscles (McBurney or Lanz incision). Pfannenstiel: transverse, cosmetic, avoids nerve damage â€” used for C-section, pelvic surgery.' },
       { term: 'Retroperitoneal Structures', def: '"SAD PUCKER" â€” Suprarenal glands, Aorta/IVC, Duodenum (2nd-4th parts), Pancreas (except tail), Ureters, Colon (ascending + descending), Kidneys, Esophagus (abdominal), Rectum', detail: 'Surgical significance: retroperitoneal hematoma can be large and occult. Zone I (midline): almost always explore. Zone II (flank/kidney): explore if penetrating, observe if blunt (unless expanding). Zone III (pelvis): avoid exploration (pelvic fracture bleeding â†’ angiography).', pearl: 'Duodenal injury can be missed â€” retroperitoneal perforation doesn\'t cause classic peritonitis. Look for retroperitoneal air on CT. High index of suspicion with seatbelt injuries.' },
     ]},
-  { id: 'neck', title: 'Neck Surgery', icon: 'ðŸ«',
+  { id: 'neck', title: 'Neck Surgery', icon: '',
     items: [
       { term: 'Zones of the Neck (Trauma)', def: 'Zone I: clavicle to cricoid. Zone II: cricoid to angle of mandible. Zone III: angle of mandible to skull base.', detail: 'Zone II penetrating injury â†’ traditionally "explore all" (most accessible). Zone I and III â†’ CTA/angiography first (difficult surgical access). Modern approach: CTA for all zones, selective exploration.', pearl: 'Zone I injuries more lethal (great vessels, thoracic inlet). Zone III most difficult to access (may need mandible subluxation, risk to CN VII, XII). Zone II most forgiving surgically.' },
       { term: 'Thyroidectomy â€” Recurrent Laryngeal Nerve', def: 'RLN runs in tracheoesophageal groove. Right RLN loops around right subclavian. Left RLN loops around aortic arch. Motor to ALL laryngeal muscles EXCEPT cricothyroid (external branch of SLN).', detail: 'Injury â†’ hoarseness (unilateral), airway obstruction (bilateral). Superior laryngeal nerve external branch: injury â†’ loss of high-pitched voice. Identify and preserve during thyroidectomy.', pearl: 'Non-recurrent laryngeal nerve (0.6% right side): associated with aberrant right subclavian artery (arteria lusoria). Takes a direct path to larynx instead of looping. Extremely rare on left side.' },
       { term: 'Parathyroid Glands', def: '4 glands (2 superior fixed position, 2 inferior variable). Supplied by inferior thyroid artery. Preserve blood supply during thyroidectomy.', detail: 'Accidental removal â†’ hypocalcemia. Post-thyroidectomy hypocalcemia: check calcium Q6h. Symptoms: perioral numbness, Chvostek sign, Trousseau sign, QTc prolongation. Severe: IV calcium gluconate 10%.', pearl: 'Hungry bone syndrome after parathyroidectomy for hyperPTH: massive calcium uptake by bones after PTH normalizes. Can cause severe hypocalcemia. Monitor closely 24-72h post-op.' },
     ]},
-  { id: 'vascular', title: 'Vascular Anatomy', icon: 'ðŸ«€',
+  { id: 'vascular', title: 'Vascular Anatomy', icon: '',
     items: [
       { term: 'Aortic Branches', def: 'Celiac trunk (T12): left gastric, splenic, common hepatic. SMA (L1): jejunum, ileum, cecum, ascending/transverse colon. IMA (L3): descending colon, sigmoid, upper rectum.', detail: 'Marginal artery of Drummond: connects SMA and IMA along colon. Arc of Riolan: direct SMA-IMA connection. Watershed areas: splenic flexure (Griffiths\'), rectosigmoid (Sudeck\'s).', pearl: 'During AAA repair: reimplant IMA if back-bleeding poor (indicates poor collateral flow). Sigmoid ischemia (bloody diarrhea post-AAA) â†’ colonoscopy within 24h. Splenic flexure most vulnerable to ischemia in low-flow states.' },
       { term: 'Femoral Triangle', def: 'Bounded by: inguinal ligament (superior), sartorius (lateral), adductor longus (medial). Floor: iliopsoas + pectineus. Contains (lateral to medial): Nerve, Artery, Vein, Lymphatics (NAVEL).', detail: 'Femoral sheath contains (medial to lateral): femoral canal (lymphatics), femoral vein, femoral artery. Femoral nerve is OUTSIDE the sheath. Femoral hernia: through femoral canal, medial to femoral vein.', pearl: 'Femoral hernia incarceration: more common in women (wider pelvis). High strangulation risk due to rigid boundaries (lacunar ligament). Emergency repair needed. McVay (Cooper ligament) repair closes femoral canal.' },
@@ -18920,7 +18920,7 @@ function SurgicalAnatomyView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ”ª Surgical Anatomy</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Surgical Anatomy</h2>
         <p className="text-xs opacity-40 mt-0.5">Key anatomical relationships for surgery</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -18937,7 +18937,7 @@ function SurgicalAnatomyView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#ef444408', border: '1px solid #ef444420', color: '#ef4444' }}>
-                    <span>âš¡</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -18966,14 +18966,14 @@ function SurgicalAnatomyView() {
    TRANSFUSION MEDICINE â€” Blood products, reactions, compatibility
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const TRANSFUSION_DATA = [
-  { id: 'products', title: 'Blood Products', icon: 'ðŸ©¸',
+  { id: 'products', title: 'Blood Products', icon: '',
     items: [
       { term: 'Packed Red Blood Cells (pRBCs)', def: 'Volume: ~300 mL. Hematocrit: 55-80%. Shelf life: 42 days (4°C). One unit â†‘ Hgb ~1 g/dL.', detail: 'Indications: Hgb <7 g/dL (restrictive, most patients), Hgb <8 g/dL (cardiac disease, hip fracture), active hemorrhage. Leukoreduced by default in most centers (reduces febrile reactions, CMV transmission, HLA alloimmunization).', pearl: 'Restrictive (Hgb <7) is as safe as liberal (Hgb <10) in most patients â€” TRICC trial. Exception: active ACS â†’ transfuse Hgb <8. Massive transfusion: 1:1:1 ratio (pRBC:FFP:platelets).' },
       { term: 'Fresh Frozen Plasma (FFP)', def: 'Volume: ~250 mL. Contains ALL coagulation factors. Shelf life: 1 year frozen, 24h after thaw.', detail: 'Indications: INR >1.5-2 with active bleeding, massive transfusion, TTP (therapeutic plasma exchange), DIC with bleeding, warfarin reversal (when PCC unavailable). Dose: 10-15 mL/kg.', pearl: 'FFP must be ABO compatible (contains anti-A, anti-B antibodies). AB plasma is the universal donor plasma (no antibodies). Thawing takes ~30 min â€” plan ahead for emergencies.' },
       { term: 'Platelets', def: 'Apheresis (single donor): ~300 mL. Random donor: ~50 mL (pool 4-6 units). Shelf life: 5 days at room temp.', detail: 'Indications: <10K (prophylactic), <20K (fever/infection), <50K (active bleeding/invasive procedure), <100K (neurosurgery/ophthalmic). 1 apheresis unit â†‘ plt ~30-60K.', pearl: 'Platelets stored at ROOM TEMPERATURE (20-24°C) with agitation â€” NOT refrigerated (cold causes activation/clearance). Must use within 5 days (bacterial growth risk). ABO-compatible preferred but not required.' },
       { term: 'Cryoprecipitate', def: 'Volume: ~15 mL per unit. Rich in: fibrinogen (150-250 mg/unit), Factor VIII, Factor XIII, vWF, fibronectin.', detail: 'Indications: fibrinogen <100-150 mg/dL with bleeding, DIC, massive transfusion (fibrinogen depletion), uremic bleeding. Dose: pool of 10 units (adults).', pearl: 'Primary use today: fibrinogen replacement. Not for hemophilia A or vWD (use factor concentrates instead). 10-unit pool raises fibrinogen ~60-100 mg/dL.' },
     ]},
-  { id: 'reactions', title: 'Transfusion Reactions', icon: 'âš ️',
+  { id: 'reactions', title: 'Transfusion Reactions', icon: '',
     items: [
       { term: 'Acute Hemolytic (ABO Incompatibility)', def: 'MOST DANGEROUS. Minutes to hours. Fever, flank/back pain, hemoglobinuria (dark urine), DIC, shock, renal failure.', detail: 'Usually ABO mismatch (clerical error). Type II hypersensitivity (preformed IgM antibodies â†’ complement activation â†’ intravascular hemolysis).', pearl: 'Management: STOP transfusion immediately. Normal saline (maintain UOP >1 mL/kg/hr). Send blood bank sample (re-crossmatch). Check for DIC (fibrinogen, D-dimer, PT/PTT). Prevention: check identifiers at bedside!' },
       { term: 'Febrile Non-Hemolytic (FNHTR)', def: 'MOST COMMON reaction. Temperature â†‘ â‰¥1°C. Chills, rigors. Usually during or within 1-6h.', detail: 'Cause: recipient antibodies against donor WBC antigens (cytokines released from WBCs in stored blood). More common with platelet transfusion.', pearl: 'Management: slow/stop transfusion, acetaminophen, rule out hemolytic reaction (direct Coombs, haptoglobin, LDH). Prevention: leukoreduction (already standard). Can resume if confirmed FNHTR.' },
@@ -18981,7 +18981,7 @@ const TRANSFUSION_DATA = [
       { term: 'TACO (Transfusion-Assoc. Circulatory Overload)', def: 'Volume overload. Dyspnea, HTN, JVD, pulmonary edema. Elevated BNP. Distinguished from TRALI by volume status.', detail: 'Risk factors: elderly, cardiac disease, renal failure, rapid transfusion. More common than TRALI.', pearl: 'Prevention: transfuse slowly (1 unit over 2-4h), furosemide between units in at-risk patients. TACO vs TRALI: BNP elevated in TACO (not TRALI), response to diuretics (TACO yes, TRALI no), volume overload signs (TACO yes, TRALI no).' },
       { term: 'Allergic / Anaphylactic', def: 'Urticaria (mild), anaphylaxis (severe â€” IgA deficiency). Mild: hives, pruritus. Severe: bronchospasm, hypotension, angioedema.', detail: 'Mild allergic: stop, antihistamine (diphenhydramine), can resume if symptoms resolve. Anaphylaxis: stop, epinephrine, IV fluids, steroids. IgA-deficient patients: use IgA-deficient donor blood or washed products.', pearl: 'IgA deficiency (1:500 prevalence) â†’ anti-IgA antibodies â†’ anaphylaxis with transfusion. These patients need washed blood products (removes plasma proteins including IgA).' },
     ]},
-  { id: 'compat', title: 'Blood Type Compatibility', icon: 'ðŸ”¬',
+  { id: 'compat', title: 'Blood Type Compatibility', icon: '',
     items: [
       { term: 'ABO System', def: 'Type A: A antigens, anti-B antibodies. Type B: B antigens, anti-A antibodies. Type AB: both antigens, no antibodies. Type O: no antigens, both antibodies.', detail: 'Universal RBC donor: Type O (no ABO antigens). Universal plasma donor: Type AB (no ABO antibodies). Forward typing: patient RBCs + known antibodies. Reverse typing: patient serum + known RBCs.', pearl: 'In emergency (no time for crossmatch): give O-negative RBCs (universal donor). For plasma: give AB (universal). Switch to type-specific ASAP. O-neg supply is limited â€” use judiciously.' },
       { term: 'Rh System', def: 'Rh(D) positive or negative. Rh(D) negative patients can develop anti-D after exposure â†’ hemolytic reaction on re-exposure.', detail: 'Rh-negative women of childbearing age: ALWAYS give Rh-negative blood. RhoGAM (anti-D immunoglobulin) at 28 weeks and within 72h of delivery (if baby Rh+). Prevents anti-D formation.', pearl: 'Rh mismatch is NOT immediately dangerous (unlike ABO). Problem is alloimmunization â†’ future hemolytic reactions. Critical in pregnancy: maternal anti-D â†’ Hemolytic Disease of Newborn (HDN). Kleihauer-Betke test quantifies fetal-maternal hemorrhage.' },
@@ -18996,7 +18996,7 @@ function TransfusionMedicineView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©¸ Transfusion Medicine</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Transfusion Medicine</h2>
         <p className="text-xs opacity-40 mt-0.5">Blood products, reactions & compatibility</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19013,7 +19013,7 @@ function TransfusionMedicineView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#ef444408', border: '1px solid #ef444420', color: '#ef4444' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19042,20 +19042,20 @@ function TransfusionMedicineView() {
    ANTIBIOTIC STEWARDSHIP â€” Principles, de-escalation, resistance
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ABXS_SECTIONS = [
-  { id: 'principles', title: 'Stewardship Principles', icon: 'ðŸŽ¯',
+  { id: 'principles', title: 'Stewardship Principles', icon: '',
     items: [
       { term: 'The 5 D\'s of Antimicrobial Stewardship', def: 'Drug, Dose, Duration, De-escalation, Documentation.', detail: 'Right Drug: narrow-spectrum when possible, culture-guided. Right Dose: weight-based, renal/hepatic adjustment, therapeutic drug monitoring. Right Duration: shortest effective course. De-escalation: broadest â†’ narrowest based on culture data. Documentation: clear indication, planned duration, reassessment date.', pearl: '"Start smart, then focus." Broad-spectrum empirically â†’ narrow once cultures return. Document antibiotic indication, planned duration, and review date in the chart. Automatic stop orders for empiric therapy (48-72h reassessment).' },
       { term: 'Spectrum Matching', def: 'Match antibiotic spectrum to the likely pathogen. Avoid unnecessary broad-spectrum coverage.', detail: 'Community-acquired infections: often don\'t need MRSA/Pseudomonas coverage. Hospital-acquired: broader spectrum justified initially. IV-to-PO switch: when clinically improving + functioning GI tract (usually 48-72h).', pearl: 'Common de-escalation examples: Vancomycin â†’ nafcillin (MSSA), Pip-Tazo â†’ ampicillin (Enterococcus), Meropenem â†’ ceftriaxone (susceptible GNR). NEVER continue vancomycin if cultures show MSSA.' },
       { term: 'Antibiotic Timeout', def: 'Structured reassessment at 48-72 hours. Cultures available? Clinical response? Can narrow/stop?', detail: 'Questions to ask: (1) Is there an infection? (2) Is this the right drug? (3) Can I narrow spectrum? (4) Can I switch IVâ†’PO? (5) What is the optimal duration? (6) Can I stop antibiotics?', pearl: 'Procalcitonin can guide antibiotic duration in respiratory infections and sepsis. PCT <0.25 ng/mL or â†“80% from peak â†’ consider stopping antibiotics. Reduces antibiotic exposure without increasing mortality.' },
     ]},
-  { id: 'duration', title: 'Recommended Durations', icon: '⏱️',
+  { id: 'duration', title: 'Recommended Durations', icon: '',
     items: [
       { term: 'Community-Acquired Pneumonia', def: '5 days (minimum). IDSA/ATS 2019 guidelines.', detail: 'Criteria to stop: afebrile â‰¥48h, no more than 1 sign of instability (HR, RR, BP, Oâ‚‚, mental status). Longer if: slow response, complications (empyema, abscess), immunocompromised.', pearl: '5 days is sufficient for most CAP â€” 7-day courses offer no benefit if clinically stable. SHORTER IS BETTER (reduces resistance, C. diff, side effects).' },
       { term: 'Urinary Tract Infection', def: 'Uncomplicated cystitis: 3 days (TMP-SMX) or 5 days (nitrofurantoin). Pyelonephritis: 5-7 days (fluoroquinolone) or 10-14 days (others).', detail: 'Asymptomatic bacteriuria: treat ONLY in pregnancy and pre-urologic procedure. Do NOT treat in elderly, catheterized patients, or diabetics without symptoms.', pearl: 'Most common stewardship error: treating asymptomatic bacteriuria. Positive urine culture WITHOUT symptoms does NOT require antibiotics (exceptions: pregnant, pre-urologic surgery). Pyuria alone is NOT an indication to treat.' },
       { term: 'Skin & Soft Tissue Infection', def: 'Cellulitis: 5 days (can extend if not improved). Abscess: I&D ± antibiotics (small: I&D alone sufficient).', detail: 'Uncomplicated cellulitis: cephalexin or dicloxacillin (NOT MRSA). Purulent (abscess): I&D is primary therapy. Add TMP-SMX or doxycycline for MRSA coverage if needed.', pearl: 'Small abscesses (<2 cm): I&D ALONE is curative â€” antibiotics add minimal benefit (JAMA 2017 showed some benefit for TMP-SMX after I&D for abscesses). Marking borders of cellulitis helps track response.' },
       { term: 'Bacteremia', def: 'Duration depends on source. Uncomplicated: 7-14 days from first negative culture. S. aureus: minimum 14 days (usually 4-6 weeks).', detail: 'S. aureus bacteremia ALWAYS requires: (1) repeat blood cultures Q48h until negative, (2) echocardiography (TEE preferred), (3) ID consultation, (4) minimum 14 days from first negative culture. "Complicated" SAB: metastatic infection, prosthetic material, endocarditis â†’ 4-6 weeks.', pearl: 'ID consult for S. aureus bacteremia reduces mortality by ~50% (multiple studies). Always consult. Never dismiss a single positive blood culture with S. aureus â€” it is NEVER a contaminant.' },
     ]},
-  { id: 'resistance', title: 'Antimicrobial Resistance', icon: 'ðŸ¦ ',
+  { id: 'resistance', title: 'Antimicrobial Resistance', icon: '',
     items: [
       { term: 'MRSA', def: 'Methicillin-Resistant Staphylococcus aureus. mecA gene â†’ altered PBP2a â†’ resistant to ALL beta-lactams (including cephalosporins and carbapenems).', detail: 'Treatment: Vancomycin (trough 15-20 mcg/mL for serious infections), linezolid (oral bioavailability excellent), daptomycin (NOT for pneumonia â€” inactivated by surfactant), TMP-SMX/doxycycline (for mild SSTI).', pearl: 'Daptomycin: do NOT use for pneumonia (inactivated by pulmonary surfactant). Check CK weekly (rhabdomyolysis risk). Avoid statins during daptomycin therapy. Linezolid: serotonin syndrome with SSRIs, thrombocytopenia after 2 weeks â€” monitor CBC.' },
       { term: 'ESBL (Extended-Spectrum Beta-Lactamase)', def: 'Enzymes that hydrolyze extended-spectrum cephalosporins (3rd/4th gen) and aztreonam. Most common in E. coli and Klebsiella.', detail: 'Carbapenem is treatment of choice for serious ESBL infections. Alternatives for uncomplicated UTI: nitrofurantoin, TMP-SMX, fosfomycin (if susceptible). Pip-tazo may be acceptable for non-critical ESBL UTI (MERINO trial showed inferiority for bacteremia).', pearl: 'MERINO trial (2018): pip-tazo was INFERIOR to meropenem for ESBL bacteremia (30-day mortality). For serious ESBL infections: use carbapenems. For uncomplicated UTI: check susceptibility â€” nitrofurantoin often works.' },
@@ -19071,7 +19071,7 @@ function AntibioticStewardshipView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ§¬ Antibiotic Stewardship</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Antibiotic Stewardship</h2>
         <p className="text-xs opacity-40 mt-0.5">De-escalation, duration & resistance patterns</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19088,7 +19088,7 @@ function AntibioticStewardshipView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#10b98108', border: '1px solid #10b98120', color: '#10b981' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19117,20 +19117,20 @@ function AntibioticStewardshipView() {
    VENTILATOR GRAPHS â€” Waveform interpretation & troubleshooting
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const VENT_WAVEFORMS = [
-  { id: 'basics', title: 'Waveform Basics', icon: 'ðŸ“Š',
+  { id: 'basics', title: 'Waveform Basics', icon: '',
     items: [
       { term: 'Pressure-Time Waveform', def: 'Y-axis: airway pressure (cmHâ‚‚O). X-axis: time. Shows pressure changes during one breath cycle.', detail: 'Volume Control (VC): ascending pressure curve (increases as volume delivered). Pressure Control (PC): square-wave pressure (constant pressure maintained). PEEP: baseline pressure > 0. PIP: peak inspiratory pressure.', pearl: 'PIP vs Plateau Pressure: PIP = peak airway pressure (includes resistive + elastic components). Plateau (Pplat) = pressure during inspiratory pause (elastic component only). High PIP with normal Pplat = RESISTANCE problem (bronchospasm, secretions, kinked tube). High PIP with high Pplat = COMPLIANCE problem (ARDS, pneumothorax, pulmonary edema).' },
       { term: 'Flow-Time Waveform', def: 'Y-axis: flow (L/min). X-axis: time. Positive = inspiratory flow. Negative = expiratory flow.', detail: 'VC: constant (square) or decelerating inspiratory flow. PC: decelerating inspiratory flow (reaches zero if inspiratory time adequate). Expiratory flow: should return to baseline before next breath.', pearl: 'Expiratory flow NOT returning to baseline = AUTO-PEEP (air trapping). Management: â†‘ expiratory time (â†“ I:E ratio, â†“ RR, â†‘ flow rate). Critical in COPD/asthma patients.' },
       { term: 'Volume-Time Waveform', def: 'Y-axis: volume (mL). X-axis: time. Saw-tooth pattern: rises during inspiration, falls during expiration.', detail: 'In VC: volume delivered = set tidal volume (square top). In PC: volume varies with compliance/resistance. If expiratory volume < inspiratory volume â†’ AIR LEAK (check cuff, circuit connections).', pearl: 'Volume not returning to zero baseline = air trapping (auto-PEEP) or air leak. Always check both inspiratory AND expiratory tidal volumes â€” discrepancy suggests leak.' },
     ]},
-  { id: 'trouble', title: 'Troubleshooting', icon: 'ðŸ”§',
+  { id: 'trouble', title: 'Troubleshooting', icon: '',
     items: [
       { term: 'High Peak Pressure Alarm', def: 'PIP exceeds set limit. Causes: resistive (â†‘PIP, normal Pplat) vs compliance (â†‘PIP, â†‘Pplat).', detail: 'Resistive causes: bronchospasm, secretions, kinked ETT, biting tube, small ETT. Compliance causes: pneumothorax, mainstem intubation, pulmonary edema, ARDS, abdominal distension, pleural effusion.', pearl: 'Systematic approach: (1) Assess patient (chest rise, SpOâ‚‚, auscultation). (2) Suction ETT. (3) Check circuit for kinks/water. (4) Inspiratory hold â†’ Pplat. High PIP + normal Pplat = resistive. High PIP + high Pplat = compliance.' },
       { term: 'Auto-PEEP (Intrinsic PEEP)', def: 'Air trapped from incomplete expiration. Expiratory flow doesn\'t reach zero. Causes: COPD, asthma, high RR, short expiratory time.', detail: 'Consequences: â†‘ work of breathing, hemodynamic compromise (â†“ venous return), patient-vent dyssynchrony, inaccurate PEEP measurement.', pearl: 'Measurement: expiratory hold maneuver â†’ total PEEP - set PEEP = auto-PEEP. Treatment: â†“ RR, â†“ I:E ratio, â†‘ inspiratory flow, bronchodilators. External PEEP at 50-80% of auto-PEEP can help trigger ventilator (reduces trigger threshold).' },
       { term: 'Patient-Ventilator Dyssynchrony', def: 'Mismatch between patient\'s respiratory effort and ventilator delivery. Common and under-recognized.', detail: 'Types: (1) Trigger dyssynchrony: missed triggers, auto-triggering. (2) Flow dyssynchrony: inadequate flow rate (VC mode). (3) Cycle dyssynchrony: breath terminates too early/late. (4) Double-triggering: one patient effort triggers two ventilator breaths.', pearl: 'Flow starvation (in VC mode): patient pulling against insufficient flow â†’ concave pressure waveform during inspiration. Fix: â†‘ flow rate, or switch to PC mode (flow varies with demand). Sedation should NOT be first-line for dyssynchrony â€” fix the ventilator first.' },
       { term: 'Pressure-Volume Loops', def: 'X-axis: volume. Y-axis: pressure. Counterclockwise loop during mechanical ventilation.', detail: 'Lower Inflection Point (LIP): suggests optimal PEEP level. Upper Inflection Point (UIP): overdistension begins. Set PEEP above LIP, tidal volume below UIP. Beaking on loop = overdistension.', pearl: 'P-V loop practical pearls: (1) Increased loop width = â†‘ airway resistance. (2) Loop shifted right = â†“ compliance. (3) "Figure-8" = flow dyssynchrony. (4) Beaking/flattening at top = overdistension â†’ â†“ tidal volume.' },
     ]},
-  { id: 'modes', title: 'Mode Quick Reference', icon: 'âš™️',
+  { id: 'modes', title: 'Mode Quick Reference', icon: '',
     items: [
       { term: 'AC/VC (Assist-Control Volume)', def: 'Set: Vt, RR, FiOâ‚‚, PEEP, flow rate. Guaranteed tidal volume. Pressure varies.', detail: 'Each breath delivers set Vt. Patient can trigger additional breaths (all at set Vt). Constant flow pattern. Monitor: PIP, Pplat, auto-PEEP.', pearl: 'ARDSNet protocol uses AC/VC: Vt 6 mL/kg IBW, Pplat â‰¤30 cmHâ‚‚O. If Pplat >30: â†“ Vt to 5 or 4 mL/kg. Allow permissive hypercapnia (pH >7.20). PEEP/FiOâ‚‚ table-guided.' },
       { term: 'AC/PC (Assist-Control Pressure)', def: 'Set: Î”P (above PEEP), RR, FiOâ‚‚, PEEP, I-time. Guaranteed pressure. Volume varies.', detail: 'Each breath maintains set Î”P. Decelerating flow pattern. Vt varies with compliance/resistance â€” MUST monitor Vt closely. If compliance worsens â†’ Vt drops.', pearl: 'PC advantage: decelerating flow is more physiologic, better distribution of ventilation. Disadvantage: Vt NOT guaranteed â€” if patient desaturates, check if Vt dropped (worsening compliance â†’ need to â†‘ Î”P).' },
@@ -19146,7 +19146,7 @@ function VentilatorGraphsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ“Š Ventilator Waveforms</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Ventilator Waveforms</h2>
         <p className="text-xs opacity-40 mt-0.5">Waveform interpretation & troubleshooting</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19163,7 +19163,7 @@ function VentilatorGraphsView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#6366f108', border: '1px solid #6366f120', color: '#6366f1' }}>
-                    <span>âš¡</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19231,7 +19231,7 @@ function HemodynamicCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">❤️â€ðŸ”¥ Hemodynamic Calculator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Hemodynamic Calculator</h2>
         <p className="text-xs opacity-40 mt-0.5">MAP, SVR, PVR, cardiac index & shock profiles</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -19281,7 +19281,7 @@ function HemodynamicCalculatorView() {
         </div>
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-          <h3 className="font-bold text-sm mb-2" style={{ color: '#f59e0b' }}>ðŸ“ Formulas</h3>
+          <h3 className="font-bold text-sm mb-2" style={{ color: '#f59e0b' }}>Formulas</h3>
           {[
             'MAP = (SBP + 2Ã—DBP) / 3',
             'SVR = [(MAP - CVP) / CO] Ã— 80    (normal 800-1200)',
@@ -19303,25 +19303,25 @@ function HemodynamicCalculatorView() {
    DERMATOLOGY ATLAS â€” Common skin conditions and descriptions
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const DERM_CONDITIONS = [
-  { id: 'papulosquam', title: 'Papulosquamous Diseases', icon: 'ðŸ”´',
+  { id: 'papulosquam', title: 'Papulosquamous Diseases', icon: '',
     items: [
       { term: 'Psoriasis', def: 'Chronic autoimmune. Well-demarcated, salmon-pink plaques with silvery scale. Auspitz sign (pinpoint bleeding), Koebner phenomenon (trauma â†’ new lesions).', detail: 'Types: plaque (most common, 80%), guttate (post-strep, droplet-shaped), inverse (flexural, no scale), pustular (sterile pustules, can be life-threatening), erythrodermic (>90% BSA, medical emergency). Nail changes: pitting, oil drop sign, onycholysis.', pearl: 'Comorbidities: psoriatic arthritis (30%), metabolic syndrome, CV disease. Screen for HTN, diabetes, hyperlipidemia. Treatment ladder: topicals (steroids, vitamin D analogs) â†’ phototherapy (NB-UVB) â†’ systemic (MTX, cyclosporine) â†’ biologics (TNF-α, IL-17, IL-23).' },
       { term: 'Lichen Planus', def: '5 Ps: Pruritic, Purple, Polygonal, Planar, Papules. Wickham striae (white lines on surface). Koebner positive.', detail: 'Distribution: wrists, ankles, oral mucosa (white lacy pattern). Mucous membrane involvement common â€” check oral mucosa. Associated with hepatitis C. Nail dystrophy: dorsal pterygium (pathognomonic).', pearl: 'Oral lichen planus: malignant potential (~1% transform to SCC). Regular follow-up needed. If erosive/ulcerative type â†’ biopsy to rule out dysplasia. Treatment: topical steroids, tacrolimus for oral.' },
       { term: 'Pityriasis Rosea', def: 'Self-limited. Herald patch (large oval, collarette scale) â†’ 1-2 weeks later â†’ "Christmas tree" pattern on trunk. HHV-6/7 associated.', detail: 'Distribution follows skin lines (Langer\'s lines). Lasts 6-8 weeks. Papules are oval with trailing scale (collarette). Important DDx: secondary syphilis (check RPR!), tinea corporis.', pearl: 'ALWAYS rule out secondary syphilis if classic presentation: check RPR/VDRL. Secondary syphilis involves palms and soles (pityriasis rosea typically doesn\'t). If atypical or palms/soles involved â†’ syphilis until proven otherwise.' },
     ]},
-  { id: 'vesicobullous', title: 'Vesiculobullous Diseases', icon: 'ðŸ’§',
+  { id: 'vesicobullous', title: 'Vesiculobullous Diseases', icon: '',
     items: [
       { term: 'Pemphigus Vulgaris', def: 'Autoimmune IgG against desmoglein 3 (mucosal) ± desmoglein 1 (skin). Flaccid blisters, Nikolsky sign positive. Intraepidermal (suprabasal) cleavage.', detail: 'Oral erosions in 50-70% (often first sign). Blisters rupture easily â†’ painful erosions that don\'t heal. Histology: "tombstoning" (basal layer attached, upper layers separated). DIF: IgG in "fishnet" intercellular pattern.', pearl: 'Pemphigus vulgaris is POTENTIALLY FATAL without treatment (mortality was >75% before steroids). Treatment: systemic steroids + steroid-sparing agent (rituximab now first-line per RITUX 3 trial). Nikolsky sign: lateral pressure â†’ blister extension.' },
       { term: 'Bullous Pemphigoid', def: 'Autoimmune IgG against BP180/BP230 (hemidesmosomes). TENSE blisters on erythematous base. Nikolsky NEGATIVE. Subepidermal cleavage.', detail: 'Elderly patients (>60). Tense blisters that don\'t rupture easily. Urticarial prodrome. Oral involvement rare (<20%). DIF: linear IgG + C3 at DEJ (basement membrane zone).', pearl: 'Pemphigus (PemphiguS = Superficial = flaccid = bad prognosis). Pemphigoid (PemphigoiD = Deep = tense = better prognosis). BP typically milder and doesn\'t necessarily need systemic immunosuppression (superpotent topical steroids like clobetasol can be sufficient).' },
       { term: 'Dermatitis Herpetiformis', def: 'Intensely pruritic, grouped vesicles on extensor surfaces (elbows, knees, buttocks). Pathognomonic for celiac disease.', detail: 'Nearly all patients (>90%) have celiac disease on biopsy (even if asymptomatic). DIF: granular IgA at dermal papillae. Neutrophilic microabscesses at papillary tips.', pearl: 'Treatment: dapsone provides rapid relief (24-48h). Must check G6PD before starting (hemolytic anemia risk). Long-term: gluten-free diet (treats both skin and gut disease, may allow dapsone discontinuation). All patients should be on gluten-free diet regardless.' },
     ]},
-  { id: 'infections', title: 'Skin Infections', icon: 'ðŸ¦ ',
+  { id: 'infections', title: 'Skin Infections', icon: '',
     items: [
       { term: 'Tinea (Dermatophytosis)', def: 'Superficial fungal infection. "Ring worm" â€” annular, scaly border with central clearing. KOH prep: septate hyphae.', detail: 'Types by location: capitis (scalp â€” requires systemic therapy), corporis (body), cruris (groin), pedis (feet), unguium (nails = onychomycosis). Kerion: boggy tender mass on scalp (inflammatory tinea capitis) â€” NOT an abscess, don\'t I&D.', pearl: 'Tinea vs eczema: KOH prep is essential. Topical steroids WORSEN tinea ("tinea incognito" â€” partially treated by steroids â†’ atypical presentation). If "eczema" fails to improve with steroids â†’ KOH prep. Tinea capitis: griseofulvin (8 weeks) or terbinafine (4 weeks).' },
       { term: 'Herpes Zoster (Shingles)', def: 'VZV reactivation. Painful, grouped vesicles on erythematous base in DERMATOMAL distribution. Does NOT cross midline.', detail: 'Prodrome: pain/burning/tingling 1-5 days before rash. Hutchinson sign: vesicles on tip of nose â†’ V1 (nasociliary) â†’ ophthalmic zoster (get ophthalmology consult). Treatment: valacyclovir 1g TID Ã— 7d (within 72h of rash).', pearl: 'Shingrix vaccine: 2 doses, >90% effective. Recommended â‰¥50 years (even if prior Zostavax or prior shingles). Post-herpetic neuralgia (PHN): pain persisting >90 days. Treatment: gabapentin, pregabalin, duloxetine, lidocaine patch, capsaicin.' },
       { term: 'Molluscum Contagiosum', def: 'Poxvirus. Dome-shaped, umbilicated (central dell) papules. Self-limited in immunocompetent (6-12 months). Widespread in HIV.', detail: 'Spread by direct contact/fomites. In children: face, trunk, extremities. In adults: often sexually transmitted â€” genital/perigenital. Histology: Henderson-Patterson bodies (intracytoplasmic inclusions).', pearl: 'In HIV: extensive molluscum (especially face, >100 lesions) â†’ check CD4 count. Improves with ART. DDx for umbilicated papules in HIV: cryptococcosis, histoplasmosis, penicilliosis (all can mimic molluscum â†’ biopsy if atypical).' },
     ]},
-  { id: 'cancer', title: 'Skin Cancer', icon: 'â˜€️',
+  { id: 'cancer', title: 'Skin Cancer', icon: '',
     items: [
       { term: 'Basal Cell Carcinoma (BCC)', def: 'MOST COMMON cancer in humans. Pearly, translucent papule/nodule with telangiectasias and rolled borders. Rarely metastasizes.', detail: 'Types: nodular (most common), superficial (trunk), morpheaform/sclerosing (scar-like, aggressive). Risk factors: UV exposure, fair skin, arsenic, radiation, Gorlin syndrome (PTCH1 mutation â†’ multiple BCCs).', pearl: 'BCC grows locally destructive but almost never metastasizes (<0.1%). Treatment: Mohs micrographic surgery (cosmetically sensitive areas, recurrent), excision, electrodesiccation/curettage (superficial), topical imiquimod (superficial BCC). Hedgehog pathway inhibitors (vismodegib) for inoperable/metastatic.' },
       { term: 'Squamous Cell Carcinoma (SCC)', def: 'Firm, erythematous, keratotic papule/nodule. Can arise from actinic keratosis. CAN metastasize (especially immunosuppressed).', detail: 'Risk factors: UV exposure, immunosuppression (transplant patients â€” #1 cancer post-transplant), chronic wounds/scars (Marjolin ulcer), HPV, arsenic. Actinic keratosis: "pre-SCC" (evolves in ~10%).', pearl: 'High-risk features: size >2cm, depth >4mm, perineural invasion, poorly differentiated, ear/lip location, immunosuppressed. These need wider margins ± Mohs ± adjuvant radiation. SCC metastasizes to regional lymph nodes first.' },
@@ -19336,7 +19336,7 @@ function DermatologyAtlasView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ§´ Dermatology Atlas</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Dermatology Atlas</h2>
         <p className="text-xs opacity-40 mt-0.5">Skin conditions, morphology & management</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19353,7 +19353,7 @@ function DermatologyAtlasView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>ðŸ’¡</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19382,21 +19382,21 @@ function DermatologyAtlasView() {
    OPHTHALMOLOGY GUIDE â€” Red eye, visual loss, emergencies
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const OPHTHO_SECTIONS = [
-  { id: 'redeye', title: 'Red Eye Differential', icon: 'ðŸ‘️',
+  { id: 'redeye', title: 'Red Eye Differential', icon: '',
     items: [
       { term: 'Conjunctivitis', def: 'Inflammation of conjunctiva. Diffuse injection, no vision loss, no pain (just irritation). Normal pupil, normal pressure.', detail: 'Viral (most common): watery discharge, preauricular lymphadenopathy, bilateral. Bacterial: mucopurulent discharge, unilateral â†’ bilateral. Allergic: bilateral, itching (hallmark), watery, chemosis.', pearl: 'Viral conjunctivitis: HIGHLY contagious (adenovirus). Self-limited 7-14 days. Supportive care (cool compresses, artificial tears). Allergic: mast cell stabilizers (olopatadine), avoid rubbing. Bacterial: topical antibiotic (erythromycin, fluoroquinolone). Gonococcal: hyperacute, profuse purulent â†’ ophthalmology emergency (corneal perforation risk). Systemic + topical abx.' },
       { term: 'Acute Angle-Closure Glaucoma', def: 'EMERGENCY. Sudden â†‘ IOP (>40 mmHg). Severe eye pain, headache, N/V, halos around lights. Fixed mid-dilated pupil. Hazy cornea.', detail: 'Risk factors: hyperopia (farsighted), elderly, Asian descent, shallow anterior chamber. Triggered by: dim lighting, mydriatic drugs (anticholinergics, sympathomimetics).', pearl: 'Treatment: emergent IOP lowering. Timolol (β-blocker) + pilocarpine (miotic) + apraclonidine (α-agonist) + acetazolamide IV + mannitol IV if refractory. Definitive: laser peripheral iridotomy. Do NOT dilate the eye! Pilocarpine may not work initially (sphincter ischemia).' },
       { term: 'Anterior Uveitis (Iritis)', def: 'Ciliary flush (limbal injection), photophobia, deep aching pain, consensual photophobia (light in other eye causes pain). Cells and flare in anterior chamber.', detail: 'Associations: HLA-B27 (ankylosing spondylitis, reactive arthritis, IBD), sarcoidosis, herpes, syphilis, TB, juvenile idiopathic arthritis. Often recurrent.', pearl: 'Diagnose by slit lamp: cells (WBCs floating in anterior chamber) and flare (protein leakage). Treatment: topical steroids (prednisolone acetate) + cycloplegic (cyclopentolate â€” prevents synechiae and â†“ pain). NEVER prescribe topical steroids without slit lamp â€” can worsen herpes keratitis.' },
       { term: 'Corneal Abrasion/Ulcer', def: 'Abrasion: epithelial defect, pain, tearing, foreign body sensation. Stains with fluorescein. Ulcer: infective, white infiltrate on cornea.', detail: 'Abrasion: topical antibiotic, NO patching (doesn\'t improve healing). Contact lens wearer with ulcer: ALWAYS cover Pseudomonas (fluoroquinolone drops Q1h). Refer urgently if ulcer suspected.', pearl: 'Contact lens corneal ulcer: Pseudomonas aeruginosa until proven otherwise. Can perforate in 24h. NEVER patch a contact lens-related corneal ulcer (worsens infection). Referral to ophthalmology SAME DAY.' },
     ]},
-  { id: 'vision', title: 'Acute Vision Loss', icon: 'ðŸ”¦',
+  { id: 'vision', title: 'Acute Vision Loss', icon: '',
     items: [
       { term: 'Central Retinal Artery Occlusion (CRAO)', def: 'PAINLESS sudden monocular vision loss. Cherry-red spot on fundoscopy (fovea visible through thin retina over choroid). Pale, edematous retina.', detail: 'Embolic source most common (carotid, cardiac). Relative afferent pupillary defect (RAPD) present. Only 90-120 minutes to save vision.', pearl: 'OCULAR STROKE â€” same workup as cerebral stroke: carotid imaging, echocardiography, rhythm monitoring. Only 90 min for retinal survival (similar to "time is brain"). Emergent ophthalmology consult. Ocular massage, anterior chamber paracentesis. tPA within 4.5h (investigational). Long-term: secondary prevention for atherosclerosis.' },
       { term: 'Central Retinal Vein Occlusion (CRVO)', def: 'PAINLESS. "Blood and thunder" fundus: widespread retinal hemorrhages, cotton-wool spots, disc edema, dilated veins.', detail: 'Risk factors: HTN, DM, glaucoma, hyperviscosity syndromes. Less acute than CRAO. Vision loss from macular edema. Complications: neovascularization â†’ neovascular glaucoma (if ischemic type).', pearl: 'BRVO (branch) vs CRVO (central): BRVO = pie-shaped hemorrhages in one section. CRVO = all quadrants ("blood and thunder"). Treatment: anti-VEGF injections (ranibizumab, aflibercept) for macular edema. Ischemic CRVO: monitor closely for neovascularization.' },
       { term: 'Retinal Detachment', def: 'Flashes + floaters + "curtain coming down" over visual field. PAINLESS. Emergency.', detail: 'Types: rhegmatogenous (most common â€” retinal tear), tractional (diabetic, sickle cell), exudative (tumors, inflammation). Risk factors: myopia, prior cataract surgery, trauma, FHx.', pearl: 'Retinal detachment is an EMERGENCY. If macula ON (central vision preserved) â†’ urgent (within 24h) surgery. If macula OFF â†’ less urgent but still within days. Call ophthalmology immediately. Surgical options: pneumatic retinopexy, scleral buckle, vitrectomy.' },
       { term: 'Temporal (Giant Cell) Arteritis', def: 'Age >50. New headache, jaw claudication, scalp tenderness, polymyalgia rheumatica. ESR usually >50 (often >100). Risk: blindness (AION).', detail: 'Anterior ischemic optic neuropathy (AION): sudden painless vision loss from ciliary artery inflammation. Risk of bilateral blindness if untreated. Temporal artery biopsy: gold standard (skip lesions â€” must get â‰¥2 cm).', pearl: 'DO NOT WAIT for biopsy to start steroids. Treat with high-dose prednisone (60-80 mg/day) or IV methylprednisolone (if visual symptoms) IMMEDIATELY. Biopsy remains positive for 1-2 weeks after starting steroids. CRP may be more sensitive than ESR. Tocilizumab is steroid-sparing agent (GiACTA trial).' },
     ]},
-  { id: 'emergencies', title: 'Ocular Emergencies', icon: 'ðŸš¨',
+  { id: 'emergencies', title: 'Ocular Emergencies', icon: '',
     items: [
       { term: 'Chemical Burns', def: 'ALKALI worse than acid (penetrates deeper â€” liquefactive necrosis). Begin irrigation IMMEDIATELY. Do not wait for anything.', detail: 'Irrigation: normal saline or water for minimum 30 minutes continuously (2L). Check pH every 15 min â€” continue until pH 7.0-7.4 neutral. Alkali injuries: NaOH (lye), ammonia, lime (cement). Acid injuries: battery acid, pool chemicals.', pearl: 'Chemical burn is THE #1 ocular emergency. IRRIGATE FIRST â€” before any examination, visual acuity check, or anything else. Alkali penetrates rapidly (within seconds). Morgan lens for continuous irrigation. Refer to ophthalmology after stabilization.' },
       { term: 'Orbital Cellulitis', def: 'BEHIND the orbital septum. Proptosis, restricted/painful eye movements, â†“ vision, fever. Most from ethmoid sinusitis. Can be vision- and life-threatening.', detail: 'CT orbits with contrast (or MRI): identify abscess, assess sinuses. Treatment: IV broad-spectrum antibiotics (vancomycin + Unasyn or ceftriaxone + metronidazole). Surgical drainage if abscess or no improvement in 48h.', pearl: 'Preseptal (periorbital) vs orbital cellulitis: Key differences â€” orbital: proptosis, ophthalmoplegia, â†“vision (preseptal has NONE of these). Preseptal: lid swelling only, no proptosis/ophthalmoplegia, normal vision. Preseptal can be treated outpatient (oral abx). Orbital = ADMISSION + IV abx.' },
@@ -19411,7 +19411,7 @@ function OphthalmologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ‘️ Ophthalmology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Ophthalmology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Red eye, vision loss & ocular emergencies</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19428,7 +19428,7 @@ function OphthalmologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#6366f108', border: '1px solid #6366f120', color: '#6366f1' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19457,26 +19457,26 @@ function OphthalmologyGuideView() {
    NEPHROLOGY GUIDE â€” AKI, CKD, Dialysis, Glomerulonephritis
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const NEPHRO_SECTIONS = [
-  { id: 'aki', title: 'Acute Kidney Injury', icon: 'ðŸš¨',
+  { id: 'aki', title: 'Acute Kidney Injury', icon: '',
     items: [
       { term: 'KDIGO AKI Staging', def: 'Stage 1: Cr â†‘ 1.5-1.9Ã— baseline OR â†‘ â‰¥0.3 mg/dL in 48h. UOP <0.5 mL/kg/h for 6-12h.\nStage 2: Cr â†‘ 2.0-2.9Ã— baseline. UOP <0.5 mL/kg/h for â‰¥12h.\nStage 3: Cr â†‘ â‰¥3Ã— baseline OR Cr â‰¥4.0 mg/dL OR RRT initiation. UOP <0.3 mL/kg/h â‰¥24h or anuria â‰¥12h.', detail: 'AKI develops over hours-days. Contrast with CKD (months-years). Look for: small kidneys on US (CKD), anemia + bone disease (CKD), broad waxy casts (CKD).', pearl: 'FENa helps distinguish pre-renal (<1%) from intrinsic renal (>2%). BUT: FENa unreliable with diuretics â€” use FEUrea instead (<35% = pre-renal). FENa also unreliable in contrast nephropathy, myoglobinuria, early obstruction.' },
       { term: 'Pre-Renal AKI', def: 'Decreased renal perfusion. BUN/Cr ratio >20:1. FENa <1%. Urine Na <20. Concentrated urine (osmolality >500). Bland sediment.', detail: 'Causes: hypovolemia (hemorrhage, dehydration, burns), decreased cardiac output (CHF, cardiogenic shock), renal vasoconstriction (NSAIDs, ACEi/ARB, hepatorenal syndrome), systemic vasodilation (sepsis, cirrhosis).', pearl: 'Hepatorenal syndrome (HRS): AKI in advanced cirrhosis without other cause. Type 1: rapid (Cr doubles in <2 weeks, often triggered by SBP). Type 2: gradual (refractory ascites). Treatment: midodrine + octreotide + albumin (bridge to transplant). Terlipressin if available.' },
       { term: 'Intrinsic Renal AKI', def: 'Damage to tubules, interstitium, glomeruli, or vasculature. FENa >2%. Urine Na >40. Isosthenuric (osm ~300).', detail: 'ATN (most common): muddy brown granular casts, renal epithelial cell casts. Ischemic (prolonged pre-renal) or nephrotoxic (aminoglycosides, contrast, myoglobin, cisplatin). AIN: WBC casts, eosinophiluria (drug-induced: NSAIDs, beta-lactams, PPIs, sulfonamides). GN: RBC casts, dysmorphic RBCs, proteinuria.', pearl: 'ATN recovery: typically 1-3 weeks. Hallmark is muddy brown granular casts. Contrast-induced AKI: Cr rises 24-48h after contrast, peaks 3-5 days, usually resolves in 7-10 days. Prevention: IV hydration (NS or isotonic bicarb). NAC benefit unclear. Hold metformin (lactic acidosis risk if AKI develops).' },
       { term: 'Post-Renal AKI (Obstructive)', def: 'Obstruction of urinary outflow. Must be bilateral (or unilateral with single kidney). Hydronephrosis on ultrasound.', detail: 'Causes: BPH (most common in elderly men), nephrolithiasis, malignancy (cervical, prostate, bladder), retroperitoneal fibrosis, neurogenic bladder. Bladder scan or Foley catheter â†’ immediate improvement suggests obstruction.', pearl: 'Post-obstructive diuresis: massive polyuria after relief of bilateral obstruction. Can lose liters of fluid â†’ hypovolemia. Monitor and replace 50-75% of urine output with NS. Watch for hyponatremia, hypokalemia. Usually self-limited (24-48h).' },
     ]},
-  { id: 'ckd', title: 'Chronic Kidney Disease', icon: 'ðŸ“‰',
+  { id: 'ckd', title: 'Chronic Kidney Disease', icon: '',
     items: [
       { term: 'CKD Staging', def: 'Stage 1: GFR â‰¥90 (kidney damage with normal GFR). Stage 2: GFR 60-89. Stage 3a: 45-59. Stage 3b: 30-44. Stage 4: 15-29. Stage 5: <15 (or dialysis).', detail: 'Most common causes: diabetes (40%), hypertension (25%), glomerulonephritis, polycystic kidney disease. Diagnosis: GFR <60 OR kidney damage (proteinuria, hematuria, structural abnormality) for >3 months. Refer to nephrology at Stage 4 (GFR <30).', pearl: 'CKD-EPI equation preferred over MDRD (more accurate at higher GFR). Cystatin C-based GFR: better for extremes (muscle wasting, bodybuilders, amputees). ACR (albumin-creatinine ratio) for proteinuria: A1 <30, A2 30-300 (microalbuminuria), A3 >300.' },
       { term: 'CKD Complications Management', def: 'Anemia, mineral bone disease, hyperkalemia, metabolic acidosis, volume overload, uremic symptoms.', detail: 'Anemia: EPO (erythropoietin) when Hgb <10 g/dL (target 10-11.5, NOT >13). Iron supplementation first (ferritin >100, TSAT >20%). MBD: phosphate binders (calcium carbonate/acetate, sevelamer, lanthanum), calcitriol, vitamin D. Hyperkalemia: dietary restriction, kayexalate, patiromer, sodium zirconium cyclosilicate.', pearl: 'Blood pressure target in CKD with proteinuria: <130/80. ACEi/ARB first-line (reduce proteinuria, slow CKD progression). SGLT2 inhibitors (empagliflozin, dapagliflozin): proven renal protection in CKD (DAPA-CKD, EMPA-KIDNEY trials) â€” add for GFR â‰¥20 with albuminuria. Finerenone (non-steroidal MRA): additional renal/CV benefit in diabetic CKD.' },
       { term: 'Dialysis Indications', def: 'AEIOU: Acidosis (refractory), Electrolytes (hyperkalemia refractory), Ingestion (toxic alcohols, lithium, salicylates), Overload (volume, refractory), Uremia (pericarditis, encephalopathy, bleeding).', detail: 'Modalities: Hemodialysis (3Ã—/week, 4h sessions via AV fistula/graft/catheter), Peritoneal dialysis (daily exchanges at home), CRRT (continuous, for hemodynamically unstable ICU patients). AV fistula is preferred vascular access (lowest infection rate, best longevity) â€” plan 6 months ahead.', pearl: 'Dialysis disequilibrium syndrome: cerebral edema during/after first hemodialysis session (rapid solute clearance â†’ osmotic gradient â†’ water shifts into brain). Prevent: slow initial dialysis, smaller surface area dialyzer, mannitol. Symptoms: headache, nausea, confusion, seizures.' },
     ]},
-  { id: 'gn', title: 'Glomerulonephritis', icon: 'ðŸ”¬',
+  { id: 'gn', title: 'Glomerulonephritis', icon: '',
     items: [
       { term: 'Nephrotic Syndrome', def: 'Proteinuria >3.5 g/day, hypoalbuminemia (<3 g/dL), peripheral edema, hyperlipidemia, lipiduria (maltese crosses, oval fat bodies).', detail: 'Causes by age â€” Children: minimal change disease (most common). Adults: membranous nephropathy (most common primary), FSGS (most common in Black patients), diabetic nephropathy. Complications: thromboembolism (loss of antithrombin III), infection (loss of immunoglobulins), AKI.', pearl: 'Minimal change: foot process effacement on EM, normal light microscopy, responds to steroids. Membranous: "spike and dome" on EM, PLA2R antibodies (70-80% primary). FSGS: most common cause of nephrotic syndrome in Black adults. Diabetic nephropathy: Kimmelstiel-Wilson nodules, start ACEi/ARB early.' },
       { term: 'Nephritic Syndrome', def: 'Hematuria (RBC casts, dysmorphic RBCs), mild proteinuria (<3.5 g), HTN, oliguria, azotemia.', detail: 'IgA nephropathy (Berger): most common GN worldwide. Episodic gross hematuria 1-2 days after URI (synpharyngitic). IgA deposits in mesangium. Post-streptococcal GN: 2-4 weeks after pharyngitis/impetigo. "Lumpy-bumpy" IF pattern, subepithelial humps. Complement â†“ (C3 low). Children: excellent prognosis.', pearl: 'Low complement GN: post-streptococcal (â†“C3), membranoproliferative (â†“C3, â†“C4), lupus nephritis (â†“C3, â†“C4), cryoglobulinemia. Normal complement GN: IgA nephropathy, Goodpasture (anti-GBM linear IF), ANCA vasculitis (pauci-immune, no immune deposits on IF).' },
       { term: 'Rapidly Progressive GN (RPGN)', def: 'Rapid loss of renal function over days-weeks. Crescent formation on biopsy. Nephritic sediment. Medical emergency â€” biopsy and treat immediately.', detail: 'Type I (anti-GBM): Goodpasture syndrome (lungs + kidneys), linear IgG on IF. Type II (immune complex): lupus, IgA, post-infectious. Granular IF. Type III (pauci-immune): ANCA-associated (GPA, MPA, EGPA). No/minimal IF deposits.', pearl: 'RPGN treatment must NOT wait for biopsy results: empiric pulse methylprednisolone 500-1000 mg IV Ã— 3 days + cyclophosphamide or rituximab. Plasmapheresis for anti-GBM disease and severe ANCA vasculitis with pulmonary hemorrhage. Delay = permanent kidney loss.' },
     ]},
-  { id: 'stones', title: 'Nephrolithiasis', icon: 'ðŸ’Ž',
+  { id: 'stones', title: 'Nephrolithiasis', icon: '',
     items: [
       { term: 'Calcium Oxalate (75-80%)', def: 'Most common stone type. Envelope-shaped crystals. Radiopaque on X-ray. Birefringent under polarized light.', detail: 'Risk factors: hypercalciuria (most common), hyperoxaluria, hypocitraturia, low fluid intake. Causes of hyperoxaluria: high oxalate diet (spinach, rhubarb, nuts, chocolate), fat malabsorption (Crohn\'s, gastric bypass â†’ enteric hyperoxaluria).', pearl: 'Prevention: fluids (>2.5L/day, goal UOP >2L/day), thiazide diuretics (â†“ urinary Ca), potassium citrate (inhibitor of stone formation), dietary Na restriction. Paradox: dietary calcium restriction INCREASES stone risk (less GI calcium to bind oxalate â†’ more oxalate absorbed).' },
       { term: 'Uric Acid (5-10%)', def: 'ONLY radiolucent stone (invisible on X-ray, visible on CT). Associated with gout, tumor lysis, chronic diarrhea. Form in acidic urine (pH <5.5).', detail: 'Rhomboid or rosette crystals. Treatment/prevention: alkalinize urine (potassium citrate, target pH 6.5-7.0), allopurinol (if hyperuricemia), fluids.', pearl: 'Uric acid stones are the only common stone that can be DISSOLVED with medical therapy (urine alkalinization to pH 6.5-7.0). No need for surgery if patient can alkalinize urine. CT without contrast is gold standard for all stones (can detect radiolucent uric acid stones).' },
@@ -19492,7 +19492,7 @@ function NephrologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ«˜ Nephrology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Nephrology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">AKI, CKD, glomerulonephritis & nephrolithiasis</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19509,7 +19509,7 @@ function NephrologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#6366f108', border: '1px solid #6366f120', color: '#6366f1' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19538,25 +19538,25 @@ function NephrologyGuideView() {
    ENDOCRINOLOGY GUIDE â€” DKA/HHS, Thyroid, Adrenal, Pituitary
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ENDO_SECTIONS = [
-  { id: 'dka', title: 'DKA & HHS', icon: 'ðŸ¬',
+  { id: 'dka', title: 'DKA & HHS', icon: '',
     items: [
       { term: 'Diabetic Ketoacidosis (DKA)', def: 'Glucose >250, pH <7.3, bicarb <18, anion gap >12, positive ketones. Usually Type 1 DM (can occur in Type 2).', detail: 'Triggers (5 I\'s): Infection, Insulin missed, Infarction (MI), Intoxication, Initial presentation (new diagnosis). Presentation: Kussmaul breathing, fruity breath (acetone), abdominal pain, nausea/vomiting, AMS.', pearl: 'DKA treatment protocol: (1) Volume: NS 1-1.5L/hr first 1-2h, then 250-500 mL/hr. (2) Insulin: regular insulin 0.1 U/kg bolus â†’ 0.1 U/kg/hr drip. (3) Potassium: if K <3.3 â†’ hold insulin, replete K first. If K 3.3-5.3 â†’ add 20-40 mEq/L to each liter of fluids. If K >5.3 â†’ hold K, recheck Q2h. (4) When glucose <200 â†’ add D5 to fluids, â†“ insulin to 0.02-0.05 U/kg/hr.' },
       { term: 'Hyperosmolar Hyperglycemic State (HHS)', def: 'Glucose >600, osmolality >320, pH >7.3, minimal/no ketones. Usually Type 2 DM. MORE lethal than DKA (mortality 10-20%).', detail: 'Develops over days-weeks (vs DKA hours-days). Severe dehydration (avg 9L deficit). Altered mental status. No significant acidosis (enough insulin to prevent ketosis, not enough to control glucose).', pearl: 'HHS treatment: aggressive fluid resuscitation is priority #1 (much greater fluid deficit than DKA). NS 1-1.5L first hour â†’ switch to 1/2 NS if corrected Na normal/high. Insulin: lower doses than DKA (0.05-0.1 U/kg/hr) â€” rapid glucose correction risks cerebral edema. Correct slowly. Watch for thromboembolism (dehydration = hypercoagulable).' },
       { term: 'Hypoglycemia', def: 'Whipple\'s triad: (1) symptoms (tremor, diaphoresis, confusion, seizure), (2) low glucose (<70 mg/dL), (3) resolution with glucose correction.', detail: 'Causes: excess insulin/sulfonylurea (most common), insulinoma, adrenal insufficiency, sepsis, liver failure, alcohol, non-islet cell tumor. Workup: check insulin, C-peptide, proinsulin, beta-hydroxybutyrate, sulfonylurea screen during hypoglycemic episode.', pearl: 'Insulin:C-peptide patterns: Exogenous insulin: â†‘insulin, â†“C-peptide. Insulinoma: â†‘insulin, â†‘C-peptide. Sulfonylurea: â†‘insulin, â†‘C-peptide, + sulfonylurea screen. Treatment: conscious â†’ oral glucose (15g carbs, recheck 15 min). Unconscious â†’ IV D50 (25g) or glucagon 1 mg IM/SQ.' },
     ]},
-  { id: 'thyroid', title: 'Thyroid Disorders', icon: 'ðŸ¦‹',
+  { id: 'thyroid', title: 'Thyroid Disorders', icon: '',
     items: [
       { term: 'Hypothyroidism', def: 'High TSH, low free T4 (primary). Low TSH, low free T4 (central/secondary). Most common cause: Hashimoto\'s thyroiditis (anti-TPO antibodies).', detail: 'Symptoms: fatigue, cold intolerance, weight gain, constipation, dry skin, bradycardia, delayed DTRs, myxedema. Treatment: levothyroxine (start low in elderly/cardiac patients: 25-50 mcg). Full replacement: ~1.6 mcg/kg/day.', pearl: 'Myxedema coma: life-threatening hypothyroidism. Hypothermia, AMS, bradycardia, hypotension, hyponatremia, hypoglycemia. Treatment: IV levothyroxine (200-400 mcg loading dose) + IV hydrocortisone (stress-dose steroids before T4 â€” may unmask adrenal insufficiency). ICU admission. Mortality 30-60%.' },
       { term: 'Hyperthyroidism', def: 'Low TSH, high free T4/T3 (primary). Graves\' disease (most common): TSI (thyroid-stimulating immunoglobulin), diffuse goiter, exophthalmos, pretibial myxedema.', detail: 'Other causes: toxic multinodular goiter, toxic adenoma, thyroiditis (transient), exogenous T4. Diagnosis: TSH + free T4. If TSH suppressed: radioactive iodine uptake (RAIU) â€” high = Graves/toxic nodule, low = thyroiditis/exogenous.', pearl: 'Thyroid storm: life-threatening thyrotoxicosis. Fever >104°F, tachycardia, AMS, GI symptoms (N/V/D), cardiac failure. Treatment order matters: (1) propranolol (symptom control), (2) PTU (blocks new hormone synthesis + peripheral T4â†’T3 conversion), (3) iodine (Lugol\'s/SSKI) 1 HOUR AFTER PTU (blocks release; if given before PTU â†’ fuel for more hormone), (4) hydrocortisone (blocks T4â†’T3 + treats relative adrenal insufficiency), (5) cooling measures.' },
       { term: 'Thyroid Nodules', def: 'Common (50% of adults by US). Most are benign. Evaluation: TSH first. If TSH low â†’ RAIU (hot nodule â†’ rarely malignant). If TSH normal/high â†’ US features guide FNA.', detail: 'US features concerning for malignancy: hypoechoic, microcalcifications, irregular margins, taller-than-wide, extrathyroidal extension. Bethesda classification of FNA: I (nondiagnosticâ†’repeat), II (benign), III (AUS/FLUS), IV (follicular neoplasm), V (suspicious), VI (malignant).', pearl: 'Bethesda III-IV: molecular testing (Afirma, ThyroSeq) helps decide surgery vs surveillance. Most common thyroid cancer: papillary (80%) â€” excellent prognosis, "Orphan Annie" nuclei, psammoma bodies, lymphatic spread. Medullary thyroid carcinoma: from C cells (calcitonin), associated with MEN2A/2B â€” always check calcitonin and RET proto-oncogene.' },
     ]},
-  { id: 'adrenal', title: 'Adrenal Disorders', icon: 'âš¡',
+  { id: 'adrenal', title: 'Adrenal Disorders', icon: '',
     items: [
       { term: 'Adrenal Insufficiency', def: 'Primary (Addison\'s): low cortisol, HIGH ACTH, hyperpigmentation, hyperkalemia. Secondary: low cortisol, LOW ACTH, NO hyperpigmentation, no hyperkalemia.', detail: 'Primary causes: autoimmune (80% in developed countries), TB (most common worldwide), adrenal hemorrhage (Waterhouse-Friderichsen â€” meningococcal sepsis), metastases, medications (ketoconazole, etomidate). Secondary: chronic steroid use (most common overall), pituitary tumors.', pearl: 'Adrenal crisis: acute, life-threatening. Hypotension/shock unresponsive to fluids/pressors. Treatment: IV hydrocortisone 100 mg bolus â†’ 50 mg Q8h + aggressive NS resuscitation. DO NOT wait for cortisol results to treat if clinically suspected. Random cortisol <3 mcg/dL during stress = diagnostic. ACTH stimulation test: cortisol <18 at 30-60 min post-cosyntropin = insufficient.' },
       { term: 'Cushing\'s Syndrome', def: 'Cortisol excess. Central obesity, moon facies, buffalo hump, striae (purple/wide), thin skin, proximal myopathy, HTN, hyperglycemia, osteoporosis.', detail: 'Screening: 24h urine free cortisol, late-night salivary cortisol, or 1 mg overnight dexamethasone suppression test (cortisol >1.8 at 8 AM = positive). Localization: ACTH level â†’ if ACTH-dependent (pituitary = Cushing\'s disease 70%, ectopic ACTH 15%) vs ACTH-independent (adrenal tumor 15%).', pearl: 'High-dose dex suppression test: suppression = pituitary Cushing\'s disease (responds to feedback). No suppression = ectopic ACTH (lung small cell, carcinoid â€” doesn\'t respond to feedback). Inferior petrosal sinus sampling (IPSS): gold standard for differentiating pituitary from ectopic if equivocal. Hypokalemia + metabolic alkalosis in Cushing\'s â†’ suspect ectopic ACTH (very high cortisol overwhelms 11β-HSD2 â†’ mineralocorticoid effect).' },
       { term: 'Pheochromocytoma', def: 'Catecholamine-secreting tumor from chromaffin cells (adrenal medulla). "Rule of 10s": 10% bilateral, 10% extra-adrenal (paraganglioma), 10% malignant, 10% pediatric.', detail: 'Classic triad: episodic headache, sweating, tachycardia/palpitations + severe HTN. Diagnosis: 24h urine fractionated metanephrines and catecholamines, OR plasma free metanephrines (preferred screening). Imaging: CT/MRI adrenals after biochemical confirmation.', pearl: 'CRITICAL: alpha-blockade FIRST (phenoxybenzamine or doxazosin for 10-14 days), THEN add beta-blocker. If beta-blocker given first â†’ unopposed alpha stimulation â†’ hypertensive crisis. Preop: alpha-block â†’ volume expansion â†’ then beta-block. Associated with MEN2A (with medullary thyroid Ca + hyperparathyroidism), MEN2B, VHL, NF1, SDH mutations.' },
     ]},
-  { id: 'calcium', title: 'Calcium Disorders', icon: 'ðŸ¦´',
+  { id: 'calcium', title: 'Calcium Disorders', icon: '',
     items: [
       { term: 'Hypercalcemia', def: 'Corrected Ca = measured Ca + 0.8 Ã— (4.0 - albumin). Most common causes: primary hyperparathyroidism (outpatient) and malignancy (inpatient).', detail: '"Stones, bones, groans, thrones, and psychiatric overtones": nephrolithiasis, bone pain/fractures, abdominal pain/constipation/pancreatitis, polyuria/polydipsia, confusion/depression.', pearl: 'PTH-dependent (â†‘PTH): primary hyperparathyroidism (adenoma 85%, hyperplasia 15%). PTH-independent (â†“PTH): malignancy (PTHrP, osteolytic mets, 1,25-vit D from lymphoma), granulomatous disease (sarcoid â€” â†‘ 1,25-vit D), vitamin D intoxication, milk-alkali, thiazides. Treatment of acute hypercalcemia: NS 200-300 mL/hr â†’ furosemide (ONLY after volume repleted) â†’ calcitonin (rapid but transient) â†’ zoledronic acid (onset 2-4 days, duration weeks) â†’ denosumab if refractory.' },
       { term: 'Hypocalcemia', def: 'Corrected Ca <8.5 mg/dL OR ionized Ca <4.5 mg/dL. Always check albumin and magnesium.', detail: 'Causes: hypoparathyroidism (post-surgical most common), vitamin D deficiency, CKD (â†“ 1,25-vit D), hypomagnesemia (impairs PTH secretion AND function â€” must correct Mg first), pancreatitis, hungry bone syndrome post-parathyroidectomy.', pearl: 'Severe/symptomatic (tetany, seizures, laryngospasm, QTc prolongation): IV calcium gluconate 1-2 g in 50 mL D5W over 10-20 min â†’ continuous infusion 0.5-1.5 mg/kg/hr. Chvostek sign: tap facial nerve â†’ twitch. Trousseau sign: inflate BP cuff >SBP for 3 min â†’ carpal spasm (more specific). ALWAYS check and correct magnesium â€” hypoMg makes hypoCa refractory to treatment.' },
@@ -19570,7 +19570,7 @@ function EndocrinologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¦‹ Endocrinology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Endocrinology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">DKA/HHS, thyroid, adrenal & calcium disorders</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19587,7 +19587,7 @@ function EndocrinologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20', color: '#f59e0b' }}>
-                    <span>âš¡</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19616,25 +19616,25 @@ function EndocrinologyGuideView() {
    HEMATOLOGY GUIDE â€” Anemias, Coagulation, Anticoagulation
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const HEME_SECTIONS = [
-  { id: 'anemia', title: 'Anemia Classification', icon: 'ðŸ©¸',
+  { id: 'anemia', title: 'Anemia Classification', icon: '',
     items: [
       { term: 'Microcytic (MCV <80)', def: 'TICS: Thalassemia, Iron deficiency, Chronic disease (some), Sideroblastic. Iron deficiency is the most common cause of anemia worldwide.', detail: 'Iron deficiency: â†“ ferritin (<30 is diagnostic, <15 definitive), â†“ serum iron, â†‘ TIBC, â†“ transferrin saturation (<20%). Retic count low. Causes: blood loss (GI > menstrual), malabsorption (celiac, gastrectomy), increased demand (pregnancy).', pearl: 'Iron studies interpretation: Iron deficiency: â†“ferritin, â†“iron, â†‘TIBC, â†“TSAT. Anemia of chronic disease: â†‘ferritin, â†“iron, â†“TIBC, â†“TSAT. Combined: â†“-normal ferritin (<100 in inflammation), â†“iron, â†“TIBC, â†“TSAT. TIBC = transferrin capacity: "hungry for iron" in iron deficiency (â†‘TIBC), "not hungry" in ACD (â†“TIBC). Ferritin is an acute phase reactant â€” can be falsely normal/elevated in inflammation.' },
       { term: 'Normocytic (MCV 80-100)', def: 'Reticulocyte count is the KEY branch point. High retic = appropriate response (hemolysis, acute blood loss). Low retic = underproduction (ACD, aplastic anemia, CKD, myelodysplastic).', detail: 'Hemolysis workup: â†‘ reticulocytes, â†‘ LDH, â†‘ indirect bilirubin, â†“ haptoglobin, â†‘ bilirubin. Peripheral smear critical. Intravascular: â†‘ free Hgb, hemoglobinuria. Extravascular: splenomegaly. Coombs test: (+) = autoimmune â†’ warm (IgG, spleen) vs cold (IgM, complement, liver).', pearl: 'Hemolysis smear findings: Schistocytes (fragments) â†’ TTP/HUS, DIC, MAHA, mechanical valve. Spherocytes â†’ hereditary spherocytosis, autoimmune hemolytic anemia. Target cells â†’ thalassemia, liver disease, hemoglobin C. Bite cells â†’ G6PD deficiency. Sickle cells â†’ sickle cell. Spur cells (acanthocytes) â†’ liver disease, abetalipoproteinemia.' },
       { term: 'Macrocytic (MCV >100)', def: 'Megaloblastic: B12 or folate deficiency (hypersegmented neutrophils, macro-ovalocytes). Non-megaloblastic: liver disease, hypothyroidism, MDS, reticulocytosis, alcohol, medications.', detail: 'B12 deficiency: neurologic symptoms (subacute combined degeneration â€” posterior columns + lateral corticospinal tracts â†’ loss of vibration/proprioception + upper motor neuron signs). Causes: pernicious anemia (anti-IF antibodies), gastrectomy, ileal disease/resection (terminal ileum absorbs B12), metformin, Nâ‚‚O abuse.', pearl: 'Check BOTH B12 and folate. If B12 borderline-low: check methylmalonic acid (MMA â€” elevated in B12 deficiency only) and homocysteine (elevated in both B12 and folate deficiency). CRITICAL: if both B12 and folate deficient, must replace B12 FIRST â€” giving folate alone can worsen B12 neurologic damage by diverting limited B12 away from neurologic pathways.' },
     ]},
-  { id: 'coag', title: 'Coagulation Disorders', icon: 'ðŸ§¬',
+  { id: 'coag', title: 'Coagulation Disorders', icon: '',
     items: [
       { term: 'Coagulation Cascade Basics', def: 'PT/INR: extrinsic pathway (factor VII) â†’ monitors warfarin. aPTT: intrinsic pathway (VIII, IX, XI, XII) â†’ monitors heparin. Both converge at common pathway (X, V, II, fibrinogen).', detail: 'Mixing study: aPTT prolonged â†’ mix patient plasma 1:1 with normal plasma. If corrects: factor deficiency. If doesn\'t correct: inhibitor (lupus anticoagulant or factor-specific inhibitor like anti-factor VIII).', pearl: 'Factor VII has the shortest half-life (6h) â†’ PT elevates first in warfarin therapy and liver failure. DIC: â†‘PT, â†‘aPTT, â†“fibrinogen, â†‘D-dimer, â†“platelets, schistocytes. Treatment: treat underlying cause + replace (cryo for fibrinogen <100, platelets if <50 + bleeding, FFP if PT/aPTT elevated + bleeding).' },
       { term: 'Thrombocytopenias', def: 'Decreased production (marrow failure, MDS, chemo), increased destruction (ITP, TTP, HUS, HIT, DIC), sequestration (splenomegaly), dilutional (massive transfusion).', detail: 'ITP: isolated thrombocytopenia, no other cause found. Anti-platelet antibodies (anti-GPIIb/IIIa). Treatment: observation if plt >30K + no bleeding. Steroids first-line, IVIG for urgent situations, rituximab, TPO agonists (eltrombopag, romiplostim), splenectomy.', pearl: 'TTP pentad: thrombocytopenia, MAHA (schistocytes), renal dysfunction, neurologic symptoms, fever. ADAMTS13 <10% is diagnostic. Treatment: urgent plasma exchange (plasmapheresis) + steroids + caplacizumab. Do NOT transfuse platelets (fuel the fire â†’ more thrombosis). HUS: similar but renal predominant, STEC (Shiga toxin E. coli O157:H7) â€” supportive care, avoid antibiotics.' },
       { term: 'Heparin-Induced Thrombocytopenia (HIT)', def: 'Type II HIT: immune-mediated (IgG against PF4-heparin complex). Platelet drop >50% from baseline, typically day 5-10 of heparin exposure. THROMBOTIC, not bleeding disorder.', detail: '4T score: Timing, Thrombocytopenia magnitude, Thrombosis, other causes. If high/intermediate probability â†’ send anti-PF4/heparin antibody (ELISA) + serotonin release assay (SRA, confirmatory). STOP ALL HEPARIN (including flushes, coated catheters).', pearl: 'HIT is a PROTHROMBOTIC state â€” despite low platelets, these patients CLOT (not bleed). DVT, PE, stroke, limb ischemia. Treatment: stop ALL heparin + start alternative anticoagulant immediately: argatroban (hepatic metabolism, good for renal failure) or bivalirudin (short half-life). Do NOT give warfarin until platelets >150K (risk of warfarin-induced skin necrosis/venous limb gangrene). Do NOT transfuse platelets.' },
     ]},
-  { id: 'anticoag', title: 'Anticoagulation Management', icon: 'ðŸ’Š',
+  { id: 'anticoag', title: 'Anticoagulation Management', icon: '',
     items: [
       { term: 'Warfarin', def: 'Vitamin K antagonist. Inhibits factors II, VII, IX, X, protein C, protein S. Monitor with PT/INR. Target INR 2-3 (most indications), 2.5-3.5 (mechanical mitral valve).', detail: 'Drug interactions: CYP2C9 inhibitors â†‘ warfarin effect (fluconazole, amiodarone, metronidazole, TMP-SMX). CYP2C9 inducers â†“ warfarin effect (rifampin, carbamazepine, phenytoin). Vitamin K-rich foods (leafy greens): â†“ warfarin effect. CONSISTENCY is key.', pearl: 'Warfarin reversal: INR elevated, no bleeding â†’ hold warfarin ± oral vitamin K (1-2.5 mg). Serious bleeding: IV vitamin K 10 mg + 4-factor PCC (Kcentra) for immediate reversal. FFP if PCC unavailable (slower, volume overload). Protein C has shorter half-life than most clotting factors â†’ initial warfarin therapy can be PROTHROMBOTIC (bridge with heparin for 5 days, until INR therapeutic Ã— 2 days).' },
       { term: 'DOACs (Direct Oral Anticoagulants)', def: 'Xa inhibitors: rivaroxaban, apixaban, edoxaban. Thrombin inhibitor: dabigatran. No routine monitoring needed.', detail: 'Advantages over warfarin: predictable pharmacokinetics, fewer drug interactions, no monitoring, rapid onset (2-4h). Limitations: renal clearance (dose adjust/avoid in severe CKD), no reliable routine monitoring, cost. Dabigatran: GI side effects, requires acid for absorption (avoid PPIs).', pearl: 'Reversal agents: Dabigatran â†’ idarucizumab (Praxbind, specific reversal). Xa inhibitors â†’ andexanet alfa (Andexxa) or 4-factor PCC. Dabigatran is dialyzable (unlike Xa inhibitors). For AF: DOACs preferred over warfarin in most patients (RE-LY, ROCKET-AF, ARISTOTLE, ENGAGE-TIMI). Exception: mechanical valve or moderate-severe mitral stenosis â†’ warfarin only.' },
       { term: 'Heparin (UFH & LMWH)', def: 'UFH: IV or SQ, monitor aPTT (target 1.5-2.5Ã— control). Short half-life (60-90 min), protamine reversal. LMWH (enoxaparin): SQ, predictable, monitor anti-Xa in obesity/renal failure.', detail: 'UFH advantages: short half-life (useful perioperatively), fully reversible with protamine, not renally cleared. LMWH advantages: SQ dosing, predictable levels, outpatient use, lower HIT risk. Protamine reversal: 1 mg per 100 units UFH (given in last 2-3h). For LMWH: protamine reverses ~60%.', pearl: 'Heparin dosing for PE: 80 U/kg bolus â†’ 18 U/kg/hr. Check aPTT Q6h, adjust. Enoxaparin: 1 mg/kg SQ Q12h (treatment), 40 mg SQ daily (prophylaxis). Adjust for CrCl <30: enoxaparin 1 mg/kg Q24h (treatment), 30 mg daily (prophylaxis). In morbid obesity (>150 kg): use actual body weight for dosing, monitor anti-Xa levels.' },
     ]},
-  { id: 'sickle', title: 'Sickle Cell Disease', icon: 'ðŸŒ™',
+  { id: 'sickle', title: 'Sickle Cell Disease', icon: '',
     items: [
       { term: 'Vaso-Occlusive Crisis', def: 'Most common reason for ED visit/hospitalization. Severe bone/joint pain (often back, long bones, chest). Triggered by cold, dehydration, infection, stress, hypoxia.', detail: 'Management: aggressive IV fluids, opioid analgesia (PCA preferred, avoid meperidine â€” seizures), NSAIDs as adjunct, incentive spirometry (prevent ACS), supplemental Oâ‚‚ only if hypoxic.', pearl: 'Do NOT undertreat pain in sickle cell patients. These patients develop tolerance and need higher opioid doses â€” this is NOT drug-seeking behavior. Hydroxyurea is disease-modifying: â†‘ HbF, â†“ crises, â†“ ACS, â†“ mortality. Indications: â‰¥3 crises/year, recurrent ACS, symptomatic anemia.' },
       { term: 'Acute Chest Syndrome', def: 'New pulmonary infiltrate + ONE of: chest pain, fever >38.5°C, respiratory symptoms, hypoxia. Most common cause of death in SCD adults.', detail: 'Causes: atelectasis/hypoventilation (rib infarction), infection (Chlamydia, Mycoplasma, S. pneumoniae), fat embolism (from bone marrow necrosis), pulmonary infarction.', pearl: 'Treatment: antibiotics (cephalosporin + macrolide to cover atypicals), exchange transfusion (target HbS <30%), incentive spirometry Q2h, supplemental Oâ‚‚, bronchodilators. Simple transfusion if Hgb <10 â€” exchange transfusion if Hgb already near baseline (avoid hyperviscosity by not pushing Hgb >10-11).' },
@@ -19649,7 +19649,7 @@ function HematologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ©¸ Hematology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Hematology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Anemias, coagulation & sickle cell disease</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19666,7 +19666,7 @@ function HematologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#ef444408', border: '1px solid #ef444420', color: '#ef4444' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19695,23 +19695,23 @@ function HematologyGuideView() {
    RHEUMATOLOGY GUIDE â€” Autoimmune, Joint Patterns, Serologies
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const RHEUM_SECTIONS = [
-  { id: 'ra', title: 'Rheumatoid Arthritis & OA', icon: 'ðŸ¦´',
+  { id: 'ra', title: 'Rheumatoid Arthritis & OA', icon: '',
     items: [
       { term: 'Rheumatoid Arthritis', def: 'Chronic, symmetric, inflammatory polyarthritis. MCP + PIP joints (spares DIP). Morning stiffness >1 hour. Pannus formation erodes cartilage/bone.', detail: 'Labs: RF (70-80% sensitive, not specific), anti-CCP (more specific, 95%). Elevated ESR/CRP. X-ray: juxta-articular osteopenia, joint space narrowing, erosions. Extra-articular: rheumatoid nodules (30%), interstitial lung disease, Felty syndrome (RA + splenomegaly + neutropenia), atlantoaxial subluxation.', pearl: 'Treatment: "treat to target" (remission or low disease activity). Start DMARD early (within 3 months of diagnosis). Methotrexate is cornerstone (7.5-25 mg/weekly + folic acid). Add biologics if inadequate response: TNF-α inhibitors (adalimumab, etanercept), IL-6 inhibitors (tocilizumab), JAK inhibitors (tofacitinib), rituximab, abatacept. Check for latent TB before biologics!' },
       { term: 'Osteoarthritis', def: 'Degenerative. DIP (Heberden\'s), PIP (Bouchard\'s), 1st CMC, knees, hips, spine. Pain WORSENS with activity, IMPROVES with rest. Stiffness <30 min.', detail: 'X-ray: joint space narrowing, osteophytes, subchondral sclerosis, subchondral cysts. NO systemic features (normal labs). Risk factors: age, obesity, prior joint injury, repetitive use.', pearl: 'OA treatment ladder: (1) Weight loss + exercise (MOST effective, single best intervention). (2) Topical NSAIDs (diclofenac gel). (3) Oral NSAIDs (lowest dose, shortest duration). (4) Intra-articular steroids (temporary, max 3-4Ã—/year). (5) Duloxetine (for pain modulation). (6) Joint replacement (when conservative fails, functionally limiting). Avoid: opioids (minimal benefit, high risk), hyaluronic acid injections (evidence is weak).' },
     ]},
-  { id: 'lupus', title: 'Systemic Lupus Erythematosus', icon: 'ðŸ¦‹',
+  { id: 'lupus', title: 'Systemic Lupus Erythematosus', icon: '',
     items: [
       { term: 'SLE Diagnosis', def: 'Young women (F:M = 9:1). Multisystem autoimmune disease. ANA positive (98% sensitive but NOT specific). Anti-dsDNA (specific, correlates with disease activity/nephritis). Anti-Smith (most specific).', detail: 'SLICC criteria (â‰¥4 of 11 or biopsy-proven lupus nephritis + ANA/anti-dsDNA): malar rash, discoid rash, photosensitivity, oral ulcers, arthritis (non-erosive), serositis (pleuritis/pericarditis), renal (proteinuria/casts), neurologic (seizure/psychosis), hematologic (hemolytic anemia, leukopenia, thrombocytopenia), immunologic (anti-dsDNA, anti-Sm, antiphospholipid), ANA.', pearl: 'Drug-induced lupus: hydralazine, procainamide, isoniazid, minocycline, TNF-α inhibitors. Anti-histone antibodies (95% positive). Usually NO renal or CNS involvement. Resolves after stopping drug. Neonatal lupus: anti-Ro/SSA antibodies cross placenta â†’ congenital heart block (permanent), transient rash, cytopenias.' },
       { term: 'Lupus Nephritis', def: 'Occurs in ~50% of SLE. Class III/IV (proliferative) most severe. Presents with proteinuria, hematuria, hypertension, elevated creatinine.', detail: 'ISN/RPS classification: Class I (minimal mesangial), II (mesangial proliferative), III (focal proliferative), IV (diffuse proliferative â€” worst prognosis, most common requiring treatment), V (membranous), VI (sclerotic). Biopsy is gold standard.', pearl: 'Class III/IV treatment: induction with mycophenolate mofetil (MMF) or IV cyclophosphamide + steroids. Maintenance: MMF or azathioprine. Voclosporin (calcineurin inhibitor) added to MMF: AURORA trial showed improved renal response. Belimumab: anti-BLyS, shown to reduce lupus flares (BLISS trials). Hydroxychloroquine: ALL SLE patients should be on it (reduces flares, renal damage, mortality, thrombosis). Annual eye exam for HCQ retinal toxicity.' },
     ]},
-  { id: 'vasculitis', title: 'Vasculitis', icon: 'ðŸ”¥',
+  { id: 'vasculitis', title: 'Vasculitis', icon: '',
     items: [
       { term: 'Large Vessel Vasculitis', def: 'Giant Cell Arteritis (GCA): age >50, temporal headache, jaw claudication, vision loss (AION), PMR overlap. ESR >50, â†‘CRP. Temporal artery biopsy (skip lesions). Takayasu arteritis: young women, aortic arch + branches, limb claudication, absent pulses.', detail: 'GCA treatment: high-dose prednisone 60-80 mg/day (or IV methylprednisolone if visual symptoms). Do NOT wait for biopsy. Tocilizumab as steroid-sparing agent (GiACTA trial). Takayasu: steroids ± methotrexate. Anti-TNF for refractory.', pearl: 'GCA and PMR frequently coexist (40-60%). PMR alone: prednisone 15-20 mg/day. If PMR + GCA symptoms â†’ treat as GCA (60 mg). PMR that requires >20 mg prednisone or doesn\'t respond â†’ reconsider diagnosis (malignancy, RA, myositis).' },
       { term: 'Medium Vessel Vasculitis', def: 'Polyarteritis Nodosa (PAN): systemic (NOT pulmonary), associated with Hep B. Livedo reticularis, mononeuritis multiplex, renal (aneurysms, NOT GN), skin nodules, abdominal pain. Kawasaki: children, fever â‰¥5 days, "CRASH" (Conjunctivitis, Rash, Adenopathy cervical, Strawberry tongue, Hand/foot changes). Risk: coronary artery aneurysms.', detail: 'PAN: angiography shows microaneurysms (string of pearls). Biopsy: fibrinoid necrosis, NO granulomas. ANCA negative. Hep B associated â†’ treat Hep B. Kawasaki treatment: IVIG (within 10 days) + high-dose aspirin (only pediatric indication for aspirin). Echocardiography at diagnosis, 2 weeks, and 6-8 weeks.', pearl: 'PAN spares the lungs (unlike ANCA vasculitis). If lung involvement â†’ think ANCA vasculitis, not PAN. Kawasaki: incomplete presentation common in infants â€” have low threshold for echo if prolonged fever + some criteria met. Coronary aneurysm risk highest if IVIG delayed past day 10.' },
       { term: 'Small Vessel (ANCA) Vasculitis', def: 'GPA (Wegener\'s): c-ANCA/anti-PR3. Upper airway (sinusitis, saddle nose), lower airway (pulmonary nodules/hemorrhage), renal (RPGN). MPA: p-ANCA/anti-MPO. Pulmonary-renal syndrome (no upper airway). EGPA (Churg-Strauss): p-ANCA, asthma, eosinophilia, neuropathy.', detail: 'Treatment: induction with rituximab (RAVE trial: non-inferior to cyclophosphamide, preferred for relapsing disease) OR cyclophosphamide + steroids. Maintenance: rituximab Q6 months or azathioprine. Avacopan (C5a receptor inhibitor): steroid-sparing in ANCA vasculitis (ADVOCATE trial).', pearl: 'ANCA vasculitis involves kidneys as pauci-immune crescentic GN (minimal/no immune deposits on IF â€” unlike lupus nephritis or anti-GBM disease). Lung-kidney syndrome DDx: ANCA vasculitis, anti-GBM (Goodpasture), SLE. Plasma exchange: add for severe renal disease (Cr >5.7) or diffuse alveolar hemorrhage.' },
     ]},
-  { id: 'crystal', title: 'Crystal Arthropathies', icon: 'ðŸ’Ž',
+  { id: 'crystal', title: 'Crystal Arthropathies', icon: '',
     items: [
       { term: 'Gout', def: 'Monosodium urate crystals. Needle-shaped, NEGATIVELY birefringent (yellow parallel to polarizer). Acute: 1st MTP (podagra) classic, but any joint. Tophi in chronic disease.', detail: 'Risk factors: male, obesity, alcohol (beer > liquor > wine), purine-rich diet, thiazides, loop diuretics, cyclosporine, CKD. Trigger: sudden uric acid change (starting/stopping ULT, surgery, dehydration, binge drinking).', pearl: 'Acute gout: NSAIDs (indomethacin) OR colchicine (within 36h of onset: 1.2 mg â†’ 0.6 mg 1h later) OR steroids (if NSAIDs/colchicine contraindicated). Anakinra (IL-1 blocker) for refractory. Do NOT start or stop allopurinol during acute flare! ULT (urate-lowering therapy): allopurinol (start low 100 mg, titrate to target uric acid <6 mg/dL) or febuxostat. Start ULT with anti-inflammatory prophylaxis (colchicine 0.6 mg daily Ã— 3-6 months).' },
       { term: 'Pseudogout (CPPD)', def: 'Calcium pyrophosphate crystals. Rhomboid-shaped, WEAKLY POSITIVELY birefringent (blue parallel to polarizer). Knee is most common joint. Chondrocalcinosis on X-ray.', detail: 'Associated with the "5 H\'s": Hyperparathyroidism, Hemochromatosis, Hypomagnesemia, Hypothyroidism, Hypophosphatasia. Age >65 is biggest risk factor. Can mimic gout, RA, OA, or septic arthritis.', pearl: 'Crystal gout vs pseudogout mnemonic: "Negatively birefringent Needles = gout (Negative = yellow = gout = Needles)." "Positively birefringent = Pseudogout = blue Parallel." Joint aspiration is gold standard for BOTH â€” always aspirate to rule out septic arthritis. Cell count >50K WBCs = septic until proven otherwise (even in known crystal disease).' },
@@ -19725,7 +19725,7 @@ function RheumatologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¦´ Rheumatology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Rheumatology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Autoimmune diseases, vasculitis & crystal arthropathies</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19742,7 +19742,7 @@ function RheumatologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#8b5cf608', border: '1px solid #8b5cf620', color: '#8b5cf6' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19771,24 +19771,24 @@ function RheumatologyGuideView() {
    NEUROLOGY GUIDE â€” Stroke, Seizures, Headache, Neuromuscular
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const NEURO_SECTIONS = [
-  { id: 'stroke', title: 'Stroke', icon: 'ðŸ§ ',
+  { id: 'stroke', title: 'Stroke', icon: '',
     items: [
       { term: 'Ischemic Stroke', def: 'Acute focal neurologic deficit from cerebral artery occlusion. 87% of all strokes. Thrombotic (large vessel atherosclerosis, small vessel/lacunar), embolic (cardiac â€” AF, valvular; artery-to-artery), cryptogenic (ESUS).', detail: 'Workup: non-contrast CT (rule out hemorrhage â€” hemorrhagic stroke is a contraindication to thrombolytics), CTA (vessel occlusion), NIHSS score, glucose, CBC, coags, troponin, ECG. CT perfusion: core infarct vs penumbra (salvageable tissue).', pearl: 'tPA (alteplase): within 4.5h of last-known-well. Dose: 0.9 mg/kg (max 90 mg), 10% bolus + 90% over 60 min. BP must be <185/110 before tPA, <180/105 after. Contraindications: active bleeding, platelets <100K, INR >1.7, recent surgery. Mechanical thrombectomy: large vessel occlusion (ICA, M1 MCA), within 24h if favorable imaging (DAWN, DEFUSE-3 trials up to 24h if CT perfusion shows salvageable tissue).' },
       { term: 'Hemorrhagic Stroke', def: 'Intracerebral hemorrhage (ICH): hypertensive (basal ganglia, thalamus, pons, cerebellum), amyloid angiopathy (lobar, elderly), AVM, coagulopathy. Subarachnoid (SAH): sudden "worst headache of life" â€” ruptured aneurysm (berry aneurysm at circle of Willis).', detail: 'ICH management: reverse anticoagulation (4F-PCC for warfarin, idarucizumab for dabigatran), BP control (SBP <140 per INTERACT2/ATACH-2), monitor for ICP elevation, surgical evacuation if cerebellar hemorrhage >3 cm or deteriorating.', pearl: 'SAH: CT sensitivity ~95% <6h (decreases with time). If CT negative but clinical suspicion high â†’ LP (xanthochromia, elevated RBCs that don\'t clear). CTA for aneurysm. Treatment: secure aneurysm (endovascular coiling preferred > surgical clipping per ISAT). Nimodipine 60 mg Q4h Ã— 21 days (prevents vasospasm). Monitor for: rebleeding, vasospasm (day 4-14), hydrocephalus, hyponatremia (SIADH or cerebral salt wasting).' },
       { term: 'TIA & Secondary Prevention', def: 'Transient neurologic deficit resolving within <24h (most <1h) with no infarction on imaging. ABCD2 score stratifies risk. High risk: same admission workup.', detail: 'Secondary prevention: antiplatelets (aspirin + clopidogrel Ã— 21 days for minor stroke/TIA per CHANCE/POINT trials, then single antiplatelet), statin (high-intensity), BP control (<130/80), diabetes control, smoking cessation, carotid endarterectomy if ipsilateral 70-99% symptomatic stenosis.', pearl: 'AF-related stroke: anticoagulation with DOAC (not dual antiplatelet) â€” start 4-14 days after stroke (earlier for minor, later for large). CHAâ‚‚DSâ‚‚-VASc score guides decision (â‰¥2 men, â‰¥3 women â†’ anticoagulate). PFO closure: consider in cryptogenic stroke patients <60 with high-risk PFO features (large shunt, atrial septal aneurysm) â€” RESPECT, CLOSE trials.' },
     ]},
-  { id: 'seizure', title: 'Seizures & Epilepsy', icon: 'âš¡',
+  { id: 'seizure', title: 'Seizures & Epilepsy', icon: '',
     items: [
       { term: 'Seizure Classification', def: 'Focal (aware vs impaired awareness, motor vs non-motor) â†’ one hemisphere. Generalized (tonic-clonic, absence, myoclonic, atonic) â†’ both hemispheres from onset. Focal to bilateral tonic-clonic (previously "secondary generalized").', detail: 'New-onset seizure workup: stat glucose, BMP (Na, Ca, Mg), CBC, tox screen, pregnancy test if applicable. Brain MRI (with epilepsy protocol). EEG within 24h. LP if febrile or immunocompromised.', pearl: 'Key epilepsy syndromes: Childhood absence: 3 Hz spike-and-wave, hyperventilation triggers, ethosuximide first-line. JME (Juvenile Myoclonic Epilepsy): morning myoclonic jerks + GTC, lifelong treatment, valproate first-line (avoid in women of childbearing age â€” teratogenic). Lennox-Gastaut: multiple seizure types, slow spike-and-wave, intellectual disability. West syndrome (infantile spasms): hypsarrhythmia, ACTH/vigabatrin.' },
       { term: 'Status Epilepticus', def: 'Continuous seizure >5 min or â‰¥2 seizures without return to baseline. MEDICAL EMERGENCY. Mortality ~20%. Convulsive > non-convulsive.', detail: 'Treatment algorithm: (0-5 min) ABCs, IV access, glucose/thiamine, labs. (5-20 min) Benzodiazepine: lorazepam 4 mg IV (repeat Ã—1) OR midazolam 10 mg IM (RAMPART trial â€” IM midazolam non-inferior). (20-40 min) Second-line: fosphenytoin 20 mg PE/kg IV, or levetiracetam 60 mg/kg IV, or valproate 40 mg/kg IV (ESETT trial â€” all equivalent). (>40 min) Refractory: intubation + continuous infusion midazolam, propofol, or pentobarbital + continuous EEG monitoring.', pearl: 'Non-convulsive status epilepticus (NCSE): altered mental status without overt seizure activity. Diagnose with EEG. Common in ICU patients with unexplained AMS. Treat same as convulsive SE. Causes of status epilepticus: AED non-compliance (#1), alcohol withdrawal, CNS infection, metabolic (hyponatremia, hypoglycemia, hypocalcemia), structural (stroke, tumor, TBI).' },
       { term: 'Antiepileptic Drugs', def: 'First-line for focal: levetiracetam (Keppra â€” fewest drug interactions, no hepatotoxicity), lamotrigine, oxcarbazepine. First-line for generalized: valproate, lamotrigine, levetiracetam.', detail: 'Important side effects: Valproate â€” teratogenic (neural tube defects), hepatotoxic, pancreatitis, weight gain, tremor, thrombocytopenia. Carbamazepine â€” hyponatremia (SIADH), aplastic anemia, SJS (HLA-B*1502 in Asian descent â€” screen before starting), CYP inducer. Phenytoin â€” gingival hyperplasia, hirsutism, nystagmus, SJS, zero-order kinetics (small dose â†‘ â†’ large level â†‘), CYP inducer.', pearl: 'Lamotrigine: titrate SLOWLY (especially with valproate â€” inhibits LTG metabolism â†’ SJS risk). Requires 6-8 week titration. Women of childbearing age: lamotrigine or levetiracetam preferred (least teratogenic). Seizure-freedom â‰¥2 years â†’ consider AED withdrawal (relapse risk ~30-50%). Stop driving during taper + 3-6 months (state-dependent laws).' },
     ]},
-  { id: 'headache', title: 'Headache Syndromes', icon: 'ðŸ¤•',
+  { id: 'headache', title: 'Headache Syndromes', icon: '',
     items: [
       { term: 'Migraine', def: 'Unilateral, pulsating, moderate-severe, 4-72 hours. Nausea/vomiting, photophobia, phonophobia. Aura in ~25% (visual â€” scintillating scotoma, fortification spectra; sensory; language). F > M (3:1).', detail: 'Acute treatment: triptans (sumatriptan) first-line for moderate-severe. NSAIDs for mild-moderate. Antiemetics (metoclopramide, prochlorperazine). Avoid opioids and butalbital. Medication overuse headache: >10 days/month triptan or >15 days/month NSAID use â†’ paradoxical worsening.', pearl: 'Preventive therapy (â‰¥4 headache days/month, disabling): Beta-blockers (propranolol), TCAs (amitriptyline), anticonvulsants (topiramate, valproate), CGRP monoclonal antibodies (erenumab, fremanezumab, galcanezumab â€” newer, well-tolerated, monthly/quarterly SQ injection), onabotulinumtoxinA (Botox) for chronic migraine (â‰¥15 days/month for â‰¥3 months). Gepants (rimegepant, ubrogepant): oral CGRP antagonists for acute treatment and/or prevention.' },
       { term: 'Tension-Type & Cluster', def: 'Tension: bilateral, pressing/tightening, mild-moderate, 30 min-7 days. No nausea, no worsening with activity. Most common headache. Cluster: severe unilateral orbital/temporal pain, 15-180 min, autonomic symptoms (tearing, rhinorrhea, ptosis, miosis). M > F. Circadian/circannual pattern.', detail: 'Cluster acute: 100% Oâ‚‚ (12-15 L/min via non-rebreather Ã— 15 min) or sumatriptan SQ. Prevention: verapamil (first-line), lithium, galcanezumab. Bridge with prednisone. DO NOT use beta-blockers for cluster (worsen).', pearl: 'Red flag headaches (SNOOPX): Systemic symptoms/Secondary risk factors, Neurologic deficits, Onset sudden (thunderclap), Older age (new >50), Pattern change, Positional (worse lying down = â†‘ ICP, worse standing = intracranial hypotension). Thunderclap DDx: SAH (#1 r/o), RCVS (reversible cerebral vasoconstriction), cervical artery dissection, CVT (cerebral venous thrombosis), pituitary apoplexy.' },
     ]},
-  { id: 'neuromusc', title: 'Neuromuscular Disorders', icon: 'ðŸ’ª',
+  { id: 'neuromusc', title: 'Neuromuscular Disorders', icon: '',
     items: [
       { term: 'Myasthenia Gravis', def: 'Autoimmune â€” antibodies against postsynaptic nicotinic acetylcholine receptors (AChR-Ab 85%) or MuSK. Fatigable weakness â€” worsens with use, improves with rest. Ptosis, diplopia, bulbar symptoms (dysarthria, dysphagia), can progress to respiratory failure.', detail: 'Diagnosis: AChR antibodies (85% generalized, 50% ocular-only), if negative â†’ anti-MuSK. Edrophonium (Tensilon) test (rarely used now). Repetitive nerve stimulation: decremental response. Single-fiber EMG: most sensitive. CT chest for thymoma (10-15%).', pearl: 'Treatment: pyridostigmine (symptomatic â€” AChE inhibitor). Immunosuppression: prednisone + steroid-sparing (azathioprine, mycophenolate). Thymectomy: all with thymoma + non-thymoma generalized MG (MGTX trial â€” benefits even without thymoma). Myasthenic crisis (respiratory failure): intubate early (don\'t wait for COâ‚‚ rise â€” diaphragm fatigue â†’ sudden decompensation). IVIG or plasmapheresis. AVOID: aminoglycosides, fluoroquinolones, magnesium, beta-blockers, neuromuscular blockers â†’ worsen MG.' },
       { term: 'Guillain-Barré Syndrome', def: 'Acute inflammatory demyelinating polyradiculoneuropathy (AIDP). Ascending symmetric weakness, areflexia, post-infectious (Campylobacter jejuni #1, CMV, EBV, Zika, influenza). Can progress to respiratory failure.', detail: 'Diagnosis: LP shows albuminocytologic dissociation (â†‘ protein, normal WBCs). NCS: demyelinating pattern (slowed conduction velocity, prolonged F-waves, conduction block). Subtypes: AIDP (most common in West), AMAN (axonal, C. jejuni, worse prognosis), Miller Fisher (ophthalmoplegia, ataxia, areflexia â€” anti-GQ1b antibodies).', pearl: 'Treatment: IVIG (0.4 g/kg/day Ã— 5 days) or plasmapheresis (equivalent efficacy, choose one â€” do NOT combine). Monitor respiratory function: FVC Q4-6h â€” intubate if FVC <20 mL/kg or declining (20-30-40 rule: FVC <20, NIF <30, >30% decline = intubate). Steroids are NOT effective and may worsen. Recovery: 80% walk independently at 6 months, but residual fatigue and weakness common. Pain is underrecognized â€” treat with gabapentin/pregabalin.' },
@@ -19802,7 +19802,7 @@ function NeurologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ§  Neurology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Neurology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Stroke, seizures, headache & neuromuscular</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19819,7 +19819,7 @@ function NeurologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#3b82f608', border: '1px solid #3b82f620', color: '#3b82f6' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19848,23 +19848,23 @@ function NeurologyGuideView() {
    CARDIOLOGY GUIDE â€” ACS, Arrhythmias, Heart Failure, Valvular
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const CARDIO_SECTIONS = [
-  { id: 'acs', title: 'Acute Coronary Syndrome', icon: '❤️',
+  { id: 'acs', title: 'Acute Coronary Syndrome', icon: '',
     items: [
       { term: 'STEMI', def: 'Complete coronary occlusion â†’ transmural ischemia. ST elevation â‰¥1 mm in â‰¥2 contiguous leads (â‰¥2 mm in V1-V3 in men). New LBBB with suspicious symptoms. Door-to-balloon <90 min (PCI) or door-to-needle <30 min (fibrinolysis if PCI not available within 120 min).', detail: 'Localization: Anterior (LAD): V1-V4. Inferior (RCA): II, III, aVF â€” check right-sided leads (V4R) for RV infarct. Lateral (LCx): I, aVL, V5-V6. Posterior: ST depression V1-V3 + tall R waves (get V7-V9 for ST elevation).', pearl: 'STEMI management: Aspirin 325 mg chewed + P2Y12 inhibitor (ticagrelor or prasugrel for PCI, clopidogrel if fibrinolysis). Anticoagulation (heparin). PCI: drug-eluting stent preferred. Post-STEMI: DAPT (ASA + P2Y12 Ã— 12 months), high-intensity statin, beta-blocker, ACEi/ARB, eplerenone (if EF â‰¤40% or HF/DM). RV infarct: volume-dependent â€” give fluids, AVOID nitroglycerin and diuretics (preload-dependent).' },
       { term: 'NSTEMI / UA', def: 'NSTEMI: elevated troponin with ischemic symptoms ± ST depression/T-wave inversion. UA: ischemic symptoms without troponin rise. Both = partial occlusion / demand ischemia. Risk-stratify with TIMI or GRACE score.', detail: 'Management: anti-ischemic therapy (beta-blocker, NTG), antiplatelet (ASA + P2Y12), anticoagulation. Early invasive strategy (<24h catheterization) for high-risk features: â†‘ troponin, ST changes, GRACE >140, hemodynamic instability, recurrent symptoms. Otherwise ischemia-guided approach acceptable.', pearl: 'Type 2 MI: supply-demand mismatch (tachycardia, sepsis, hypotension, anemia, respiratory failure) â†’ troponin elevated but not from plaque rupture. Treat underlying cause, NOT with antiplatelet/anticoagulation as primary therapy. High-sensitivity troponin decision pathways: 0/1h or 0/3h algorithms â€” rapid rule-in/rule-out using serial troponin measurements (ESC guidelines).' },
     ]},
-  { id: 'arrhythmia', title: 'Arrhythmias', icon: 'ðŸ“Š',
+  { id: 'arrhythmia', title: 'Arrhythmias', icon: '',
     items: [
       { term: 'Atrial Fibrillation', def: 'Irregularly irregular. No P waves, fibrillatory baseline. Most common sustained arrhythmia. Risk factors: age, HTN, HF, valvular disease, obesity, OSA, alcohol, hyperthyroidism, post-cardiac surgery.', detail: 'Management: (1) Rate vs rhythm control. Rate control preferred for most: beta-blocker (metoprolol) or CCB (diltiazem). Digoxin add-on for HF. Target HR <110 (RACE II). (2) Rhythm control: cardioversion (electrical or pharmacologic with amiodarone, flecainide, ibutilide), catheter ablation (PVI â€” pulmonary vein isolation) for symptomatic/refractory.', pearl: 'Anticoagulation: CHAâ‚‚DSâ‚‚-VASc â‰¥2 men / â‰¥3 women â†’ DOAC (apixaban, rivaroxaban, edoxaban, dabigatran). Score 1 men / 2 women â†’ consider. 0 â†’ no anticoagulation. Pre-cardioversion: if AF >48h or unknown duration â†’ either 3 weeks anticoagulation OR TEE to exclude LA thrombus, then cardiovert + continue anticoagulation â‰¥4 weeks post. EAST-AFNET 4 trial: early rhythm control in those diagnosed within 1 year â†’ reduced CV events.' },
       { term: 'Ventricular Arrhythmias', def: 'VTach: â‰¥3 consecutive ventricular complexes â‰¥100 bpm. Sustained (>30s or hemodynamic instability). Monomorphic (one morphology â€” often structural heart disease/scar). Polymorphic: changing QRS morphology.', detail: 'Stable monomorphic VT: amiodarone IV or synchronized cardioversion. Unstable VT or VFib: immediate defibrillation + ACLS. Torsades de Pointes (TdP): polymorphic VT with QT prolongation. Treatment: IV magnesium 2g, overdrive pacing, isoproterenol. STOP offending drug. QT-prolonging drugs: antiarrhythmics (sotalol, dofetilide, amiodarone), antibiotics (macrolides, fluoroquinolones), antipsychotics, methadone.', pearl: 'ICD (Implantable Cardioverter-Defibrillator) indications: (1) Secondary prevention: survived cardiac arrest or sustained VT with hemodynamic compromise. (2) Primary prevention: EF â‰¤35% despite â‰¥3 months optimal medical therapy (NYHA II-III, ischemic â€” SCD-HeFT, MADIT-II), or EF â‰¤30% ischemic (MADIT). Must be >40 days post-MI and >90 days post-revascularization. Wearable defibrillator (LifeVest): bridge when ICD timing criteria not yet met.' },
       { term: 'Bradyarrhythmias & Heart Block', def: 'Sinus bradycardia: rate <60 bpm. 1st-degree AV block: PR >200 ms (benign). 2nd-degree Type I (Wenckebach): progressive PR prolongation â†’ dropped beat (usually benign). 2nd-degree Type II (Mobitz II): sudden dropped beat without PR prolongation (infra-nodal, more serious). 3rd-degree (complete): AV dissociation.', detail: 'Pacemaker indications: symptomatic sinus node dysfunction (SSS), Mobitz Type II, 3rd-degree AV block, alternating bundle branch block, symptomatic chronotropic incompetence. Temporary pacing: atropine first (for symptomatic bradycardia), transcutaneous pacing if atropine fails, transvenous pacing for sustained.', pearl: 'High-degree AV block post-inferior STEMI: usually transient (AV node supplied by RCA), observe with temporary pacer for 5-7 days before permanent pacemaker. Post-anterior STEMI: more ominous (infra-nodal, both bundle branches at risk), earlier permanent pacer consideration. Drug causes: beta-blockers, CCBs, digoxin, amiodarone â€” often reversible by stopping the drug.' },
     ]},
-  { id: 'hf', title: 'Heart Failure', icon: 'ðŸ«€',
+  { id: 'hf', title: 'Heart Failure', icon: '',
     items: [
       { term: 'HFrEF (EF â‰¤40%)', def: 'Neurohormonal activation (RAAS, sympathetic). Four pillars of GDMT (Guideline-Directed Medical Therapy): ACEi/ARB/ARNI + beta-blocker + MRA + SGLT2i. Start simultaneously or in rapid sequence.', detail: 'ACEi/ARB/ARNI: sacubitril-valsartan (Entresto) preferred over ACEi/ARB (PARADIGM-HF: 20% â†“ mortality). Beta-blocker: carvedilol, metoprolol succinate, bisoprolol (only these 3 have mortality benefit). MRA: spironolactone or eplerenone (RALES, EMPHASIS-HF â€” monitor K⁺, Cr). SGLT2i: dapagliflozin or empagliflozin (DAPA-HF, EMPEROR-Reduced â€” benefit regardless of diabetes status).', pearl: 'Titrate GDMT to target doses (most of the mortality benefit is at target dose): Entresto 97/103 mg BID, carvedilol 25 mg BID (50 mg BID if >85 kg), metoprolol succinate 200 mg daily, spironolactone 25-50 mg daily, dapa/empa 10 mg daily. Additional therapies: hydralazine + nitrate (A-HeFT â€” especially Black patients), ivabradine (HR >70 on max beta-blocker), CRT (EF â‰¤35% + LBBB â‰¥150 ms), ICD (EF â‰¤35% for primary prevention). Diuretics for congestion (improve symptoms, not mortality).' },
       { term: 'HFpEF (EF â‰¥50%)', def: 'Diastolic dysfunction with preserved ejection fraction. >50% of HF. Associated with age, HTN, obesity, diabetes, AF, female sex. Hâ‚‚FPEF score or HFA-PEFF algorithm for diagnosis.', detail: 'Diagnosis: symptoms of HF + EF â‰¥50% + evidence of diastolic dysfunction (elevated filling pressures: â†‘ E/e\', â†‘ LA volume, â†‘ TR velocity on echo) + elevated BNP/NT-proBNP. If inconclusive: exercise hemodynamics (invasive if needed).', pearl: 'Treatment: SGLT2 inhibitors (EMPEROR-Preserved, DELIVER trials â€” first drugs to show benefit in HFpEF!). Diuretics for congestion. Treat comorbidities aggressively: HTN, AF (rhythm control), obesity (weight loss), diabetes, coronary disease. Manage volume status closely. Finerenone (non-steroidal MRA): FINEARTS-HF trial showed benefit across the EF spectrum. GLP-1 agonists: promising for HFpEF with obesity (STEP-HFpEF with semaglutide â†’ improved symptoms and exercise capacity).' },
     ]},
-  { id: 'valve', title: 'Valvular Heart Disease', icon: 'ðŸ”Š',
+  { id: 'valve', title: 'Valvular Heart Disease', icon: '',
     items: [
       { term: 'Aortic Stenosis', def: 'Triad: syncope, angina, heart failure (once HF develops, 2-year survival ~50% without intervention). Crescendo-decrescendo systolic murmur at RUSB, radiates to carotids. Pulsus parvus et tardus.', detail: 'Severity: severe = valve area <1.0 cm², mean gradient >40 mmHg, peak velocity >4 m/s. Low-flow low-gradient (EF <50%): dobutamine stress echo to differentiate true-severe from pseudo-severe. Paradoxical low-flow low-gradient (normal EF): small hypertrophied LV, often elderly female with HTN.', pearl: 'Treatment: AVR (surgical or TAVR) for symptomatic severe or asymptomatic severe with EF <50%, progressive decline in exercise tolerance, or very severe (peak velocity >5 m/s). TAVR: preferred for high/prohibitive surgical risk, increasingly used in intermediate risk (PARTNER trials, evolving for low risk). No medical therapy delays progression. AVOID vigorous exercise/vasodilators in severe AS (fixed obstruction â†’ can\'t augment cardiac output â†’ syncope/death).' },
       { term: 'Mitral Regurgitation', def: 'Primary (organic): MVP, rheumatic, endocarditis, radiation. Holosystolic murmur at apex, radiates to axilla. Acute severe: flash pulmonary edema (papillary muscle rupture post-MI, chordae rupture). Secondary (functional): LV dilation pulls leaflets apart (HFrEF).', detail: 'Assessment: echo (regurgitant volume, EROA, vena contracta). Severe: EROA â‰¥0.4 cm² (primary), â‰¥0.2 cm² (secondary), regurgitant volume â‰¥60 mL. Watch for LA dilation, pulmonary hypertension, AF â€” thresholds for intervention.', pearl: 'Primary (degenerative) MR: surgical repair preferred over replacement (better outcomes, lower mortality). Refer to experienced center (>95% repair rate). Indications: symptomatic severe, or asymptomatic with EF â‰¤60%, LVESD â‰¥40 mm, new AF, PHTN >50 mmHg. Secondary (functional) MR: optimize GDMT for HF first. MitraClip (TEER â€” transcatheter edge-to-edge repair) if remains severe despite optimal medical therapy (COAPT trial: significant mortality benefit if correctly selected).' },
@@ -19879,7 +19879,7 @@ function CardiologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">❤️ Cardiology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Cardiology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">ACS, arrhythmias, heart failure & valvular disease</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19896,7 +19896,7 @@ function CardiologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#dc262608', border: '1px solid #dc262620', color: '#dc2626' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -19925,22 +19925,22 @@ function CardiologyGuideView() {
    PULMONOLOGY GUIDE â€” Asthma, COPD, ILD, Pleural Disease
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PULM_SECTIONS = [
-  { id: 'asthma', title: 'Asthma', icon: 'ðŸŒ¬️',
+  { id: 'asthma', title: 'Asthma', icon: '',
     items: [
       { term: 'Asthma Classification & Stepwise', def: 'Intermittent: symptoms â‰¤2 days/wk, â‰¤2 nights/mo, FEVâ‚ >80%. Mild persistent: >2 days/wk. Moderate persistent: daily symptoms, FEVâ‚ 60-80%. Severe persistent: throughout day, FEVâ‚ <60%.', detail: 'Stepwise therapy: Step 1: PRN SABA (albuterol). Step 2: low-dose ICS. Step 3: low-dose ICS + LABA or medium-dose ICS. Step 4: medium-dose ICS + LABA. Step 5: high-dose ICS + LABA + add-on (LAMA, biologic). Step 6: high-dose ICS + LABA + oral corticosteroid or biologic.', pearl: 'GINA 2023 update: do NOT use SABA alone (even in Step 1). Preferred: PRN low-dose ICS-formoterol (budesonide-formoterol) as both reliever AND controller (SMART approach). Reduces severe exacerbations vs SABA alone. Biologics for severe uncontrolled: Tezepelumab (anti-TSLP, broadest phenotype coverage), Dupilumab (anti-IL-4/IL-13, Type 2 high/eosinophilic + elevated FeNO), Mepolizumab/Benralizumab (anti-IL-5, eosinophilic), Omalizumab (anti-IgE, allergic asthma).' },
       { term: 'Acute Exacerbation', def: 'Progressive dyspnea, wheezing, chest tightness, cough. â†“ peak flow. Triggers: URI (rhinovirus #1), allergens, exercise, cold air, NSAID/ASA, beta-blockers, GERD, poor adherence.', detail: 'Mild-moderate: albuterol neb Q20 min Ã— 3, ipratropium if severe, oral prednisone 40-60 mg Ã— 5 days (no taper needed). Severe/imminent arrest: continuous albuterol neb, ipratropium, IV magnesium sulfate 2g, systemic steroids, consider epinephrine IM, intubation if failing.', pearl: 'Red flags for near-fatal asthma: silent chest (no air movement), altered consciousness, bradycardia, cyanosis, PaCOâ‚‚ normal or rising (should be LOW in acute asthma â€” respiratory alkalosis expected). A "normal" blood gas in severe asthma = IMPENDING RESPIRATORY FAILURE (patient is tiring). Intubate early. Post-intubation: low RR, high I:E ratio, permissive hypercapnia to avoid breath stacking and auto-PEEP.' },
     ]},
-  { id: 'copd', title: 'COPD', icon: 'ðŸ«',
+  { id: 'copd', title: 'COPD', icon: '',
     items: [
       { term: 'COPD Diagnosis & Classification', def: 'FEVâ‚/FVC <0.70 post-bronchodilator. GOLD classification by FEVâ‚: GOLD 1 (â‰¥80%), GOLD 2 (50-79%), GOLD 3 (30-49%), GOLD 4 (<30%). ABE grouping by symptoms and exacerbation history.', detail: 'Risk factors: smoking (#1), alpha-1 antitrypsin deficiency (consider in early-onset, lower-lobe emphysema, liver disease, family history â€” check AAT level). Phenotypes: emphysema (pink puffer â€” hyperinflation, thin, pursed-lip breathing, preserved oxygenation) vs chronic bronchitis (blue bloater â€” productive cough, cyanotic, overweight, cor pulmonale).', pearl: 'GOLD 2024 ABE groups: Group A (few symptoms, 0-1 exacerbations): bronchodilator PRN. Group B (more symptoms, 0-1 exacerbations): LABA + LAMA. Group E (â‰¥2 moderate or â‰¥1 severe exacerbation): LABA + LAMA ± ICS (add ICS if eosinophils â‰¥300). Triple therapy (ICS + LABA + LAMA): IMPACT and ETHOS trials showed reduced exacerbations and mortality. ICS increases pneumonia risk â€” consider blood eosinophils to guide ICS use (benefit if eos â‰¥300, avoid if <100).' },
       { term: 'Acute Exacerbation (AECOPD)', def: 'Increased dyspnea, sputum volume, and/or sputum purulence. Most common triggers: viral URI, bacterial infection (H. influenzae, M. catarrhalis, S. pneumoniae), air pollution.', detail: 'Treatment: short-acting bronchodilators (albuterol + ipratropium), systemic corticosteroids (prednisone 40 mg Ã— 5 days â€” REDUCE trial), antibiotics if increased sputum purulence + â‰¥1 other cardinal symptom (azithromycin or amoxicillin-clavulanate for outpatient; fluoroquinolone for inpatient or risk factors for Pseudomonas).', pearl: 'NIV (BiPAP) for AECOPD with respiratory acidosis (pH <7.35, PaCOâ‚‚ >45): reduces intubation and mortality â€” NNT of 5! Start early. Contraindications: inability to protect airway, hemodynamic instability, facial deformity. Oxygen target: 88-92% SpOâ‚‚ (avoid hyperoxia â†’ â†‘ COâ‚‚ from Haldane effect + V/Q mismatch). Long-term supplemental Oâ‚‚ prolongs survival if PaOâ‚‚ â‰¤55 or SpOâ‚‚ â‰¤88% (NOTT, MRC trials).' },
     ]},
-  { id: 'ild', title: 'Interstitial Lung Disease', icon: 'ðŸ”¬',
+  { id: 'ild', title: 'Interstitial Lung Disease', icon: '',
     items: [
       { term: 'Idiopathic Pulmonary Fibrosis', def: 'Most common and most deadly IIP. Mean survival 3-5 years. UIP (Usual Interstitial Pneumonia) pattern on HRCT: basilar-predominant honeycombing, traction bronchiectasis, reticulation, minimal ground-glass.', detail: 'Diagnosis: HRCT + clinical context (age >60, male, smoker/ex-smoker) may be sufficient for probable UIP pattern. Surgical lung biopsy if uncertain HRCT. Restrictive PFTs: â†“ FVC, â†“ DLCO, normal/increased FEVâ‚/FVC ratio.', pearl: 'Treatment: antifibrotics â€” pirfenidone or nintedanib (both slow FVC decline by ~50%, neither cures). Start early (don\'t wait for severe disease). Lung transplant referral at diagnosis for eligible patients. AVOID steroids (ineffective and harmful in IPF â€” unlike many other ILDs). Acute exacerbation of IPF: rapid deterioration, high mortality (~50%), supportive care ± high-dose steroids (limited evidence). Key DDx: hypersensitivity pneumonitis (HP â€” exposure history, upper-lobe predominant, mosaic attenuation), sarcoidosis, CTD-ILD.' },
       { term: 'Sarcoidosis', def: 'Non-caseating granulomas, multisystem. Bilateral hilar lymphadenopathy (BHL) classic. African Americans, Northern Europeans, women. Age 25-35 peak. Löfgren syndrome: BHL + erythema nodosum + periarticular ankle inflammation + fever.', detail: 'Staging: Stage 0 (normal CXR), I (BHL only â€” most resolve spontaneously), II (BHL + infiltrates), III (infiltrates, no BHL), IV (fibrosis). Diagnosis: clinical + imaging + biopsy (non-caseating granulomas) + exclude other causes (TB, fungal).', pearl: 'Treatment: most patients do NOT need treatment (self-limited). Treat if: progressive lung disease, cardiac sarcoid (arrhythmias, HF), neurosarcoid, hypercalcemia, severe ocular/skin disease. First-line: prednisone 20-40 mg, taper over months. Steroid-sparing: methotrexate, azathioprine, mycophenolate. Anti-TNF (infliximab) for refractory. Monitor: PFTs, ACE levels (correlate with granuloma burden but NOT useful for diagnosis), 24h urine calcium, ECG, ophthalmologic exam.' },
     ]},
-  { id: 'pleural', title: 'Pleural Disease & PE', icon: 'ðŸ’¨',
+  { id: 'pleural', title: 'Pleural Disease & PE', icon: '',
     items: [
       { term: 'Pleural Effusion', def: 'Light\'s criteria for exudate (any ONE): protein ratio >0.5, LDH ratio >0.6, LDH >2/3 upper limit of normal. Transudative: HF (#1), cirrhosis (hepatic hydrothorax), nephrotic syndrome. Exudative: infection (parapneumonic/empyema), malignancy, PE, TB, autoimmune, pancreatitis.', detail: 'Complicated parapneumonic/empyema: pH <7.2, glucose <60, LDH >1000, positive Gram stain/culture, loculation, frank pus. Treatment: chest tube drainage ± intrapleural fibrinolytics (tPA + DNase â€” MIST2 trial). VATS if tube fails.', pearl: 'Key fluid analyses: Low glucose (<60): RA, empyema, TB, malignancy, lupus. Elevated amylase: pancreatitis, esophageal rupture, malignancy. Milky/chylous (triglycerides >110): chylothorax (thoracic duct injury â€” post-surgical, lymphoma, trauma). ADA >40: highly suggestive of TB in endemic areas. Lymphocyte-predominant: TB, malignancy, lymphoma, sarcoidosis. Eosinophilic (>10%): previous taps (air/blood in pleural space), parasites, drug reaction, EGPA.' },
       { term: 'Pulmonary Embolism', def: 'DVT â†’ PE (most from proximal LE DVT). Wells score: high probability (>6), moderate (2-6), low (<2). D-dimer: high sensitivity, low specificity â€” useful to RULE OUT in low-probability patients (age-adjusted: age Ã— 10 in patients >50).', detail: 'Diagnosis: CTPA (CT pulmonary angiography) â€” gold standard. V/Q scan if CT contraindicated (contrast allergy, CKD). Echo: RV dilation/dysfunction (not diagnostic but prognostic). PESI/sPESI: risk-stratify (hemodynamically stable PE).', pearl: 'Treatment: anticoagulation Ã— 3-6 months (provoked â€” surgery/immobilization), consider indefinite for unprovoked or recurrent. DOACs preferred (rivaroxaban or apixaban â€” no bridging needed). Massive PE (SBP <90 or cardiac arrest): systemic thrombolysis (alteplase 100 mg IV over 2h) OR catheter-directed therapy OR surgical embolectomy. Submassive PE (stable + RV dysfunction/elevated troponin): anticoagulation + close monitoring ± escalation if deteriorates. IVC filter: only if anticoagulation absolutely contraindicated (active hemorrhage). Retrievable filter â€” remove when anticoagulation can resume.' },
@@ -19954,7 +19954,7 @@ function PulmonologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ« Pulmonology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Pulmonology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Asthma, COPD, ILD & pleural disease</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -19971,7 +19971,7 @@ function PulmonologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#06b6d408', border: '1px solid #06b6d420', color: '#06b6d4' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -20000,22 +20000,22 @@ function PulmonologyGuideView() {
    GASTROENTEROLOGY GUIDE â€” GI Bleeding, Liver, IBD, Pancreatitis
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const GI_SECTIONS = [
-  { id: 'gibleed', title: 'GI Bleeding', icon: 'ðŸ©¸',
+  { id: 'gibleed', title: 'GI Bleeding', icon: '',
     items: [
       { term: 'Upper GI Bleeding', def: 'Proximal to ligament of Treitz. Hematemesis (bright red or coffee-ground), melena. Causes: peptic ulcer disease (PUD) #1 (40-50%), esophageal/gastric varices, Mallory-Weiss tear, erosive gastritis/esophagitis, Dieulafoy lesion, AVM.', detail: 'Management: resuscitation (2 large-bore IVs, crystalloid, crossmatch, transfuse if Hgb <7 â€” restrictive strategy per TRIGGER trial). PPI drip (80 mg IV bolus â†’ 8 mg/hr) for PUD. Octreotide + antibiotics (ceftriaxone) if variceal bleed suspected. EGD within 24h (12h if variceal or hemodynamically unstable).', pearl: 'Glasgow-Blatchford Score (GBS): predicts need for intervention. GBS = 0 â†’ safe for outpatient management. Forrest classification (ulcer): Ia/Ib (active bleeding) â†’ 55% rebleed without treatment â†’ endoscopic therapy. IIa (visible vessel) â†’ 43% rebleed â†’ endoscopic therapy. IIb (adherent clot) â†’ consider removing, treat if active bleeding underneath. IIc/III (flat spot/clean base) â†’ <5% rebleed â†’ early discharge. Variceal banding > sclerotherapy. TIPS (transjugular intrahepatic portosystemic shunt) for refractory variceal bleed.' },
       { term: 'Lower GI Bleeding', def: 'Distal to ligament of Treitz. Hematochezia (bright red blood per rectum). Causes: diverticulosis (#1 in elderly), hemorrhoids, colonic AVM/angiodysplasia, colorectal cancer/polyps, IBD, ischemic colitis, infectious colitis, radiation proctitis.', detail: 'Workup: colonoscopy (after bowel prep) is preferred initial diagnostic. If massive/hemodynamically unstable: CTA first (active extravasation), then colonoscopy/angiographic embolization. Tagged RBC scan: sensitive for slow bleeds (0.1-0.4 mL/min) â€” localize before angiography.', pearl: 'Diverticulosis: 80% of bleeds stop spontaneously. Usually painless, large-volume hematochezia. Right-sided diverticula bleed more often (even though left-sided diverticulosis is more common). Recurrence rate: 25% after first bleed. Angiodysplasia: associated with aortic stenosis (Heyde syndrome â€” acquired vWF deficiency), CKD, hereditary hemorrhagic telangiectasia (Osler-Weber-Rendu). Ischemic colitis: "watershed areas" (splenic flexure, rectosigmoid). Thumbprinting on CT/X-ray.' },
     ]},
-  { id: 'liver', title: 'Liver Disease', icon: 'ðŸ«€',
+  { id: 'liver', title: 'Liver Disease', icon: '',
     items: [
       { term: 'Cirrhosis & Complications', def: 'End-stage fibrosis from any chronic liver disease. Hepatocellular pattern (â†‘ AST/ALT): viral hepatitis, MASLD/MASH (formerly NAFLD/NASH), alcohol, autoimmune hepatitis, Wilson\'s, hemochromatosis. Cholestatic pattern (â†‘ ALP/GGT): PBC (anti-mitochondrial Ab), PSC (MRCP â€” beading of bile ducts, UC association).', detail: 'Complications: portal HTN (varices, ascites, hepatorenal, hepatopulmonary syndrome), hepatic encephalopathy (HE), coagulopathy, HCC. Child-Pugh (A/B/C) and MELD scores for prognosis/transplant listing.', pearl: 'Ascites: diagnostic paracentesis for new-onset or SBP suspicion. SAAG (Serum-Ascites Albumin Gradient) â‰¥1.1 = portal HTN. SBP: PMN â‰¥250/mm³ in ascites fluid â†’ empiric ceftriaxone (or cefotaxime). IV albumin 1.5 g/kg day 1, 1 g/kg day 3 (reduces hepatorenal syndrome mortality per Sort et al.). SBP prophylaxis: norfloxacin or TMP-SMX if prior SBP, ascitic protein <1.5 g/dL + renal dysfunction or liver failure. Hepatic encephalopathy: lactulose (titrate to 2-3 BMs/day) + rifaximin (REDUCE trial â€” 50% reduction in recurrence).' },
       { term: 'Hepatocellular Carcinoma', def: 'Most common primary liver cancer. Surveillance: ultrasound ± AFP every 6 months in cirrhosis (any cause), chronic HBV (even without cirrhosis in high-risk groups: Asian males >40, Asian females >50, African/Afro-Caribbean >20, family history HCC).', detail: 'Diagnosis: multiphasic CT or MRI â€” arterial phase enhancement + portal venous/delayed phase washout is diagnostic (LI-RADS 5). Biopsy needed only if imaging indeterminate. Staging: BCLC (Barcelona Clinic Liver Cancer) guides treatment.', pearl: 'Treatment by BCLC stage: Very early/early (single â‰¤5 cm or â‰¤3 nodules â‰¤3 cm): resection, ablation (RFA/MWA), or liver transplant (Milan criteria: single â‰¤5 cm or â‰¤3 â‰¤3 cm â€” recurrence-free survival >70% at 5 years). Intermediate: TACE (transarterial chemoembolization). Advanced: systemic therapy â€” atezolizumab + bevacizumab (IMbrave150 â€” first-line, OS ~19 months), or durvalumab + tremelimumab (HIMALAYA). Sorafenib/lenvatinib as alternatives.' },
     ]},
-  { id: 'ibd', title: 'Inflammatory Bowel Disease', icon: 'ðŸ”¥',
+  { id: 'ibd', title: 'Inflammatory Bowel Disease', icon: '',
     items: [
       { term: 'Crohn\'s Disease', def: 'Transmural inflammation, skip lesions, any GI tract (mouth to anus, most common: terminal ileum/ileocecal). Cobblestone mucosa, non-caseating granulomas (30%). Complications: strictures, fistulae (perianal, enteroenteric, enterovesical), abscesses.', detail: 'Extraintestinal: arthritis (most common, migratory large joints), erythema nodosum, pyoderma gangrenosum, eye (uveitis, episcleritis), PSC (more UC), kidney stones (oxalate from fat malabsorption), gallstones (decreased bile salt reabsorption from ileal disease).', pearl: 'Treatment: 5-ASA (mesalamine) for mild colonic Crohn\'s only (NOT effective for small bowel or moderate-severe). Steroids for induction (budesonide for ileal/right colon, prednisone for moderate-severe) â€” NOT for maintenance. Immunomodulators: thiopurines (azathioprine/6-MP), methotrexate. Biologics: anti-TNF (infliximab, adalimumab â€” mucosal healing), vedolizumab (gut-selective anti-α4β7 integrin), ustekinumab (anti-IL-12/23), risankizumab (anti-IL-23 â€” ADVANCE/MOTIVATE trials). Small molecules: upadacitinib (JAK inhibitor). Top-down approach (early biologic) increasingly favored for moderate-severe.' },
       { term: 'Ulcerative Colitis', def: 'Mucosal/submucosal inflammation, continuous from rectum proximally. Bloody diarrhea, urgency, tenesmus. Pseudopolyps. No skip lesions, no transmural involvement (usually). Toxic megacolon: colonic dilation >6 cm + systemic toxicity.', detail: 'PSC association (3-8% of UC) â†’ increased risk of cholangiocarcinoma. Colorectal cancer risk increases with disease duration/extent â€” annual surveillance colonoscopy starting 8 years after diagnosis. Proctocolectomy with IPAA (ileal pouch-anal anastomosis) is curative.', pearl: 'Treatment: 5-ASA (mesalamine, sulfasalazine) â€” first-line for mild-moderate (oral + topical rectal). Biologics same as Crohn\'s + tofacitinib (JAK inhibitor â€” approved for UC before Crohn\'s). Ozanimod (S1P receptor modulator â€” TRUE NORTH trial). Acute severe UC (>6 bloody stools/day + systemic toxicity): IV methylprednisolone. No improvement in 3 days â†’ rescue therapy with infliximab or cyclosporine. Surgery if medical therapy fails. Toxic megacolon: NPO, NG decompression, IV steroids, broad-spectrum antibiotics, serial abdominal X-rays, surgical consult (colectomy if no improvement in 48-72h or perforation).' },
     ]},
-  { id: 'pancreas', title: 'Pancreatitis', icon: 'ðŸ«’',
+  { id: 'pancreas', title: 'Pancreatitis', icon: '',
     items: [
       { term: 'Acute Pancreatitis', def: '2 of 3: (1) epigastric pain radiating to back, (2) lipase >3Ã— ULN, (3) imaging findings. Causes: gallstones (#1, 40%) and alcohol (#2, 30%). Others: hypertriglyceridemia (>1000), drugs (azathioprine, valproate, GLP-1 agonists), ERCP, trauma, autoimmune, pancreatic divisum.', detail: 'Severity: Revised Atlanta Classification â€” mild (no organ failure, no local complications), moderately severe (transient organ failure <48h or local complications), severe (persistent organ failure >48h â€” mortality 30-50%). Predict severity: BISAP score, APACHE-II, CRP at 48h (>150 = severe).', pearl: 'Management: aggressive IV fluid resuscitation (lactated Ringer\'s preferred, 1.5 mL/kg/hr initially â€” goal-directed, new data suggests moderate resuscitation may be sufficient per WATERFALL trial), pain control (IV opioids), NPO â†’ early oral feeding when tolerated (within 24h if mild â€” don\'t wait for lipase to normalize!). NO prophylactic antibiotics. Infected necrotizing pancreatitis: step-up approach â†’ percutaneous drainage first, then minimally invasive surgical necrosectomy if needed (PANTER, TENSION trials). Cholecystectomy before discharge for gallstone pancreatitis (to prevent recurrence).' },
       { term: 'Chronic Pancreatitis', def: 'Irreversible fibrosis and loss of exocrine/endocrine function. Alcohol #1 cause. Chronic epigastric pain. Late complications: pancreatic exocrine insufficiency (steatorrhea, fat-soluble vitamin deficiency), diabetes (type 3c), pseudocysts, pancreatic duct strictures/stones.', detail: 'Diagnosis: CT (calcifications, ductal dilation, atrophy). MRCP/EUS for early disease. Fecal elastase-1 <200 = exocrine insufficiency. Treatment: pain management (stepladder approach â€” avoid opioid dependence), pancreatic enzyme replacement therapy (PERT with meals â€” lipase 40,000-50,000 IU per meal), fat-soluble vitamins (A, D, E, K), diabetes management.', pearl: 'Pancreatic cancer risk: chronic pancreatitis increases risk ~10-15Ã— over general population. Screening: not standardized, but clinical vigilance (unexplained weight loss, new diabetes in chronic pancreatitis patient, worsening pain pattern). Autoimmune pancreatitis (AIP): Type 1 (IgG4-related â€” multisystem, elevated IgG4, sausage-shaped pancreas on imaging) responds dramatically to steroids. Type 2 (idiopathic duct-centric, associated with UC) â€” steroids also effective. Must distinguish from pancreatic cancer (imaging overlap).' },
@@ -20029,7 +20029,7 @@ function GastroenterologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ« Gastroenterology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Gastroenterology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">GI bleeding, liver disease, IBD & pancreatitis</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -20046,7 +20046,7 @@ function GastroenterologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#f5920808', border: '1px solid #f5920820', color: '#f59208' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -20075,22 +20075,22 @@ function GastroenterologyGuideView() {
    EMERGENCY MEDICINE GUIDE â€” Trauma, Resuscitation, Toxidromes
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const EM_SECTIONS = [
-  { id: 'trauma', title: 'Trauma', icon: 'ðŸš‘',
+  { id: 'trauma', title: 'Trauma', icon: '',
     items: [
       { term: 'Primary Survey (ABCDE)', def: 'A â€” Airway with C-spine protection: jaw thrust (not chin lift if cervical injury), intubate if unable to maintain airway. B â€” Breathing: inspect, auscultate, percuss. Tension pneumothorax: absent breath sounds + tracheal deviation + hemodynamic instability â†’ needle decompression 2nd ICS MCL â†’ chest tube. C â€” Circulation: control hemorrhage (direct pressure, tourniquet for extremity). 2 large-bore IVs, 1L crystalloid, then blood (1:1:1 pRBC:FFP:platelets per MTP). D â€” Disability: GCS, pupils. E â€” Exposure: undress, log-roll, prevent hypothermia.', detail: 'Lethal trauma triad (vicious cycle): hypothermia + acidosis + coagulopathy â†’ damage control surgery (stop bleeding, contamination â†’ ICU resuscitation â†’ definitive repair later). FAST exam: free fluid in Morrison\'s pouch (hepatorenal), splenorenal, pelvis (pouch of Douglas), pericardial. Positive FAST + hemodynamic instability â†’ OR.', pearl: 'Massive transfusion protocol (MTP): trigger if anticipating â‰¥10 units pRBC in 24h or â‰¥4 in 1h. Ratio 1:1:1 (pRBC:FFP:platelets â€” PROPPR trial). TXA (tranexamic acid) 1g IV within 3h of injury (CRASH-2 trial â€” â†“ mortality). Calcium replacement (citrate in blood products chelates Ca²⁺). Do NOT delay OR for imaging in hemodynamically unstable trauma. ABC assessment + finger thoracostomy > formal chest tube in arrest. Resuscitative thoracotomy: penetrating thoracic trauma with witnessed arrest or recent loss of vitals (survival ~10-15% penetrating, <2% blunt).' },
       { term: 'Traumatic Brain Injury', def: 'Mild (GCS 13-15, concussion), Moderate (GCS 9-12), Severe (GCS â‰¤8 â€” intubate for airway protection). Epidural hematoma: "talk and die" â€” lucid interval, biconvex/lens-shaped, MMA (temporal bone fracture). Subdural: crescent-shaped, bridging veins, elderly/anticoagulated/alcoholics. Subarachnoid: trauma #1 cause.', detail: 'ICP management: head of bed 30°, sedation/analgesia, hyperosmolar therapy (mannitol 1g/kg or hypertonic saline 23.4% 30 mL), mild hyperventilation target PaCOâ‚‚ 35 mmHg (temporary measure), EVD for monitoring/CSF drainage. Target CPP >60 mmHg (CPP = MAP - ICP). Herniation signs: ipsilateral blown pupil (CN III compression), contralateral hemiparesis, Cushing triad (HTN + bradycardia + irregular respirations â†’ late sign).', pearl: 'Surgical evacuation: epidural >15 mm thickness or midline shift >5 mm, acute subdural >10 mm or midline shift >5 mm or GCS â†“â‰¥2 points. Decompressive craniectomy: refractory ICP elevation (DECRA, RESCUEicp trials â€” improves survival but may increase severe disability). Concussion: gradual return-to-play protocol (no same-day return). Post-concussion syndrome: headache, cognitive difficulty, mood changes â€” symptoms usually resolve in weeks-months. Second impact syndrome: rare but catastrophic brain swelling from repeat concussion before first has healed.' },
     ]},
-  { id: 'resus', title: 'Cardiac Arrest & Resuscitation', icon: 'âš¡',
+  { id: 'resus', title: 'Cardiac Arrest & Resuscitation', icon: '',
     items: [
       { term: 'ACLS Algorithms', def: 'Shockable rhythms (VFib/pVT): CPR â†’ defibrillation (biphasic 200J) â†’ CPR 2 min â†’ rhythm check â†’ repeat. Epinephrine 1 mg Q3-5 min. Amiodarone 300 mg first dose, 150 mg second. Non-shockable (PEA/asystole): CPR â†’ epinephrine 1mg Q3-5 min â†’ reassess Q2 min. Treat reversible causes (H\'s and T\'s).', detail: 'H\'s: Hypovolemia, Hypoxia, Hydrogen ion (acidosis), Hypo/Hyperkalemia, Hypothermia. T\'s: Tension pneumothorax, Tamponade (cardiac), Toxins, Thrombosis (coronary â€” STEMI, pulmonary â€” PE). High-quality CPR: rate 100-120/min, depth 2-2.4 inches, full recoil, minimize interruptions (<10 sec for rhythm check).', pearl: 'Post-cardiac arrest care: targeted temperature management (TTM) 32-36°C for 24h (TTM2 trial: target normothermia 37.5°C with aggressive fever prevention may be equivalent). Early PCI if STEMI or suspected cardiac etiology. Neuroprognostication: wait â‰¥72h after normothermia. Poor prognostic signs: bilateral absent pupillary and corneal reflexes, status myoclonus, absent N20 on SSEP, highly malignant EEG, diffusion restriction on MRI. No single test is 100% â€” use multimodal assessment. ECMO-CPR (E-CPR): extracorporeal CPR for refractory arrest â€” emerging evidence (INCEPTION trial) in selected centers.' },
       { term: 'Pediatric Resuscitation', def: 'Compression rate 100-120/min. Depth: 1/3 AP diameter (infants: 1.5 inches, children: 2 inches). Infant: 2-thumb encircling technique or 2-finger (single rescuer). Shockable: 2 J/kg â†’ 4 J/kg â†’ 4 J/kg (max 10 J/kg or adult dose). Epinephrine: 0.01 mg/kg (0.1 mL/kg of 1:10,000) IV/IO.', detail: 'Newborn resuscitation (NRP): dry, stimulate, position. CPAP/PPV if persistent apnea or HR <100 after initial steps. Intubate if PPV ineffective. Chest compressions if HR <60 despite adequate ventilation. Epinephrine if HR <60 despite compressions + ventilation. Room air for term infants (21% FiOâ‚‚), adjust per oximeter.', pearl: 'Key pediatric differences: respiratory failure is #1 cause of pediatric cardiac arrest (NOT cardiac). Always check for respiratory causes first. Broselow tape for weight-based dosing. IO access (intraosseous â€” proximal tibia) if IV cannot be obtained in 90 seconds. Medication errors are the most common preventable adverse event in pediatric resuscitation â€” weight-based dosing is CRITICAL. Cuffed ETT for all ages (historically avoided in children <8).' },
     ]},
-  { id: 'toxic', title: 'Toxidromes & Poisoning', icon: 'â˜ ️',
+  { id: 'toxic', title: 'Toxidromes & Poisoning', icon: '',
     items: [
       { term: 'Major Toxidromes', def: 'Anticholinergic: "Hot as a hare, blind as a bat, dry as a bone, red as a beet, mad as a hatter." Tachycardia, dry skin, mydriasis, urinary retention, altered mental status, hyperthermia. Agents: diphenhydramine, TCAs, atropine, jimson weed.', detail: 'Cholinergic (DUMBBELSS): Diarrhea, Urination, Miosis, Bronchospasm/Bradycardia, Emesis, Lacrimation, Salivation, Sweating. Agents: organophosphates, carbamates, nerve agents. Treatment: atropine (large doses titrated to dry secretions) + pralidoxime (2-PAM). Sympathomimetic: tachycardia, HTN, hyperthermia, mydriasis, diaphoresis, agitation. Agents: cocaine, amphetamines, MDMA. Treat with benzos, cooling. Opioid: miosis, bradypnea, CNS depression. Naloxone 0.04-2 mg (titrate to respiratory effort, not consciousness).', pearl: 'Serotonin syndrome vs NMS: Both have altered mental status and hyperthermia. Serotonin syndrome: CLONUS (key distinguishing feature), hyperreflexia, diarrhea, mydriasis, rapid onset (hours). Caused by serotonergic drugs (SSRIs, MAOIs, tramadol, linezolid, triptans). Treatment: cyproheptadine + benzos + cooling. NMS: lead-pipe RIGIDITY (no clonus), slow onset (days-weeks), caused by dopamine antagonists (antipsychotics, metoclopramide, droperidol). Treatment: stop offending agent, dantrolene, bromocriptine, cooling.' },
       { term: 'Common Overdoses', def: 'Acetaminophen: #1 cause of acute liver failure in US. Rumack-Matthew nomogram (4-24h post-ingestion). N-acetylcysteine (NAC) is 100% protective if given within 8h. Dose: 150 mg/kg IV over 1h â†’ 50 mg/kg over 4h â†’ 100 mg/kg over 16h (21h IV protocol). Aspirin: respiratory alkalosis + anion gap metabolic acidosis. Ring ears. Treat: NaHCOâ‚ƒ for urinary alkalinization â†’ dialysis if level >100, AKI, pulmonary edema, seizures, AMS.', detail: 'TCA overdose: "3 C\'s" â€” Convulsions, Cardiac (wide QRS â†’ sodium channel blockade, treat with NaHCOâ‚ƒ), Coma. QRS >100 ms â†’ NaHCOâ‚ƒ, >160 ms â†’ high risk VT/VF. Digoxin: bradycardia, hyperkalemia, bidirectional VT, visual changes (yellow halos). Treat with Digifab (digoxin-specific antibodies). Beta-blocker/CCB overdose: bradycardia, hypotension. Glucagon for beta-blocker. High-dose insulin (HIE) for CCB (1 U/kg bolus â†’ 1-10 U/kg/hr + dextrose to maintain glucose). IV lipid emulsion for lipophilic drug toxicity (local anesthetic systemic toxicity, CCB).', pearl: 'Toxic alcohols: methanol (formic acid â†’ blindness, basal ganglia necrosis) and ethylene glycol (oxalic acid â†’ renal failure, calcium oxalate crystals in urine). Both: osmolar gap â†’ anion gap metabolic acidosis (gap transitions as parent compound metabolized). Treatment: fomepizole (inhibits alcohol dehydrogenase â€” preferred) or ethanol drip + hemodialysis if severe (level >50, renal failure, visual symptoms, severe acidosis). Isopropyl alcohol: only â†‘ osmolar gap (NO anion gap), ketones without acidosis.' },
     ]},
-  { id: 'enviro', title: 'Environmental Emergencies', icon: 'ðŸŒ¡️',
+  { id: 'enviro', title: 'Environmental Emergencies', icon: '',
     items: [
       { term: 'Heat Illness', def: 'Heat exhaustion: core temp <40°C (104°F), sweating present, fatigue, headache, nausea. Treat: rest, cooling, rehydrate. Heat stroke: core temp >40°C + CNS dysfunction (confusion, seizures, coma). DRY and HOT skin in classic (elderly); may still be sweating in exertional (athletes, military).', detail: 'Treatment of heat stroke: RAPID COOLING is the priority (target <39°C within 30 min). Cold water immersion is gold standard. Evaporative cooling (mist + fan) if immersion not available. Ice packs to groin, axillae, neck. Cold IV fluids. Monitor for rhabdomyolysis (CK, K⁺, myoglobinuria â†’ aggressive IV hydration), DIC, hepatic failure, AKI.', pearl: 'Exertional heat stroke in young athlete: ice water immersion â†’ "cool first, transport second" (start cooling at the event/field before transport). Survival approaches 100% if cooled within 30 minutes. Malignant hyperthermia: genetic susceptibility + triggering agent (succinylcholine, volatile anesthetics) â†’ massive uncontrolled muscle contraction, hyperthermia, rhabdomyolysis, hyperkalemia. Treatment: stop trigger + dantrolene 2.5 mg/kg IV + active cooling + treat hyperkalemia. NOT a toxidrome â€” it\'s a pharmacogenetic reaction.' },
       { term: 'Hypothermia & Submersion', def: 'Mild (32-35°C): shivering, confusion. Moderate (28-32°C): loss of shivering, bradycardia, arrhythmias, decreased consciousness. Severe (<28°C): VFib risk, coma, fixed dilated pupils (NOT a sign of death â€” "not dead until warm and dead").', detail: 'Rewarming: Mild â†’ passive (warm environment, blankets). Moderate â†’ active external (forced warm air â€” Bair Hugger, warm IV fluids 40°C). Severe â†’ active internal (warm peritoneal lavage, warm pleural lavage, ECMO/bypass for cardiac arrest or instability).', pearl: 'Hypothermic cardiac arrest: CPR may be modified (intermittent chest compressions if rescuers unable to provide continuous CPR in remote setting). Defibrillation: may not be effective below 30°C â€” try once, then focus on rewarming to >30°C before repeating. Withhold vasopressors until >30°C (ineffective). ECMO is the gold standard for rewarming in severe hypothermic cardiac arrest (survival with good neurologic outcome ~50% in appropriate candidates). Cold water submersion in children: hypothermia may be neuroprotective â€” aggressive resuscitation, don\'t stop until warm (~32°C) and still no ROSC.' },
@@ -20104,7 +20104,7 @@ function EmergencyMedicineGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸš‘ Emergency Medicine Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Emergency Medicine Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Trauma, resuscitation, toxidromes & environmental</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -20121,7 +20121,7 @@ function EmergencyMedicineGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#ef444408', border: '1px solid #ef444420', color: '#ef4444' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -20150,22 +20150,22 @@ function EmergencyMedicineGuideView() {
    ORTHOPEDICS GUIDE â€” Fractures, Joint Injuries, Compartment Syndrome
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ORTHO_SECTIONS = [
-  { id: 'fractures', title: 'Fracture Principles', icon: 'ðŸ¦´',
+  { id: 'fractures', title: 'Fracture Principles', icon: '',
     items: [
       { term: 'Fracture Classification & Management', def: 'Open vs closed. Simple (2 fragments) vs comminuted (multiple). Description: transverse, oblique, spiral, segmental, butterfly. Salter-Harris (pediatric, epiphyseal plate): Type I (through physis), II (above â€” most common), III (lower), IV (through all), V (crush/compression).', detail: 'Open fractures: Gustilo-Anderson classification. Type I: wound <1 cm, low energy. Type II: wound 1-10 cm, moderate tissue damage. Type IIIA: adequate soft tissue coverage despite high energy. IIIB: inadequate soft tissue (requires flap). IIIC: vascular injury requiring repair. All open fractures: IV antibiotics (cefazolin ± aminoglycoside), tetanus, surgical debridement within 24h (no longer mandatory within 6h per FLOW trial), external fixation if needed.', pearl: 'Salter-Harris mnemonic: SALTR â€” Same (through physis only), Above (metaphysis + physis), Lower (epiphysis + physis), Through all (metaphysis + physis + epiphysis), Rammed/cRush (compression). Type I may have normal X-ray (diagnosis by point tenderness over growth plate) â†’ treat as fracture, repeat imaging in 10-14 days. Type IV and V: highest risk for growth arrest â†’ orthopedic referral.' },
       { term: 'Upper Extremity Fractures', def: 'Clavicle: MC fracture overall, middle third (80%). Proximal humerus: elderly falls, 4-part Neer classification. Supracondylar (pediatric): FOOSH, watch for brachial artery and median/AIN injury. Radial head: FOOSH, point tenderness over radial head, Mason classification.', detail: 'Scaphoid fracture: FOOSH, snuffbox tenderness, normal initial X-ray in up to 20%. MRI at 24-48h or repeat X-ray in 10-14 days. Non-union and avascular necrosis risk (retrograde blood supply â€” proximal pole has worst prognosis). Treat with thumb spica cast â‰¥8 weeks. Boxer\'s fracture: 5th metacarpal neck, punch injury. Acceptable angulation up to 70° (5th MC), less for 2nd/3rd.', pearl: 'Supracondylar fracture: most common elbow fracture in children (peak 5-7 years). Gartland classification: Type I (non-displaced â€” cast), Type II (posterior cortex intact, angulated â€” closed reduction + pinning usually), Type III (completely displaced â€” emergent surgical fixation). Check: radial pulse, AIN function (OK sign â€” thumb-index finger pinch), median nerve (thenar sensation). Volkmann\'s ischemic contracture: feared complication of forearm compartment syndrome from supracondylar fracture.' },
     ]},
-  { id: 'joints', title: 'Joint Injuries', icon: 'ðŸ”§',
+  { id: 'joints', title: 'Joint Injuries', icon: '',
     items: [
       { term: 'Shoulder Injuries', def: 'Anterior dislocation (95%): arm abducted + externally rotated, loss of deltoid contour, humeral head palpable anteriorly. Check axillary nerve (lateral deltoid sensation). Reduce: Cunningham (seated massage), external rotation, traction-countertraction. Post-reduction: sling, X-ray (Bankart lesion â€” anterior labral tear, Hill-Sachs â€” humeral head impaction).', detail: 'Rotator cuff: SITS (Supraspinatus â€” most commonly torn, abduction; Infraspinatus â€” external rotation; Teres minor â€” external rotation; Subscapularis â€” internal rotation). Impingement: painful arc 60-120° abduction, positive Neer/Hawkins test. Acute tears: trauma in elderly, surgical repair if significant. Adhesive capsulitis (frozen shoulder): diabetes, thyroid, progressive limitation of active AND passive ROM. Treatment: PT ± cortisone injection.', pearl: 'AC joint injury (shoulder separation): classified by Rockwood (I-VI). Type I-II: conservative (sling, PT). Type III: controversial (most conservative, consider surgery in overhead athletes/laborers). Type IV-VI: surgical repair. Labral tears: SLAP (superior labrum â€” overhead athletes, pain with overhead activities, O\'Brien test), Bankart (anterior â€” recurrent instability). MRA (MR arthrogram) is study of choice for labral tears. Young patients (<25) with first-time anterior dislocation: high recurrence rate (70-90%) â†’ consider early surgical stabilization vs older patients.' },
       { term: 'Knee Injuries', def: 'ACL tear: non-contact pivot/deceleration, "pop" + effusion within hours, positive Lachman (most sensitive), anterior drawer, pivot shift. MCL: valgus stress (medial opening). LCL: varus stress. PCL: dashboard injury (posterior tibial translation), posterior drawer test.', detail: 'Meniscus: medial > lateral (medial is less mobile, more commonly injured). Twisting injury, joint line tenderness, locking/catching, McMurray test. MRI for diagnosis. Conservative if peripheral tear (red zone has blood supply â€” can heal). Arthroscopic repair vs partial meniscectomy. Unhappy triad: ACL + MCL + medial meniscus tear.', pearl: 'ACL reconstruction: recommended for active patients, young athletes, combined ligament injuries. Autograft (bone-patellar tendon-bone or hamstring) preferred over allograft in young athletes (lower re-tear rate). Return to sport: typically 9-12 months, functional testing must pass before clearance. Knee dislocation (multi-ligament injury): VASCULAR EMERGENCY â€” check popliteal artery (ABI/ankle-brachial index, CT angiography). Even if pulse is present, intimal injury may cause delayed occlusion. MUST get CTA. Associated with peroneal nerve injury (foot drop).' },
     ]},
-  { id: 'compartment', title: 'Compartment Syndrome', icon: 'ðŸš¨',
+  { id: 'compartment', title: 'Compartment Syndrome', icon: '',
     items: [
       { term: 'Acute Compartment Syndrome', def: 'Pressure within closed muscle compartment exceeds perfusion pressure â†’ ischemia â†’ necrosis. MC: tibia fracture (anterior compartment), forearm (Volkmann\'s), but can occur anywhere. The 6 P\'s: Pain (out of proportion, with passive stretch â€” earliest and most reliable), Pressure (tense compartment), Paresthesias, Paralysis (late), Pulselessness (very late), Poikilothermia.', detail: 'Diagnosis: CLINICAL â€” do not delay treatment for compartment pressure measurement if clinical suspicion is high. If measured: absolute pressure >30 mmHg or delta pressure (diastolic BP - compartment pressure) <30 mmHg â†’ emergent fasciotomy. Stryker device for measurement.', pearl: 'Fasciotomy: the ONLY treatment. Must be performed within 6 hours of symptom onset (irreversible muscle necrosis by 6-8h). Two-incision four-compartment fasciotomy of the leg: anterolateral incision (anterior + lateral compartments) + posteromedial incision (superficial + deep posterior). Leave wounds open, delayed primary closure or skin grafting at 48-72h. If missed â†’ rhabdomyolysis (â†‘ CK, myoglobinuria, hyperkalemia, AKI), Volkmann\'s contracture (forearm), permanent disability. Post-fasciotomy complications: infection, nerve injury, chronic venous insufficiency.' },
       { term: 'Specific Orthopedic Emergencies', def: 'Septic arthritis: hot, swollen joint, cannot bear weight, fever. WBC >50,000 in aspirate (75% sensitivity, not 100% specific â€” crystal disease can overlap). Kocher criteria (pediatric hip): fever >38.5°C, non-weight-bearing, ESR >40, WBC >12K. â‰¥3 criteria â†’ 93% probability.', detail: 'Septic arthritis: S. aureus (#1 in all ages), N. gonorrhoeae (young sexually active â€” polyarticular â†’ monoarticular, associated with tenosynovitis + rash), Kingella kingae (children <4). Treatment: joint aspiration + IV antibiotics (vancomycin + ceftriaxone empirically). Surgical washout for hip (deep joint, difficult to aspirate/manage percutaneously) and if no improvement in 48h.', pearl: 'Cauda equina syndrome: SURGICAL EMERGENCY. Urinary retention (#1 predictor), saddle anesthesia, bilateral leg pain/weakness, decreased anal tone/rectal sensation, sexual dysfunction. Disc herniation (L4-L5, L5-S1 most common) but also tumor, abscess, hematoma. MRI of lumbar spine STAT. Surgical decompression within 48h (earlier = better outcomes). If missed â†’ permanent neurologic deficit. Any patient with new back pain + urinary retention â†’ consider cauda equina until ruled out.' },
     ]},
-  { id: 'spine', title: 'Spine & Pelvis', icon: 'ðŸ¥',
+  { id: 'spine', title: 'Spine & Pelvis', icon: '',
     items: [
       { term: 'Cervical Spine Injuries', def: 'NEXUS criteria or Canadian C-spine rule to determine imaging need. Jefferson fracture (C1 burst â€” axial load, diving), Hangman\'s fracture (C2 pars â€” hyperextension), Odontoid (C2 dens: Type I â€” tip, stable; Type II â€” base of dens, UNSTABLE, most common; Type III â€” body, usually heals with immobilization).', detail: 'Subaxial injuries: facet dislocation (unilateral â€” 25% subluxation, bilateral â€” 50% subluxation, associated with SCI). Burst fractures: axial loading, retropulsed fragments into canal â†’ SCI risk. SLIC score (Subaxial Injury Classification) guides surgical vs conservative management.', pearl: 'Spinal cord injury levels: C3-C5 (phrenic nerve) â†’ diaphragm paralysis, ventilator-dependent. C5 â†’ deltoid/biceps (can flex elbow but not extend). C6 â†’ wrist extension (tenodesis grip). C7 â†’ triceps (extend elbow). T1 â†’ hand intrinsics. High-dose methylprednisolone is NO LONGER recommended for acute SCI (NASCIS trials were flawed, increased complications). Neurogenic shock (SCI above T6): hypotension + bradycardia (loss of sympathetic tone) â€” treat with vasopressors (norepinephrine preferred), NOT fluids alone. MAP target â‰¥85 for 7 days (AANS guidelines).' },
       { term: 'Pelvic Fractures', def: 'High-energy mechanism (MVC, falls from height). Life-threatening hemorrhage (venous plexus, iliac vessels). Tile classification: Type A (stable â€” pubic ramus), Type B (rotationally unstable, vertically stable â€” open-book, lateral compression), Type C (rotationally + vertically unstable â€” most severe, vertical shear).', detail: 'Assessment: hemodynamic instability + pelvic fracture â†’ pelvic binder (at level of greater trochanters, do NOT remove in field). Do NOT log-roll or rock pelvis. FAST exam: if positive â†’ OR for abdominal source. If negative â†’ likely pelvic hemorrhage â†’ angioembolization or preperitoneal pelvic packing (REBOA emerging).', pearl: 'Young-Burgess classification (mechanism-based): APC (anterior-posterior compression â€” "open book," external rotation), LC (lateral compression â€” most common, internal rotation), VS (vertical shear â€” unilateral, leg-length discrepancy), CM (combined mechanism). Pubic ramus fractures in elderly (low-energy falls): usually stable, can often mobilize with weight-bearing as tolerated, but must rule out sacral insufficiency fracture (MRI if continued pain â€” X-ray misses 70%). Associated injuries: urethral injury (blood at meatus â†’ retrograde urethrogram BEFORE Foley), bladder (CT cystogram), rectal, vaginal.' },
@@ -20179,7 +20179,7 @@ function OrthopedicsGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ¦´ Orthopedics Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Orthopedics Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Fractures, joint injuries, compartment syndrome & spine</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -20196,7 +20196,7 @@ function OrthopedicsGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#22c55e08', border: '1px solid #22c55e20', color: '#22c55e' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -20225,23 +20225,23 @@ function OrthopedicsGuideView() {
    ENT GUIDE â€” Ear, Nose, Throat, Airway
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ENT_SECTIONS = [
-  { id: 'ear', title: 'Ear Disorders', icon: 'ðŸ‘‚',
+  { id: 'ear', title: 'Ear Disorders', icon: '',
     items: [
       { term: 'Otitis Media', def: 'Acute OM (AOM): middle ear infection. MC in children 6-24 months. S. pneumoniae, non-typeable H. influenzae, M. catarrhalis. Bulging, erythematous, immobile TM.', detail: 'Treatment: amoxicillin 80-90 mg/kg/day first-line. If treatment failure at 48-72h: amoxicillin-clavulanate. PCN allergy: cefdinir, ceftriaxone IM. Tympanostomy tubes: â‰¥3 episodes in 6 months or â‰¥4 in 12 months with effusion; chronic OME >3 months with bilateral hearing loss.', pearl: 'Observation option (delayed antibiotics): age â‰¥2 years with unilateral AOM and mild symptoms â€” can observe 48-72h with follow-up. Reduces unnecessary antibiotic use. Otitis media with effusion (OME): NOT infection â€” serous fluid in middle ear, typically follows AOM. Do NOT treat with antibiotics. Watch 3 months, then hearing test â†’ tubes if bilateral hearing loss. Complications of AOM: TM perforation, mastoiditis (post-auricular swelling, tenderness, protrusion of auricle â€” CT temporal bones, IV antibiotics ± myringotomy ± mastoidectomy), cholesteatoma (chronic), intracranial (rare): meningitis, brain abscess, lateral sinus thrombosis.' },
       { term: 'Hearing Loss', def: 'Conductive: outer/middle ear (cerumen impaction, OE, OM, otosclerosis, TM perforation, cholesteatoma). Weber lateralizes TO affected ear. Rinne: bone > air (BC > AC). Sensorineural: inner ear/CN VIII (presbycusis, noise-induced, Meniere\'s, acoustic neuroma, ototoxic drugs). Weber lateralizes AWAY from affected ear. Rinne: air > bone (AC > BC, but both diminished).', detail: 'Sudden sensorineural hearing loss (SSNHL): â‰¥30 dB loss over â‰¤3 days at â‰¥3 contiguous frequencies. ENT emergency. Treatment: oral or intratympanic steroids within 2 weeks (earlier = better). MRI to rule out acoustic neuroma (vestibular schwannoma). Ototoxic drugs: aminoglycosides (irreversible), cisplatin, loop diuretics, aspirin (reversible tinnitus).', pearl: 'Otosclerosis: abnormal bone remodeling of stapes â†’ conductive hearing loss, typically young women, bilateral. Schwartze sign (pink blush on promontory). Audiogram: Carhart notch at 2 kHz on bone conduction. Treatment: hearing aids or stapedectomy. Cholesteatoma: squamous epithelium in middle ear eroding ossicles/bone. White pearly mass behind TM. Chronic foul-smelling otorrhea unresponsive to antibiotics. CT temporal bones. Surgery (tympanomastoidectomy) â€” can erode into lateral semicircular canal (vertigo), facial nerve (facial weakness), tegmen tympani (intracranial complications).' },
       { term: 'Vertigo', def: 'BPPV: most common. Brief episodes triggered by head position changes. Diagnosis: Dix-Hallpike maneuver (upbeat torsional nystagmus with fatigability). Treatment: Epley maneuver (canalith repositioning â€” 80% cure rate in one session). Meniere\'s disease: episodic vertigo (20 min-12h), fluctuating low-frequency SNHL, tinnitus, aural fullness.', detail: 'Meniere\'s: endolymphatic hydrops. Treatment: low-sodium diet (<2g/day), diuretics (HCTZ/triamterene), betahistine. Acute attacks: vestibular suppressants (meclizine, diazepam). Refractory: intratympanic dexamethasone or gentamicin (chemical labyrinthectomy), endolymphatic sac decompression. Vestibular neuritis: sudden severe vertigo lasting days, horizontal nystagmus (away from affected ear), no hearing loss. Usually post-viral (HSV-1). Treatment: vestibular suppressants short-term + vestibular rehabilitation (PT).', pearl: 'HINTS exam (for acute vestigo): Head Impulse, Nystagmus, Test of Skew. Central pattern (stroke): NORMAL head impulse test (no corrective saccade), direction-changing nystagmus, skew deviation. Peripheral pattern: abnormal HIT (corrective saccade), unidirectional nystagmus (fast phase away from lesion), no skew. HINTS is MORE sensitive than early MRI for posterior circulation stroke in acute vestibular syndrome. If central pattern â†’ emergent MRI/MRA + neurology consult.' },
     ]},
-  { id: 'nose', title: 'Nose & Sinus', icon: 'ðŸ‘ƒ',
+  { id: 'nose', title: 'Nose & Sinus', icon: '',
     items: [
       { term: 'Sinusitis', def: 'Acute rhinosinusitis (ARS): <4 weeks. Viral (common cold) >> bacterial. Bacterial if: symptoms >10 days without improvement, OR severe onset (fever â‰¥39°C + purulent discharge â‰¥3 days), OR "double-sickening" (initial improvement then worsening at day 5-6).', detail: 'MC bacterial pathogens: S. pneumoniae, H. influenzae, M. catarrhalis. First-line: amoxicillin-clavulanate (not plain amoxicillin anymore â€” ARS guidelines). PCN allergy: doxycycline or respiratory fluoroquinolone. Duration: 5-7 days (adults), 10-14 days (children). Adjuncts: nasal saline irrigation, intranasal steroids.', pearl: 'Do NOT prescribe antibiotics for viral URI or acute viral rhinosinusitis (vast majority of cases). Complications of bacterial sinusitis: orbital (preseptal cellulitis â†’ orbital cellulitis â†’ subperiosteal abscess â†’ orbital abscess â†’ cavernous sinus thrombosis). Chandler classification. CT orbits + sinuses. IV antibiotics + surgical drainage for orbital complications. Intracranial: frontal bone osteomyelitis (Pott puffy tumor â€” frontal sinusitis in adolescents), epidural/subdural abscess, meningitis, brain abscess.' },
       { term: 'Epistaxis', def: 'Anterior (90%): Kiesselbach\'s plexus (Little\'s area) â€” visible, easy to treat with direct pressure Ã— 15 min + topical oxymetazoline. Silver nitrate cautery if visible bleeding point. Anterior packing (Merocel, Rapid Rhino) if persists.', detail: 'Posterior (10%): sphenopalatine artery. More severe, harder to control. Posterior packing (Foley catheter balloon or posterior nasal pack) â†’ admit for monitoring (vagal response, airway compromise). May need endoscopic sphenopalatine artery ligation or embolization.', pearl: 'Hereditary Hemorrhagic Telangiectasia (HHT/Osler-Weber-Rendu): autosomal dominant. Telangiectasias on lips/tongue/fingertips, recurrent epistaxis, AVM\'s (pulmonary â†’ paradoxical embolism/stroke, hepatic, cerebral). Screen: CT chest for pulmonary AVMs. Curaçao criteria for diagnosis. Juvenile nasopharyngeal angiofibroma: benign but locally aggressive vascular tumor in ADOLESCENT MALES. Unilateral nasal obstruction + recurrent epistaxis. Do NOT biopsy (hemorrhage risk). CT/MRI + embolization before surgical excision.' },
     ]},
-  { id: 'throat', title: 'Throat & Airway', icon: 'ðŸ—£️',
+  { id: 'throat', title: 'Throat & Airway', icon: '',
     items: [
       { term: 'Pharyngitis & Tonsillitis', def: 'Viral (majority â€” rhinovirus, adenovirus, EBV). GAS (Group A Strep): Centor criteria (fever, tonsillar exudates, tender anterior cervical lymphadenopathy, absence of cough). Modified: age 3-14 â†’ +1 point, >45 â†’ -1 point. Score â‰¥3 â†’ rapid strep test ± throat culture.', detail: 'GAS treatment: penicillin V 500 mg BID Ã— 10 days (or amoxicillin 50 mg/kg once daily Ã— 10 days). IM benzathine penicillin 1.2 MU single dose. PCN allergy: azithromycin, cephalosporins (if not anaphylactic). Purpose: prevent rheumatic fever (within 9 days of symptoms), reduce symptom duration, decrease transmission.', pearl: 'Peritonsillar abscess (PTA): MC deep neck space infection. Unilateral tonsillar swelling with uvular deviation, "hot potato" voice, trismus, drooling. Treatment: needle aspiration ± incision and drainage + antibiotics (amoxicillin-clavulanate or clindamycin). EBV/Mono: if amoxicillin given â†’ diffuse maculopapular rash (not true allergy, but avoid ampicillin/amoxicillin during acute mono). Spleen precaution: no contact sports Ã— 3-4 weeks (splenic rupture risk). Atypical lymphocytes on smear, positive heterophile (Monospot) or EBV serologies.' },
       { term: 'Airway Emergencies', def: 'Epiglottitis: H. influenzae type b (historically pediatric, now more adults due to Hib vaccine). Sudden severe sore throat, dysphagia, drooling, tripod position, muffled voice. Thumb sign on lateral X-ray. Do NOT examine throat (can precipitate complete obstruction in children).', detail: 'Epiglottitis treatment: secure airway FIRST (controlled intubation in OR if pediatric, fiber-optic in adults), then IV antibiotics (ceftriaxone + vancomycin). Croup (laryngotracheobronchitis): primarily parainfluenza virus, age 6 months-3 years. Barking (seal-like) cough, inspiratory stridor, steeple sign on AP X-ray. Treatment: single dose dexamethasone 0.6 mg/kg (even mild croup), nebulized epinephrine for moderate-severe (observe â‰¥2h for rebound).', pearl: 'Retropharyngeal abscess: children <5 years (retropharyngeal lymph nodes degenerate by age 5). Fever, neck stiffness, dysphagia, drooling. Lateral neck X-ray: retropharyngeal space widening >7 mm at C2 (must be in extension during inspiration). CT neck with contrast for confirm. Risk: rupture â†’ aspiration, mediastinitis (descends along prevertebral fascia). Treatment: IV antibiotics (ampicillin-sulbactam or clindamycin) ± surgical drainage if abscess >2 cm or not improving. Ludwig\'s angina: submandibular space infection (dental origin). Bilateral submandibular swelling, "woody" induration, elevated tongue, airway compromise. Priority: secure airway â†’ IV antibiotics â†’ surgical drainage.' },
     ]},
-  { id: 'neck', title: 'Neck Masses', icon: 'ðŸ”',
+  { id: 'neck', title: 'Neck Masses', icon: '',
     items: [
       { term: 'Pediatric Neck Masses', def: 'Congenital: thyroglossal duct cyst (midline, moves with swallowing AND tongue protrusion â€” remnant of thyroid descent from foramen cecum), branchial cleft cyst (lateral, anterior to SCM â€” 2nd cleft most common), dermoid cyst, cystic hygroma (lymphatic malformation â€” posterior triangle, transilluminates, associated with Turner syndrome).', detail: 'Thyroglossal duct cyst: risk of ectopic thyroid tissue (confirm normal thyroid position with US before surgery). Sistrunk procedure: excise cyst + central portion of hyoid bone + tract to foramen cecum (prevents recurrence). Branchial cleft cyst: may present as recurrent abscess. Excision is definitive. Reactive lymphadenopathy: most common pediatric neck mass. Self-limited if <2 cm, mobile, non-tender. If >6 weeks â†’ workup (CBC, ESR, CRP, PPD, imaging).', pearl: 'Concerning features in pediatric neck mass: supraclavicular location (think malignancy), firm/fixed, >2 cm, rapidly enlarging, persistent >6 weeks, systemic symptoms (weight loss, night sweats, fevers â€” B symptoms). DDx: lymphoma (Hodgkin\'s â€” painless, may have alcohol-induced pain; Non-Hodgkin\'s), neuroblastoma (catecholamines, Horner syndrome), rhabdomyosarcoma. Workup: US â†’ FNA (or excisional biopsy for lymphoma â€” need architecture) â†’ CT/PET.' },
       { term: 'Adult Neck Masses', def: 'Rule of 80s: 80% neoplastic, 80% of neoplastic are malignant, 80% of malignant are metastatic (SCC of head & neck). Primary sites: oral cavity, oropharynx (HPV-related â€” increasing incidence, better prognosis), larynx, hypopharynx, nasopharynx.', detail: 'Workup: HPE (history, physical, endoscopy). FNA (fine-needle aspiration) of mass. CT neck with contrast. PET-CT for staging. Panendoscopy (triple endoscopy: laryngoscopy, esophagoscopy, bronchoscopy) to evaluate for synchronous primary. HPV testing (p16 IHC) for oropharyngeal SCC â€” HPV-positive has significantly better prognosis.', pearl: 'Parathyroid/thyroid masses are separate entity (see Endocrinology). Parotid tumors: 80% benign, most common is pleomorphic adenoma. Warthin\'s tumor: 2nd most common, bilateral (10%), smokers, often in older men. Mucoepidermoid carcinoma: most common malignant parotid tumor. Facial nerve palsy in parotid mass = MALIGNANT until proven otherwise. FNA for all parotid masses. Superficial parotidectomy with facial nerve preservation for benign. Nasopharyngeal carcinoma: EBV-associated (especially in Southeast Asian/Southern Chinese populations). Unilateral serous otitis media in adult â†’ nasopharyngoscopy to rule out NPC (Eustachian tube obstruction).' },
@@ -20255,7 +20255,7 @@ function ENTGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ‘‚ ENT Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">ENT Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">Ear, nose, throat & airway emergencies</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -20272,7 +20272,7 @@ function ENTGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#a855f708', border: '1px solid #a855f720', color: '#a855f7' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>
@@ -20301,21 +20301,21 @@ function ENTGuideView() {
    UROLOGY GUIDE â€” BPH, Stones, Hematuria, Scrotal Emergencies
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const URO_SECTIONS = [
-  { id: 'bph', title: 'BPH & Prostate', icon: 'ðŸ”µ',
+  { id: 'bph', title: 'BPH & Prostate', icon: '',
     items: [
       { term: 'Benign Prostatic Hyperplasia', def: 'Prevalence increases with age (50% at 50, 90% at 80). LUTS: frequency, urgency, nocturia, weak stream, hesitancy, incomplete emptying, post-void dribbling. IPSS (International Prostate Symptom Score) for severity.', detail: 'Diagnosis: DRE (smooth, enlarged, firm, non-tender), UA (rule out UTI), PSA (discuss), PVR (post-void residual â€” â‰¥200-300 mL is significant). Uroflowmetry, pressure-flow studies for equivocal cases.', pearl: 'Treatment: Mild (IPSS <8): watchful waiting, lifestyle (reduce fluids before bed, limit caffeine/alcohol). Moderate-severe: Alpha-blockers (tamsulosin, alfuzosin) â€” rapid symptom relief (days to weeks). 5α-reductase inhibitors (finasteride, dutasteride) â€” reduce prostate volume over months, prevent progression. Combination therapy (MTOPS, CombAT trials). PDE5 inhibitor (tadalafil 5 mg daily â€” for BPH + ED). Surgical: TURP (gold standard), HoLEP (laser enucleation â€” comparable, less bleeding), UroLift (prostatic urethral lift â€” preserves ejaculatory function), water vapor therapy (Rezūm), aquablation (robotic waterjet).' },
       { term: 'Prostate Cancer', def: 'Most common cancer in men (excluding skin). Risk factors: age, family history, African American race, BRCA2 mutation. Most are adenocarcinoma, arise from peripheral zone (palpable on DRE).', detail: 'Screening: controversial. PSA screening â€” shared decision-making. USPSTF: offer PSA screening to men 55-69 (Grade C). Do NOT screen >70 or <55 (without risk factors). PSA >4 ng/mL (or >3 in high risk) â†’ biopsy. PSA velocity >0.75/year, PSA density, free PSA% help distinguish benign vs malignant.', pearl: 'Gleason score/Grade Group: GG1 (Gleason â‰¤6, very low risk), GG2 (3+4=7, favorable intermediate), GG3 (4+3=7, unfavorable intermediate), GG4 (Gleason 8, high), GG5 (9-10, very high). Low-risk (GG1, T1-T2a, PSA <10): active surveillance (repeat PSA, MRI, biopsy â€” avoid overtreatment of indolent disease). Intermediate/high risk: radical prostatectomy or radiation + ADT (androgen deprivation therapy). Metastatic: ADT (LHRH agonist/antagonist) + novel agent (abiraterone, enzalutamide, darolutamide, docetaxel â€” upfront intensification per LATITUDE, STAMPEDE, ENZAMET, ARASENS trials). PSMA-PET: highly sensitive for metastatic disease staging.' },
     ]},
-  { id: 'stones', title: 'Urolithiasis', icon: 'ðŸ’Ž',
+  { id: 'stones', title: 'Urolithiasis', icon: '',
     items: [
       { term: 'Renal Colic', def: 'Colicky flank pain radiating to groin (ureteral stone), acute onset, patient cannot get comfortable (writhing â€” unlike peritonitis where still). Hematuria (90%). Nausea/vomiting.', detail: 'Non-contrast CT abdomen/pelvis: gold standard (>95% sensitivity). US first-line in pregnancy and pediatrics. Types: calcium oxalate (80% â€” radiopaque), calcium phosphate, uric acid (radiolucent on X-ray, visible on CT), struvite (staghorn, infection-related â€” Proteus, Klebsiella), cystine (genetic â€” hexagonal crystals).', pearl: 'Management: <5 mm: 90% pass spontaneously. Medical expulsive therapy: tamsulosin (alpha-blocker â€” relaxes ureteral smooth muscle) + NSAIDs (ketorolac) for pain. IV fluids do NOT speed passage (but treat dehydration). 5-10 mm: 50% pass spontaneously, may need intervention. >10 mm: unlikely to pass â†’ urology. Renal: SWL (shock wave lithotripsy) or PCNL (percutaneous nephrolithotomy) for stones >2 cm. Ureteral: ureteroscopy with laser lithotripsy. Emergent urology: infected obstructing stone (UTI + obstruction) â†’ emergent decompression (ureteral stent or percutaneous nephrostomy) + IV antibiotics. This is a urologic emergency (urosepsis).' },
       { term: 'Stone Prevention', def: 'High fluid intake (â‰¥2.5L urine output/day) is the single most effective prevention. 24h urine collection for metabolic evaluation after first stone in high-risk patients or recurrent stones.', detail: 'Calcium oxalate: increase fluids, low sodium diet (reduces urinary calcium), normal calcium intake (LOW dietary calcium INCREASES stone risk by increasing oxalate absorption), citrate supplementation (potassium citrate â€” inhibits crystallization). Thiazide diuretics (reduce urinary calcium). Uric acid: alkalinize urine to pH 6.5-7 (potassium citrate), allopurinol if hyperuricosuric. Uric acid stones can be DISSOLVED by urinary alkalinization.', pearl: 'Struvite stones: Proteus, Klebsiella (urease-producing organisms) â†’ alkaline urine â†’ magnesium ammonium phosphate crystals. "Coffin lid" crystals. Often form staghorn calculi. Definitive treatment: complete stone removal (PCNL ± SWL) + treat underlying UTI. If stone fragments remain, infection recurs. Cystine stones: cystinuria (AR). Hexagonal crystals. Dissolve with D-penicillamine or tiopronin + alkalinization + high fluid intake. Positive nitroprusside test. Dietary protein restriction helps reduce cystine excretion.' },
     ]},
-  { id: 'hematuria', title: 'Hematuria', icon: 'ðŸ”´',
+  { id: 'hematuria', title: 'Hematuria', icon: '',
     items: [
       { term: 'Microscopic Hematuria Workup', def: 'â‰¥3 RBCs/HPF on two of three samples (or single with risk factors). AUA guidelines (2020): risk-stratify into low, intermediate, high risk. Low risk: repeat UA in 6 months. Intermediate: cystoscopy + renal US. High risk: cystoscopy + CT urogram.', detail: 'Causes: UTI (most common), kidney stones, BPH, glomerular disease, malignancy (bladder > kidney > ureteral). Risk factors for malignancy: age >40 (especially >60), male sex, smoking history, gross hematuria, prior pelvic radiation, cyclophosphamide exposure.', pearl: 'Glomerular hematuria: dysmorphic RBCs, RBC casts, proteinuria. Suggests nephrologic workup (IgA nephropathy most common glomerular cause of hematuria). Non-glomerular (urologic) hematuria: normal RBC morphology, no casts, no significant proteinuria â†’ cystoscopy + imaging. NEVER attribute hematuria solely to anticoagulation or aspirin without workup â€” patients on anticoagulants who have hematuria have the same rate of underlying malignancy as those not on anticoagulants. Gross hematuria: always requires cystoscopy + CT urogram regardless of age.' },
     ]},
-  { id: 'scrotal', title: 'Scrotal Emergencies', icon: 'ðŸš¨',
+  { id: 'scrotal', title: 'Scrotal Emergencies', icon: '',
     items: [
       { term: 'Testicular Torsion', def: 'SURGICAL EMERGENCY. Bell-clapper deformity (horizontal lie) predisposes. Sudden severe unilateral scrotal pain, nausea/vomiting. Affected testis is high-riding, transverse lie, absent cremasteric reflex. Peak: neonates and age 12-18.', detail: 'Diagnosis: CLINICAL â€” do NOT delay for imaging if clinical suspicion is high. Doppler US if diagnosis uncertain: decreased/absent blood flow. Manual detorsion: "open the book" (medial to lateral â€” left testicle clockwise, right counterclockwise when viewed from patient\'s perspective). Temporary measure â†’ still needs surgical exploration.', pearl: 'Surgical window: <6h â†’ 90% salvage rate. 6-12h â†’ 50%. >24h â†’ <10% (orchidectomy). Always fix the contralateral testis (bilateral orchiopexy) â€” bell-clapper deformity is often bilateral. DDx: torsion of appendix testis ("blue dot sign" â€” torted appendage visible through scrotal skin), epididymitis (more gradual onset, positive Prehn sign â€” pain relief with elevation, but Prehn sign is unreliable and should NOT be used to exclude torsion). In adolescent male with acute scrotum â€” TREAT AS TORSION UNTIL PROVEN OTHERWISE.' },
       { term: 'Epididymitis & Fournier\'s Gangrene', def: 'Epididymitis: <35 years â€” STI (Chlamydia, Gonorrhea): ceftriaxone + doxycycline. >35 years â€” UTI organisms (E. coli): fluoroquinolone or TMP-SMX. Gradual onset, tender epididymis, may have fever/pyuria.', detail: 'Fournier\'s gangrene: necrotizing fasciitis of perineum/genitalia. SURGICAL EMERGENCY. Risk factors: diabetes (#1), immunocompromised, obesity, alcoholism, perineal trauma/surgery. Polymicrobial (aerobic + anaerobic). Rapid spread, crepitus, disproportionate pain, sepsis.', pearl: 'Fournier\'s gangrene: LRINEC score (Laboratory Risk Indicator for Necrotizing Fasciitis) >6 = suspicious, >8 = high risk. Treatment: broad-spectrum antibiotics (vancomycin + piperacillin-tazobactam + clindamycin) + URGENT surgical debridement (return to OR Q24-48h for re-debridement until clean margins). Mortality: 20-40% even with treatment. Delay in surgery is the primary determinant of mortality. Varicocele: "bag of worms" â€” left side predominates (left gonadal vein drains into left renal vein at 90°). Varicocele that doesn\'t decompress when supine â†’ think IVC/renal vein obstruction (renal cell carcinoma â€” get CT abdomen).' },
@@ -20329,7 +20329,7 @@ function UrologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">ðŸ”µ Urology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Urology Guide</h2>
         <p className="text-xs opacity-40 mt-0.5">BPH, stones, hematuria & scrotal emergencies</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -20346,7 +20346,7 @@ function UrologyGuideView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#0ea5e908', border: '1px solid #0ea5e920', color: '#0ea5e9' }}>
-                    <span>ðŸ’Ž</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>

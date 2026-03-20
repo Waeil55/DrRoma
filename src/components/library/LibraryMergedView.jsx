@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — LibraryMergedView
  * Main home/library page — hero, stats, BG tasks, documents grid/list, drag-drop, quick actions.
  */
@@ -70,10 +70,10 @@ export default function LibraryMergedView({ docs, uploading, onUpload, onOpen, o
                 <span className="text-[10px] font-black uppercase tracking-[.15em] px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'rgba(255,255,255,.9)' }}>
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                 </span>
-                {streak >= 3 && <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}>🔥 {streak} day streak</span>}
+                {streak >= 3 && <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full" style={{ background: 'rgba(255,255,255,.2)', color: 'white' }}> {streak} day streak</span>}
               </div>
               <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight" style={{ fontFamily: 'Plus Jakarta Sans,system-ui' }}>
-                {new Date().getHours() < 12 ? 'Good morning ☀️' : new Date().getHours() < 17 ? 'Good afternoon 🌤' : 'Good evening 🌙'}
+                {new Date().getHours() < 12 ? 'Good morning ' : new Date().getHours() < 17 ? 'Good afternoon ' : 'Good evening '}
               </h1>
               <p className="text-sm mt-1 text-white/70 font-medium">
                 {dueCards > 0 ? `${dueCards} flashcards due · ${docs.length} documents` : docs.length === 0 ? 'Upload your first document to get started' : `${totalCards} cards · ${totalQ} exam questions · ${totalCases} cases`}

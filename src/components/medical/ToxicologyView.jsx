@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const TOXICOLOGY_DATA = [
@@ -11,12 +11,12 @@ const TOXICOLOGY_DATA = [
     presentation: 'Classic triad: respiratory depression + miosis (pinpoint pupils) + altered consciousness. Hypotension, hypothermia, ↓ bowel sounds.',
     antidote: 'Naloxone (Narcan) — competitive mu-receptor antagonist',
     dosing: 'IV/IM/IN: Start 0.04-0.4 mg, repeat Q2-3 min up to 10 mg. Higher doses for synthetic opioids (fentanyl). Infusion: 2/3 of reversal dose per hour.',
-    keyPoints: ['Start LOW dose in opioid-dependent patients (precipitate withdrawal)', 'Naloxone duration (30-90 min) shorter than most opioids → MUST observe for re-narcotization', 'Fentanyl may require higher/repeated naloxone doses', 'Intubate if not responding to naloxone', '⚠️ Acute withdrawal is not life-threatening but is very uncomfortable'] },
+    keyPoints: ['Start LOW dose in opioid-dependent patients (precipitate withdrawal)', 'Naloxone duration (30-90 min) shorter than most opioids → MUST observe for re-narcotization', 'Fentanyl may require higher/repeated naloxone doses', 'Intubate if not responding to naloxone', ' Acute withdrawal is not life-threatening but is very uncomfortable'] },
   { toxin: 'Benzodiazepines', mechanism: 'GABA-A receptor positive allosteric modulator → CNS depression',
     presentation: 'Sedation, slurred speech, ataxia, respiratory depression (especially combined with opioids/alcohol). Paradoxical agitation in elderly.',
     antidote: 'Flumazenil — competitive GABA-A antagonist',
     dosing: '0.2 mg IV over 30 sec, then 0.3 mg, then 0.5 mg at 1-min intervals. Max 3-5 mg.',
-    keyPoints: ['⚠️ AVOID flumazenil in chronic BZD users → precipitates SEIZURES', 'Avoid in mixed ingestions (especially tricyclics)', 'BZD overdose alone rarely fatal — mainly fatal when combined with opioids/alcohol', 'Supportive care + airway management is usually sufficient'] },
+    keyPoints: [' AVOID flumazenil in chronic BZD users → precipitates SEIZURES', 'Avoid in mixed ingestions (especially tricyclics)', 'BZD overdose alone rarely fatal — mainly fatal when combined with opioids/alcohol', 'Supportive care + airway management is usually sufficient'] },
   { toxin: 'Organophosphates (Nerve Agents)', mechanism: 'Irreversible inhibition of acetylcholinesterase → excess acetylcholine (muscarinic + nicotinic)',
     presentation: 'SLUDGE/BBB: Salivation, Lacrimation, Urination, Defecation, GI cramps, Emesis + Bronchospasm, Bradycardia, miosis (small pupils). KILLER Bs: Bradycardia, Bronchospasm, Bronchorrhea.',
     antidote: 'Atropine (muscarinic) + Pralidoxime/2-PAM (regenerates AChE)',
@@ -52,7 +52,7 @@ export default function ToxicologyView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">☠️ Toxicology & Antidotes</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Toxicology & Antidotes</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search poisons / antidotes…"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -64,7 +64,7 @@ export default function ToxicologyView() {
             <div key={t.toxin} className="glass rounded-2xl overflow-hidden" style={{ border: `1px solid ${isOpen ? '#ef444440' : 'var(--border)'}` }}>
               <button onClick={() => setExpanded(e => e === t.toxin ? null : t.toxin)}
                 className="w-full p-4 text-left flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: '#ef444410' }}>☠️</div>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: '#ef444410' }}></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-sm">{t.toxin}</h3>
                   <p className="text-xs opacity-40 mt-0.5">Antidote: {t.antidote}</p>
@@ -82,11 +82,11 @@ export default function ToxicologyView() {
                     <p className="text-xs opacity-70 leading-relaxed">{t.presentation}</p>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#10b98108', border: '1px solid #10b98120' }}>
-                    <h4 className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#10b981' }}>💉 Antidote: {t.antidote}</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#10b981' }}> Antidote: {t.antidote}</h4>
                     <p className="text-xs opacity-70 leading-relaxed">{t.dosing}</p>
                   </div>
                   <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                    <h4 className="text-xs font-black mb-2" style={{ color: '#f59e0b' }}>💎 Key Points</h4>
+                    <h4 className="text-xs font-black mb-2" style={{ color: '#f59e0b' }}> Key Points</h4>
                     {t.keyPoints.map((kp, i) => (
                       <div key={i} className="flex gap-2 text-xs py-0.5">
                         <span style={{ color: '#f59e0b' }}>▸</span>

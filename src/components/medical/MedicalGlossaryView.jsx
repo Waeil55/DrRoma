@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const MEDICAL_GLOSSARY = [
@@ -54,7 +54,7 @@ export default function MedicalGlossaryView() {
     <div style={{ padding: '1.5rem', maxWidth: 900, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>📖 Medical Glossary</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}> Medical Glossary</h2>
         <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
           {filtered.length} term{filtered.length !== 1 ? 's' : ''}
         </p>

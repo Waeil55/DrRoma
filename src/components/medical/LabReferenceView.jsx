@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronDown, AlertCircle } from 'lucide-react';
 
 const LAB_REFERENCE_DATA = [
@@ -56,7 +56,7 @@ export default function LabReferenceView() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>🔬 Lab Reference</h2>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}> Lab Reference</h2>
           <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
             {filtered.length} lab{filtered.length !== 1 ? 's' : ''} — Normal ranges
           </p>
@@ -73,7 +73,7 @@ export default function LabReferenceView() {
               transition: 'all 0.2s',
             }}
           >
-            ♂ Male
+             Male
           </button>
           <button
             onClick={() => setSex('female')}
@@ -85,7 +85,7 @@ export default function LabReferenceView() {
               transition: 'all 0.2s',
             }}
           >
-            ♀ Female
+             Female
           </button>
         </div>
       </div>
@@ -185,14 +185,14 @@ export default function LabReferenceView() {
                       padding: '0.5rem 0.75rem', borderRadius: 10,
                       background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)',
                     }}>
-                      <div style={{ fontSize: '0.72rem', color: '#888', marginBottom: '0.2rem', fontWeight: 600 }}>♂ Male</div>
+                      <div style={{ fontSize: '0.72rem', color: '#888', marginBottom: '0.2rem', fontWeight: 600 }}> Male</div>
                       <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{l.male}</div>
                     </div>
                     <div style={{
                       padding: '0.5rem 0.75rem', borderRadius: 10,
                       background: 'rgba(236,72,153,0.08)', border: '1px solid rgba(236,72,153,0.15)',
                     }}>
-                      <div style={{ fontSize: '0.72rem', color: '#888', marginBottom: '0.2rem', fontWeight: 600 }}>♀ Female</div>
+                      <div style={{ fontSize: '0.72rem', color: '#888', marginBottom: '0.2rem', fontWeight: 600 }}> Female</div>
                       <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{l.female}</div>
                     </div>
                   </div>

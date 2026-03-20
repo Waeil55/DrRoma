@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — XP & Levels System (Prompt2.md Part E §6)
  * Centralised XP logic shared by FlashcardsView, ExamsView, DashboardView, AchievementsView.
  * Uses localStorage so XP persists without requiring IndexedDB access.
@@ -26,12 +26,12 @@ export const LEVELS = [
 ];
 
 export const VARIABLE_REWARD_INSIGHTS = [
-  '💡 Students who review mechanisms (not just names) score 23% higher on pharma questions.',
-  '📊 You\'re in the top 12% of students who studied today.',
-  '🧠 The forgetting curve says 70% forgotten in 24h — FSRS just scheduled the perfect review.',
-  '⚡ Spaced repetition is proven to outperform cramming by 200%.',
-  '📈 Each card you review strengthens the neural pathway for long-term retention.',
-  '🔥 Average passing USMLE student studied 847 hours of flashcards. Keep going!',
+  ' Students who review mechanisms (not just names) score 23% higher on pharma questions.',
+  ' You\'re in the top 12% of students who studied today.',
+  ' The forgetting curve says 70% forgotten in 24h — FSRS just scheduled the perfect review.',
+  ' Spaced repetition is proven to outperform cramming by 200%.',
+  ' Each card you review strengthens the neural pathway for long-term retention.',
+  ' Average passing USMLE student studied 847 hours of flashcards. Keep going!',
 ];
 
 /** Returns the current LEVELS entry for the given XP amount. */

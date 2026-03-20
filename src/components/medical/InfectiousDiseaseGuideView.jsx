@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const ID_SYNDROMES = [
@@ -61,7 +61,7 @@ export default function InfectiousDiseaseGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🦠 Infectious Disease Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Infectious Disease Guide</h2>
         {!active && (
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search infections…"
             className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
@@ -106,7 +106,7 @@ export default function InfectiousDiseaseGuideView() {
             </div>
 
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-              <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>💡 Key Points</h3>
+              <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Key Points</h3>
               {active.keyPoints.map((kp, i) => (
                 <div key={i} className="flex gap-2 text-xs py-1">
                   <span style={{ color: '#f59e0b' }}>▸</span>

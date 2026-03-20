@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — ExamList Component
  * Exam listing with stats, filters, and actions.
  */
@@ -100,13 +100,13 @@ export default function ExamList({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-black text-sm truncate">{ex.title}</h3>
-                    {ex.isBuiltin && <span className="badge badge-success shrink-0">📚 Built-in</span>}
+                    {ex.isBuiltin && <span className="badge badge-success shrink-0"> Built-in</span>}
                   </div>
                   <p className="text-xs opacity-40 mt-0.5">
                     {ex.questions?.length} questions · {ex.isBuiltin ? 'Always available' : new Date(ex.createdAt).toLocaleDateString()}
                   </p>
                   {ex.docId && docs?.find(d => d.id === ex.docId) && (
-                    <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === ex.docId).name}</p>
+                    <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === ex.docId).name}</p>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">

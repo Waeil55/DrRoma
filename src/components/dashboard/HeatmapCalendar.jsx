@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — HeatmapCalendar
  * GitHub-style contribution/mastery heatmap for flashcard review activity.
  * Desktop: 52-week grid. Mobile: last 90 days simplified.
@@ -72,7 +72,7 @@ export default function HeatmapCalendar({ reviewHistory = {}, isMobile = false }
           </p>
         )}
         <div className="flex items-center gap-4 mt-2 text-xs" style={{ color: 'var(--text2)' }}>
-          <span>🔥 {currentStreak} day streak</span>
+          <span> {currentStreak} day streak</span>
           <span>Best: {bestStreak} days</span>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function HeatmapCalendar({ reviewHistory = {}, isMobile = false }
         </p>
       )}
       <div className="flex items-center gap-4 mt-2 text-xs" style={{ color: 'var(--text2)' }}>
-        <span>🔥 {currentStreak} day streak</span>
+        <span> {currentStreak} day streak</span>
         <span>Best: {bestStreak} days</span>
       </div>
 

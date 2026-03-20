@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const ICU_PROTOCOLS = [
-  { id: 'vent', title: 'Mechanical Ventilation', cat: 'Respiratory', icon: '🫁',
+  { id: 'vent', title: 'Mechanical Ventilation', cat: 'Respiratory', icon: '',
     sections: [
       { heading: 'Initial Settings (Volume Control)',
         content: [
@@ -44,7 +44,7 @@ const ICU_PROTOCOLS = [
           'If desaturating: disconnect from vent → BVM with 100% O₂ → systematic assessment',
         ]},
     ]},
-  { id: 'shock', title: 'Shock Management', cat: 'Hemodynamics', icon: '💉',
+  { id: 'shock', title: 'Shock Management', cat: 'Hemodynamics', icon: '',
     sections: [
       { heading: 'Classification of Shock',
         content: [
@@ -82,7 +82,7 @@ const ICU_PROTOCOLS = [
           'SVR: 800-1200 dynes·sec/cm⁵ (low in distributive, high in cardiogenic)',
         ]},
     ]},
-  { id: 'sedation', title: 'ICU Sedation & Analgesia', cat: 'Neurology', icon: '💊',
+  { id: 'sedation', title: 'ICU Sedation & Analgesia', cat: 'Neurology', icon: '',
     sections: [
       { heading: 'Pain-First Approach (eCASH)',
         content: [
@@ -116,7 +116,7 @@ const ICU_PROTOCOLS = [
           'Risk factors: age >65, dementia, severity of illness, BZD use, immobility, sleep deprivation',
         ]},
     ]},
-  { id: 'codes', title: 'Cardiac Arrest / ACLS', cat: 'Emergency', icon: '🚨',
+  { id: 'codes', title: 'Cardiac Arrest / ACLS', cat: 'Emergency', icon: '',
     sections: [
       { heading: 'Shockable Rhythms (VF / pVT)',
         content: [
@@ -168,7 +168,7 @@ export default function CriticalCareProtocolsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🏥 Critical Care Protocols</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Critical Care Protocols</h2>
         <p className="text-xs opacity-40 mt-0.5">ICU management references</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Layers, CheckSquare, TrendingUp, Award, Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -69,7 +69,7 @@ Be specific, motivating, and educational. Max 200 words.`,
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar scroll-content p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-black flex items-center gap-2">📊 Progress Report</h2>
+        <h2 className="text-xl font-black flex items-center gap-2"> Progress Report</h2>
         <div className="flex gap-1.5">
           {PERIODS.map(p => (
             <button key={p.id} onClick={() => { setPeriod(p.id); setAiReport(''); setShowAiReport(false); }}
@@ -168,7 +168,7 @@ Be specific, motivating, and educational. Max 200 words.`,
             className="glass px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1.5"
             style={{ color: 'var(--accent)', border: '1px solid var(--accent)/30' }}>
             {generating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-            {generating ? 'Writing…' : showAiReport ? '↺ Refresh' : '✨ Generate'}
+            {generating ? 'Writing…' : showAiReport ? '↺ Refresh' : ' Generate'}
           </button>
         </div>
         {showAiReport && (

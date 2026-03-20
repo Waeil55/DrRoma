@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { X, RotateCcw } from 'lucide-react';
 
 export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
@@ -63,18 +63,18 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
   if (done) return (
     <div className="fixed inset-0 z-[9900] flex flex-col items-center justify-center gap-6 p-6"
       style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)' }}>
-      <div className="text-6xl">🎉</div>
+      <div className="text-6xl"></div>
       <div className="text-center">
         <h2 className="text-3xl font-black">Done!</h2>
         <p className="opacity-50 mt-2">{set.title} — {cards.length} cards</p>
       </div>
       <div className="flex gap-8">
         <div className="text-center">
-          <div className="text-3xl font-black" style={{ color: '#10b981' }}>✓ {results.know}</div>
+          <div className="text-3xl font-black" style={{ color: '#10b981' }}> {results.know}</div>
           <div className="text-xs opacity-40 mt-1">Know it</div>
         </div>
         <div className="text-center">
-          <div className="text-3xl font-black" style={{ color: '#ef4444' }}>✗ {results.dontKnow}</div>
+          <div className="text-3xl font-black" style={{ color: '#ef4444' }}> {results.dontKnow}</div>
           <div className="text-xs opacity-40 mt-1">Review</div>
         </div>
       </div>
@@ -97,8 +97,8 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
           <p className="text-sm font-black">{idx + 1} / {cards.length}</p>
         </div>
         <div className="text-right">
-          <div className="text-xs font-black" style={{ color: '#10b981' }}>✓ {results.know}</div>
-          <div className="text-xs font-black" style={{ color: '#ef4444' }}>✗ {results.dontKnow}</div>
+          <div className="text-xs font-black" style={{ color: '#10b981' }}> {results.know}</div>
+          <div className="text-xs font-black" style={{ color: '#ef4444' }}> {results.dontKnow}</div>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
           }}>
           <div className="glass rounded-3xl p-8 min-h-[280px] flex flex-col items-center justify-center text-center"
             style={{ border: '1px solid var(--border)', background: flipped ? 'var(--accent)/10' : 'var(--card,var(--surface))' }}>
-            <div className="text-xs font-black uppercase tracking-widest opacity-30 mb-6">{flipped ? '💡 Answer' : '❓ Question'}</div>
+            <div className="text-xs font-black uppercase tracking-widest opacity-30 mb-6">{flipped ? ' Answer' : ' Question'}</div>
             <p className="text-lg font-bold leading-relaxed mb-6">{flipped ? (curr.a || curr.back) : (curr.q || curr.front)}</p>
             {!flipped && <p className="text-xs opacity-30">Tap to reveal</p>}
           </div>
@@ -143,7 +143,7 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
       <div className="px-8 pb-safe pb-8 pt-4 shrink-0 flex gap-6 justify-center">
         <button onClick={() => advance(false)}
           className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-90"
-          style={{ background: '#ef444420', border: '2px solid #ef4444', color: '#ef4444', fontSize: 24 }}>✗</button>
+          style={{ background: '#ef444420', border: '2px solid #ef4444', color: '#ef4444', fontSize: 24 }}></button>
         <button onClick={() => setFlipped(p => !p)}
           className="w-16 h-16 rounded-full flex items-center justify-center glass"
           style={{ border: '1px solid var(--border)' }}>
@@ -151,7 +151,7 @@ export default function FlashcardTinderMode({ set, onClose, onUpdate }) {
         </button>
         <button onClick={() => advance(true)}
           className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-90"
-          style={{ background: '#10b98120', border: '2px solid #10b981', color: '#10b981', fontSize: 24 }}>✓</button>
+          style={{ background: '#10b98120', border: '2px solid #10b981', color: '#10b981', fontSize: 24 }}></button>
       </div>
     </div>
   );

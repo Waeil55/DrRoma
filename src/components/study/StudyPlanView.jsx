@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -59,7 +59,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
         parsed.examDate = examDate;
         setPlan(parsed);
         localStorage.setItem('mariam_study_plan', JSON.stringify(parsed));
-        addToast('Study plan generated ✓', 'success');
+        addToast('Study plan generated ', 'success');
       } else throw new Error('Invalid JSON response');
     } catch (e) { addToast('Plan generation failed: ' + e.message, 'error'); }
     setGenerating(false);
@@ -69,7 +69,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-black text-xl flex items-center gap-2">📅 Study Plan</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Study Plan</h2>
           {plan && <button onClick={() => { setPlan(null); localStorage.removeItem('mariam_study_plan'); }} className="text-xs opacity-40 hover:opacity-70">Clear</button>}
         </div>
         <p className="text-xs opacity-40">AI-powered personalized study schedule</p>
@@ -143,7 +143,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
               <div className="relative z-10">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <h3 className="font-black">📋 Your Study Plan</h3>
+                    <h3 className="font-black"> Your Study Plan</h3>
                     {plan.examDate && <p className="text-xs opacity-40 mt-0.5">Exam: {new Date(plan.examDate).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>}
                   </div>
                   <button onClick={generate} disabled={generating} className="glass px-3 py-1.5 rounded-xl text-xs font-black shrink-0" style={{ color: 'var(--accent)' }}>
@@ -208,7 +208,7 @@ Create ${Math.min(4, Math.ceil(daysUntil / 7))} weeks. Keep tasks realistic.`,
                 <div className="space-y-2">
                   {plan.tips.map((tip, i) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
-                      <span style={{ color: 'var(--accent)' }}>💡</span>
+                      <span style={{ color: 'var(--accent)' }}></span>
                       <span className="opacity-70 leading-relaxed">{tip}</span>
                     </div>
                   ))}

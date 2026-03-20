@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+﻿import React, { useState, useMemo, useRef } from 'react';
 import { X, GripVertical } from 'lucide-react';
 
 export default function QuickReviewWidget({ flashcards, setFlashcards, onClose }) {
@@ -48,7 +48,7 @@ export default function QuickReviewWidget({ flashcards, setFlashcards, onClose }
   if (dueCards.length === 0 || done) return (
     <div className="fixed z-[9800] bottom-28 right-4 glass rounded-2xl p-4 shadow-2xl animate-scale-in" style={{ border: '1px solid var(--border)', minWidth: 200 }}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-black">{done ? '✅ All done!' : '🎉 No cards due!'}</span>
+        <span className="text-sm font-black">{done ? ' All done!' : ' No cards due!'}</span>
         <button onClick={onClose}><X size={14} /></button>
       </div>
       <p className="text-xs opacity-40">Come back later for more reviews</p>

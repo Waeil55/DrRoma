@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — TutorChat
  * Streaming AI tutor chat with voice input — used inside document reader & study views.
  */
@@ -50,7 +50,7 @@ export default function TutorChat({ context, settings, contextLabel = '' }) {
       const hist = newMsgs.slice(-20).map(m => `${m.role === 'user' ? 'STUDENT' : 'TUTOR'}: ${m.content}`).join('\n');
       const prompt = `Expert tutor. Document context:\n${JSON.stringify(context, null, 2)}\n\nConversation:\n${hist}\n\nStudent: ${msg}\n\nAnswer concisely but completely.`;
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk }]); }, settings, 3000);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `⚠️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: ` ${e.message}` }]); }
     finally { setLoading(false); }
   };
 

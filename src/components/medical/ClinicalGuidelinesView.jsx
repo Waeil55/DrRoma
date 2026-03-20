@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown, ChevronLeft } from 'lucide-react';
 
 const CLINICAL_GUIDELINES = [
@@ -76,7 +76,7 @@ export default function ClinicalGuidelinesView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">📋 Clinical Guidelines</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Clinical Guidelines</h2>
         <p className="text-xs opacity-40 mt-0.5">Evidence-based management protocols</p>
         {!active && (
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search guidelines…"
@@ -117,7 +117,7 @@ export default function ClinicalGuidelinesView() {
 
             {/* Key points */}
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-              <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>💡 Key Points</h3>
+              <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Key Points</h3>
               <div className="space-y-2">
                 {active.keyPoints.map((kp, i) => (
                   <div key={i} className="flex gap-2 text-xs">

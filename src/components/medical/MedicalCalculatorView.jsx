@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const CALCULATORS = [
   {
-    id: 'gfr', title: 'eGFR (CKD-EPI)', category: 'Nephrology', icon: '🩺',
+    id: 'gfr', title: 'eGFR (CKD-EPI)', category: 'Nephrology', icon: '',
     desc: 'Estimated Glomerular Filtration Rate using CKD-EPI 2021 formula',
     fields: [
       { key: 'creatinine', label: 'Serum Creatinine', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
@@ -24,7 +24,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'bmi', title: 'BMI', category: 'General', icon: '⚖️',
+    id: 'bmi', title: 'BMI', category: 'General', icon: '',
     desc: 'Body Mass Index with classification',
     fields: [
       { key: 'weight', label: 'Weight', unit: 'kg', type: 'number', min: 1, step: 0.1, placeholder: '70' },
@@ -40,7 +40,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'chadsvasc', title: 'CHA₂DS₂-VASc', category: 'Cardiology', icon: '❤️',
+    id: 'chadsvasc', title: 'CHA₂DS₂-VASc', category: 'Cardiology', icon: '',
     desc: 'Stroke risk in non-valvular atrial fibrillation',
     fields: [
       { key: 'chf', label: 'Congestive Heart Failure', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
@@ -62,7 +62,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'wells_dvt', title: 'Wells DVT Score', category: 'Hematology', icon: '🦵',
+    id: 'wells_dvt', title: 'Wells DVT Score', category: 'Hematology', icon: '',
     desc: 'Pre-test probability for deep vein thrombosis',
     fields: [
       { key: 'cancer', label: 'Active cancer', unit: '', type: 'select', options: ['No (0)', 'Yes (+1)'] },
@@ -85,7 +85,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'sofa', title: 'SOFA Score', category: 'Critical Care', icon: '🏥',
+    id: 'sofa', title: 'SOFA Score', category: 'Critical Care', icon: '',
     desc: 'Sequential Organ Failure Assessment — sepsis severity',
     fields: [
       { key: 'pf', label: 'PaO₂/FiO₂ ratio', unit: '', type: 'select', options: ['≥400 (0)', '300–399 (+1)', '200–299 (+2)', '100–199 (+3)', '<100 (+4)'] },
@@ -103,7 +103,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'glasgow', title: 'Glasgow Coma Scale', category: 'Neurology', icon: '🧠',
+    id: 'glasgow', title: 'Glasgow Coma Scale', category: 'Neurology', icon: '',
     desc: 'Neurological status — eye, verbal, motor',
     fields: [
       { key: 'eye', label: 'Eye Opening', unit: '', type: 'select', options: ['Spontaneous (4)', 'To voice (3)', 'To pain (2)', 'None (1)'] },
@@ -118,7 +118,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'meld', title: 'MELD Score', category: 'Gastroenterology', icon: '🫀',
+    id: 'meld', title: 'MELD Score', category: 'Gastroenterology', icon: '',
     desc: 'Model for End-Stage Liver Disease — liver transplant priority',
     fields: [
       { key: 'bili', label: 'Bilirubin', unit: 'mg/dL', type: 'number', min: 0.1, step: 0.1, placeholder: '1.0' },
@@ -138,7 +138,7 @@ const CALCULATORS = [
     },
   },
   {
-    id: 'apgar', title: 'APGAR Score', category: 'Pediatrics', icon: '👶',
+    id: 'apgar', title: 'APGAR Score', category: 'Pediatrics', icon: '',
     desc: 'Newborn health assessment at 1 and 5 minutes',
     fields: [
       { key: 'activity', label: 'Muscle Tone (Activity)', unit: '', type: 'select', options: ['Limp (0)', 'Some flexion (1)', 'Active motion (2)'] },
@@ -182,7 +182,7 @@ export default function MedicalCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl mb-3 flex items-center gap-2">🩺 Medical Calculators</h2>
+        <h2 className="font-black text-xl mb-3 flex items-center gap-2"> Medical Calculators</h2>
         <div className="flex gap-2 overflow-x-auto pb-1">
           {categories.map(c => (
             <button key={c} onClick={() => { setCategory(c); setActiveCalc(null); }}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const PROCEDURE_CHECKLISTS = [
@@ -95,7 +95,7 @@ export default function ProcedureChecklistView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">✅ Procedure Checklists</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Procedure Checklists</h2>
         <p className="text-xs opacity-40 mt-0.5">Step-by-step clinical procedures</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -119,7 +119,7 @@ export default function ProcedureChecklistView() {
 
             {/* Equipment */}
             <div className="glass rounded-2xl p-4" style={{ border: '1px solid var(--border)' }}>
-              <h3 className="text-xs font-black uppercase tracking-widest opacity-40 mb-3">🧰 Equipment</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest opacity-40 mb-3"> Equipment</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {active.equipment.map((eq, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs py-1">
@@ -155,7 +155,7 @@ export default function ProcedureChecklistView() {
             {/* Pearls */}
             {active.pearls?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>💎 Clinical Pearls</h3>
+                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Clinical Pearls</h3>
                 {active.pearls.map((p, i) => <div key={i} className="flex gap-2 text-xs py-1"><span style={{ color: '#f59e0b' }}>▸</span><span className="opacity-70 leading-relaxed">{p}</span></div>)}
               </div>
             )}

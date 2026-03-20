@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — CasePlayer Component
  * Three-panel clinical case player: Vignette/Q + Lab Results + AI Tutor
  */
@@ -123,10 +123,10 @@ export default function CasePlayer({ caseSet, settings, addToast, AiTutorPanel }
                 <ChevronRight size={20} />Next Case
               </button>
             ) : (
-              <button onClick={() => addToast('All cases complete! 🏆', 'success')}
+              <button onClick={() => addToast('All cases complete! ', 'success')}
                 className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl"
                 style={{ background: 'var(--success)' }}>
-                Finish Session 🎉
+                Finish Session 
               </button>
             )}
           </div>

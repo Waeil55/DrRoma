@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { FileUp, Sparkles, Brain, Eye, EyeOff } from 'lucide-react';
 
 export default function OnboardingFlow({ onComplete, settings, setSettings }) {
@@ -8,11 +8,11 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
   const [showKey, setShowKey] = useState(false);
 
   const STEPS = [
-    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: '👩‍⚕️' },
-    { title: "What's your name?", subtitle: 'Personalize your experience', emoji: '✏️' },
-    { title: 'Connect Your AI', subtitle: 'Add an API key to unlock AI features', emoji: '🔑' },
-    { title: 'How it works', subtitle: 'Upload → Generate → Study', emoji: '🚀' },
-    { title: "You're all set!", subtitle: 'Start your learning journey', emoji: '🎉' },
+    { title: 'Welcome to MARIAM PRO', subtitle: 'Your AI-powered medical study companion', emoji: '‍' },
+    { title: "What's your name?", subtitle: 'Personalize your experience', emoji: '' },
+    { title: 'Connect Your AI', subtitle: 'Add an API key to unlock AI features', emoji: '' },
+    { title: 'How it works', subtitle: 'Upload → Generate → Study', emoji: '' },
+    { title: "You're all set!", subtitle: 'Start your learning journey', emoji: '' },
   ];
 
   const s = STEPS[step];
@@ -88,7 +88,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
 
         {step === 4 && (
           <div className="grid grid-cols-2 gap-3 w-full">
-            {[['📄 Docs', 'PDF & Word support'], ['🃏 Cards', 'FSRS spaced repetition'], ['📝 Exams', 'AI-generated tests'], ['🎙️ Voice', 'AI voice tutor']].map(([title, desc]) => (
+            {[[' Docs', 'PDF & Word support'], [' Cards', 'FSRS spaced repetition'], [' Exams', 'AI-generated tests'], [' Voice', 'AI voice tutor']].map(([title, desc]) => (
               <div key={title} className="glass rounded-2xl p-4 text-center" style={{ border: '1px solid var(--border)' }}>
                 <p className="font-black text-sm">{title}</p>
                 <p className="text-xs opacity-40 mt-1">{desc}</p>
@@ -100,7 +100,7 @@ export default function OnboardingFlow({ onComplete, settings, setSettings }) {
         <div className="flex gap-3 w-full">
           {step > 0 && <button onClick={() => setStep(s => s - 1)} className="flex-1 glass py-3 rounded-2xl font-black" style={{ border: '1px solid var(--border)' }}>Back</button>}
           <button onClick={next} className="flex-1 btn-accent py-3 rounded-2xl font-black">
-            {step === STEPS.length - 1 ? "Let's Go! 🚀" : 'Continue →'}
+            {step === STEPS.length - 1 ? "Let's Go! " : 'Continue →'}
           </button>
         </div>
 

@@ -1,14 +1,14 @@
-/**
+﻿/**
  * MARIAM PRO — Rating Buttons Component
  * FSRS rating buttons (Again/Hard/Good/Easy) for flashcard review.
  */
 import React from 'react';
 
 const RATINGS = [
-  ['Again', 0, '#ef4444', '🔁'],
-  ['Hard',  2, '#f59e0b', '😓'],
-  ['Good',  3, '#3b82f6', '👍'],
-  ['Easy',  5, '#10b981', '⚡'],
+  ['Again', 0, '#ef4444', ''],
+  ['Hard',  2, '#f59e0b', ''],
+  ['Good',  3, '#3b82f6', ''],
+  ['Easy',  5, '#10b981', ''],
 ];
 
 export default function RatingButtons({ onRate, flipped, onShowAnswer }) {

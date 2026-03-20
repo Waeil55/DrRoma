@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — QuickGenerateModal
  * Generate flashcards / exams / cases from any document.
  * Supports library pick or file upload, page range, count (1-1000), difficulty.
@@ -77,19 +77,19 @@ export default function QuickGenerateModal({
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
           title: `Cards — ${activeDoc.name.slice(0, 30)}`, cards, createdAt: now
         }]);
-        addToast(`${cards.length} flashcards saved! ⚡`, 'success');
+        addToast(`${cards.length} flashcards saved! `, 'success');
       } else if (type === 'exam') {
         setExams(p => [...p, {
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
           title: `Exam — ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
         }]);
-        addToast(`${data.length} exam questions saved! ⚡`, 'success');
+        addToast(`${data.length} exam questions saved! `, 'success');
       } else if (type === 'cases') {
         setCases(p => [...p, {
           id: taskId, docId: activeDoc.id, sourcePages: `${sp}-${ep}`,
           title: `Cases — ${activeDoc.name.slice(0, 30)}`, questions: data, createdAt: now
         }]);
-        addToast(`${data.length} cases saved! ⚡`, 'success');
+        addToast(`${data.length} cases saved! `, 'success');
       }
       bgClear(tid);
     };
@@ -256,7 +256,7 @@ export default function QuickGenerateModal({
                   className={`py-2.5 rounded-xl text-xs font-black border transition-all
                     ${difficulty === i + 1 ? 'text-white border-transparent shadow-md' : 'glass border-[color:var(--border2,var(--border))] opacity-60 hover:opacity-100'}`}
                   style={difficulty === i + 1 ? { background: ['#10b981', '#f59e0b', '#ef4444'][i] } : {}}>
-                  {['🟢', '🟡', '🔴'][i]} {l}
+                  {['', '', ''][i]} {l}
                 </button>
               ))}
             </div>

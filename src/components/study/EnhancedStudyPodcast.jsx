@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Zap, Loader2, Play, Square, Trash2, Volume2 } from 'lucide-react';
 import { callAIStreaming } from '../../services/ai/callAIStreaming';
 
@@ -53,7 +53,7 @@ export default function EnhancedStudyPodcast({ flashcards, exams, settings, addT
         id: Date.now().toString(), title: set.title, script, chapters,
         createdAt: Date.now(), setId: set.id, setTitle: set.title
       }, ...p]);
-      addToast('Podcast generated ✓', 'success');
+      addToast('Podcast generated ', 'success');
     } catch (e) { addToast('Failed: ' + e.message, 'error'); }
     setGenerating(false);
   };

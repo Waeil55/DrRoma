@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const ANATOMY_SYSTEMS = [
-  { id: 'cardiac', name: 'Heart & Great Vessels', icon: '❤️',
+  { id: 'cardiac', name: 'Heart & Great Vessels', icon: '',
     structures: [
       { name: 'Right Atrium', details: 'Receives deoxygenated blood from SVC, IVC, coronary sinus. SA node (pacemaker) located here. Tricuspid valve → RV.' },
       { name: 'Right Ventricle', details: 'Pumps to pulmonary artery via pulmonic valve. Wall thinner than LV (low-pressure circuit). Moderator band = landmark.' },
@@ -18,7 +18,7 @@ const ANATOMY_SYSTEMS = [
       'Beck triad (tamponade): hypotension, JVD, muffled heart sounds',
       'Atrial fibrillation: irregular irregularly, loss of P waves, f waves',
     ]},
-  { id: 'respiratory', name: 'Respiratory System', icon: '🫁',
+  { id: 'respiratory', name: 'Respiratory System', icon: '',
     structures: [
       { name: 'Trachea', details: 'C-shaped cartilage rings. Bifurcates at carina (T4-T5). Right main bronchus: wider, shorter, more vertical → foreign body aspiration.' },
       { name: 'Right Lung', details: '3 lobes (upper, middle, lower), 2 fissures (oblique, horizontal). 10 bronchopulmonary segments. Slightly larger than left.' },
@@ -33,7 +33,7 @@ const ANATOMY_SYSTEMS = [
       'Pleural effusion: dullness to percussion, decreased breath sounds, meniscus on CXR',
       'Phrenic nerve palsy (C3-5): elevated hemidiaphragm on CXR',
     ]},
-  { id: 'neuro', name: 'Central Nervous System', icon: '🧠',
+  { id: 'neuro', name: 'Central Nervous System', icon: '',
     structures: [
       { name: 'Frontal Lobe', details: 'Motor cortex (precentral gyrus), Broca area (speech production, dominant hemisphere), prefrontal cortex (personality, judgment, executive function).' },
       { name: 'Parietal Lobe', details: 'Somatosensory cortex (postcentral gyrus). Spatial awareness, proprioception. Dominant: calculation, language. Non-dominant: neglect syndrome.' },
@@ -51,7 +51,7 @@ const ANATOMY_SYSTEMS = [
       'Wernicke aphasia (receptive): fluent but nonsensical speech, poor comprehension',
       'CN III palsy: "down and out" eye, ptosis, mydriasis — PComm aneurysm until proven otherwise',
     ]},
-  { id: 'gi', name: 'GI & Hepatobiliary', icon: '🫄',
+  { id: 'gi', name: 'GI & Hepatobiliary', icon: '',
     structures: [
       { name: 'Esophagus', details: 'Upper 1/3 skeletal muscle, lower 2/3 smooth. LES prevents reflux. Barrett esophagus: intestinal metaplasia from chronic GERD → ↑ cancer risk.' },
       { name: 'Stomach', details: 'Fundus, body, antrum, pylorus. Parietal cells: HCl + intrinsic factor (B12 absorption). Chief cells: pepsinogen. G cells: gastrin.' },
@@ -76,7 +76,7 @@ export default function AnatomyQuickRefView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🫀 Anatomy Reference</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Anatomy Reference</h2>
         <p className="text-xs opacity-40 mt-0.5">Body systems with clinical correlations</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -99,7 +99,7 @@ export default function AnatomyQuickRefView() {
 
             {active.clinicalCorrelations?.length > 0 && (
               <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}>🏥 Clinical Correlations</h3>
+                <h3 className="font-black text-sm flex items-center gap-2 mb-3" style={{ color: '#f59e0b' }}> Clinical Correlations</h3>
                 {active.clinicalCorrelations.map((cc, i) => (
                   <div key={i} className="flex gap-2 text-xs py-1.5">
                     <span style={{ color: '#f59e0b' }}>▸</span>

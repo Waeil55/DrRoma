@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 function HemodynamicCalculatorView() {
   const [vals, setVals] = useState({ sbp: '', dbp: '', hr: '', cvp: '', co: '', svp: '', map_pa: '', pcwp: '', bsa: '' });
@@ -40,7 +40,7 @@ function HemodynamicCalculatorView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">❤️‍🔥 Hemodynamic Calculator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2">Hemodynamic Calculator</h2>
         <p className="text-xs opacity-40 mt-0.5">MAP, SVR, PVR, cardiac index & shock profiles</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -90,7 +90,7 @@ function HemodynamicCalculatorView() {
         </div>
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid #f59e0b20', background: '#f59e0b05' }}>
-          <h3 className="font-black text-sm mb-2" style={{ color: '#f59e0b' }}>📐 Formulas</h3>
+          <h3 className="font-black text-sm mb-2" style={{ color: '#f59e0b' }}> Formulas</h3>
           {[
             'MAP = (SBP + 2×DBP) / 3',
             'SVR = [(MAP - CVP) / CO] × 80    (normal 800-1200)',

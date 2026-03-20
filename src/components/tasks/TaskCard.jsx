@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — TaskCard Component
  * Individual task card with toggle, edit, delete.
  */
@@ -21,7 +21,7 @@ export default function TaskCard({ task, onToggle, onDelete, onEdit }) {
           borderColor: task.done ? 'var(--success)' : PRIORITY_COLORS[task.priority] || 'var(--accent)',
           background: task.done ? 'var(--success)' : 'transparent',
         }}>
-        {task.done && <span className="block w-full h-full flex items-center justify-center text-white text-xs">✓</span>}
+        {task.done && <span className="block w-full h-full flex items-center justify-center text-white text-xs"></span>}
       </button>
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-semibold${task.done ? ' line-through' : ''}`} style={{ color: 'var(--fg)' }}>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — Export to PDF utility
  * Dynamically loads jsPDF from CDN and generates styled PDFs.
  */
@@ -66,7 +66,7 @@ export const exportToPDF = async (type, data, title, addToast) => {
           doc.setFontSize(8.5);
           doc.setTextColor(isCorrect ? 22 : 80, isCorrect ? 163 : 80, isCorrect ? 74 : 80);
           doc.text(`${String.fromCharCode(65 + oi)}. ${opt}`, margin + 3, y);
-          if (isCorrect) { doc.setTextColor(22, 163, 74); doc.text('✓', pageW - margin - 5, y); }
+          if (isCorrect) { doc.setTextColor(22, 163, 74); doc.text('', pageW - margin - 5, y); }
           y += 6.5;
         });
         if (q.explanation) {
@@ -112,7 +112,7 @@ export const exportToPDF = async (type, data, title, addToast) => {
     }
 
     doc.save(`${title.replace(/[^a-zA-Z0-9]/g, '_')}_${type}.pdf`);
-    if (addToast) addToast('PDF exported! 📄', 'success');
+    if (addToast) addToast('PDF exported! ', 'success');
   } catch (e) {
     console.error('PDF export error:', e);
     if (addToast) addToast(`PDF export failed: ${e.message}`, 'error');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function FSRSFlashcardReview({ set, onUpdate, onClose }) {
@@ -25,7 +25,7 @@ export default function FSRSFlashcardReview({ set, onUpdate, onClose }) {
   if (done || !card) return (
     <div className="fixed inset-0 z-[8000] flex flex-col items-center justify-center" style={{ background: 'var(--bg)' }}>
       <div className="glass rounded-3xl p-10 text-center max-w-sm w-full mx-4 animate-scale-in" style={{ border: '1px solid var(--border)' }}>
-        <div className="text-5xl mb-4">🏆</div><h2 className="text-3xl font-black gradient-text mb-2">Session Done!</h2>
+        <div className="text-5xl mb-4"></div><h2 className="text-3xl font-black gradient-text mb-2">Session Done!</h2>
         <p className="text-sm opacity-50 mb-6">{reviewed} cards reviewed</p>
         <button onClick={onClose} className="btn-accent px-8 py-3 rounded-2xl font-black w-full">Continue</button>
       </div>

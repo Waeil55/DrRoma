@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
 const SEV_COLORS = { major: '#ef4444', moderate: '#f59e0b', minor: '#10b981' };
-const SEV_ICONS = { major: '🔴', moderate: '🟡', minor: '🟢' };
+const SEV_ICONS = { major: '', moderate: '', minor: '' };
 
 const QUICK_DRUGS = [
   'Aspirin', 'Warfarin', 'Metformin', 'Lisinopril', 'Amlodipine',
@@ -83,7 +83,7 @@ Be thorough and clinically accurate. Include all relevant interactions.`;
     <div style={{ padding: '1.5rem', maxWidth: 900, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>💊 Drug Interactions</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}> Drug Interactions</h2>
         <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
           AI-powered drug interaction checker
         </p>
@@ -213,7 +213,7 @@ Be thorough and clinically accurate. Include all relevant interactions.`;
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.6rem' }}>
-                <span style={{ fontSize: '1.1rem' }}>{SEV_ICONS[inter.severity] || '⚪'}</span>
+                <span style={{ fontSize: '1.1rem' }}>{SEV_ICONS[inter.severity] || ''}</span>
                 <span style={{ fontWeight: 700, flex: 1, fontSize: '0.95rem' }}>
                   {inter.drugs?.join(' ↔ ')}
                 </span>

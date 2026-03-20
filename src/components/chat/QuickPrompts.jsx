@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — Quick Prompts / Starters
  * Conversation starter cards shown before first message.
  */
@@ -7,12 +7,12 @@ import React from 'react';
 const MARIAM_IMG = 'https://i.ibb.co/gbL3pSCw/mariam.png';
 
 const STARTERS = [
-  { icon: '🧬', text: 'Explain a complex topic' },
-  { icon: '📋', text: 'Create a study plan' },
-  { icon: '❓', text: 'Quiz me on key concepts' },
-  { icon: '🔍', text: 'Compare and contrast' },
-  { icon: '📝', text: 'Summarize main points' },
-  { icon: '💡', text: 'Give me clinical pearls' },
+  { icon: '', text: 'Explain a complex topic' },
+  { icon: '', text: 'Create a study plan' },
+  { icon: '', text: 'Quiz me on key concepts' },
+  { icon: '', text: 'Compare and contrast' },
+  { icon: '', text: 'Summarize main points' },
+  { icon: '', text: 'Give me clinical pearls' },
 ];
 
 export default function QuickPrompts({ onSelect }) {

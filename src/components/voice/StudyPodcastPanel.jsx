@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — StudyPodcastPanel Component
  * AI-generated audio summaries with multi-voice dialogue, chapter markers,
  * speed controls, and Media Session API integration.
@@ -174,7 +174,7 @@ export default function StudyPodcastPanel({ flashcards, settings, addToast, call
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => setDialogueMode(!dialogueMode)}
             className={`px-3 py-1.5 rounded-lg text-xs font-black border transition-all ${dialogueMode ? 'bg-[var(--accent)] text-white border-transparent' : 'glass border-[color:var(--border2,var(--border))] opacity-60'}`}>
-            {dialogueMode ? '🎭 Dialogue Mode' : '🎙️ Solo Mode'}
+            {dialogueMode ? ' Dialogue Mode' : ' Solo Mode'}
           </button>
           {dialogueMode && <span className="text-xs opacity-40">Host + Student conversation</span>}
         </div>

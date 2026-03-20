@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 
 export default function PomodoroWidget({ onComplete }) {
@@ -21,7 +21,7 @@ export default function PomodoroWidget({ onComplete }) {
           setMode(nextMode);
           setSecs(DURATIONS[nextMode]);
           onComplete?.();
-          try { new Notification('MARIAM Timer', { body: mode === 'work' ? '🎉 Break time!' : '📚 Back to work!', icon: '/M.jpeg' }); } catch {}
+          try { new Notification('MARIAM Timer', { body: mode === 'work' ? ' Break time!' : ' Back to work!', icon: '/M.jpeg' }); } catch {}
           return 0;
         }
         return s - 1;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronDown, Trash2 } from 'lucide-react';
 
 const BUILTIN_MNEMONICS = [
@@ -196,7 +196,7 @@ export default function MedicalMnemonicsView({ addToast }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>🧠 Mnemonics</h2>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}> Mnemonics</h2>
           <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
             {filtered.length} mnemonic{filtered.length !== 1 ? 's' : ''}
           </p>

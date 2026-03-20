@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 export default function BloodGasInterpreterView() {
   const [values, setValues] = useState({ ph: '', pco2: '', hco3: '', pao2: '', fio2: '' });
@@ -76,7 +76,7 @@ export default function BloodGasInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🩸 ABG Interpreter</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> ABG Interpreter</h2>
         <p className="text-xs opacity-40 mt-0.5">Systematic arterial blood gas analysis</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -131,7 +131,7 @@ export default function BloodGasInterpreterView() {
         )}
 
         <div className="glass rounded-2xl p-5" style={{ border: '1px solid var(--border)' }}>
-          <h3 className="font-black text-sm mb-3">📋 ABG Interpretation Steps</h3>
+          <h3 className="font-black text-sm mb-3"> ABG Interpretation Steps</h3>
           {[
             'Step 1: Look at pH → Acidemia (<7.35) or Alkalemia (>7.45)?',
             'Step 2: Identify primary disorder → pCO₂ (respiratory) or HCO₃⁻ (metabolic)?',

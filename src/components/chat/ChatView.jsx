@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — ChatView orchestrator
  * Sidebar with sessions (grouped by date, pinned, projects), streaming chat,
  * voice input, starter prompts, context menu, session management, project CRUD.
@@ -14,12 +14,12 @@ import { renderAIContent } from '../../utils/markdown';
 const MARIAM_IMG = 'https://i.ibb.co/kgMwrZG/mariam.png';
 
 const STARTERS = [
-  { icon: '🧬', text: 'Explain a complex topic' },
-  { icon: '📋', text: 'Create a study plan' },
-  { icon: '❓', text: 'Quiz me on key concepts' },
-  { icon: '🔍', text: 'Compare and contrast' },
-  { icon: '📝', text: 'Summarize main points' },
-  { icon: '💡', text: 'Give me clinical pearls' },
+  { icon: '', text: 'Explain a complex topic' },
+  { icon: '', text: 'Create a study plan' },
+  { icon: '', text: 'Quiz me on key concepts' },
+  { icon: '', text: 'Compare and contrast' },
+  { icon: '', text: 'Summarize main points' },
+  { icon: '', text: 'Give me clinical pearls' },
 ];
 
 export default function ChatView({ settings, sessions, setSessions }) {
@@ -141,7 +141,7 @@ EXAMPLE CALLOUT:
       await callAIStreaming(prompt, chunk => { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: chunk, timestamp: Date.now() }]); }, settings, 6000);
       const finalMsgs = [...newMsgs.slice(0, -1), { ...newMsgs[newMsgs.length - 1] }];
       setTimeout(() => saveSession(finalMsgs, sessId), 300);
-    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: `⚠️ ${e.message}` }]); }
+    } catch (e) { setMsgs(p => [...p.slice(0, -1), { role: 'assistant', content: ` ${e.message}` }]); }
     finally { setLoading(false); }
   };
 

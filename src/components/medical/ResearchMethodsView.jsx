@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 
 const RESEARCH_SECTIONS = [
-  { id: 'designs', title: 'Study Designs', icon: '📊',
+  { id: 'designs', title: 'Study Designs', icon: '',
     items: [
       { term: 'Randomized Controlled Trial (RCT)', def: 'Gold standard for determining causality. Random assignment to treatment vs control. Double-blinding reduces bias.', detail: 'Intention-to-treat (ITT): analyze by assigned group regardless of compliance (preserves randomization, more conservative). Per-protocol: analyze only compliant participants (may overestimate effect).', pearl: 'Crossover RCT: each participant serves as own control (two periods) — reduces confounding, needs fewer subjects. Washout period between. Cluster RCT: randomize groups (hospitals, clinics) instead of individuals — used when individual randomization is impractical.' },
       { term: 'Cohort Study', def: 'Observe exposed vs unexposed groups over time → measure outcomes. Prospective (follow forward) or retrospective (use existing records). Measure: Relative Risk (RR).', detail: 'Prospective: expensive, time-consuming, but strong temporal relationship. Retrospective: faster, cheaper, but limited by data quality. RR = incidence in exposed / incidence in unexposed. RR >1 = risk factor, <1 = protective.', pearl: 'Framingham Heart Study = classic prospective cohort. Best for rare exposures (recruit exposed group). NOT good for rare diseases (need huge sample). Attrition bias is major weakness of prospective cohorts.' },
@@ -11,7 +11,7 @@ const RESEARCH_SECTIONS = [
       { term: 'Meta-Analysis / Systematic Review', def: 'Systematic review: comprehensive search + critical appraisal of all studies. Meta-analysis: statistical pooling of results. Highest level of evidence (when includes RCTs).', detail: 'Forest plot: individual study effects + pooled estimate (diamond). Heterogeneity: I² statistic (>50% = substantial heterogeneity). Fixed-effects (assume common true effect) vs random-effects (assume distribution of effects).', pearl: 'Funnel plot: detects publication bias (asymmetry suggests missing small negative studies). GRADE system: rates quality of evidence (high → moderate → low → very low). Cochrane Collaboration = gold standard for systematic reviews.' },
       { term: 'Case Report / Case Series', def: 'Detailed description of unusual cases. No control group, no hypothesis testing. Lowest level of evidence but important for: new diseases, rare presentations, adverse drug reactions.', detail: 'Case series: collection of similar cases. Can suggest new hypotheses. Cannot establish causation, prevalence, or incidence.', pearl: 'AIDS was first identified through a case series (5 young men with PCP in LA, 1981). Case reports remain vital for pharmacovigilance (new drug side effects) and identifying emerging infectious diseases.' },
     ]},
-  { id: 'bias', title: 'Bias & Confounding', icon: '⚠️',
+  { id: 'bias', title: 'Bias & Confounding', icon: '',
     items: [
       { term: 'Selection Bias', def: 'Systematic error in how participants are selected or retained. Study sample does not represent target population.', detail: 'Berkson bias: hospital-based cases have different exposure pattern than general population. Healthy worker effect: employed people are healthier than general population. Volunteer bias: participants differ from non-participants. Attrition/loss to follow-up: drop-outs differ from completers.', pearl: 'Randomization is the best way to reduce selection bias in interventional studies. For observational studies: clearly defined inclusion/exclusion criteria, population-based sampling, adequate follow-up rates (>80%).' },
       { term: 'Information (Measurement) Bias', def: 'Systematic error in how exposure or outcome is measured or classified.', detail: 'Recall bias: differential memory of exposures (case-control studies). Observer bias: knowledge of exposure influences outcome assessment. Misclassification: non-differential (random → biases toward null/no effect) vs differential (systematic → can bias in either direction).', pearl: 'Blinding reduces observer bias. Standardized measurement tools reduce measurement bias. Non-differential misclassification is "conservative" — it makes you LESS likely to find an association that exists.' },
@@ -19,7 +19,7 @@ const RESEARCH_SECTIONS = [
       { term: 'Lead-Time Bias', def: 'Screening detects disease earlier → appears to increase survival time even if treatment doesn\'t change outcome. The patient simply KNOWS longer.', detail: 'Control: use mortality rate (not survival time) as the outcome. Or use randomized screening trial comparing screened vs unscreened groups.', pearl: 'Lead-time bias is the #1 pitfall in evaluating cancer screening programs. Just because 5-year survival improves with screening does NOT mean people live longer — they may just be diagnosed earlier without any true benefit.' },
       { term: 'Length-Time Bias', def: 'Screening preferentially detects slower-growing, less aggressive tumors (they have a longer preclinical phase, so more likely to be caught at screening).', detail: 'Aggressive tumors present between screenings (interval cancers). Screened tumors appear to have better prognosis simply because they are inherently less aggressive.', pearl: 'To truly demonstrate screening benefit: need to show reduction in DISEASE-SPECIFIC MORTALITY in an RCT (randomized to screening vs no screening). Example: mammography screening has shown mortality reduction in RCTs.' },
     ]},
-  { id: 'biostats', title: 'Biostatistics', icon: '📈',
+  { id: 'biostats', title: 'Biostatistics', icon: '',
     items: [
       { term: 'Sensitivity / Specificity', def: 'Sensitivity (Sn): true positive rate = TP/(TP+FN). "SnNOut" — Sensitive test, Negative result rules OUT disease. Specificity (Sp): true negative rate = TN/(TN+FP). "SpPIn" — Specific test, Positive result rules IN disease.', detail: 'Sensitivity and specificity are intrinsic properties of the test (do not change with prevalence). Trade-off: increasing sensitivity usually decreases specificity and vice versa (ROC curve).', pearl: 'Use HIGH SENSITIVITY test for screening (don\'t miss disease). Use HIGH SPECIFICITY test for confirmation (don\'t falsely diagnose). Troponin = high sensitivity for MI (screening). Western blot = high specificity for HIV (confirmatory).' },
       { term: 'PPV / NPV', def: 'PPV: probability of disease given a positive test = TP/(TP+FP). NPV: probability of no disease given a negative test = TN/(TN+FN).', detail: 'PPV and NPV CHANGE with prevalence. As prevalence ↑: PPV ↑, NPV ↓. As prevalence ↓: PPV ↓, NPV ↑. In very low prevalence: even a highly specific test will have many false positives (low PPV).', pearl: 'This is why you don\'t screen the general population for rare diseases (low prevalence → low PPV → too many false positives). Pre-test probability (clinical gestalt) is essentially prevalence for an individual patient — Bayesian reasoning.' },
@@ -38,7 +38,7 @@ export default function ResearchMethodsView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">📚 Research Methods</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Research Methods</h2>
         <p className="text-xs opacity-40 mt-0.5">Study designs, bias & biostatistics</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
@@ -55,7 +55,7 @@ export default function ResearchMethodsView() {
                 {item.detail && <p className="text-xs opacity-50 leading-relaxed">{item.detail}</p>}
                 {item.pearl && (
                   <div className="glass rounded-xl p-3 mt-2 flex items-start gap-2 text-xs" style={{ background: '#3b82f608', border: '1px solid #3b82f620', color: '#3b82f6' }}>
-                    <span>💎</span><span className="leading-relaxed">{item.pearl}</span>
+                    <span></span><span className="leading-relaxed">{item.pearl}</span>
                   </div>
                 )}
               </div>

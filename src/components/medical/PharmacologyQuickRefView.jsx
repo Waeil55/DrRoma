@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const PHARMA_CLASSES = [
@@ -76,7 +76,7 @@ export default function PharmacologyQuickRefView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">💊 Pharmacology</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Pharmacology</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search drug classes…"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -99,7 +99,7 @@ export default function PharmacologyQuickRefView() {
               <button onClick={() => setExpanded(e => e === p.cls ? null : p.cls)}
                 className="w-full p-4 text-left flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                  style={{ background: 'var(--accent)/10' }}>💊</div>
+                  style={{ background: 'var(--accent)/10' }}></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black">{p.cls}</h3>
                   <p className="text-xs opacity-40 mt-0.5">{p.cat} · {p.drugs.length} drugs</p>
@@ -122,23 +122,23 @@ export default function PharmacologyQuickRefView() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">✅ Indications</h4>
+                      <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2"> Indications</h4>
                       <div className="space-y-1">{p.indications.map(ind => <div key={ind} className="flex gap-2 text-xs"><span style={{ color: '#10b981' }}>•</span><span className="opacity-70">{ind}</span></div>)}</div>
                     </div>
                     <div>
-                      <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">⚠️ Side Effects</h4>
+                      <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2"> Side Effects</h4>
                       <div className="space-y-1">{p.sideEffects.map(se => <div key={se} className="flex gap-2 text-xs"><span style={{ color: '#f59e0b' }}>•</span><span className="opacity-70">{se}</span></div>)}</div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2">🚫 Contraindications</h4>
+                    <h4 className="text-xs font-black uppercase tracking-widest opacity-40 mb-2"> Contraindications</h4>
                     <div className="space-y-1">{p.contraindications.map(ci => <div key={ci} className="flex gap-2 text-xs"><span style={{ color: '#ef4444' }}>•</span><span className="opacity-70">{ci}</span></div>)}</div>
                   </div>
 
                   {p.pearls?.length > 0 && (
                     <div className="glass rounded-xl p-3" style={{ background: '#f59e0b08', border: '1px solid #f59e0b20' }}>
-                      <h4 className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#f59e0b' }}>💎 High-Yield Pearls</h4>
+                      <h4 className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: '#f59e0b' }}> High-Yield Pearls</h4>
                       {p.pearls.map((pearl, i) => <p key={i} className="text-xs opacity-70 leading-relaxed mt-1">{pearl}</p>)}
                     </div>
                   )}

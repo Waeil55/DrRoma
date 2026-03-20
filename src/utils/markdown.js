@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — Markdown Rendering Utilities
  * Extracts renderMdInline, renderMarkdown, UiTable, UiFlowchart,
  * UiCallout, and renderAIContent from App.jsx for reuse.
@@ -160,10 +160,10 @@ export const UiFlowchart = ({ html }) => {
 /* ── UI Callout Component ── */
 export const UiCallout = ({ type, children }) => {
   const map = {
-    warning: { bg: 'rgba(245,158,11,.1)', border: 'rgba(245,158,11,.35)', color: '#f59e0b', icon: '⚠️' },
-    info:    { bg: 'rgba(14,165,233,.1)',  border: 'rgba(14,165,233,.35)', color: '#0ea5e9', icon: 'ℹ️' },
-    success: { bg: 'rgba(16,185,129,.1)',  border: 'rgba(16,185,129,.35)', color: '#10b981', icon: '✅' },
-    danger:  { bg: 'rgba(244,63,94,.08)',  border: 'rgba(244,63,94,.35)', color: '#f43f5e', icon: '🚨' },
+    warning: { bg: 'rgba(245,158,11,.1)', border: 'rgba(245,158,11,.35)', color: '#f59e0b', icon: '' },
+    info:    { bg: 'rgba(14,165,233,.1)',  border: 'rgba(14,165,233,.35)', color: '#0ea5e9', icon: '' },
+    success: { bg: 'rgba(16,185,129,.1)',  border: 'rgba(16,185,129,.35)', color: '#10b981', icon: '' },
+    danger:  { bg: 'rgba(244,63,94,.08)',  border: 'rgba(244,63,94,.35)', color: '#f43f5e', icon: '' },
   };
   const s = map[type] || map.info;
   return (

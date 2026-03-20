@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Trophy, CalendarClock } from 'lucide-react';
 
 export default function CalendarView({ flashcards, exams, tasks }) {
@@ -30,9 +30,9 @@ export default function CalendarView({ flashcards, exams, tasks }) {
   const eventMap = useMemo(() => {
     const map = {};
     const add = (dateMs, evt) => { if (!dateMs) return; const d = new Date(dateMs); const key = dateKey(d); if (!map[key]) map[key] = []; map[key].push(evt); };
-    (flashcards || []).forEach(set => (set.cards || []).forEach(c => { if (c.nextReview) add(c.nextReview, { type: 'fsrs', label: `📚 ${set.title?.slice(0,20)}`, color: 'var(--accent)', time: c.nextReview }); }));
-    (exams || []).forEach(ex => { if (ex.scheduledAt) add(ex.scheduledAt, { type: 'exam', label: `📝 ${ex.title?.slice(0,20)}`, color: 'var(--danger)', time: ex.scheduledAt }); });
-    (tasks || []).forEach(t => { if (t.dueDate) add(new Date(t.dueDate).getTime(), { type: 'task', label: `✅ ${(t.title || t.text)?.slice(0,20)}`, color: 'var(--success)', time: new Date(t.dueDate).getTime() }); });
+    (flashcards || []).forEach(set => (set.cards || []).forEach(c => { if (c.nextReview) add(c.nextReview, { type: 'fsrs', label: ` ${set.title?.slice(0,20)}`, color: 'var(--accent)', time: c.nextReview }); }));
+    (exams || []).forEach(ex => { if (ex.scheduledAt) add(ex.scheduledAt, { type: 'exam', label: ` ${ex.title?.slice(0,20)}`, color: 'var(--danger)', time: ex.scheduledAt }); });
+    (tasks || []).forEach(t => { if (t.dueDate) add(new Date(t.dueDate).getTime(), { type: 'task', label: ` ${(t.title || t.text)?.slice(0,20)}`, color: 'var(--success)', time: new Date(t.dueDate).getTime() }); });
     return map;
   }, [flashcards, exams, tasks]);
 
@@ -97,7 +97,7 @@ export default function CalendarView({ flashcards, exams, tasks }) {
             <Trophy size={18} style={{ color: urgencyColor, flexShrink: 0 }} />
             <div className="flex-1 text-left">
               <span className="font-black text-sm" style={{ color: urgencyColor }}>
-                {daysLeft > 0 ? `${daysLeft} day${daysLeft === 1 ? '' : 's'} to Boards` : daysLeft === 0 ? 'Boards Today! 🏆' : 'Boards date passed'}
+                {daysLeft > 0 ? `${daysLeft} day${daysLeft === 1 ? '' : 's'} to Boards` : daysLeft === 0 ? 'Boards Today! ' : 'Boards date passed'}
               </span>
               <span className="text-xs opacity-60 ml-2">{new Date(examDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
             </div>
@@ -123,10 +123,10 @@ export default function CalendarView({ flashcards, exams, tasks }) {
                   </div>
                   <div className="rounded-xl px-3 py-2.5 text-xs space-y-1" style={{ background: 'var(--card)' }}>
                     <div className="font-bold opacity-70 mb-1">Daily Plan</div>
-                    <div>📚 Review <strong>{cardsPerDay}</strong> flashcards</div>
-                    {daysLeft > 7 && <div>📝 1 practice exam section/week</div>}
-                    {daysLeft <= 7 && <div>🔥 Full mock exam today + weak areas</div>}
-                    <div>💬 Ask tutor about unclear topics</div>
+                    <div> Review <strong>{cardsPerDay}</strong> flashcards</div>
+                    {daysLeft > 7 && <div> 1 practice exam section/week</div>}
+                    {daysLeft <= 7 && <div> Full mock exam today + weak areas</div>}
+                    <div> Ask tutor about unclear topics</div>
                   </div>
                   {/* Progress bar */}
                   <div>
@@ -139,13 +139,13 @@ export default function CalendarView({ flashcards, exams, tasks }) {
                   </div>
                 </>
               ) : (
-                <p className="text-center opacity-60 py-4 text-sm">{daysLeft === 0 ? '🎓 Good luck today!' : '🏁 Set a new exam date below.'}</p>
+                <p className="text-center opacity-60 py-4 text-sm">{daysLeft === 0 ? ' Good luck today!' : ' Set a new exam date below.'}</p>
               )}
               <div className="flex items-center gap-2">
                 <label className="text-xs opacity-60 shrink-0">Change date:</label>
                 <input type="date" value={examDate} onChange={e => saveExamDate(e.target.value)}
                   className="flex-1 rounded-xl px-3 py-1.5 text-xs" style={{ background: 'var(--card)', color: 'var(--text)', border: '1px solid var(--border)' }} />
-                <button onClick={() => { saveExamDate(''); setCdExpanded(false); }} className="text-xs opacity-50 hover:opacity-80 px-2">✕</button>
+                <button onClick={() => { saveExamDate(''); setCdExpanded(false); }} className="text-xs opacity-50 hover:opacity-80 px-2"></button>
               </div>
             </div>
           )}

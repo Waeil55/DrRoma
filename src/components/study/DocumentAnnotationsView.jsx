@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { Bookmark, FileText, PenLine, Trash2 } from 'lucide-react';
 
 export default function DocumentAnnotationsView({ docs, notes, setNotes, addToast, setView, setActiveId }) {
@@ -20,7 +20,7 @@ export default function DocumentAnnotationsView({ docs, notes, setNotes, addToas
   const updateAnnotation = (id) => {
     setNotes(p => p.map(n => n.id === id ? { ...n, content: editText, updatedAt: Date.now() } : n));
     setEditId(null);
-    addToast('Annotation updated ✓', 'success');
+    addToast('Annotation updated ', 'success');
   };
 
   const deleteAnnotation = (id) => {
@@ -39,7 +39,7 @@ export default function DocumentAnnotationsView({ docs, notes, setNotes, addToas
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <h2 className="font-black text-xl flex items-center gap-2">📌 Annotations</h2>
+          <h2 className="font-black text-xl flex items-center gap-2"> Annotations</h2>
           <span className="text-xs opacity-40">{annotations.length} total</span>
         </div>
         <input value={search} onChange={e => setSearch(e.target.value)}

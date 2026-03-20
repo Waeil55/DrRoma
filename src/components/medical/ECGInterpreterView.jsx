@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const ECG_RHYTHMS = [
@@ -62,7 +62,7 @@ export default function ECGInterpreterView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0 space-y-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">💓 ECG Interpreter</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> ECG Interpreter</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search rhythms…"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -84,7 +84,7 @@ export default function ECGInterpreterView() {
               <button onClick={() => setExpanded(e => e === ecg.name ? null : ecg.name)}
                 className="w-full p-4 text-left flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-                  style={{ background: catColor(ecg.cat) + '15' }}>💓</div>
+                  style={{ background: catColor(ecg.cat) + '15' }}></div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-black text-sm">{ecg.name}</h3>
                   <p className="text-xs opacity-40 mt-0.5">{ecg.cat} · Rate: {ecg.rate} · {ecg.regularity}</p>

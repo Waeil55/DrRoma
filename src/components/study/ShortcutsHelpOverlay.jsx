@@ -24,7 +24,7 @@ export default function ShortcutsHelpOverlay({ onClose }) {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)' }} onClick={onClose}>
       <div className="glass rounded-3xl p-6 max-w-md w-full animate-scale-in" style={{ border: '1px solid var(--border)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-black text-xl flex items-center gap-2">⌨️ Keyboard Shortcuts</h2>
+          <h2 className="font-black text-xl flex items-center gap-2">Keyboard Shortcuts</h2>
           <button onClick={onClose} className="w-8 h-8 glass rounded-xl flex items-center justify-center opacity-50"><X size={14} /></button>
         </div>
         {groups.map(group => (

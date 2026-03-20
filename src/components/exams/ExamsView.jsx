@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — ExamsView orchestrator
  * Switches between exam list, active exam, score screen, and review mode.
  * Includes inline AI tutor panel with draggable width.
@@ -109,7 +109,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
             </div>
             {submitted && q.explanation && (
               <div className="rounded-2xl p-5 animate-slide-up" style={{ background: 'var(--info-bg)', border: '1px solid var(--info-border)', borderLeft: '4px solid var(--info)' }}>
-                <p className="text-xs font-black mb-2 uppercase tracking-widest" style={{ color: 'var(--info)' }}>📖 Explanation</p>
+                <p className="text-xs font-black mb-2 uppercase tracking-widest" style={{ color: 'var(--info)' }}> Explanation</p>
                 <p className="text-sm leading-relaxed">{q.explanation}</p>
                 {q.evidence && <p className="text-xs italic mt-3 pt-3 border-t opacity-50" style={{ borderColor: 'var(--border2,var(--border))' }}>"{q.evidence}"</p>}
               </div>
@@ -119,7 +119,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
                 <button onClick={submit} disabled={selected === null} className="w-full py-4 btn-accent rounded-2xl text-base font-black disabled:opacity-40 shadow-xl">Submit Answer</button> :
                 qi < selEx.questions.length - 1 ?
                   <button onClick={next} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">Next Question →</button> :
-                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); const xpGain = XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct; awardXP(xpGain); addToast(`+${xpGain} XP 📝`, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
+                  <button onClick={() => { const sc = answers.filter(a => a.correct).length; setScore(sc); trackStudy('exam', sc, selEx.questions.length); const xpGain = XP_TABLE.exam_completed + sc * XP_TABLE.exam_correct; awardXP(xpGain); addToast(`+${xpGain} XP `, 'success'); }} className="w-full py-4 btn-accent rounded-2xl text-base font-black shadow-xl">See Results →</button>
               }
             </div>
             <div className="lg:hidden mt-4 flex-shrink-0">
@@ -197,7 +197,7 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
     const pct = Math.round((score / selEx.questions.length) * 100);
     const grade = pct >= 90 ? 'A' : pct >= 80 ? 'B' : pct >= 70 ? 'C' : pct >= 60 ? 'D' : 'F';
     const scoreColor = pct >= 80 ? 'var(--success)' : pct >= 60 ? 'var(--warning)' : 'var(--danger)';
-    const scoreMsg = pct >= 90 ? 'Outstanding! 🏆' : pct >= 80 ? 'Excellent work! 🎉' : pct >= 70 ? 'Good effort! 📚' : pct >= 60 ? 'Keep studying 💪' : 'More review needed 🔁';
+    const scoreMsg = pct >= 90 ? 'Outstanding! ' : pct >= 80 ? 'Excellent work! ' : pct >= 70 ? 'Good effort! ' : pct >= 60 ? 'Keep studying ' : 'More review needed ';
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6 bg-mesh">
         <div className="glass rounded-3xl p-10 text-center max-w-sm w-full animate-scale-in" style={{ border: '1px solid var(--border2,var(--border))' }}>
@@ -276,11 +276,11 @@ export default function ExamsView({ exams, setExams, settings, addToast, docs, s
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-black text-sm truncate">{ex.title}</h3>
-                  {ex.isBuiltin && <span className="badge badge-success shrink-0">📚 Built-in</span>}
+                  {ex.isBuiltin && <span className="badge badge-success shrink-0"> Built-in</span>}
                 </div>
                 <p className="text-xs opacity-40 mt-0.5">{ex.questions?.length} questions · {ex.isBuiltin ? 'Always available' : new Date(ex.createdAt).toLocaleDateString()}</p>
                 {ex.docId && docs?.find(d => d.id === ex.docId) && (
-                  <p className="text-xs opacity-30 mt-0.5 truncate">📄 {docs.find(d => d.id === ex.docId).name}</p>
+                  <p className="text-xs opacity-30 mt-0.5 truncate"> {docs.find(d => d.id === ex.docId).name}</p>
                 )}
               </div>
               <div className="flex gap-2 shrink-0">

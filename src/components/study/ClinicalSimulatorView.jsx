@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { Loader2, Sparkles, ChevronLeft, Send, AlertCircle } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -101,7 +101,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
   if (phase === 'select') return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🏥 Clinical Simulator</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Clinical Simulator</h2>
         <p className="text-xs opacity-40 mt-0.5">Interactive patient encounters with AI</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4">
@@ -134,7 +134,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
       </div>
       <div className="glass rounded-3xl p-6 text-center" style={{ border: `2px solid ${score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444'}40` }}>
         <div className="text-5xl font-black mb-2" style={{ color: score?.score >= 80 ? '#10b981' : score?.score >= 50 ? '#f59e0b' : '#ef4444' }}>{score?.score}%</div>
-        <div className="text-lg font-black mb-4">{score?.correct ? '✅ Correct Diagnosis!' : score?.nearMiss ? '⚠️ Close — Near Miss' : '❌ Incorrect'}</div>
+        <div className="text-lg font-black mb-4">{score?.correct ? ' Correct Diagnosis!' : score?.nearMiss ? ' Close — Near Miss' : ' Incorrect'}</div>
         <div className="text-sm font-black mb-1">Correct: <span style={{ color: '#10b981' }}>{selectedCase.correctDx}</span></div>
         <div className="text-sm mb-4 opacity-60">Your answer: {userDx}</div>
         <p className="text-sm opacity-70 leading-relaxed">{score?.feedback}</p>
@@ -180,7 +180,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
 
       {/* Phase tabs */}
       <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        {[['hx', '🗣 History'], ['exam', '🩺 Exam'], ['orders', '📋 Orders'], ['dx', '🎯 Diagnosis']].map(([id, lbl]) => (
+        {[['hx', ' History'], ['exam', ' Exam'], ['orders', ' Orders'], ['dx', ' Diagnosis']].map(([id, lbl]) => (
           <button key={id} onClick={() => setPhase(id)}
             className="flex-1 py-2 text-xs font-black transition-all"
             style={phase === id ? { borderBottom: '2px solid var(--accent)', color: 'var(--accent)' } : { opacity: 0.45 }}>
@@ -205,7 +205,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
             </div>
             <button onClick={submitDiagnosis} disabled={!userDx.trim() || loading}
               className="btn-accent w-full py-3 rounded-xl font-black flex items-center justify-center gap-2">
-              {loading ? <Loader2 size={16} className="animate-spin" /> : '🎯'} Submit Diagnosis
+              {loading ? <Loader2 size={16} className="animate-spin" /> : ''} Submit Diagnosis
             </button>
           </div>
         </div>
@@ -214,7 +214,7 @@ Give feedback as JSON: { "score": 0-100, "correct": true/false, "nearMiss": true
           <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                {msg.role !== 'user' && <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm" style={{ background: msg.role === 'system-intro' ? 'var(--border)' : 'var(--accent)/15' }}>{msg.role === 'patient' ? '🤒' : msg.role === 'loading' ? '⏳' : '💡'}</div>}
+                {msg.role !== 'user' && <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-sm" style={{ background: msg.role === 'system-intro' ? 'var(--border)' : 'var(--accent)/15' }}>{msg.role === 'patient' ? '' : msg.role === 'loading' ? '' : ''}</div>}
                 <div className="glass rounded-2xl px-4 py-3 text-sm max-w-[80%]" style={{ border: '1px solid var(--border)', background: msg.role === 'user' ? 'var(--accent)/10' : 'transparent' }}>
                   {msg.role === 'loading' ? <Loader2 size={14} className="animate-spin" /> : <p className="leading-relaxed">{msg.text}</p>}
                 </div>

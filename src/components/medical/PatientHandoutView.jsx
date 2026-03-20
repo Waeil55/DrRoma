@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Loader2, Sparkles, Copy, Save } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -41,18 +41,18 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
     const updated = [entry, ...saved.slice(0, 19)];
     setSaved(updated);
     localStorage.setItem('mariam_handouts', JSON.stringify(updated));
-    addToast('Handout saved ✓', 'success');
+    addToast('Handout saved ', 'success');
   };
 
   const copyHandout = () => {
     navigator.clipboard?.writeText(handout);
-    addToast('Copied ✓', 'success');
+    addToast('Copied ', 'success');
   };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">📄 Patient Handouts</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Patient Handouts</h2>
         <p className="text-xs opacity-40 mt-0.5">AI-generated patient education materials</p>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
@@ -99,7 +99,7 @@ Keep language simple, compassionate, and clear. Use bullet points. About 400-500
         {handout && (
           <div className="glass rounded-2xl p-5 animate-fade-in-up" style={{ border: '1px solid var(--border)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-black text-sm">📄 {condition}</h3>
+              <h3 className="font-black text-sm"> {condition}</h3>
               <div className="flex gap-2">
                 <button onClick={copyHandout} className="glass px-3 py-1.5 rounded-xl text-xs font-black flex items-center gap-1"
                   style={{ border: '1px solid var(--border)' }}><Copy size={11} /> Copy</button>

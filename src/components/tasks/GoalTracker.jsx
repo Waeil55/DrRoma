@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Target, Plus, Trash2, Check, Sparkles } from 'lucide-react';
 
 const DEFAULT_GOALS = [
-  { id: 'cards', label: 'Review flashcards', target: 20, unit: 'cards', icon: '📚' },
-  { id: 'chapters', label: 'Read chapters', target: 1, unit: 'chapters', icon: '📖' },
+  { id: 'cards', label: 'Review flashcards', target: 20, unit: 'cards', icon: '' },
+  { id: 'chapters', label: 'Read chapters', target: 1, unit: 'chapters', icon: '' },
 ];
 
 export default function GoalTracker({ dailyProgress = {}, onGoalsChange, goals: savedGoals }) {
@@ -48,7 +48,7 @@ export default function GoalTracker({ dailyProgress = {}, onGoalsChange, goals: 
       label: newLabel.trim(),
       target: Math.max(1, newTarget),
       unit: newUnit || 'items',
-      icon: '🎯',
+      icon: '',
     }];
     setGoals(updated);
     onGoalsChange?.(updated);

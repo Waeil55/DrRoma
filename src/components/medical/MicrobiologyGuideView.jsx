@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { ChevronLeft, ChevronDown } from 'lucide-react';
 
 const MICRO_DATA = [
-  { cat: 'Gram-Positive Cocci', icon: '🟣', organisms: [
+  { cat: 'Gram-Positive Cocci', icon: '', organisms: [
     { name: 'Staphylococcus aureus', gram: 'GPC in clusters', catalase: '+', coagulase: '+',
       diseases: 'Skin infections (abscess, cellulitis, impetigo), bacteremia, endocarditis (acute), osteomyelitis, septic arthritis, pneumonia (post-influenza), TSS, food poisoning (preformed toxin)',
       key: 'MRSA: mecA gene → altered PBP2a. Treat MRSA: Vancomycin, daptomycin, linezolid, TMP-SMX (skin). MSSA: Nafcillin/oxacillin (DOC).',
@@ -20,7 +20,7 @@ const MICRO_DATA = [
       key: 'γ-hemolytic (non-hemolytic), PYR+. Can grow in 6.5% NaCl + bile esculin+. VRE: treat with linezolid or daptomycin. E. faecium more resistant than E. faecalis.',
       virulence: 'Intrinsic low-level aminoglycoside resistance. Can acquire vanA/vanB → VRE. Biofilm formation.' },
   ]},
-  { cat: 'Gram-Negative Rods', icon: '🔴', organisms: [
+  { cat: 'Gram-Negative Rods', icon: '', organisms: [
     { name: 'Escherichia coli', gram: 'GNR', catalase: '+', coagulase: 'N/A',
       diseases: '#1 cause of UTI, #1 cause of gram-negative sepsis, neonatal meningitis (K1 capsule), traveler\'s diarrhea (ETEC), hemolytic uremic syndrome (EHEC O157:H7)',
       key: 'Lactose fermenter (pink on MacConkey). ESBL-producing: treat with carbapenems. EHEC: DO NOT give antibiotics → ↑ HUS risk.',
@@ -38,7 +38,7 @@ const MICRO_DATA = [
       key: 'Maltose+ and glucose+ fermenter (unlike N. gonorrhoeae which is glucose only). Capsular serotypes: A, B, C, W, Y. Vaccine: MenACWY (required for college dorms), MenB.',
       virulence: 'Polysaccharide capsule (serogroup B = poorly immunogenic → sialylated), LPS/endotoxin (→ DIC, shock), IgA protease, pili' },
   ]},
-  { cat: 'Anaerobes', icon: '🟤', organisms: [
+  { cat: 'Anaerobes', icon: '', organisms: [
     { name: 'Clostridium difficile', gram: 'GPR (anaerobic, spore-forming)', catalase: '−', coagulase: 'N/A',
       diseases: 'Antibiotic-associated colitis (pseudomembranous colitis). "Yellow volcano-like" pseudomembranes on colonoscopy.',
       key: 'Toxin A (enterotoxin) + Toxin B (cytotoxin). Diagnose: Stool PCR or GDH + toxin EIA. Treat: Oral vancomycin (125 mg QID) for initial episode or fidaxomicin (preferred for recurrence). Stop offending antibiotic.',
@@ -52,7 +52,7 @@ const MICRO_DATA = [
       key: 'Botulinum toxin: blocks ACh release at NMJ (cleaves SNARE proteins). Descending paralysis: cranial nerves first (diplopia, dysphagia, dysarthria) → respiratory failure. Treat: antitoxin (adult) + supportive care. Infant: BIG-IV (human Ig).',
       virulence: 'Most potent biological toxin known. Heat-labile (toxin destroyed by cooking). Spores are heat-resistant.' },
   ]},
-  { cat: 'Fungi', icon: '🍄', organisms: [
+  { cat: 'Fungi', icon: '', organisms: [
     { name: 'Candida albicans', gram: 'Yeast (GPC-sized)', catalase: 'N/A', coagulase: 'N/A',
       diseases: 'Oral thrush, vulvovaginal candidiasis, esophageal candidiasis (AIDS-defining, CD4 <100-200), candidemia, endocarditis (IVDU)',
       key: 'Germ tube test (+). Pseudohyphae at 37°C. Risk: immunosuppression, antibiotics, diabetes, steroids. Treat: Fluconazole (mucosal), echinocandin (invasive), amphotericin B (salvage).',
@@ -79,7 +79,7 @@ export default function MicrobiologyGuideView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">🦠 Microbiology Guide</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Microbiology Guide</h2>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search organisms…"
           className="w-full glass-input rounded-xl px-4 py-2.5 text-sm outline-none mt-3"
           style={{ background: 'var(--surface,var(--card))', border: '1px solid var(--border)' }} />
@@ -129,7 +129,7 @@ export default function MicrobiologyGuideView() {
                         <p className="text-xs opacity-70 leading-relaxed">{o.virulence}</p>
                       </div>
                       <div className="glass rounded-xl p-3" style={{ background: '#10b98108', border: '1px solid #10b98120' }}>
-                        <h4 className="text-xs font-black mb-1" style={{ color: '#10b981' }}>💊 Key Treatment / Identification</h4>
+                        <h4 className="text-xs font-black mb-1" style={{ color: '#10b981' }}> Key Treatment / Identification</h4>
                         <p className="text-xs opacity-70 leading-relaxed">{o.key}</p>
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import callAIStreaming from '../../services/ai/callAIStreaming';
 
@@ -88,7 +88,7 @@ Keep response under 300 words. Be balanced — note strengths AND weaknesses.`,
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">📊 EBM Tools</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> EBM Tools</h2>
         <div className="flex gap-2 mt-3">
           {[['nnt', 'NNT Calculator'], ['pico', 'PICO Builder'], ['appraise', 'Study Appraisal']].map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)}

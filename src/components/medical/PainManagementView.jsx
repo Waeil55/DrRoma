@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 const PAIN_DATA = {
   ladder: [
@@ -47,7 +47,7 @@ function PainManagementView() {
   return (
     <div className="flex-1 min-h-0 flex flex-col">
       <div className="px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <h2 className="font-black text-xl flex items-center gap-2">💊 Pain Management</h2>
+        <h2 className="font-black text-xl flex items-center gap-2"> Pain Management</h2>
         <div className="flex gap-1 mt-3">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
@@ -97,7 +97,7 @@ function PainManagementView() {
               </div>
             </div>
             <div className="glass rounded-2xl p-5" style={{ border: '1px solid #ef444420', background: '#ef444405' }}>
-              <h3 className="font-black text-sm mb-2" style={{ color: '#ef4444' }}>⚠️ Conversion Safety</h3>
+              <h3 className="font-black text-sm mb-2" style={{ color: '#ef4444' }}> Conversion Safety</h3>
               {[
                 'When rotating opioids, reduce calculated equianalgesic dose by 25-50% (incomplete cross-tolerance)',
                 'Methadone conversion is NOT linear — use specific conversion ratios (highly variable, requires specialist)',

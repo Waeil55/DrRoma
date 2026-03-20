@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — NotificationService
  * Wraps the Web Notifications API and schedules study reminders.
  * All 6 notification types supported.
@@ -14,12 +14,12 @@ export const NOTIFICATION_TYPES = {
 };
 
 const ICONS = {
-  study_reminder: '📚',
-  review_due:     '🔁',
-  streak_alert:   '🔥',
-  achievement:    '🏆',
-  exam_countdown: '📅',
-  daily_goal:     '🎯',
+  study_reminder: '',
+  review_due:     '',
+  streak_alert:   '',
+  achievement:    '',
+  exam_countdown: '',
+  daily_goal:     '',
 };
 
 class NotificationService {
@@ -59,7 +59,7 @@ class NotificationService {
   async show(type, params = {}) {
     if (!this._permitted) return;
 
-    const icon = ICONS[type] || '📖';
+    const icon = ICONS[type] || '';
     const title = params.title || this._defaultTitle(type);
     const body  = params.body  || '';
 
@@ -120,7 +120,7 @@ class NotificationService {
     const delay = target - now;
     this.schedule(NOTIFICATION_TYPES.STUDY_REMINDER, delay, {
       title: 'Daily Study Reminder',
-      body:  params.body || 'You have flashcards due. Keep your streak going! 🔥',
+      body:  params.body || 'You have flashcards due. Keep your streak going! ',
       ...params,
     });
   }
@@ -158,7 +158,7 @@ class NotificationService {
       if (dueCards.length > 0) {
         const delay = this._msUntil('09:00');
         this.schedule(`review_${deck.id}`, delay, {
-          title: `📚 ${dueCards.length} cards due — ${deck.title || 'Flashcards'}`,
+          title: ` ${dueCards.length} cards due — ${deck.title || 'Flashcards'}`,
           body: 'Keep your streak alive! Review now to maximize retention.',
           data: { view: 'flashcards', deckId: deck.id },
         });
@@ -174,14 +174,14 @@ class NotificationService {
 
     if (dayBefore > now) {
       this.schedule(`exam_24h_${examTitle}`, dayBefore - now, {
-        title: `📝 Exam tomorrow: ${examTitle}`,
+        title: ` Exam tomorrow: ${examTitle}`,
         body: 'Get a good night\'s sleep and review your weak spots.',
         data: { view: 'exams' },
       });
     }
     if (hourBefore > now) {
       this.schedule(`exam_1h_${examTitle}`, hourBefore - now, {
-        title: `⏰ Exam in 1 hour: ${examTitle}`,
+        title: ` Exam in 1 hour: ${examTitle}`,
         body: 'Last-minute review: focus on high-yield topics.',
         data: { view: 'exams' },
       });
@@ -194,7 +194,7 @@ class NotificationService {
     if (now.getHours() >= 21) return; // too late
     const delay = this._msUntil('21:00');
     this.schedule(NOTIFICATION_TYPES.STREAK_ALERT, delay, {
-      title: `🔥 ${streakDays}-day streak at risk!`,
+      title: ` ${streakDays}-day streak at risk!`,
       body: 'Study for just 5 minutes to keep your streak alive.',
       data: { view: 'flashcards', requireInteraction: true },
     });

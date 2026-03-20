@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MARIAM PRO — FlashcardCard Component
  * 3D flip card with RAF physics driver, dynamic shadow, and swipe gesture support.
  */
@@ -47,13 +47,13 @@ export default function FlashcardCard({ card, flipped, setFlipped, swipeHandlers
       {swipeHint === 'right' && (
         <div className="absolute inset-0 rounded-3xl z-10 flex items-center justify-start pl-8 pointer-events-none"
           style={{ background: 'rgba(16,185,129,0.15)', border: '2px solid #10b981', borderRadius: '1.5rem' }}>
-          <span className="text-2xl font-black" style={{ color: '#10b981' }}>⚡ Easy</span>
+          <span className="text-2xl font-black" style={{ color: '#10b981' }}> Easy</span>
         </div>
       )}
       {swipeHint === 'left' && (
         <div className="absolute inset-0 rounded-3xl z-10 flex items-center justify-end pr-8 pointer-events-none"
           style={{ background: 'rgba(239,68,68,0.15)', border: '2px solid #ef4444', borderRadius: '1.5rem' }}>
-          <span className="text-2xl font-black" style={{ color: '#ef4444' }}>🔁 Again</span>
+          <span className="text-2xl font-black" style={{ color: '#ef4444' }}> Again</span>
         </div>
       )}
       <div style={{ perspective: '1200px', ...swipeStyle }} className="cursor-grab active:cursor-grabbing" onClick={handleFlip}>
