@@ -9090,14 +9090,19 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         }
         .design-nav.keyboard-open-hidden{transform:translateX(-50%) translateY(200%);opacity:0;pointer-events:none;transition:transform .3s ease,opacity .22s ease;}
         .design-nav-inner{
-          display:flex;align-items:center;justify-content:space-between;
+          display:flex;align-items:center;justify-content:flex-start;
           width:100%;padding:6px 8px;
           gap:0;
           border-radius:30px;
           backdrop-filter:saturate(130%) blur(10px);
           -webkit-backdrop-filter:saturate(130%) blur(10px);
-          position:relative;overflow:hidden;
+          position:relative;
+          overflow-x:auto;overflow-y:hidden;
+          scroll-snap-type:x mandatory;
+          -webkit-overflow-scrolling:touch;
+          scrollbar-width:none;
         }
+        .design-nav-inner::-webkit-scrollbar{display:none;}
         .dark .design-nav-inner,.oled .design-nav-inner,.slate .design-nav-inner{
           background:rgba(255,255,255,0.02);
           border:1px solid rgba(255,255,255,0.15);
@@ -9109,12 +9114,13 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
           box-shadow:0 20px 50px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,1);
         }
         .design-nav-btn{
-          flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-          gap:2px;padding:5px 1px;border-radius:1.6rem;
+          flex:0 0 auto;min-width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:2px;padding:5px 4px;border-radius:1.6rem;
           border:none;background:transparent;cursor:pointer;
           opacity:1;
           transition:all .4s cubic-bezier(.16,1,.3,1);
           min-height:56px;position:relative;
+          scroll-snap-align:center;
         }
         .dark .design-nav-btn,.oled .design-nav-btn,.slate .design-nav-btn{color:rgba(255,255,255,0.75);}
         .pure-white .design-nav-btn,.light .design-nav-btn,.warm .design-nav-btn,.rose .design-nav-btn,.forest .design-nav-btn{color:rgba(0,0,0,0.65);}
@@ -9926,6 +9932,24 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
             title="Tutor">
             <MessageSquare size={20} strokeWidth={view === 'chat' ? 2.5 : 2} />
             <span className="design-nav-label">Tutor</span>
+          </button>
+          <button onClick={() => setView('medicines')}
+            className={`design-nav-btn ${view === 'medicines' ? 'active' : ''}`}
+            title="Medicine">
+            <Pill size={20} strokeWidth={view === 'medicines' ? 2.5 : 2} />
+            <span className="design-nav-label">Medicine</span>
+          </button>
+          <button onClick={() => setView('diseases')}
+            className={`design-nav-btn ${view === 'diseases' ? 'active' : ''}`}
+            title="Diseases">
+            <Stethoscope size={20} strokeWidth={view === 'diseases' ? 2.5 : 2} />
+            <span className="design-nav-label">Diseases</span>
+          </button>
+          <button onClick={() => setView('cases')}
+            className={`design-nav-btn ${view === 'cases' ? 'active' : ''}`}
+            title="Cases">
+            <Activity size={20} strokeWidth={view === 'cases' ? 2.5 : 2} />
+            <span className="design-nav-label">Cases</span>
           </button>
           <button onClick={() => setView('settings')}
             className={`design-nav-btn ${view === 'settings' ? 'active' : ''}`}
