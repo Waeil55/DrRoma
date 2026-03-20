@@ -8,6 +8,7 @@ import EXPANDED_DISEASE_DB from './diseaseDatabase.js';
 import EXPANDED_MEDICINE_DB from './medicineDatabase.js';
 import { speakText as prosodySpeakText, getProsodyEngine } from './services/voice/speechSynthesis.js';
 import { scheduleCard as fsrs5Schedule, initCard as fsrs5InitCard, getDueCards as fsrs5GetDue, DEFAULT_W as FSRS5_W } from './services/analytics/fsrsEngine.js';
+import { QuestionVarietyEngine, buildVarietyInstruction } from './services/ai/questionVariety.js';
 
 /* ── Modular enhanced components (replace internal implementations) ── */
 import _ModTasksView from './components/tasks/TasksView.jsx';
@@ -89,6 +90,7 @@ import {
   GitBranch, Volume2, Square, Pause, RotateCcw, Focus, Paperclip,
   Calculator, MapPin, Swords, Mic2, Droplets, Bone, ShieldCheck, Siren,
   HeartPulse, Bug, Skull, Microscope, Apple, BrainCircuit, MessageCircle,
+  Shield, Check,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -468,7 +470,7 @@ const extractUniversal = async (file, onProgress) => {
  */
 const callAI = async (prompt, expectJson, strictMode, settings = {}, maxTokens = 5120) => {
   const { provider = 'anthropic', apiKey = '', baseUrl = '', model = '' } = settings;
-  const sys = `CRITICAL INSTRUCTION: You are an expert AI that generates EXCLUSIVELY from the provided PDF/document content below. You must NEVER use outside knowledge, general facts, or information not present in the document. Every question, answer, explanation, and vignette must be directly traceable to the document text. If a concept is not in the document, do not include it. Generate long, detailed, comprehensive content — questions should be multi-sentence with rich clinical/academic context. Explanations must be thorough (3-5 sentences minimum). ${strictMode ? 'STRICT MODE: Cite [Page X] for every single item.' : 'Always reference the source material explicitly.'}\n\nMEDICINE RULE — CRITICAL: Whenever any explanation, answer, flashcard, exam question, or clinical case involves a medication or drug, you MUST begin that explanation/answer/description by stating the brand name first, followed by the generic name in parentheses. Example: "Tylenol (acetaminophen)" or "Lipitor (atorvastatin)". If only the generic name is mentioned in the document, look it up from pharmacological knowledge and always present as: "BrandName (generic name) — [explanation]". This rule applies to ALL content types: flashcards, exams, clinical cases, summaries, and chat responses.`;
+  const sys = `EDUCATIONAL USE ONLY: This AI generates content strictly for learning and exam preparation — NOT for clinical decision-making, patient care, or actionable medical advice. Never provide specific dosing orders, treatment protocols, or instructions intended for real patient management.\n\nCRITICAL INSTRUCTION: You are an expert AI that generates EXCLUSIVELY from the provided PDF/document content below. You must NEVER use outside knowledge, general facts, or information not present in the document. Every question, answer, explanation, and vignette must be directly traceable to the document text. If a concept is not in the document, do not include it. Generate long, detailed, comprehensive content — questions should be multi-sentence with rich clinical/academic context. Explanations must be thorough (3-5 sentences minimum). ${strictMode ? 'STRICT MODE: Cite [Page X] for every single item.' : 'Always reference the source material explicitly.'}\n\nMEDICINE RULE — CRITICAL: Whenever any explanation, answer, flashcard, exam question, or clinical case involves a medication or drug, you MUST begin that explanation/answer/description by stating the brand name first, followed by the generic name in parentheses. Example: "Tylenol (acetaminophen)" or "Lipitor (atorvastatin)". If only the generic name is mentioned in the document, look it up from pharmacological knowledge and always present as: "BrandName (generic name) — [explanation]". This rule applies to ALL content types: flashcards, exams, clinical cases, summaries, and chat responses.`;
   const jsonSuffix = expectJson ? '\n\nRETURN ONLY RAW JSON. No markdown. No explanation. No backticks.' : '';
   const finalPrompt = prompt + jsonSuffix;
 
@@ -1797,10 +1799,19 @@ const runBgGeneration = async ({ taskId, docId, docName, taskType, startPage, en
     };
 
     const isJson = ['flashcards', 'exam', 'cases'].includes(taskType);
+    // QuestionVarietyEngine — inject variety directives per batch to prevent repetition
+    const _varietyEngine = new QuestionVarietyEngine();
+    const _domainHint = taskType === 'exam' || taskType === 'cases' ? 'clinical' : 'general';
+    const _varietyDirectives = Array.from({ length: numBatches }, (_, i) =>
+      _varietyEngine.getNextPromptDirective(i, difficultyLevel || 'medium', _domainHint)
+    );
     const tasks = Array.from({ length: numBatches }, (_, i) => {
       // Calculate exact batch size: last batch gets the remainder, all others get batchSize
       const bc = i === numBatches - 1 ? (count % batchSize === 0 ? batchSize : count % batchSize) : batchSize;
-      return () => callAI(makePrompt(bc), isJson, false, settings, 8000);
+      const varietySuffix = numBatches > 1
+        ? `\n\n## ANTI-REPETITION DIRECTIVE (Batch ${i + 1}/${numBatches})\n${_varietyDirectives[i].instruction}`
+        : '';
+      return () => callAI(makePrompt(bc) + varietySuffix, isJson, false, settings, 8000);
     });
 
     let all = [];
@@ -2318,6 +2329,163 @@ const setupPWA = () => {
     if (typeof caches !== 'undefined') caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
   }
 };
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEGAL — TOS VERSION, REQUIRED CHECKBOXES, PHI DETECTION
+═══════════════════════════════════════════════════════════════════ */
+const TOS_VERSION = '2.0';
+const REQUIRED_CHECKBOXES = [
+  'I understand this app is for EDUCATIONAL PURPOSES ONLY',
+  'I understand AI-generated content may contain errors and must be verified',
+  'I will NOT use any content in this app for real patient care decisions',
+  'I will always consult a licensed healthcare provider for clinical decisions',
+  'I am 18 years or older (or have parental consent)',
+  'I agree to the full Terms of Service and Privacy Policy',
+];
+
+const PHI_PATTERNS = [
+  /\b\d{3}-\d{2}-\d{4}\b/,
+  /\bDOB:\s*\d{1,2}\/\d{1,2}\/\d{4}\b/i,
+  /\bMRN:\s*\d+/i,
+  /\bPt\.?\s+[A-Z][a-z]+\s+[A-Z]/,
+];
+
+function detectPHI(text = '') {
+  return PHI_PATTERNS.some(p => p.test(text));
+}
+
+/* ── AIDisclaimer — shown under every AI-generated block ── */
+function AIDisclaimer() {
+  return (
+    <div style={{
+      fontSize: 10, opacity: 0.55, marginTop: 8,
+      padding: '3px 8px', borderRadius: 6,
+      background: 'rgba(245,158,11,0.08)',
+      border: '1px solid rgba(245,158,11,0.15)',
+      color: 'var(--text)',
+    }}>
+      ⚠️ AI-generated educational content. Verify before clinical use. Not medical advice.
+    </div>
+  );
+}
+
+/* ── ClinicalWarningBanner — top of clinical tools ── */
+function ClinicalWarningBanner() {
+  return (
+    <div className="glass rounded-xl p-3 mb-3 flex items-start gap-2"
+      style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.05)' }}>
+      <AlertCircle size={14} className="shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+      <p className="text-xs leading-relaxed" style={{ color: '#ef4444' }}>
+        <strong>Educational Tool Only.</strong> For learning purposes.
+        Never use for real patient care. Always follow institution protocols.
+      </p>
+    </div>
+  );
+}
+
+/* ── LegalAcceptanceModal — first launch, all boxes required ── */
+function LegalAcceptanceModal({ onAccept }) {
+  const [checked, setChecked] = useState({});
+  const allChecked = REQUIRED_CHECKBOXES.every((_, i) => checked[i]);
+
+  const toggle = (i) => setChecked(p => ({ ...p, [i]: !p[i] }));
+
+  const handleAccept = () => {
+    if (!allChecked) return;
+    localStorage.setItem('mariam_tos_accepted', JSON.stringify({ version: TOS_VERSION, ts: Date.now() }));
+    onAccept();
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ zIndex: 'var(--z-modal,110)', background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
+      <div className="w-full max-w-lg glass rounded-3xl shadow-2xl overflow-hidden"
+        style={{ border: '1px solid var(--border)', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(99,102,241,0.15)' }}>
+              <Shield size={20} style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black" style={{ color: 'var(--text)' }}>Terms of Service</h2>
+              <p className="text-xs opacity-50">Version {TOS_VERSION} — Please read carefully</p>
+            </div>
+          </div>
+          <div className="rounded-xl p-3 mt-1" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <p className="text-xs font-bold leading-relaxed" style={{ color: '#ef4444' }}>
+              ⚠️ MARIAM PRO is an educational tool for exam preparation ONLY.
+              It is NOT a clinical decision support system and must NEVER be used for real patient care.
+            </p>
+          </div>
+        </div>
+
+        {/* Checkboxes */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-3">
+          {REQUIRED_CHECKBOXES.map((label, i) => (
+            <button key={i} onClick={() => toggle(i)}
+              className="w-full flex items-start gap-3 text-left p-3 rounded-xl transition-all"
+              style={{ background: checked[i] ? 'rgba(16,185,129,0.08)' : 'var(--surface,var(--card))', border: `1px solid ${checked[i] ? 'rgba(16,185,129,0.3)' : 'var(--border)'}` }}>
+              <div className="w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-all"
+                style={{ background: checked[i] ? '#10b981' : 'transparent', border: checked[i] ? 'none' : '2px solid var(--border)' }}>
+                {checked[i] && <Check size={12} color="#fff" strokeWidth={3} />}
+              </div>
+              <p className="text-sm font-medium leading-relaxed flex-1" style={{ color: 'var(--text)' }}>{label}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Action */}
+        <div className="px-6 pb-6 pt-3 shrink-0" style={{ borderTop: '1px solid var(--border)' }}>
+          <p className="text-xs opacity-40 mb-3 text-center">All {REQUIRED_CHECKBOXES.length} items must be checked to continue.</p>
+          <button onClick={handleAccept} disabled={!allChecked}
+            className="w-full py-3.5 rounded-2xl font-black text-sm transition-all"
+            style={{
+              background: allChecked ? 'var(--accent)' : 'var(--surface2,var(--card))',
+              color: allChecked ? '#fff' : 'var(--text3)',
+              cursor: allChecked ? 'pointer' : 'not-allowed',
+              opacity: allChecked ? 1 : 0.5,
+            }}>
+            {allChecked ? 'I Agree — Get Started 🎉' : `Check all ${REQUIRED_CHECKBOXES.length} boxes to continue`}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.getElementById('portal-root') || document.body
+  );
+}
+
+/* ── CookieConsentBanner — GDPR-compliant, bottom of screen ── */
+function CookieConsentBanner({ onAccept, onDecline }) {
+  return createPortal(
+    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-xl mx-auto"
+      style={{ zIndex: 'var(--z-modal,110)' }}>
+      <div className="glass rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3"
+        style={{ border: '1px solid var(--border)' }}>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-black mb-0.5" style={{ color: 'var(--text)' }}>🍪 Cookie Preferences</p>
+          <p className="text-xs opacity-60 leading-relaxed">
+            We use essential cookies to run the app, and optional analytics to improve it.
+            Your choice is remembered.
+          </p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={onDecline}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+            style={{ background: 'var(--surface2,var(--card))', border: '1px solid var(--border)', color: 'var(--text2)' }}>
+            Essential only
+          </button>
+          <button onClick={onAccept}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+            style={{ background: 'var(--accent)', color: '#fff' }}>
+            Accept all
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.getElementById('portal-root') || document.body
+  );
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    TOAST HOOK
@@ -7064,6 +7232,12 @@ function App() {
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [showQuickReview, setShowQuickReview] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [showLegal, setShowLegal] = useState(() => {
+    const accepted = localStorage.getItem('mariam_tos_accepted');
+    if (!accepted) return true;
+    try { return JSON.parse(accepted).version !== TOS_VERSION; } catch { return true; }
+  });
+  const [showCookieBanner, setShowCookieBanner] = useState(() => !localStorage.getItem('mariam_cookie_consent_v1'));
   const { toasts, addToast } = useToast();
 
   useEffect(() => {
@@ -7246,6 +7420,11 @@ function App() {
         try {
           const data = await extractUniversal(file, pct => { setUploadPct(Math.round((fi / files.length * 100) + pct * (80 / files.length))); });
           const id = `${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+          // PHI detection — warn user if file may contain patient identifiers
+          const sampleText = Object.values(data.pagesText || {}).slice(0, 3).join(' ');
+          if (detectPHI(sampleText)) {
+            addToast('⚠️ This file may contain patient identifiers (SSN, MRN, DOB). Please de-identify before uploading. MARIAM PRO is not HIPAA-compliant storage.', 'warn', 8000);
+          }
           // For images, store preview
           let imagePreview = null;
           if (cat === 'image' && data.imageBase64) { imagePreview = `data:${data.imageType || 'image/jpeg'};base64,${data.imageBase64.substring(0, 200)}`; }
@@ -8438,6 +8617,13 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
       {/* Glass strip behind iPhone status bar (wifi/bluetooth/time) */}
       <div className="design-top-glass" aria-hidden="true" />
       <ToastContainer toasts={toasts} />
+      {showLegal && <LegalAcceptanceModal onAccept={() => setShowLegal(false)} />}
+      {!showLegal && showCookieBanner && (
+        <CookieConsentBanner
+          onAccept={() => { localStorage.setItem('mariam_cookie_consent_v1', 'all'); setShowCookieBanner(false); }}
+          onDecline={() => { localStorage.setItem('mariam_cookie_consent_v1', 'essential'); setShowCookieBanner(false); }}
+        />
+      )}
       {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions}
         onNavigate={(v, id) => { setView(v); if (id) { setActiveId(id); setOpenDocs(p => p.includes(id) ? p : [...p, id]); setDocPages(p => ({ ...p, [id]: 1 })); }; }}
         onClose={() => setShowGlobalSearch(false)} />}
