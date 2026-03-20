@@ -1463,6 +1463,20 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
         push({ type: 'Disease', icon: Stethoscope, label: d.name, sub: `${d.system || ''} Â· ${d.aka || d.category || ''}`, color: '#ef4444', action: () => onNavigate('diseases') });
     });
 
+    /* -- 14. SYMPTOMS DATABASE -- */
+    (SYMPTOMS_DB_FULL || []).forEach(s => {
+      const searchStr = [s.symptom || s.name, s.system, ...(s.aliases || []), ...(s.redFlags || [])].filter(Boolean).join(' ').toLowerCase();
+      if (searchStr.includes(lq))
+        push({ type: 'Symptom', icon: Thermometer, label: s.symptom || s.name, sub: (s.system || '') + ' \u00b7 ' + (s.icd10 || ''), color: '#f59e0b', action: () => onNavigate('symptoms') });
+    });
+
+    /* -- 15. COUNSELING DATABASE -- */
+    (COUNSELING_THERAPY_DB || []).forEach(e => {
+      const searchStr = [e.name, e.type, e.subtitle, ...(e.tags || []), ...(e.keyPrinciples || [])].filter(Boolean).join(' ').toLowerCase();
+      if (searchStr.includes(lq))
+        push({ type: 'Counseling', icon: Brain, label: e.name, sub: (e.type || '') + ' \u00b7 ' + (e.subtitle || ''), color: '#8b5cf6', action: () => onNavigate('counseling') });
+    });
+
     return out;
   }, [q, docs, flashcards, exams, cases, notes, chatSessions]);
 
@@ -1503,14 +1517,16 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
           </div>
         )}
         {!q && (
-          <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="p-5 grid grid-cols-2 sm:grid-cols-5 gap-2">
             {[
-              ['Documents', 'doc', FileText, '#6366f1'],
+              ['Documents', 'library', FileText, '#6366f1'],
               ['Flashcards', 'flashcards', Layers, '#8b5cf6'],
               ['Exams', 'exams', CheckSquare, '#3b82f6'],
               ['Cases', 'cases', Activity, '#06b6d4'],
               ['Diseases', 'diseases', Stethoscope, '#ef4444'],
               ['Medicines', 'medicines', Pill, '#10b981'],
+              ['Symptoms', 'symptoms', Thermometer, '#f59e0b'],
+              ['Counseling', 'counseling', Brain, '#8b5cf6'],
               ['Chat', 'chat', MessageSquare, '#34d399'],
               ['Notes', 'notes', PenLine, '#f59e0b'],
             ].map(([lbl, v, Icon, col]) => (
@@ -3303,6 +3319,8 @@ function SymptomsView({ settings }) {
           </div>
         )}
       </div>
+      {!isMobile && <DraggableTutorPanel context={{ tool: 'Symptom Analyzer', description: 'Analyze symptoms, build differential diagnoses, and explore diagnostic workup approaches.' }} contextLabel="Symptom Analyzer" settings={settings} defaultMode="docked" />}
+      {isMobile && selectedSymptom && <DraggableTutorPanel context={{ tool: 'Symptom Analyzer', description: `Analyzing: ${selectedSymptom?.symptom || ''}` }} contextLabel={selectedSymptom?.symptom || 'Symptom Analyzer'} settings={settings} defaultMode="floating" />}
     </div>
   );
 }
@@ -3534,6 +3552,8 @@ function CounselingTherapyView({ settings }) {
           </div>
         )}
       </div>
+      {!isMobile && <DraggableTutorPanel context={{ tool: 'Counseling & Therapy', description: 'Explore therapy modalities (CBT, DBT, ACT, EMDR), mental health conditions, and evidence-based treatment approaches.' }} contextLabel="Counseling & Therapy" settings={settings} defaultMode="docked" />}
+      {isMobile && selected && <DraggableTutorPanel context={{ tool: 'Counseling & Therapy', description: `Exploring: ${selected?.name || ''}` }} contextLabel={selected?.name || 'Counseling'} settings={settings} defaultMode="floating" />}
     </div>
   );
 }
