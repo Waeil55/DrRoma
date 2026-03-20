@@ -5,6 +5,7 @@ import * as diseasesDataModule from './Diseases.js';
 import * as drugDataModule from './drugData.js';
 import * as lawDataModule from './lawData.js';
 import EXPANDED_DISEASE_DB from './diseaseDatabase.js';
+import EXPANDED_MEDICINE_DB from './medicineDatabase.js';
 import { speakText as prosodySpeakText, getProsodyEngine } from './services/voice/speechSynthesis.js';
 import { scheduleCard as fsrs5Schedule, initCard as fsrs5InitCard, getDueCards as fsrs5GetDue, DEFAULT_W as FSRS5_W } from './services/analytics/fsrsEngine.js';
 
@@ -714,42 +715,12 @@ const UiCallout = ({ type, children }) => {
 };
 
 /* ═══════════════════════════════════════════════════════════════════
-   MEDICINES DATABASE — 200+ medicines with detailed pharmacology
+   MEDICINES DATABASE — 175+ medicines with detailed pharmacology
+   (imported from src/medicineDatabase.js)
 ═══════════════════════════════════════════════════════════════════ */
 
-const MEDICINE_DB = [
-  {
-    id: 'aspirin',
-    name: 'Aspirin',
-    genericName: 'Acetylsalicylic Acid',
-    brandNames: ['Bayer', 'Ecotrin', 'Bufferin', 'Excedrin'],
-    drugClass: 'NSAID / Antiplatelet',
-    category: 'Cardiovascular',
-    schedule: 'OTC',
-    mechanism: 'Irreversibly inhibits COX-1 and COX-2 enzymes, reducing prostaglandin synthesis.',
-    indications: ['Acute MI', 'Stroke prevention', 'Pain/fever', 'Anti-inflammatory'],
-    dosing: { adult: '81-650mg daily-PRN', pediatric: 'AVOID <12y', maxDose: '4g/day' },
-    sideEffects: { common: ['GI upset'], serious: ['GI bleeding', 'Reye syndrome'], rare: ['Anaphylaxis'] },
-    contraindications: ['Reye syndrome risk in children', 'Active GI ulcer', 'Bleeding disorders'],
-    interactions: ['Warfarin', 'NSAIDs', 'Methotrexate'],
-    monitoring: ['GI bleeding signs', 'Renal function'],
-    pharmacokinetics: { absorption: 'Rapid 1-2h', distribution: '80-90% protein bound', metabolism: 'Hepatic', elimination: 'Renal' },
-    pregnancy: 'Category D',
-    nursing: 'Use caution',
-    counseling: ['Take with food', 'Do not crush tablets', 'Monitor for bleeding'],
-    mnemonics: ['ASA = Acetylsalicylic Acid'],
-    keyFacts: ['Low-dose for antiplatelet', 'Irreversible effect'],
-    tags: ['antiplatelet', 'nsaid', 'otc'],
-    relatedDrugs: ['ibuprofen', 'clopidogrel']
-  },
-  { id: 'metoprolol', name: 'Metoprolol', genericName: 'Metoprolol Tartrate', brandNames: ['Lopressor', 'Toprol XL'], drugClass: 'Beta-1 Blocker', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'β1-adrenergic antagonist', indications: ['Hypertension', 'Angina', 'Post-MI'], dosing: { adult: '50-100mg BID', pediatric: 'Not typical', maxDose: '400mg/day' }, sideEffects: { common: ['Fatigue', 'Bradycardia'], serious: ['Heart block', 'Bronchospasm'], rare: ['Lupus-like'] }, contraindications: ['Asthma', '2nd/3rd AV block'], interactions: ['CCBs', 'Clonid ine'], monitoring: ['HR', 'BP', 'ECG'], pharmacokinetics: { absorption: '1.5h', distribution: 'Moderate', metabolism: 'Hepatic', elimination: 'Renal' }, pregnancy: 'B', nursing: 'Safe', counseling: ['Do not stop abruptly', 'Take with food'], mnemonics: ['β-blocker -olol'], keyFacts: ['Post-MI benefit'], tags: ['cardio', 'beta-blocker'], relatedDrugs: ['atenolol', 'carvedilol'] },
-  { id: 'lisinopril', name: 'Lisinopril', genericName: 'Lisinopril', brandNames: ['Prinivil', 'Zestril'], drugClass: 'ACE Inhibitor', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'ACE inhibition', indications: ['Hypertension', 'HF', 'MI', 'Renal protection'], dosing: { adult: '10-40mg daily', pediatric: '0.07mg/kg', maxDose: '40mg/day' }, sideEffects: { common: ['Dry cough', 'Hyperkalemia'], serious: ['Angioedema', 'AKI'], rare: ['Hepatotoxicity'] }, contraindications: ['Pregnancy', 'Bilateral renal artery stenosis'], interactions: ['NSAIDs', 'K+ supplements', 'ARBs'], monitoring: ['K+', 'Creatinine', 'BP'], pharmacokinetics: { absorption: '6h', distribution: 'Minimal protein', metabolism: 'None', elimination: 'Renal' }, pregnancy: 'X', nursing: 'Caution', counseling: ['Dry cough common', 'Avoid K+ foods', 'Rise slowly'], mnemonics: ['ACE-I -pril'], keyFacts: ['Cough due to bradykinin'], tags: ['ace-i', 'cardio'], relatedDrugs: ['enalapril', 'ramipril', 'losartan'] },
-  { id: 'amlodipine', name: 'Amlodipine', genericName: 'Amlodipine Besylate', brandNames: ['Norvasc'], drugClass: 'CCB', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'L-type Ca channel blockade', indications: ['Hypertension', 'Angina'], dosing: { adult: '5-10mg daily', pediatric: '2.5-5mg', maxDose: '10mg/day' }, sideEffects: { common: ['Peripheral edema', 'Flushing'], serious: ['Hypotension'], rare: ['Angioedema'] }, contraindications: ['Severe hypotension', 'Acute MI'], interactions: ['Grapefruit', 'Simvastatin'], monitoring: ['BP', 'Edema'], pharmacokinetics: { absorption: '6-12h', distribution: '99% protein', metabolism: 'CYP3A4', elimination: 'Renal' }, pregnancy: 'C', nursing: 'Caution', counseling: ['Avoid grapefruit', 'Edema may resolve'], mnemonics: ['CCB -dipine'], keyFacts: ['Long half-life 30-50h'], tags: ['ccb', 'cardio'], relatedDrugs: ['nifedipine', 'verapamil'] },
-  { id: 'metformin', name: 'Metformin', genericName: 'Metformin HCl', brandNames: ['Glucophage'], drugClass: 'Biguanide', category: 'Endocrine', schedule: 'Rx Only', mechanism: 'Decreases hepatic glucose', indications: ['T2DM', 'Prediabetes', 'PCOS'], dosing: { adult: '500-2550mg daily', pediatric: '500-2000mg', maxDose: '2550mg/day' }, sideEffects: { common: ['GI upset', 'Diarrhea'], serious: ['Lactic acidosis', 'AKI'], rare: ['B12 deficiency'] }, contraindications: ['eGFR <30', 'Acute HF'], interactions: ['Contrast dye', 'Alcohol'], monitoring: ['B12', 'eGFR', 'HbA1c'], pharmacokinetics: { absorption: '2-3h', distribution: 'None', metabolism: 'None', elimination: 'Renal' }, pregnancy: 'B', nursing: 'Safe', counseling: ['Take with meals', 'Lactic acidosis rare', 'Monitor B12'], mnemonics: ['Biguanide glucose'], keyFacts: ['No hypoglycemia solo'], tags: ['diabetes', 'biguanide'], relatedDrugs: ['glipizide', 'pioglitazone'] },
-  { id: 'omeprazole', name: 'Omeprazole', genericName: 'Omeprazole', brandNames: ['Prilosec'], drugClass: 'PPI', category: 'Gastroenterology', schedule: 'OTC', mechanism: 'H+/K+ ATPase inhibition', indications: ['GERD', 'PUD', 'Stress ulcer'], dosing: { adult: '20-40mg daily', pediatric: 'Weight-based', maxDose: '40mg/day' }, sideEffects: { common: ['Headache', 'Diarrhea'], serious: ['C. difficile', 'Hypomagnesemia'], rare: ['Stevens-Johnson'] }, contraindications: ['Clopidogrel use'],interactions: ['Clopidogrel', 'Warfarin'], monitoring: ['Mg if long-term', 'B12'], pharmacokinetics: { absorption: 'Prodrug', distribution: '95% protein', metabolism: 'CYP2C19', elimination: 'Renal' }, pregnancy: 'C', nursing: 'Safe', counseling: ['Take 30-60min before meals', '2-4 days to full effect'], mnemonics: ['PPI >90% acid'], keyFacts: ['Irreversible inhibition'], tags: ['ppi', 'gi', 'otc'], relatedDrugs: ['lansoprazole', 'pantoprazole'] },
-  { id: 'atorvastatin', name: 'Atorvastatin', genericName: 'Atorvastatin Calcium', brandNames: ['Lipitor'], drugClass: 'Statin', category: 'Cardiovascular', schedule: 'Rx Only', mechanism: 'HMG-CoA reductase inhibition', indications: ['Hypercholesterolemia', 'CAD risk', 'Post-MI'], dosing: { adult: '10-80mg daily', pediatric: '10mg daily', maxDose: '80mg/day' }, sideEffects: { common: ['Myalgia'], serious: ['Rhabdomyolysis'], rare: ['Liver failure'] }, contraindications: ['Active liver disease', 'Pregnancy'], interactions: ['Gemfibrozil', 'CYP3A4 inhibitors'], monitoring: ['Lipids', 'LFTs', 'CK'], pharmacokinetics: { absorption: '1-2h', distribution: '98% protein', metabolism: 'CYP3A4', elimination: 'Biliary' }, pregnancy: 'X', nursing: 'Contraindicated', counseling: ['Report muscle pain', 'Avoid grapefruit', 'Annual LFTs'], mnemonics: ['HMG-CoA -statin'], keyFacts: ['Most potent statin'], tags: ['statin', 'cardio'], relatedDrugs: ['rosuvastatin', 'simvastatin'] },
-  { id: 'levothyroxine', name: 'Levothyroxine', genericName: 'Levothyroxine Sodium', brandNames: ['Synthroid'], drugClass: 'Thyroid', category: 'Endocrine', schedule: 'Rx Only', mechanism: 'T4 replacement', indications: ['Hypothyroidism', 'TSH suppression'], dosing: { adult: '25-200μg daily', pediatric: '10-15μg/kg', maxDose: 'Variable' }, sideEffects: { common: ['Tremor', 'Anxiety'], serious: ['AFib', 'MI'], rare: ['Thyroid storm'] }, contraindications: ['Untreated thyrotoxicosis', 'Recent MI'], interactions: ['Ca/Iron/Antacids', 'Warfarin'], monitoring: ['TSH', 'Free T4'], pharmacokinetics: { absorption: '70-80%', distribution: '99.9% protein', metabolism: 'Deiodination', elimination: 'Renal' }, pregnancy: 'A', nursing: 'Safe', counseling: ['Empty stomach 30-60min before breakfast', 'Separate from Ca/Iron'], mnemonics: ['T4 TSH inverse'], keyFacts: ['7-8 day half-life'], tags: ['endocrine', 'thyroid'], relatedDrugs: ['liothyronine'] }
-];
+const MEDICINE_DB = EXPANDED_MEDICINE_DB;
+
 
 const DRUG_CATEGORIES = [
   'All', 'Cardiovascular', 'Antibiotics', 'Analgesics/Pain', 'CNS/Psychiatry',
@@ -1479,6 +1450,13 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
         push({ type: 'Medicine', icon: Pill, label: d.name, sub: `${d.drugClass} · ${d.genericName || ''}`, color: '#10b981', action: () => onNavigate('medicines') });
     });
 
+    /* ── 13. DISEASE DATABASE ── */
+    (typeof DISEASE_DB !== 'undefined' ? DISEASE_DB : []).forEach(d => {
+      const searchStr = [d.name, d.aka, d.system, ...(d.symptoms || []), ...(d.causes || []), ...(d.tags || [])].filter(Boolean).join(' ').toLowerCase();
+      if (searchStr.includes(lq))
+        push({ type: 'Disease', icon: Stethoscope, label: d.name, sub: `${d.system || ''} · ${d.aka || d.category || ''}`, color: '#ef4444', action: () => onNavigate('diseases') });
+    });
+
     return out;
   }, [q, docs, flashcards, exams, cases, notes, chatSessions]);
 
@@ -1513,14 +1491,23 @@ function GlobalSearch({ docs, flashcards, exams, cases, notes, chatSessions, onN
                   <p className="text-sm font-bold truncate">{r.label}</p>
                   <p className="text-xs opacity-50 truncate">{r.sub}</p>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-widest opacity-30 px-2 py-1 glass rounded-lg shrink-0">{r.type}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg shrink-0" style={{ background: (r.color || '#6b7280') + '22', color: r.color || '#6b7280' }}>{r.type}</span>
               </button>
             ))}
           </div>
         )}
         {!q && (
           <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {[['Documents', 'doc', FileText, '#6366f1'], ['Flashcards', 'flashcards', Layers, '#8b5cf6'], ['Exams', 'exams', CheckSquare, '#3b82f6'], ['Cases', 'cases', Activity, '#06b6d4']].map(([lbl, v, Icon, col]) => (
+            {[
+              ['Documents', 'doc', FileText, '#6366f1'],
+              ['Flashcards', 'flashcards', Layers, '#8b5cf6'],
+              ['Exams', 'exams', CheckSquare, '#3b82f6'],
+              ['Cases', 'cases', Activity, '#06b6d4'],
+              ['Diseases', 'diseases', Stethoscope, '#ef4444'],
+              ['Medicines', 'medicines', Pill, '#10b981'],
+              ['Chat', 'chat', MessageSquare, '#34d399'],
+              ['Notes', 'notes', PenLine, '#f59e0b'],
+            ].map(([lbl, v, Icon, col]) => (
               <button key={v} onClick={() => { onNavigate(v); onClose(); }}
                 className="glass rounded-2xl p-3 flex flex-col items-center gap-2 hover:border-[var(--accent)]/30 transition-all">
                 <Icon size={20} style={{ color: col }} />
