@@ -6086,11 +6086,41 @@ function WithAiTutor({ settings, context, children }) {
   );
 }
 
+/* ── RESUME DIALOG ──────────────────────────────────────────────── */
+function ResumeDialog({ title, subtitle, onResume, onStartFresh }) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ zIndex: 'var(--z-modal, 200)', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
+      <div className="w-full max-w-sm glass rounded-3xl p-6 shadow-2xl animate-slide-up border border-[var(--accent)]/30">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--accent)]/15 flex items-center justify-center mb-4 mx-auto">
+          <History size={24} style={{ color: 'var(--accent)' }} />
+        </div>
+        <h2 className="text-lg font-black text-center mb-1" style={{ color: 'var(--text)' }}>Resume session?</h2>
+        <p className="text-sm font-semibold text-center mb-1 truncate px-2" style={{ color: 'var(--text)' }}>{title}</p>
+        <p className="text-xs text-center mb-6 font-medium" style={{ color: 'var(--text3)' }}>{subtitle}</p>
+        <div className="flex flex-col gap-3">
+          <button onClick={onResume} className="w-full py-3.5 btn-accent rounded-2xl text-sm font-bold flex items-center justify-center gap-2">
+            <FastForward size={16} /> Resume where I left off
+          </button>
+          <button onClick={onStartFresh} className="w-full py-3 glass rounded-2xl text-sm font-semibold border border-[color:var(--border2,var(--border))]" style={{ color: 'var(--text2)' }}>
+            Start from beginning
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, setExams, setCases }) {
   const [selSet, setSelSet] = useState(null); const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false); const [mode, setMode] = useState('browse');
   const [showModal, setShowModal] = useState(false);
   const [exporting, setExporting] = useState(null);
+  const [resumeDialog, setResumeDialog] = useState(null); // {set, savedIdx, savedTs}
+  const FC_RESUME_KEY = 'mariam_fc_resume';
+  const saveFC = (set, i) => { try { localStorage.setItem(FC_RESUME_KEY, JSON.stringify({ setId: set.id, idx: i, ts: Date.now() })); } catch {} };
+  const clearFC = () => { try { localStorage.removeItem(FC_RESUME_KEY); } catch {} };
+  const getSavedFC = (set) => { try { const s = JSON.parse(localStorage.getItem(FC_RESUME_KEY) || 'null'); return (s && s.setId === set.id && s.idx > 0 && s.idx < (set.cards?.length || 0)) ? s : null; } catch { return null; } };
   const [filterDocId, setFilterDocId] = useState('all');
   const [mobileTutorOpen, setMobileTutorOpen] = useState(false);
 
@@ -6132,8 +6162,8 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
       }
     } catch {}
     const nextIdx = idx + 1;
-    if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); }
-    else { addToast(' Set complete!', 'success'); setSelSet(null); setIdx(0); }
+    if (nextIdx < selSet.cards.length) { setIdx(nextIdx); setFlipped(false); saveFC(selSet, nextIdx); }
+    else { addToast(' Set complete!', 'success'); clearFC(); setSelSet(null); setIdx(0); }
   }, [selSet, idx, setFlashcards, addToast]);
 
   const handleExport = async (set) => {
@@ -6151,6 +6181,20 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
   const handleFcTutorDrag = useCallback(x => { setFcTutorW(Math.max(280, Math.min(560, window.innerWidth - x))); }, []);
   const startFcTutorDrag = useDrag(handleFcTutorDrag, [handleFcTutorDrag]);
 
+  if (resumeDialog) {
+    const { set, savedIdx, savedTs } = resumeDialog;
+    const elapsedMin = Math.round((Date.now() - (savedTs || 0)) / 60000);
+    const timeStr = elapsedMin < 60 ? `${elapsedMin}m ago` : `${Math.round(elapsedMin / 60)}h ago`;
+    return (
+      <ResumeDialog
+        title={set.title}
+        subtitle={`Card ${savedIdx + 1} of ${set.cards?.length || 0} · ${timeStr}`}
+        onResume={() => { setResumeDialog(null); setSelSet(set); setIdx(savedIdx); setFlipped(false); }}
+        onStartFresh={() => { clearFC(); setResumeDialog(null); setSelSet(set); setIdx(0); setFlipped(false); }}
+      />
+    );
+  }
+
   if (selSet) {
     const card = selSet.cards[idx];
     const progress = ((idx + 1) / selSet.cards.length) * 100;
@@ -6159,7 +6203,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* Top bar */}
         <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
-          <button onClick={() => { setSelSet(null); setIdx(0); setFlipped(false); }}
+          <button onClick={() => { clearFC(); setSelSet(null); setIdx(0); setFlipped(false); }}
             className="glass px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><ChevronLeft size={18} />Exit</button>
           <div className="text-center">
             <p className="text-sm font-semibold truncate max-w-xs">{selSet.title}</p>
@@ -6308,7 +6352,7 @@ function FlashcardsView({ flashcards, setFlashcards, settings, addToast, docs, s
                   className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--info-bg)]" style={{ color: 'var(--info)' }}>
                   {exporting === set.id ? <Loader2 size={14} className="animate-spin" /> : <Printer size={18} />}
                 </button>
-                <button onClick={() => { setSelSet(set); setIdx(0); setFlipped(false); }}
+                <button onClick={() => { const sv = getSavedFC(set); if (sv) { setResumeDialog({ set, savedIdx: sv.idx, savedTs: sv.ts }); } else { clearFC(); setSelSet(set); setIdx(0); setFlipped(false); } }}
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-2">
                   <Layers size={16} /> Study
                 </button>
@@ -6337,7 +6381,16 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
   const [sortMode, setSortMode] = useState('newest');
   const [examMobileOpen, setExamMobileOpen] = useState(false);
 
-  const startExam = ex => { setSelEx(ex); setQi(0); setSelected(null); setSubmitted(false); setScore(null); setAnswers([]); setReviewMode(false); };
+  const EX_RESUME_KEY = 'mariam_exam_resume';
+  const saveExam = (ex, q, ans) => { try { localStorage.setItem(EX_RESUME_KEY, JSON.stringify({ examId: ex.id, qi: q, answers: ans, ts: Date.now() })); } catch {} };
+  const clearExam = () => { try { localStorage.removeItem(EX_RESUME_KEY); } catch {} };
+  const [resumeDialog, setResumeDialog] = useState(null); // {ex, savedQi, savedAnswers, savedTs}
+  const startExam = ex => {
+    let saved = null;
+    try { const s = JSON.parse(localStorage.getItem(EX_RESUME_KEY) || 'null'); if (s?.examId === ex.id && s.qi > 0) saved = s; } catch {}
+    if (saved) { setResumeDialog({ ex, savedQi: saved.qi, savedAnswers: saved.answers || [], savedTs: saved.ts }); return; }
+    clearExam(); setSelEx(ex); setQi(0); setSelected(null); setSubmitted(false); setScore(null); setAnswers([]); setReviewMode(false);
+  };
   const submit = () => {
     if (selected === null) return;
     const correct = selEx.questions[qi].correct === selected;
@@ -6345,8 +6398,10 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
     setAnswers(newAnswers); setSubmitted(true);
     if (qi === selEx.questions.length - 1) {
       const sc = newAnswers.filter(a => a.correct).length;
-      setScore(sc);
+      setScore(sc); clearExam();
       trackStudy('exam', sc, selEx.questions.length);
+    } else {
+      saveExam(selEx, qi + 1, newAnswers);
     }
   };
   const next = () => {
@@ -6372,6 +6427,20 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
   const handleExamTutorDrag = useCallback(x => { setExamTutorW(Math.max(280, Math.min(580, window.innerWidth - x))); }, []);
   const startExamTutorDrag = useDrag(handleExamTutorDrag, [handleExamTutorDrag]);
 
+  if (resumeDialog) {
+    const { ex, savedQi, savedAnswers, savedTs } = resumeDialog;
+    const elapsedMin = Math.round((Date.now() - (savedTs || 0)) / 60000);
+    const timeStr = elapsedMin < 60 ? `${elapsedMin}m ago` : `${Math.round(elapsedMin / 60)}h ago`;
+    return (
+      <ResumeDialog
+        title={ex.title}
+        subtitle={`Question ${(savedQi || 0) + 1} of ${ex.questions?.length || 0} · ${timeStr}`}
+        onResume={() => { setResumeDialog(null); setSelEx(ex); setQi(savedQi || 0); setSelected(null); setSubmitted(false); setScore(null); setAnswers(savedAnswers || []); setReviewMode(false); }}
+        onStartFresh={() => { clearExam(); setResumeDialog(null); setSelEx(ex); setQi(0); setSelected(null); setSubmitted(false); setScore(null); setAnswers([]); setReviewMode(false); }}
+      />
+    );
+  }
+
   if (selEx && score === null && !reviewMode) {
     const q = selEx.questions[qi];
     const progress = ((qi + 1) / selEx.questions.length) * 100;
@@ -6380,7 +6449,7 @@ function ExamsView({ exams, setExams, settings, addToast, docs, setFlashcards, s
       <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* Top bar */}
         <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
-          <button onClick={() => { setSelEx(null); setScore(null); setAnswers([]); }} className="glass px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><ChevronLeft size={18} />Exit</button>
+          <button onClick={() => { clearExam(); setSelEx(null); setScore(null); setAnswers([]); }} className="glass px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2"><ChevronLeft size={18} />Exit</button>
           <div className="text-center">
             <p className="text-sm font-semibold truncate max-w-xs">{selEx.title}</p>
             <p className="text-xs opacity-40">{qi + 1} / {selEx.questions.length} questions</p>
@@ -6627,6 +6696,11 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
   const [stage, setStage] = useState('vignette'); const [selOpt, setSelOpt] = useState(null); const [submitted, setSubmitted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [exporting, setExporting] = useState(null);
+  const [caseResumeDialog, setCaseResumeDialog] = useState(null); // {set, savedCi, savedTs}
+  const CA_RESUME_KEY = 'mariam_case_resume';
+  const saveCa = (set, i) => { try { localStorage.setItem(CA_RESUME_KEY, JSON.stringify({ caseId: set.id, ci: i, ts: Date.now() })); } catch {} };
+  const clearCa = () => { try { localStorage.removeItem(CA_RESUME_KEY); } catch {} };
+  const getSavedCa = (set) => { try { const s = JSON.parse(localStorage.getItem(CA_RESUME_KEY) || 'null'); return (s && s.caseId === set.id && s.ci > 0 && s.ci < (set.questions?.length || 0)) ? s : null; } catch { return null; } };
 
   const handleExport = async (set) => {
     setExporting(set.id);
@@ -6642,6 +6716,20 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
   const startLabDrag = useDrag(handleLabDrag, [handleLabDrag]);
   const startTutorDrag = useDrag(handleTutorDrag, [handleTutorDrag]);
 
+  if (caseResumeDialog) {
+    const { set, savedCi, savedTs } = caseResumeDialog;
+    const elapsedMin = Math.round((Date.now() - (savedTs || 0)) / 60000);
+    const timeStr = elapsedMin < 60 ? `${elapsedMin}m ago` : `${Math.round(elapsedMin / 60)}h ago`;
+    return (
+      <ResumeDialog
+        title={set.title}
+        subtitle={`Case ${savedCi + 1} of ${set.questions?.length || 0} · ${timeStr}`}
+        onResume={() => { setCaseResumeDialog(null); setSelSet(set); setCi(savedCi); setSelOpt(null); setSubmitted(false); }}
+        onStartFresh={() => { clearCa(); setCaseResumeDialog(null); setSelSet(set); setCi(0); setSelOpt(null); setSubmitted(false); }}
+      />
+    );
+  }
+
   if (selSet) {
     const cas = selSet.questions[ci]; const q = cas.examQuestion || cas;
     const tutorCtx = `Clinical case: ${cas?.title || 'Untitled'}\nVignette: ${cas?.vignette || ''}\nDiagnosis: ${cas?.diagnosis || 'N/A'}\nQuestion: ${q?.q}\nCorrect answer: ${q?.options?.[q?.correct]}\nExplanation: ${q?.explanation || 'N/A'}`;
@@ -6651,7 +6739,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
 
         {/*  TOP BAR  */}
         <div className="h-14 glass flex items-center justify-between px-5 shrink-0 border-b border-[color:var(--border2,var(--border))] border-x-0 border-t-0">
-          <button onClick={() => { setSelSet(null); setCi(0); setSelOpt(null); setSubmitted(false); }}
+          <button onClick={() => { clearCa(); setSelSet(null); setCi(0); setSelOpt(null); setSubmitted(false); }}
             className="glass px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 hover:border-[var(--accent)]/40 transition-all">
             <ChevronLeft size={18} />Exit
           </button>
@@ -6732,11 +6820,11 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                   Submit Answer
                 </button> :
                 ci < selSet.questions.length - 1 ?
-                  <button onClick={() => { setCi(i => i + 1); setSelOpt(null); setSubmitted(false); }}
+                  <button onClick={() => { const newCi = ci + 1; setCi(newCi); setSelOpt(null); setSubmitted(false); saveCa(selSet, newCi); }}
                     className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl flex items-center justify-center gap-2">
                     <ChevronRight size={20} />Next Case
                   </button> :
-                  <button onClick={() => { setSelSet(null); setCi(0); addToast('All cases complete! ', 'success'); }}
+                  <button onClick={() => { clearCa(); setSelSet(null); setCi(0); addToast('All cases complete! ', 'success'); }}
                     className="w-full py-4 btn-accent rounded-2xl text-base font-bold shadow-xl"
                     style={{ background: 'var(--success)' }}>
                     Finish Session 
@@ -6920,7 +7008,7 @@ function CasesView({ cases, setCases, settings, addToast, docs, setFlashcards, s
                   className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--info-bg)]" style={{ color: 'var(--info)' }}>
                   {exporting === set.id ? <Loader2 size={14} className="animate-spin" /> : <Printer size={18} />}
                 </button>
-                <button onClick={() => { setSelSet(set); setCi(0); setSelOpt(null); setSubmitted(false); }}
+                <button onClick={() => { const sv = getSavedCa(set); if (sv) { setCaseResumeDialog({ set, savedCi: sv.ci, savedTs: sv.ts }); } else { clearCa(); setSelSet(set); setCi(0); setSelOpt(null); setSubmitted(false); } }}
                   className="btn-accent px-4 py-2 rounded-xl text-xs font-bold shadow-md flex items-center gap-2"><Stethoscope size={18} />Practice</button>
                 {!(set.isBuiltin || set.isBuiltIn) && <button onClick={() => setCases(p => p.filter(x => x.id !== set.id))} className="w-9 h-9 glass rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--danger-bg)]" style={{ color: 'var(--danger)', display: set.isBuiltin ? 'none' : 'flex' }}><Trash2 size={14} /></button>}
               </div>
@@ -7844,7 +7932,10 @@ function App() {
   useEffect(() => { _appSettings = settings; }, [settings]);
   const [uploading, setUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState(0);
-  const [view, setView] = useState('library');
+  const [view, setView] = useState(() => { try { return localStorage.getItem('mariam_last_view') || 'library'; } catch { return 'library'; } });
+  // Persist navigation state across sessions (must come after view/activeId are declared)
+  useEffect(() => { try { localStorage.setItem('mariam_last_view', view); } catch {} }, [view]);
+  useEffect(() => { try { if (activeId) localStorage.setItem('mariam_last_active_doc', activeId); else localStorage.removeItem('mariam_last_active_doc'); } catch {} }, [activeId]);
   const [rpTab, setRpTab] = useState('generate');
   const [rpOpen, setRpOpen] = useState(false);
   const [rpW, setRpW] = useState(420);
@@ -7965,7 +8056,9 @@ function App() {
         setFlashcards([...BUILTIN_FLASHCARD_SETS, ...userFC]);
         setExams([...BUILTIN_EXAM_SETS, ...userEx]);
         setCases([...BUILTIN_CASE_SETS, ...userCa]);
-        if (no) setNotes(no); if (ch) setChatSessions(ch); if (od) setOpenDocs(od); if (dp) setDocPages(dp);
+        if (no) setNotes(no); if (ch) setChatSessions(ch);
+        if (od) { setOpenDocs(od); try { const lid = localStorage.getItem('mariam_last_active_doc'); if (lid && od.includes(lid)) setActiveId(lid); } catch {} }
+        if (dp) setDocPages(dp);
         if (mm) setMindMaps(mm); if (tl) setTimelines(tl);
         if (st) setSettings(p => ({ ...DEFAULT_SETTINGS, ...p, ...st }));
       } catch (err) {
