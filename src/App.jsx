@@ -2837,7 +2837,9 @@ function DraggableTutorPanel({ context, settings, contextLabel = '', defaultMode
   }
 
   if (mode === 'floating') {
-    return createPortal(
+    // Use position:fixed directly (no createPortal) to avoid React removeChild crash
+    // when parent ViewWrapper unmounts while a portal is still attached to document.body
+    return (
       <div
         ref={panelRef}
         className="fixed z-[135] flex flex-col rounded-2xl overflow-hidden shadow-2xl"
@@ -2896,8 +2898,7 @@ function DraggableTutorPanel({ context, settings, contextLabel = '', defaultMode
             <path d="M14 14L14 8M14 14L8 14M14 14L6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
-      </div>,
-      document.body
+      </div>
     );
   }
 
