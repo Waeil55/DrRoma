@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- No-cache: force iOS browsers / PWA to always fetch fresh HTML -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="/DrRoma/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a14" />
+    <title>Dr Mariam AI</title>
+    <!-- Global error trap: catches JS errors BEFORE React mounts.
+         CRITICAL: NEVER call innerHTML on #root — that destroys React's fiber
+         tree, causing a cascade of removeChild crashes. Instead we show a
+         separate overlay div that sits on top without touching React's DOM. -->
+    <script>
+      window.__appErrors = [];
+
+      function __showErrOverlay(title, body, color) {
+        // Only show once — repeated errors would keep replacing the overlay
+        if (document.getElementById('__err_overlay')) return;
+        var ov = document.createElement('div');
+        ov.id = '__err_overlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:99999;padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;';
+        var ua = navigator.userAgent || '';
+        var isIOS = /iPad|iPhone|iPod/.test(ua);
+        var iosTip = isIOS ? '<p style="font-size:13px;color:#b91c1c;margin:8px 0">iOS tip: If reload does not help, tap <strong>Hard Reset</strong> to clear cached data.</p>' : '';
+        ov.innerHTML =
+          '<h2 style="color:' + color + ';margin-top:0">' + title + '</h2>' +
+          '<pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:11px;overflow:auto;max-height:45vh">' + body + '</pre>' +
+          iosTip +
+          '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">' +
+          '<button onclick="location.reload()" style="padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Reload</button>' +
+          '<button onclick="(function(){try{localStorage.clear();sessionStorage.clear();}catch(e){}location.reload(true);})()" style="padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Hard Reset (Clear Cache)</button>' +
+          '</div>';
+        document.body.appendChild(ov);
+      }
+
+      window.onerror = function(msg, src, line, col, err) {
+        window.__appErrors.push({ msg: msg, src: src, line: line });
+        var body = msg + '\n\nFile: ' + src + '\nLine: ' + line + ':' + col +
+          (err && err.stack ? '\n\nStack:\n' + err.stack : '');
+        __showErrOverlay('App Error (line ' + line + ')', body, 'red');
+        return false; // don't suppress — let React error boundary also catch it
+      };
+
+      window.addEventListener('unhandledrejection', function(e) {
+        window.__appErrors.push({ reason: String(e.reason) });
+        __showErrOverlay('Unhandled Promise Error', String(e.reason), 'orange');
+      });
+    </script>
+    <script type="module" crossorigin src="/DrRoma/assets/index-B0uAWObo.js"></script>
+    <link rel="modulepreload" crossorigin href="/DrRoma/assets/react-Ptc8vh48.js">
+    <link rel="stylesheet" crossorigin href="/DrRoma/assets/index-DiDvSTpZ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="portal-root"></div>
+  </body>
+</html>
+
