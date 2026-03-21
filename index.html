@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- No-cache: force iOS browsers / PWA to always fetch fresh HTML -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,7 +27,17 @@
         var ov = document.createElement('div');
         ov.id = '__err_overlay';
         ov.style.cssText = 'position:fixed;inset:0;z-index:99999;padding:24px;font-family:system-ui;background:#fff;color:#111;overflow:auto;';
-        ov.innerHTML = '<h2 style="color:' + color + ';margin-top:0">' + title + '</h2><pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:12px;overflow:auto;max-height:60vh">' + body + '</pre><button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Reload</button>';
+        var ua = navigator.userAgent || '';
+        var isIOS = /iPad|iPhone|iPod/.test(ua);
+        var iosTip = isIOS ? '<p style="font-size:13px;color:#b91c1c;margin:8px 0">iOS tip: If reload does not help, tap <strong>Hard Reset</strong> to clear cached data.</p>' : '';
+        ov.innerHTML =
+          '<h2 style="color:' + color + ';margin-top:0">' + title + '</h2>' +
+          '<pre style="background:#fee2e2;padding:16px;border-radius:8px;white-space:pre-wrap;font-size:11px;overflow:auto;max-height:45vh">' + body + '</pre>' +
+          iosTip +
+          '<div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">' +
+          '<button onclick="location.reload()" style="padding:10px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Reload</button>' +
+          '<button onclick="(function(){try{localStorage.clear();sessionStorage.clear();}catch(e){}location.reload(true);})()" style="padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer">Hard Reset (Clear Cache)</button>' +
+          '</div>';
         document.body.appendChild(ov);
       }
 

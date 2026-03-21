@@ -2496,7 +2496,7 @@ function LegalAcceptanceModal({ onAccept }) {
 
   const handleAccept = () => {
     if (!allChecked) return;
-    localStorage.setItem('mariam_tos_accepted', JSON.stringify({ version: TOS_VERSION, ts: Date.now() }));
+    try { localStorage.setItem('mariam_tos_accepted', JSON.stringify({ version: TOS_VERSION, ts: Date.now() })); } catch {}
     onAccept();
   };
 
@@ -7948,7 +7948,7 @@ function App() {
   const [deepFocus, setDeepFocus] = useState(false);
   const [showVoiceTutor, setShowVoiceTutor] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('mariam_onboarded'));
+  const [showOnboarding, setShowOnboarding] = useState(() => { try { return !localStorage.getItem('mariam_onboarded'); } catch { return true; } });
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [showQuickReview, setShowQuickReview] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
@@ -7957,7 +7957,7 @@ function App() {
     if (!accepted) return true;
     try { return JSON.parse(accepted).version !== TOS_VERSION; } catch { return true; }
   });
-  const [showCookieBanner, setShowCookieBanner] = useState(() => !localStorage.getItem('mariam_cookie_consent_v1'));
+  const [showCookieBanner, setShowCookieBanner] = useState(() => { try { return !localStorage.getItem('mariam_cookie_consent_v1'); } catch { return false; } });
   const { toasts, addToast } = useToast();
 
   useEffect(() => {
@@ -8360,8 +8360,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
   };
 
   if (!loaded) return (
-    <div className="h-[100dvh] w-screen flex flex-col items-center justify-center gap-4"
-      style={{ background: 'linear-gradient(135deg,#f0f4ff 0%,#e8eeff 100%)' }}>
+    <div className="w-screen flex flex-col items-center justify-center gap-4"
+      style={{ height: '100vh', background: 'linear-gradient(135deg,#f0f4ff 0%,#e8eeff 100%)' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -8539,7 +8539,7 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
         *, *::before, *::after { box-sizing: border-box; }
         html, body {
           margin: 0; padding: 0;
-          width: 100%; height: 100dvh;
+          width: 100%; height: 100vh; height: 100dvh;
           overflow: hidden;
           overscroll-behavior: none;
           background: transparent;
@@ -9348,8 +9348,8 @@ JSON: {"items":[{"q":"...","options":["A) ...","B) ...","C) ...","D) ..."],"corr
       {showLegal && <LegalAcceptanceModal onAccept={() => setShowLegal(false)} />}
       {!showLegal && showCookieBanner && (
         <CookieConsentBanner
-          onAccept={() => { localStorage.setItem('mariam_cookie_consent_v1', 'all'); setShowCookieBanner(false); }}
-          onDecline={() => { localStorage.setItem('mariam_cookie_consent_v1', 'essential'); setShowCookieBanner(false); }}
+          onAccept={() => { try { localStorage.setItem('mariam_cookie_consent_v1', 'all'); } catch {} setShowCookieBanner(false); }}
+          onDecline={() => { try { localStorage.setItem('mariam_cookie_consent_v1', 'essential'); } catch {} setShowCookieBanner(false); }}
         />
       )}
       {showGlobalSearch && <GlobalSearch docs={docs} flashcards={flashcards} exams={exams} cases={cases} notes={notes} chatSessions={chatSessions} mindMaps={mindMaps} timelines={timelines}
